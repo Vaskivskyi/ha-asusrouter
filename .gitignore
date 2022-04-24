@@ -1,0 +1,13 @@
+### Python
+
+__pycache__/
+
+
+### Other
+# Test
+test.py
+local/
+
+# VS Code
+.vscode
+

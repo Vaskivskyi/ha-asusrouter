@@ -1,0 +1,40 @@
+{
+    "title": "ASUS Router",
+    "config": {
+        "step": {
+            "user": {
+                "title": "ASUS Router",
+                "description": "Parameters to connect to the router",
+                "data": {
+                    "name": "The name for device (blank to use device model)",
+                    "host": "Hostname / IP address",
+                    "username": "Username",
+                    "password": "Password",
+                    "port": "Port (0 to use default value)",
+                    "use_ssl": "Use SSL connection",
+                    "verify_ssl": "Verify SSL on connection",
+                    "cert_path": "Certificate path",
+                    "enable_monitor": "Enable device monitoring",
+                    "enable_control": "Enable device control"
+                }
+            }
+        },
+        "error": {
+            "error": "Failed to connect",
+            "unknown": "Unknown error",
+            "password_missing": "Password is missing",
+            "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "ASUS Router options",
+                "data": {
+                    "cache_device_time": "Caching time for device discovery",
+                    "cache_time": "Data caching time"
+                }
+            }
+        }
+    }
+}

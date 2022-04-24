@@ -1,0 +1,39 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "[%key:common::config_flow::title%]",
+                "description": "[%key:common::config_flow::description%]",
+                "data": {
+                    "name": "[%key:common::config_flow::data::name%]",
+                    "host": "[%key:common::config_flow::data::host%]",
+                    "username": "[%key:common::config_flow::data::username%]",
+                    "password": "[%key:common::config_flow::data::password%]",
+                    "port": "[%key:common::config_flow::data::port%]",
+                    "use_ssl": "[%key:common::config_flow::data::use_ssl%]",
+                    "verify_ssl": "[%key:common::config_flow::data::verify_ssl%]",
+                    "cert_path": "[%key:common::config_flow::data::cert_path%]",
+                    "enable_monitor": "[%key:common::config_flow::data::enable_monitor%]",
+                    "enable_control": "[%key:common::config_flow::data::enable_control%]"
+                }
+            }
+        },
+        "error": {
+            "error": "[%key:common::config_flow::error::error%]",
+            "unknown": "[%key:common::config_flow::error::unknown%]",
+            "password_missing": "[%key:common::config_flow::error::password_missing%]",
+            "cannot_resolve_host": "[%key:common::config_flow::error::cannot_resolve_host%]"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "ASUS Router options",
+                "data": {
+                    "cache_device_time": "Caching time for device discovery",
+                    "cache_time": "Data caching time"
+                }
+            }
+        }
+    }
+}
