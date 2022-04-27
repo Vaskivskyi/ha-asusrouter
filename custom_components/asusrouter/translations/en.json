@@ -1,9 +1,7 @@
 {
-    "title": "ASUS Router",
     "config": {
         "step": {
             "user": {
-                "title": "ASUS Router",
                 "description": "Parameters to connect to the router",
                 "data": {
                     "name": "The name for device (blank to use device model)",
