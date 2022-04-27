@@ -2,7 +2,6 @@
     "config": {
         "step": {
             "user": {
-                "title": "ASUS Router",
                 "description": "[%key:common::config_flow::description%]",
                 "data": {
                     "name": "[%key:common::config_flow::data::name%]",
