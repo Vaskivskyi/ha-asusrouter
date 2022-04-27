@@ -1,7 +1,6 @@
 {
   "name": "AsusRouter",
   "content_in_root": false,
-  "render_readme": true,
   "domains": [
 	"sensor",
 	"device_tracker"
