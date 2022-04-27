@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
   schedule:
-    - cron: "17 28 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   hacs:
