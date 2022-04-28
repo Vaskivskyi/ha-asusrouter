@@ -1,3 +1,5 @@
+[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE)
+
 ## AsusRouter - a custom Home Assistant integration
 
 AsusRouter is a custom integration for Home Assistant to monitor and control your Asus router using [AsusRouter](https://github.com/Vaskivskyi/asusrouter) python library.
@@ -63,6 +65,10 @@ Attributes:
 - Hostname (name of the connected device as stated before)
 - Last time reachable
 - Connection time (for WiFi devices only)
+
+**Important**
+
+If the connected device MAC address is known to Home Assistant (e.g. it was set up by another integration `ABC`), its `device_tracker` will be added to that device in enabled state. Moreover, this device will be showing for both integrations: `AsusRouter` and `ABC`
 
 #### Long-term statistics
 
