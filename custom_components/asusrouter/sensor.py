@@ -96,6 +96,13 @@ SENSORS = {
         entity_registry_enabled_default = False,
         extra_state_attributes = {
             "core_1": "Core 1",
+            "core_2": "Core 2",
+            "core_3": "Core 3",
+            "core_4": "Core 4",
+            "core_5": "Core 5",
+            "core_6": "Core 6",
+            "core_7": "Core 7",
+            "core_8": "Core 8",
         },
     ),
     ("ram", "usage"): AsusRouterSensorDescription(
