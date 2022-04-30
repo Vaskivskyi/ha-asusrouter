@@ -15,7 +15,9 @@ categories:
   - title: ":hammer: Refactoring"
     label: "refactoring"
   - title: ":package: Dependencies"
-    labels: "dependencies"
+    labels: 
+      - "dependencies"
+      - "build"
 
 template: |
   ## Changes
