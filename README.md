@@ -1,4 +1,4 @@
-[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE) [![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz)
 
 ## AsusRouter - a custom Home Assistant integration
 
@@ -9,19 +9,21 @@ Please note, that this integration is in the early development stage and may con
 
 ## Installation
 
+#### HACS
+
+You can add this repository in your HACS:
+`HACS -> Integrations -> Explore & Download Repositories -> AsusRouter`
+
 #### Manual
 
 Copy content of `custom_components/asusrouter/` to `custom_components/asusrouter/` in your Home Assistant folder.
-
-#### HACS
-
-You can add this repository (https://github.com/Vaskivskyi/ha-asusrouter) to a list of custom repositories in your HACS
-`HACS -> Integrations -> ... (menu) -> Custom repositories -> Add`
 
 
 ## Usage
 
 After AsusRouter is installed, you can add your device from Home Assistant UI.
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=asusrouter)
 
 #### Sensors
 
