@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "user": {
+            "device": {
                 "description": "Parâmetros para se conectar ao roteador",
                 "data": {
                     "name": "Nome do dispositivo (deixe em branco para usar o modelo do dispositivo)",
@@ -9,7 +9,7 @@
                     "username": "Nome de usuário",
                     "password": "Senha",
                     "port": "Porta (0 para usar o valor padrão)",
-                    "use_ssl": "Usar conexão SSL",
+                    "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar SSL na conexão",
                     "cert_path": "Caminho do certificado",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
