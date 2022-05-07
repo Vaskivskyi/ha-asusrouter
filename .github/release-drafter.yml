@@ -8,6 +8,8 @@ categories:
     label: "bug"
   - title: ":racehorse: Performance"
     label: "performance"
+  - title: ":book: Translation"
+    label: "translation"
   - title: ":rotating_light: Testing"
     label: "testing"
   - title: ":books: Documentation"
