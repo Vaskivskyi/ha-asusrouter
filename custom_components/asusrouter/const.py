@@ -1,56 +1,83 @@
 """ASUS Router component constants"""
 
 from __future__ import annotations
+from datetime import timedelta
 
 from typing import Any
 
 from homeassistant.const import (
     DATA_GIGABYTES,
     DATA_RATE_MEGABITS_PER_SECOND,
+    Platform,
 )
 from homeassistant.components.sensor import (
     SensorStateClass,
 )
 
 
+# Main integrartion info
 DOMAIN = "asusrouter"
 DATA_ASUSROUTER = DOMAIN
 
-CONF_USE_SSL = "use_ssl"
-CONF_CERT_PATH = "cert_path"
+PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]
+
+
+# Configurartion keys
 CONF_CACHE_TIME = "cache_time"
-CONF_ENABLE_MONITOR = "enable_monitor"
+CONF_CERT_PATH = "cert_path"
 CONF_ENABLE_CONTROL = "enable_control"
+CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_INTERFACES = "interfaces"
 
+# Configuration keys that rerquire reload of integration
 CONF_REQ_RELOAD = [CONF_INTERFACES]
 
-DEFAULT_USERNAME = "admin"
+
+# Default configuration
 DEFAULT_PORT = 0
-#DEFAULT_PORT = {"no_ssl": 80, "ssl": 8443}
+DEFAULT_USERNAME = "admin"
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
-DEFAULT_USE_SSL = False
+DEFAULT_SSL = False
 DEFAULT_VERIFY_SSL = True
 DEFAULT_CACHE_TIME = 5
 DEFAULT_ENABLE_MONITOR = True
 DEFAULT_ENABLE_CONTROL = False
 DELAULT_INTERFACES = ["WAN"]
+DEFAULT_SCAN_INTERVAL = timedelta(seconds = 30)
 
+
+# Sensors types
+SENSORS_TYPE_CPU = "cpu"
+SENSORS_TYPE_DEVICES = "devices"
+SENSORS_TYPE_MISC = "misc"
+SENSORS_TYPE_NETWORK_STAT = "network_stat"
+SENSORS_TYPE_RAM = "ram"
+
+# Sensors
+SENSORS_CHANGE = ["change"]
+SENSORS_CONNECTED_DEVICES = ["number"]
 SENSORS_CPU = ["total", "core_1", "core_2", "core_3", "core_4", "core_5", "core_6", "core_7", "core_8"]
-
+SENSORS_MISC = ["boottime"]
+SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 SENSORS_RAM = ["total", "free", "used", "usage"]
 
-SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 
-SENSORS_CONNECTED_DEVICES = ["number"]
+# Types of results on actions
+RESULT_ERROR = "error"
+RESULT_SUCCESS = "success"
+RESULT_UNKNOWN = "unknown"
 
-SENSORS_MISC = ["boottime"]
 
-SENSORS_CHANGE = ["change"]
-
+# Constants
 CONVERT_TO_MEGA = 1048576
 CONVERT_TO_GIGA = 1073741824
 
+
+# Keys
+KEY_COORDINATOR = "coordinator"
+
+
+# Params to generate sensors
 KEY_SENSOR_ID = "{}_{}"
 
 SENSORS_PARAM : dict[str, dict[str, Any]] = {

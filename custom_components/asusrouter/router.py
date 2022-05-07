@@ -22,6 +22,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_PORT,
     CONF_VERIFY_SSL,
+    CONF_SSL,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -35,40 +36,24 @@ from homeassistant.util import dt as dt_util
 
 from .bridge import AsusRouterBridge
 from .const import (
-    CONF_REQ_RELOAD,
-    CONF_USE_SSL,
-    CONF_CERT_PATH,
     CONF_CACHE_TIME,
-    CONF_ENABLE_MONITOR,
     CONF_ENABLE_CONTROL,
-    DEFAULT_PORT,
-    DEFAULT_HTTP,
-    DEFAULT_USE_SSL,
-    DEFAULT_VERIFY_SSL,
+    CONF_ENABLE_MONITOR,
+    CONF_REQ_RELOAD,
     DEFAULT_CACHE_TIME,
-    DEFAULT_ENABLE_MONITOR,
     DEFAULT_ENABLE_CONTROL,
-    SENSORS_CONNECTED_DEVICES,
+    DEFAULT_ENABLE_MONITOR,
+    DEFAULT_HTTP,
+    DEFAULT_PORT,
+    DEFAULT_SSL,
+    DEFAULT_VERIFY_SSL,
     DOMAIN,
+    KEY_COORDINATOR,
+    DEFAULT_SCAN_INTERVAL,
+    SENSORS_CONNECTED_DEVICES,
+    SENSORS_TYPE_DEVICES,
 )
 
-KEY_COORDINATOR = "coordinator"
-KEY_SENSORS = "sensors"
-KEY_SENSORS_CPU = "cpu"
-KEY_SENSORS_RAM = "ram"
-KEY_SENSORS_NETWORK_STAT = "network_stat"
-KEY_SENSORS_DEVICES = "devices"
-KEY_SENSORS_MISC = "misc"
-
-SCAN_INTERVAL = timedelta(seconds = 30)
-
-SENSORS_TYPE_MAIN = "sensors_main"
-SENSORS_TYPE_CPU = "cpu"
-SENSORS_TYPE_RAM = "ram"
-SENSORS_TYPE_NETWORK_STAT = "network_stat"
-SENSORS_TYPE_DEVICES = "devices"
-SENSORS_TYPE_CHANGE = "change"
-SENSORS_TYPE_MISC = "misc"
 
 _T = TypeVar("_T")
 
@@ -117,7 +102,7 @@ class AsusRouterSensorHandler:
             _LOGGER,
             name = sensor_type,
             update_method = method,
-            update_interval = SCAN_INTERVAL if should_poll else None,
+            update_interval = DEFAULT_SCAN_INTERVAL if should_poll else None,
         )
         await coordinator.async_refresh()
 
@@ -230,7 +215,7 @@ class AsusRouterObj:
         self._on_close : list[Callable] = []
 
         self._options = {
-            CONF_USE_SSL: DEFAULT_USE_SSL,
+            CONF_SSL: DEFAULT_SSL,
             CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
             CONF_CACHE_TIME: DEFAULT_CACHE_TIME,
             CONF_ENABLE_MONITOR: DEFAULT_ENABLE_MONITOR, 
@@ -304,7 +289,7 @@ class AsusRouterObj:
         await self.init_sensors_coordinator()
 
         self.async_on_close(
-            async_track_time_interval(self.hass, self.update_all, SCAN_INTERVAL)
+            async_track_time_interval(self.hass, self.update_all, DEFAULT_SCAN_INTERVAL)
         )
 
 

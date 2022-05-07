@@ -13,9 +13,10 @@ from asusrouter import AsusRouter
 
 from homeassistant.const import (
     CONF_HOST,
-    CONF_USERNAME,
     CONF_PASSWORD,
     CONF_PORT,
+    CONF_SSL,
+    CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
 from homeassistant.core import HomeAssistant
@@ -24,21 +25,18 @@ from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from .const import (
-    CONF_USE_SSL,
-    CONF_CERT_PATH,
     CONF_CACHE_TIME,
-    CONF_ENABLE_MONITOR,
+    CONF_CERT_PATH,
     CONF_ENABLE_CONTROL,
-    SENSORS_RAM,
-    SENSORS_NETWORK_STAT,
+    CONF_ENABLE_MONITOR,
     SENSORS_MISC,
+    SENSORS_NETWORK_STAT,
+    SENSORS_RAM,
+    SENSORS_TYPE_CPU,
+    SENSORS_TYPE_MISC,
+    SENSORS_TYPE_NETWORK_STAT,
+    SENSORS_TYPE_RAM,
 )
-
-SENSORS_TYPE_CPU = "cpu"
-SENSORS_TYPE_RAM = "ram"
-SENSORS_TYPE_NETWORK_STAT = "network_stat"
-SENSORS_TYPE_DEVICES = "devices"
-SENSORS_TYPE_MISC = "misc"
 
 
 class AsusRouterBridge(ABC):
@@ -139,7 +137,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
             username = conf[CONF_USERNAME],
             password = conf[CONF_PASSWORD],
             port = conf[CONF_PORT],
-            use_ssl = conf[CONF_USE_SSL],
+            use_ssl = conf[CONF_SSL],
             cert_check = conf[CONF_VERIFY_SSL],
             cert_path = conf.get(CONF_CERT_PATH, ""),
             cache_time = conf.get(CONF_CACHE_TIME, 3),
