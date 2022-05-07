@@ -1,24 +1,18 @@
 """Config flow for AsusRouter integration"""
 
 from __future__ import annotations
-from email.policy import default
 
 import logging
-from typing import Any
 _LOGGER = logging.getLogger(__name__)
 
-import os
+from typing import Any
+
 import socket
 
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
-
-from homeassistant.components.device_tracker.const import (
-    CONF_CONSIDER_HOME,
-    DEFAULT_CONSIDER_HOME,
-)
 
 from homeassistant.const import (
     CONF_NAME,

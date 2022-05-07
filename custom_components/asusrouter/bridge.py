@@ -12,7 +12,6 @@ from datetime import datetime
 from asusrouter import AsusRouter
 
 from homeassistant.const import (
-    CONF_NAME,
     CONF_HOST,
     CONF_USERNAME,
     CONF_PASSWORD,
@@ -21,7 +20,6 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.update_coordinator import UpdateFailed
 

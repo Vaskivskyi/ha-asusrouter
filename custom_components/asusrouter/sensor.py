@@ -4,30 +4,21 @@ from __future__ import annotations
 
 import logging
 _LOGGER = logging.getLogger(__name__)
-
-from dataclasses import dataclass
-from html import entities
 from numbers import Real
-from collections.abc import Callable, Mapping
-from typing import Any, Final, cast
-from xml.dom.minidom import Entity
-from datetime import datetime
+from typing import Any
 
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
-    SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    DATA_GIGABYTES,
-    DATA_RATE_MEGABITS_PER_SECOND,
     PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory, DeviceInfo, EntityDescription, Entity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,

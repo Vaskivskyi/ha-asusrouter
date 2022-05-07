@@ -9,9 +9,6 @@ from homeassistant.const import (
     DATA_RATE_MEGABITS_PER_SECOND,
 )
 from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorEntityDescription,
     SensorStateClass,
 )
 

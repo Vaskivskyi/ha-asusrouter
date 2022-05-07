@@ -7,17 +7,9 @@ from typing import Any
 from collections.abc import Callable, Mapping
 
 from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
     SensorEntityDescription,
-    SensorStateClass,
 )
-from homeassistant.helpers.entity import EntityCategory, DeviceInfo, EntityDescription, Entity
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-)
+from homeassistant.helpers.entity import EntityDescription
 
 
 @dataclass
