@@ -65,6 +65,7 @@ async def async_get_network_interfaces(hass : HomeAssistant, user_input : dict[s
 
     try:
         labels = await api.async_get_network_interfaces()
+        await api.async_disconnect()
         return labels
     except Exception as ex:
         _LOGGER.debug("Cannot get available network stat sensors for {}: {}".format(user_input[CONF_HOST], ex))
@@ -86,7 +87,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     @callback
     def _show_form_device(self, user_input = None, errors = None):
         """Show the setup form"""
-        
+
         if user_input is None:
             user_input = {}
 
@@ -188,6 +189,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             return self._show_form_device(user_input)
 
         self._input = user_input
+        self._host = user_input[CONF_HOST]
 
         errors = dict()
 
@@ -277,6 +279,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
             return self.async_show_form(step_id = "init", data_schema = data_schema)
 
-        return self.async_create_entry(title = "", data = user_input)
+        return self.async_create_entry(title = self.config_entry.data[CONF_HOST], data = user_input)
 
 

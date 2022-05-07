@@ -34,16 +34,17 @@ CONF_REQ_RELOAD = [CONF_INTERFACES]
 
 
 # Default configuration
-DEFAULT_PORT = 0
-DEFAULT_USERNAME = "admin"
-DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
-DEFAULT_SSL = False
-DEFAULT_VERIFY_SSL = True
 DEFAULT_CACHE_TIME = 5
-DEFAULT_ENABLE_MONITOR = True
 DEFAULT_ENABLE_CONTROL = False
+DEFAULT_ENABLE_MONITOR = True
+DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
 DELAULT_INTERFACES = ["WAN"]
+DEFAULT_PORT = 0
+DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
 DEFAULT_SCAN_INTERVAL = timedelta(seconds = 30)
+DEFAULT_SSL = False
+DEFAULT_USERNAME = "admin"
+DEFAULT_VERIFY_SSL = True
 
 
 # Sensors types

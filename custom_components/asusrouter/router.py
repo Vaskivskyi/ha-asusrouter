@@ -45,6 +45,7 @@ from .const import (
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_HTTP,
     DEFAULT_PORT,
+    DEFAULT_PORTS,
     DEFAULT_SSL,
     DEFAULT_VERIFY_SSL,
     DOMAIN,
@@ -224,8 +225,8 @@ class AsusRouterObj:
 
         self._options.update(entry.options)
 
-        if self._port == "":
-            self._port = DEFAULT_PORT["ssl"] if self._options[CONF_VERIFY_SSL] else DEFAULT_PORT["no_ssl"]
+        if self._port == DEFAULT_PORT:
+            self._port = DEFAULT_PORTS["ssl"] if self._options[CONF_VERIFY_SSL] else DEFAULT_PORTS["no_ssl"]
 
 
     async def setup(self) -> None:
