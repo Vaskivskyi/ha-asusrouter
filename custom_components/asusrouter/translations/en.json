@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "user": {
+            "device": {
                 "description": "Parameters to connect to the router",
                 "data": {
                     "name": "The name for device (blank to use device model)",
@@ -14,6 +14,12 @@
                     "cert_path": "Certificate path",
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control"
+                }
+            },
+            "interfaces": {
+                "description": "Interfaces to monitor",
+                "data": {
+                    "interfaces": "Select netwirk interfaces to monitor"
                 }
             }
         },
@@ -29,6 +35,7 @@
             "init": {
                 "title": "ASUS Router options",
                 "data": {
+                    "interfaces": "Select network interfaces to monitor",
                     "cache_device_time": "Caching time for device discovery",
                     "cache_time": "Data caching time"
                 }

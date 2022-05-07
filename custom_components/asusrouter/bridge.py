@@ -363,3 +363,10 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         return sensors
     ### <- GET SENSORS LIST
 
+
+    async def async_get_network_interfaces(self):
+        """"""
+
+        return await self._api.async_get_network_labels()
+
+

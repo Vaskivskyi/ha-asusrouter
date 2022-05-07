@@ -37,6 +37,7 @@ from homeassistant.util import dt as dt_util
 
 from .bridge import AsusRouterBridge
 from .const import (
+    CONF_REQ_RELOAD,
     CONF_USE_SSL,
     CONF_CERT_PATH,
     CONF_CACHE_TIME,
@@ -52,10 +53,6 @@ from .const import (
     SENSORS_CONNECTED_DEVICES,
     DOMAIN,
 )
-
-CONF_REQ_RELOAD = [
-    CONF_CACHE_TIME
-]
 
 KEY_COORDINATOR = "coordinator"
 KEY_SENSORS = "sensors"
