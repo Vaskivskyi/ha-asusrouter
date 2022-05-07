@@ -1,24 +1,18 @@
 """Config flow for AsusRouter integration"""
 
 from __future__ import annotations
-from email.policy import default
 
 import logging
-from typing import Any
 _LOGGER = logging.getLogger(__name__)
 
-import os
+from typing import Any
+
 import socket
 
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
-
-from homeassistant.components.device_tracker.const import (
-    CONF_CONSIDER_HOME,
-    DEFAULT_CONSIDER_HOME,
-)
 
 from homeassistant.const import (
     CONF_NAME,
@@ -27,33 +21,32 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PORT,
     CONF_VERIFY_SSL,
+    CONF_SSL,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
-    CONF_USE_SSL,
-    CONF_CERT_PATH,
     CONF_CACHE_TIME,
-    CONF_ENABLE_MONITOR,
+    CONF_CERT_PATH,
     CONF_ENABLE_CONTROL,
+    CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
-    DELAULT_INTERFACES,
-    DEFAULT_USERNAME,
-    DEFAULT_USE_SSL,
-    DEFAULT_VERIFY_SSL,
-    DEFAULT_ENABLE_MONITOR,
-    DEFAULT_ENABLE_CONTROL,
     DEFAULT_CACHE_TIME,
+    DEFAULT_ENABLE_CONTROL,
+    DEFAULT_ENABLE_MONITOR,
+    DELAULT_INTERFACES,
     DEFAULT_PORT,
+    DEFAULT_SSL,
+    DEFAULT_USERNAME,
+    DEFAULT_VERIFY_SSL,
     DOMAIN,
+    RESULT_ERROR,
+    RESULT_SUCCESS,
+    RESULT_UNKNOWN,
 )
 
 from .bridge import AsusRouterBridge
-
-_MSG_RESULT_SUCCESS = "success"
-_MSG_RESULT_ERROR = "error"
-_MSG_RESULT_UNKNOWN = "unknown"
 
 
 def _get_ip(host):
@@ -72,6 +65,7 @@ async def async_get_network_interfaces(hass : HomeAssistant, user_input : dict[s
 
     try:
         labels = await api.async_get_network_interfaces()
+        await api.async_disconnect()
         return labels
     except Exception as ex:
         _LOGGER.debug("Cannot get available network stat sensors for {}: {}".format(user_input[CONF_HOST], ex))
@@ -81,7 +75,7 @@ async def async_get_network_interfaces(hass : HomeAssistant, user_input : dict[s
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     """Handle config flow for AsusRouter"""
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self):
         """Initialise config flow"""
@@ -93,7 +87,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     @callback
     def _show_form_device(self, user_input = None, errors = None):
         """Show the setup form"""
-        
+
         if user_input is None:
             user_input = {}
 
@@ -126,9 +120,9 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
                 )
             ): int,
             vol.Optional(
-                CONF_USE_SSL,
+                CONF_SSL,
                 default = user_input.get(
-                    CONF_USE_SSL, DEFAULT_USE_SSL
+                    CONF_SSL, DEFAULT_SSL
                 )
             ): bool,
             vol.Optional(
@@ -172,14 +166,14 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             await api.async_connect()
         except OSError:
             _LOGGER.error("Error during connection for {}".format(self._host))
-            return _MSG_RESULT_ERROR
+            return RESULT_ERROR
         except Exception as ex:
             _LOGGER.error("Unknown error during connection for {}: {}".format(self._host, ex))
-            return _MSG_RESULT_UNKNOWN
+            return RESULT_UNKNOWN
 
         await api.async_disconnect()
 
-        return _MSG_RESULT_SUCCESS
+        return RESULT_SUCCESS
 
 
     async def async_step_user(self, user_input : dict[str, Any] | None = None) -> FlowResult:
@@ -195,6 +189,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             return self._show_form_device(user_input)
 
         self._input = user_input
+        self._host = user_input[CONF_HOST]
 
         errors = dict()
 
@@ -204,7 +199,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
         if not errors:
             check = await self._async_check_connection(user_input)
-            if check != _MSG_RESULT_SUCCESS:
+            if check != RESULT_SUCCESS:
                 errors["base"] = check
 
         if errors:
@@ -284,6 +279,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
             return self.async_show_form(step_id = "init", data_schema = data_schema)
 
-        return self.async_create_entry(title = "", data = user_input)
+        return self.async_create_entry(title = self.config_entry.data[CONF_HOST], data = user_input)
 
 

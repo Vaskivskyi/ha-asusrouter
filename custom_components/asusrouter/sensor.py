@@ -4,30 +4,21 @@ from __future__ import annotations
 
 import logging
 _LOGGER = logging.getLogger(__name__)
-
-from dataclasses import dataclass
-from html import entities
 from numbers import Real
-from collections.abc import Callable, Mapping
-from typing import Any, Final, cast
-from xml.dom.minidom import Entity
-from datetime import datetime
+from typing import Any
 
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
-    SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    DATA_GIGABYTES,
-    DATA_RATE_MEGABITS_PER_SECOND,
     PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory, DeviceInfo, EntityDescription, Entity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -38,39 +29,40 @@ from .const import (
     CONF_INTERFACES,
     DATA_ASUSROUTER,
     DOMAIN,
+    SENSORS_TYPE_CPU,
+    SENSORS_TYPE_DEVICES,
+    SENSORS_TYPE_MISC,
+    SENSORS_TYPE_RAM,
 )
 
-from .dataclass import AsusRouterSensorDescription, AsusRouterAttributeDescription
+from .dataclass import AsusRouterAttributeDescription, AsusRouterSensorDescription
 
-from .router import KEY_COORDINATOR, KEY_SENSORS_CPU, KEY_SENSORS_MISC, KEY_SENSORS_RAM, KEY_SENSORS_NETWORK_STAT, KEY_SENSORS_DEVICES, AsusRouterObj
+from .router import AsusRouterObj, KEY_COORDINATOR
 from .compilers import list_sensors_network
 
 
-DEFAULT_PREFIX = "AsusRouter"
-
-
 SENSORS = {
-    ("devices", "number"): AsusRouterSensorDescription(
+    (SENSORS_TYPE_DEVICES, "number"): AsusRouterSensorDescription(
         key = "number",
-        key_group = KEY_SENSORS_DEVICES,
+        key_group = SENSORS_TYPE_DEVICES,
         name = "Connected Devices",
         icon = "mdi:router-network",
         state_class = SensorStateClass.MEASUREMENT,
         entity_category = EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default = True,
     ),
-    ("misc", "boottime"): AsusRouterSensorDescription(
+    (SENSORS_TYPE_MISC, "boottime"): AsusRouterSensorDescription(
         key = "boottime",
-        key_group = KEY_SENSORS_MISC,
+        key_group = SENSORS_TYPE_MISC,
         name = "Boot Time",
         icon = "mdi:restart",
         device_class = SensorDeviceClass.TIMESTAMP,
         entity_category = EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default = False,
     ),
-    ("cpu", "total"): AsusRouterSensorDescription(
+    (SENSORS_TYPE_CPU, "total"): AsusRouterSensorDescription(
         key = "total",
-        key_group = KEY_SENSORS_CPU,
+        key_group = SENSORS_TYPE_CPU,
         name = "CPU",
         icon = "mdi:cpu-32-bit",
         state_class = SensorStateClass.MEASUREMENT,
@@ -88,9 +80,9 @@ SENSORS = {
             "core_8": "Core 8",
         },
     ),
-    ("ram", "usage"): AsusRouterSensorDescription(
+    (SENSORS_TYPE_RAM, "usage"): AsusRouterSensorDescription(
         key = "usage",
-        key_group = KEY_SENSORS_RAM,
+        key_group = SENSORS_TYPE_RAM,
         name = "RAM",
         icon = "mdi:memory",
         state_class = SensorStateClass.MEASUREMENT,
