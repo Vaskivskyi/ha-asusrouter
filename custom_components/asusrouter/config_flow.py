@@ -1,6 +1,10 @@
 """Config flow for AsusRouter integration"""
 
+from __future__ import annotations
+from email.policy import default
+
 import logging
+from typing import Any
 _LOGGER = logging.getLogger(__name__)
 
 import os
@@ -9,6 +13,7 @@ import socket
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.data_entry_flow import FlowResult
 
 from homeassistant.components.device_tracker.const import (
     CONF_CONSIDER_HOME,
@@ -23,7 +28,7 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
@@ -32,6 +37,8 @@ from .const import (
     CONF_CACHE_TIME,
     CONF_ENABLE_MONITOR,
     CONF_ENABLE_CONTROL,
+    CONF_INTERFACES,
+    DELAULT_INTERFACES,
     DEFAULT_USERNAME,
     DEFAULT_USE_SSL,
     DEFAULT_VERIFY_SSL,
@@ -58,6 +65,19 @@ def _get_ip(host):
         return None
 
 
+async def async_get_network_interfaces(hass : HomeAssistant, user_input : dict[str, Any]) -> list[str]:
+    """Return list of possible to monitor network interfaces"""
+
+    api = AsusRouterBridge.get_bridge(hass = hass, conf = user_input)
+
+    try:
+        labels = await api.async_get_network_interfaces()
+        return labels
+    except Exception as ex:
+        _LOGGER.debug("Cannot get available network stat sensors for {}: {}".format(user_input[CONF_HOST], ex))
+        return DELAULT_INTERFACES
+
+
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     """Handle config flow for AsusRouter"""
 
@@ -67,10 +87,11 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         """Initialise config flow"""
 
         self._host = None
+        self._input = dict()
 
 
     @callback
-    def _show_setup_form(self, user_input = None, errors = None):
+    def _show_form_device(self, user_input = None, errors = None):
         """Show the setup form"""
         
         if user_input is None:
@@ -137,7 +158,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         }
 
         return self.async_show_form(
-            step_id = "user",
+            step_id = "device",
             data_schema = vol.Schema(schema),
             errors = errors or {},
         )
@@ -161,23 +182,25 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         return _MSG_RESULT_SUCCESS
 
 
-    async def async_step_user(self, user_input = None):
+    async def async_step_user(self, user_input : dict[str, Any] | None = None) -> FlowResult:
         """Flow initiated by user"""
 
-        if user_input is None:
-            return self._show_setup_form(user_input)
+        return await self.async_step_device(user_input)
 
-        errors = {}
-        self._host = user_input[CONF_HOST]
-        password = user_input.get(CONF_PASSWORD)
 
-        if not password:
-            errors["base"] = "password_missing"
+    async def async_step_device(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+        """Step to setup the device"""
 
-        if not errors:
-            ip = await self.hass.async_add_executor_job(_get_ip, self._host)
-            if not ip:
-                errors["base"] = "cannot_resolve_host"
+        if not user_input:
+            return self._show_form_device(user_input)
+
+        self._input = user_input
+
+        errors = dict()
+
+        ip = await self.hass.async_add_executor_job(_get_ip, user_input[CONF_HOST])
+        if not ip:
+            errors["base"] = "cannot_resolve_host"
 
         if not errors:
             check = await self._async_check_connection(user_input)
@@ -185,11 +208,32 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
                 errors["base"] = check
 
         if errors:
-            return self._show_setup_form(user_input, errors)
+            _LOGGER.error("Some errors appear to happen")
+            return self._show_form_device(user_input, errors)
+
+        return await self.async_step_interfaces()
+
+
+    async def async_step_interfaces(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+        """Step to select interfaces for traffic monitoring"""
+
+        if not user_input:
+            interfaces = await async_get_network_interfaces(self.hass, self._input)
+            return self.async_show_form(
+                step_id="interfaces",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONF_INTERFACES): cv.multi_select(
+                            {k: k for k in interfaces}
+                        ),
+                    }
+                ),
+            )
 
         return self.async_create_entry(
             title = self._host,
-            data = user_input,
+            data = self._input,
+            options = user_input,
         )
 
 
@@ -203,7 +247,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Options flow for AsusRouter"""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+    def __init__(self, config_entry : config_entries.ConfigEntry) -> None:
         """Initialize options flow"""
 
         self.config_entry = config_entry
@@ -212,21 +256,34 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(self, user_input = None):
         """Handle options flow"""
 
-        if user_input is not None:
-            return self.async_create_entry(title = "", data = user_input)
+        if not user_input:
+            configured_interfaces : list[str] = self.config_entry.options[CONF_INTERFACES]
+            interfaces = await async_get_network_interfaces(self.hass, self.config_entry.data)
 
-        data_schema = vol.Schema(
-            {
-                vol.Optional(
-                    CONF_CACHE_TIME,
-                    default = self.config_entry.options.get(
-                        CONF_CACHE_TIME, DEFAULT_CACHE_TIME
-                    )
-                ): vol.All(vol.Coerce(int), vol.Clamp(min = 1, max = 3600)),
-                
-            }
-        )
+            # If interface was tracked, but cannot be found now, still add it
+            for interface in configured_interfaces:
+                if not interface in interfaces:
+                    interfaces.append(interface)
 
-        return self.async_show_form(step_id = "init", data_schema = data_schema)
+            data_schema = vol.Schema(
+                {
+                    vol.Required(
+                        CONF_INTERFACES,
+                        default = configured_interfaces
+                    ): cv.multi_select({k: k for k in interfaces}),
+
+                    vol.Optional(
+                        CONF_CACHE_TIME,
+                        default = self.config_entry.options.get(
+                            CONF_CACHE_TIME, DEFAULT_CACHE_TIME
+                        )
+                    ): vol.All(vol.Coerce(int), vol.Clamp(min = 1, max = 3600)),
+                    
+                }
+            )
+
+            return self.async_show_form(step_id = "init", data_schema = data_schema)
+
+        return self.async_create_entry(title = "", data = user_input)
 
 
