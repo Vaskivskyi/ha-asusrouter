@@ -8,12 +8,12 @@ Monitor your Asus router from Home Assistant
 
 #### Sensors
 
-- WAN traffic and speed sensors
-- Secondary (USB) WAN (if dual-WAN is supported by the device) traffic and speed sensors
+- Traffic and speed sensors for user-selected network interfaces, including WAN, USB, LAN, WLAN and more.
 - CPU usage sensor
 - RAM usage sensor
 - Connected devices sensor
 - Boot time sensor
+- WAN and LAN ports connection sensors
 
 #### Device trackers
 
