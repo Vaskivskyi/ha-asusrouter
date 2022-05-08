@@ -80,9 +80,10 @@ async def async_migrate_entry(hass, config_entry : ConfigEntry):
 
     version = config_entry.version
     entry = {**config_entry.data}
+    options = {**config_entry.options}
 
     if version == 1:
-        entry[CONF_INTERFACES] = DELAULT_INTERFACES
+        options[CONF_INTERFACES] = DELAULT_INTERFACES
 
     while "{}_{}".format(version, version + 1) in DEPRECATED:
         new_entry = entry
@@ -96,7 +97,7 @@ async def async_migrate_entry(hass, config_entry : ConfigEntry):
         version += 1
 
     config_entry.version = version
-    hass.config_entries.async_update_entry(config_entry, data = new_entry)
+    hass.config_entries.async_update_entry(config_entry, data = new_entry, options = options)
 
     _LOGGER.info("Migration to version {} successful".format(config_entry.version))
 
