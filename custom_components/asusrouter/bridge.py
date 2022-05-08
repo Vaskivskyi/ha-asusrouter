@@ -31,10 +31,12 @@ from .const import (
     CONF_ENABLE_MONITOR,
     SENSORS_MISC,
     SENSORS_NETWORK_STAT,
+    SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_TYPE_CPU,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
+    SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
 )
 
@@ -282,6 +284,10 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
                 "sensors": SENSORS_MISC,
                 "method": self._get_misc
             },
+            SENSORS_TYPE_PORTS: {
+                "sensors": await self._get_ports_sensors(),
+                "method": self._get_ports
+            }
         }
         return sensors_types
 
@@ -328,6 +334,28 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         data["boottime"] = datetime.fromisoformat(self._api.boottime)
 
         return data
+
+
+    async def _get_ports(self) -> dict[str, dict[str, int]]:
+        """Get ports status"""
+
+        data = dict()
+        try:
+            raw = await self._api.async_get_ports()
+
+            for type in SENSORS_PORTS:
+                if type in raw:
+                    data["{}_total".format(type)] = 0
+                    for port in raw[type]:
+                        data["{}_{}".format(type, port)] = raw[type][port]
+                        data["{}_total".format(type)] += raw[type][port]
+                    if data["{}_total".format(type)] > 0:
+                        data[type] = True
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
     ### <- GET DATA FROM DEVICE
 
 
@@ -356,6 +384,24 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
             _LOGGER.debug("Available network stat sensors: {}".format(sensors))
         except Exception as ex:
             _LOGGER.debug("Cannot get available network stat sensors for {}: {}".format(self._host, ex))
+        return sensors
+
+
+    async def _get_ports_sensors(self):
+        """Check the available ports sensors"""
+
+        try:
+            sensors = []
+            data = await self._api.async_get_ports()
+            for type in SENSORS_PORTS:
+                if type in data:
+                    sensors.append(type)
+                    sensors.append("{}_total".format(type))
+                    for port in data[type]:
+                        sensors.append("{}_{}".format(type, port))
+            _LOGGER.debug("Available ports sensors: {}".format(sensors))
+        except Exception as ex:
+            _LOGGER.debug("Cannot get available ports sensors for {}: {}".format(self._host, ex))
         return sensors
     ### <- GET SENSORS LIST
 
