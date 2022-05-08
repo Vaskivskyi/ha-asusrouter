@@ -10,6 +10,8 @@ from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 
 from .const import (
+    CONF_INTERFACES,
+    DELAULT_INTERFACES,
     DOMAIN,
     DATA_ASUSROUTER,
     PLATFORMS,
@@ -78,6 +80,9 @@ async def async_migrate_entry(hass, config_entry : ConfigEntry):
 
     version = config_entry.version
     entry = {**config_entry.data}
+
+    if version == 1:
+        entry[CONF_INTERFACES] = DELAULT_INTERFACES
 
     while "{}_{}".format(version, version + 1) in DEPRECATED:
         new_entry = entry
