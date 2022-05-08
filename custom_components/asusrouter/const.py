@@ -52,6 +52,7 @@ SENSORS_TYPE_CPU = "cpu"
 SENSORS_TYPE_DEVICES = "devices"
 SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
+SENSORS_TYPE_PORTS = "ports"
 SENSORS_TYPE_RAM = "ram"
 
 # Sensors
@@ -60,6 +61,7 @@ SENSORS_CONNECTED_DEVICES = ["number"]
 SENSORS_CPU = ["total", "core_1", "core_2", "core_3", "core_4", "core_5", "core_6", "core_7", "core_8"]
 SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
+SENSORS_PORTS = ["WAN", "LAN"]
 SENSORS_RAM = ["total", "free", "used", "usage"]
 
 

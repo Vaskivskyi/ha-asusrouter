@@ -15,6 +15,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    DATA_RATE_MEGABITS_PER_SECOND,
     PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant
@@ -32,6 +33,7 @@ from .const import (
     SENSORS_TYPE_CPU,
     SENSORS_TYPE_DEVICES,
     SENSORS_TYPE_MISC,
+    SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
 )
 
@@ -94,6 +96,42 @@ SENSORS = {
             "total": "Total",
             "free": "Free",
             "used": "Used",
+        },
+    ),
+    (SENSORS_TYPE_PORTS, "WAN_total"): AsusRouterSensorDescription(
+        key = "WAN_total",
+        key_group = SENSORS_TYPE_PORTS,
+        name = "WAN Speed",
+        icon = "mdi:ethernet-cable",
+        state_class = SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement = DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category = EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default = False,
+        extra_state_attributes = {
+            "WAN_0": "WAN 0",
+            "WAN_1": "WAN 1",
+            "WAN_2": "WAN 2",
+            "WAN_3": "WAN 3",
+        },
+    ),
+    (SENSORS_TYPE_PORTS, "LAN_total"): AsusRouterSensorDescription(
+        key = "LAN_total",
+        key_group = SENSORS_TYPE_PORTS,
+        name = "LAN Speed",
+        icon = "mdi:ethernet-cable",
+        state_class = SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement = DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category = EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default = False,
+        extra_state_attributes = {
+            "LAN_1": "LAN 1",
+            "LAN_2": "LAN 2",
+            "LAN_3": "LAN 3",
+            "LAN_4": "LAN 4",
+            "LAN_5": "LAN 5",
+            "LAN_6": "LAN 6",
+            "LAN_7": "LAN 7",
+            "LAN_8": "LAN 8",
         },
     ),
 }

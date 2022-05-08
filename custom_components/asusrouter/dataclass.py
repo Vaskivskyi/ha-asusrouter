@@ -29,3 +29,5 @@ class AsusRouterSensorDescription(AsusRouterEntityDescription, SensorEntityDescr
 @dataclass
 class AsusRouterAttributeDescription(AsusRouterEntityDescription, SensorEntityDescription):
     """Describe AsusRouter attribute"""
+
+
