@@ -56,6 +56,9 @@ from .const import (
 )
 
 
+from asusrouter import ConnectedDevice
+
+
 _T = TypeVar("_T")
 
 
@@ -124,18 +127,18 @@ class AsusRouterDevInfo:
         self._connection_time : str | None = None
 
 
-    def update(self, dev_info : dict[str, Any] | None = None, consider_home : int = 0):
+    def update(self, dev_info : dict[str, ConnectedDevice] | None = None, consider_home : int = 0):
         """Update AsusRouter device info"""
 
         utc_point_in_time = dt_util.utcnow()
 
         if dev_info:
-            self._name = dev_info["name"]
-            self._ip = dev_info["IP"]
+            self._name = dev_info.name
+            self._ip = dev_info.ip
             self._last_activity = utc_point_in_time
             self._connected = True
-            if "timestamp" in dev_info["connection"]:
-                self._connection_time = datetime.fromtimestamp(dev_info["connection"]["timestamp"])
+            if dev_info.connected_since:
+                self._connection_time = dev_info.connected_since
         elif self._connected:
             self._connected = (
                 utc_point_in_time - self._last_activity

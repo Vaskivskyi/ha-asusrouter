@@ -9,7 +9,7 @@ from typing import Any
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from asusrouter import AsusRouter
+from asusrouter import AsusRouter, ConnectedDevice
 
 from homeassistant.const import (
     CONF_HOST,
@@ -78,7 +78,7 @@ class AsusRouterBridge(ABC):
 
 
     @abstractmethod
-    async def async_get_connected_devices(self) -> dict[str, dict[str, Any]]:
+    async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
         """Get list of connected devices"""
 
 
@@ -168,7 +168,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         await self._api.connection.async_disconnect()
 
 
-    async def async_get_connected_devices(self) -> dict[str, Any]:
+    async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
         """Get list of connected devices"""
 
         try:
