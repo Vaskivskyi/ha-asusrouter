@@ -50,7 +50,7 @@ Integration provides several types of sensors:
     - `Bits/s` - raw data from device
 
 Possible network interfaces (can be changed via `Configure` button for the configuraton):
-- `WAN` - traffic to your ISP
+- `WAN` - traffic to your ISP (*Some of the devices do not report WAN data, refer to the [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues/30). If your device also doesn't show such sensor, please add your information to this issue*)
 - `USB` - traffic to the USB modem / mobile phone connected via USB
 - `LAN` - local wired traffic
 - `WLANx` - wireless traffic: `0` - 2.4 GHz WiFi, `1` and `2` - 5 GHz WiFi
