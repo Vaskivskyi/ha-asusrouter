@@ -1,0 +1,45 @@
+{
+    "config": {
+        "step": {
+            "device": {
+                "description": "Parâmetros para se conectar ao roteador",
+                "data": {
+                    "name": "Nome do dispositivo (deixe em branco para usar o modelo do dispositivo)",
+                    "host": "Nome do host/endereço IP",
+                    "username": "Nome de usuário",
+                    "password": "Senha",
+                    "port": "Porta (0 para usar o valor padrão)",
+                    "ssl": "Usar conexão SSL",
+                    "verify_ssl": "Verificar SSL na conexão",
+                    "cert_path": "Caminho do certificado",
+                    "enable_monitor": "Ativar o monitoramento do dispositivo",
+                    "enable_control": "Ativar o controle do dispositivo"
+                }
+            },
+            "interfaces": {
+                "description": "Interfaces para monitorar",
+                "data": {
+                    "interfaces": "Selecione interfaces de rede para monitorar"
+                }
+            }
+        },
+        "error": {
+            "error": "Falhou ao conectar",
+            "unknown": "Erro desconhecido",
+            "password_missing": "Falta a senha",
+            "cannot_resolve_host": "Não pode resolver o nome do host. Tente com o endereço IP"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opções de roteador ASUS",
+                "data": {
+                    "interfaces": "Selecione interfaces de rede para monitorar",
+                    "cache_device_time": "Tempo de armazenamento em cache para descoberta de dispositivos",
+                    "cache_time": "Tempo de cache de dados"
+                }
+            }
+        }
+    }
+}
