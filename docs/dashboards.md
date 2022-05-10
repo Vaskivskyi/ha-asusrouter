@@ -14,7 +14,8 @@ In this case, the following custom cards are used:
 - [mini-graph-card](https://github.com/kalkih/mini-graph-card)
 </details>
 
-![Dashboard example](Fig-Dashboard-1.png)
+![Simple AsusRouter status dashboard](Fig-Dashboard-1.png)
+
 Fig. 1. Simple AsusRouter status dashboard
 
 <details>
@@ -95,7 +96,8 @@ The followind custom cards are used:
 - [multiple-entity-row](https://github.com/benct/lovelace-multiple-entity-row)
 </details>
 
-![Dashboard example](Fig-Dashboard-2.png)
+![Detailed AsusRouter health dashboard](Fig-Dashboard-2.png)
+
 Fig. 2. Detailed AsusRouter health dashboard. Please, note that RAM attributes are recalculated inside the custom card with 1/1000 factor. To have a correct value, one would need to divide by 1024.
 
 <details>
