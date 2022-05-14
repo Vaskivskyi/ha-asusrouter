@@ -6,7 +6,7 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 from collections.abc import Callable, Awaitable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo, timezone
 from typing import Any, TypeVar
 
 from homeassistant.components.device_tracker.const import (
@@ -138,7 +138,9 @@ class AsusRouterDevInfo:
             self._last_activity = utc_point_in_time
             self._connected = True
             if dev_info.connected_since:
-                self._connection_time = dev_info.connected_since
+                ### EDIT THIS WHEN
+                ### AsusRouter library fixes datetime object to have timezone
+                self._connection_time = dev_info.connected_since.replace(tzinfo = timezone.utc)
         elif self._connected:
             self._connected = (
                 utc_point_in_time - self._last_activity
