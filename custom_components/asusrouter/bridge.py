@@ -202,8 +202,8 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         if nvram:
             if "label_mac" in nvram:
                 self._mac = format_mac(nvram['label_mac'])
-            if "serial" in nvram:
-                self._serial = nvram['serial']
+            if "serial_no" in nvram:
+                self._serial = nvram['serial_no']
             if "model" in nvram:
                 self._model = nvram['model']
             if "pci/1/1/ATE_Brand" in nvram:
