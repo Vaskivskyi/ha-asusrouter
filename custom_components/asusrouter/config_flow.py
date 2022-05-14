@@ -82,6 +82,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
         self._host = None
         self._input = dict()
+        self._unique_id = None
 
 
     @callback
@@ -171,6 +172,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             _LOGGER.error("Unknown error during connection for {}: {}".format(self._host, ex))
             return RESULT_UNKNOWN
 
+        self._unique_id = await api.get_serial()
+
         await api.async_disconnect()
 
         return RESULT_SUCCESS
@@ -201,6 +204,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             check = await self._async_check_connection(user_input)
             if check != RESULT_SUCCESS:
                 errors["base"] = check
+            else:
+                await self.async_set_unique_id(self._unique_id)
 
         if errors:
             _LOGGER.error("Some errors appear to happen")
