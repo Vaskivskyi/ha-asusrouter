@@ -136,7 +136,8 @@ class AsusRouterDevInfo:
             self._name = dev_info.name
             self._ip = dev_info.ip
             self._last_activity = utc_point_in_time
-            self._connected = True
+            if dev_info.online:
+                self._connected = True
             if dev_info.connected_since:
                 ### EDIT THIS WHEN
                 ### AsusRouter library fixes datetime object to have timezone
@@ -326,7 +327,10 @@ class AsusRouterObj:
             self._connect_error = False
             _LOGGER.info("Reconnected to ASUS router %s", self._host)
 
-        self._connected_devices = len(api_devices)
+        self._connected_devices = 0
+        for device in api_devices:
+            if api_devices[device].online:
+                self._connected_devices += 1
         consider_home = self._options.get(
             CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME.total_seconds()
         )
