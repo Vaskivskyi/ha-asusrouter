@@ -2,13 +2,14 @@
 
 ## AsusRouter - a custom Home Assistant integration
 
-Monitor your Asus router from Home Assistant
+Monitor your Asus router from Home Assistant using native Asus HTTP(S) API.
+
 
 ## Features
 
 #### Sensors
 
-- Traffic and speed sensors for user-selected network interfaces, including WAN, USB, LAN, WLAN and more.
+- Traffic and speed sensors for user-selected network interfaces, including WAN, USB, LAN, WLAN and more
 - CPU usage sensor
 - RAM usage sensor
 - Connected devices sensor
@@ -33,6 +34,7 @@ You would need to provide the minimum information:
 - Username
 - Password
 
+Please, refer to the GitHub [Readme](https://github.com/Vaskivskyi/ha-asusrouter) if you are experiencing any problems.
 
 ---
 
