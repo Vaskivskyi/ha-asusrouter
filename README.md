@@ -1,10 +1,14 @@
 [![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE) [![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz)
 
+
 ## AsusRouter - a custom Home Assistant integration
 
 AsusRouter is a custom integration for Home Assistant to monitor and control your Asus router using [AsusRouter](https://github.com/Vaskivskyi/asusrouter) python library.
 
-Please note, that this integration is in the early development stage and may contain some errors. You could always help with its development by providing your feedback.
+It uses the native Asus HTTP(S) API - the same way the web panel works and relies on local communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
+
+You could always help with its development by providing your feedback.
+
 
 ## Installation
 
@@ -17,11 +21,29 @@ You can add this repository in your HACS:
 
 Copy content of `custom_components/asusrouter/` to `custom_components/asusrouter/` in your Home Assistant folder.
 
+
 ## Usage
 
 After AsusRouter is installed, you can add your device from Home Assistant UI.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=asusrouter)
+
+To connect to the device you need to provide the following data:
+- IP address or hostname
+- Username (the one you use for login in the Asus web panel)
+- Password
+
+You can also specify:
+- Port for the connection (if not provided, the default value `80` or `8443` will be used depending on the SSL settings)
+- Whether SSL connection should be used
+- Whether SSL certificate should be checked
+- Path to the certificate (if it is not added to the `Trusted Root Authorities`)
+
+If you are not sure about one of the settings above, please check your device settings in the web panel (`Administration - System - Local Access Config`).
+
+Integration options:
+- Enable device monitoring (defaults as `True`, will add sensors as listed in the next sections)
+- Enable device control (defaults as `False`, reserved for the further services and switches, not yet implemented)
 
 #### Selecting network interfaces for monitoring
 
@@ -49,8 +71,8 @@ Integration provides several types of sensors:
   - attributes:
     - `Bits/s` - raw data from device
 
-Possible network interfaces (can be changed via `Configure` button for the configuraton):
-- `WAN` - traffic to your ISP (*Some of the devices do not report WAN data, refer to the [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues/30). If your device also doesn't show such sensor, please add your information to this issue*)
+Possible network interfaces (can be changed via the `Configure` button for the configuration):
+- `WAN` - traffic to your ISP (*Some of the devices do not report WAN data, refer to the [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues/30). If your device also doesn't show such sensors, please add your information to this issue*)
 - `USB` - traffic to the USB modem / mobile phone connected via USB
 - `LAN` - local wired traffic
 - `WLANx` - wireless traffic: `0` - 2.4 GHz WiFi, `1` and `2` - 5 GHz WiFi
@@ -139,6 +161,7 @@ If the connected device's MAC address is known to Home Assistant (e.g. it was se
 
 The long-term statistics is supported for all the sensors, but `boot_time`.
 
+
 ## More features
 
 #### Secondary WAN (USB)
@@ -154,6 +177,7 @@ Integration does support automatic handling of the device reboots. Most of the r
 There will be an error in your log in this case.
 
 If you are experiencing multiple errors in your log (more than 5 in a row) or integration does not provide any data 5 minutes after a reboot, please report it to the Issues. The more data you provide, the easier it will be to fix the problem.
+
 
 ## Support the integration
 
@@ -172,6 +196,7 @@ Testing the integration with different devices would help a lot in the developme
 This integration is a free-time project. If you like it, you can support me by buying a coffee.
 
 <a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 40px !important;"></a>
+
 
 ## Thanks to
 
