@@ -179,6 +179,25 @@ There will be an error in your log in this case.
 If you are experiencing multiple errors in your log (more than 5 in a row) or integration does not provide any data 5 minutes after a reboot, please report it to the Issues. The more data you provide, the easier it will be to fix the problem.
 
 
+## Supported devices
+
+The list of supported devices includes (but is not limited to):
+
+802.11 AC models:
+- `RT-AC66U`
+- `RT-AC86U` (a known issue https://github.com/Vaskivskyi/ha-asusrouter/issues/29, produces warnings in the log)
+- `RT-ACRH13`
+
+802.11 AX models:
+- `RT-AX58U`
+- `RT-AX86U`
+- `RT-AX88U`
+- `RT-AX89X`
+- `ZenWiFi AX (XT8)`
+
+If your device is not listed but is confirmed to work, you are welcome to open PR with a proposed change to this list. Alternatively, you can open an issue with the device model and it will be added to the list.
+
+
 ## Support the integration
 
 ### Issues and Pull requests
