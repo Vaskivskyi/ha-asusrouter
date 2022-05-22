@@ -9,7 +9,7 @@ from typing import Any
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from asusrouter import AsusRouter, ConnectedDevice
+from asusrouter import AsusDevice, AsusRouter, ConnectedDevice
 
 from homeassistant.const import (
     CONF_HOST,
@@ -128,6 +128,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
 
         super().__init__()
         self._api = self._get_api(conf)
+        self._host = conf[CONF_HOST]
 
 
     @staticmethod
@@ -159,7 +160,8 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         """Connect to the device"""
 
         try:
-            await self._api.connection.async_connect()
+            await self._api.async_connect()
+            self._identity = await self._async_get_device_identity()
         except Exception as ex:
             raise ConfigEntryNotReady from ex
 
@@ -167,7 +169,13 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
     async def async_disconnect(self) -> None:
         """Disconnect from the device"""
 
-        await self._api.connection.async_disconnect()
+        await self._api.async_disconnect()
+
+
+    async def _async_get_device_identity(self) -> AsusDevice:
+        """Load device info"""
+
+        return await self._api.async_get_identity()
 
 
     async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
@@ -181,87 +189,34 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         return api_devices
 
 
-    async def _async_get_settings(self, info_type : str) -> dict[str, Any]:
-        """Get AsusWrt router info from nvram"""
-
-        info = {}
-        try:
-            info = await self._api.async_get_settings(info_type)
-        except Exception as ex:
-            _LOGGER.warning("Error calling method async_get_settings(%s): %s", info_type, ex)
-
-        return info
-
-
-    async def _async_get_device_info(self) -> None:
-        """Load device info"""
-
-        await self._api.async_initialize()
-        nvram = self._api._monitor_nvram
-
-        if nvram:
-            if "label_mac" in nvram:
-                self._mac = format_mac(nvram['label_mac'])
-            if "serial_no" in nvram:
-                self._serial = nvram['serial_no']
-            if "model" in nvram:
-                self._model = nvram['model']
-            if "pci/1/1/ATE_Brand" in nvram:
-                self._vendor = nvram['pci/1/1/ATE_Brand']
-            if "firmver" in nvram:
-                self._firmware = "{}.{}_{}".format(nvram['firmver'], nvram['buildno'], nvram['extendno'])
-
-        return
-
-
     async def get_firmware(self) -> str | None:
         """Get firmware information"""
 
-        if self._firmware is None:
-            self._firmware = ""
-            await self._async_get_device_info()
-
-        return self._firmware or None
+        return self._identity.firmware()
 
 
     async def get_mac(self) -> str | None:
         """Get MAC information"""
 
-        if self._mac is None:
-            self._mac = ""
-            await self._async_get_device_info()
-
-        return self._mac or None
+        return self._identity.mac
 
 
     async def get_serial(self) -> str | None:
         """Get serial information"""
 
-        if self._serial is None:
-            self._serial = ""
-            await self._async_get_device_info()
-
-        return self._serial or None
+        return self._identity.serial
 
 
     async def get_model(self) -> str | None:
         """Get model information"""
 
-        if self._model is None:
-            self._model = ""
-            await self._async_get_device_info()
-
-        return self._model or None
+        return self._identity.model
 
 
     async def get_vendor(self) -> str | None:
         """Get vendor information"""
 
-        if self._vendor is None:
-            self._vendor = ""
-            await self._async_get_device_info()
-
-        return self._vendor or None
+        return self._identity.brand
 
 
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
@@ -367,7 +322,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
             sensors = await self._api.async_get_cpu_labels()
             _LOGGER.debug("Available CPU sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.debug("Cannot get available CPU sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning("Cannot get available CPU sensors for {}: {}".format(self._host, ex))
             sensors = ["total"]
         return sensors
 
@@ -383,7 +338,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
                     sensors.append("{}_{}".format(label, el))
             _LOGGER.debug("Available network stat sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.debug("Cannot get available network stat sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning("Cannot get available network stat sensors for {}: {}".format(self._host, ex))
         return sensors
 
 
@@ -401,7 +356,7 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
                         sensors.append("{}_{}".format(type, port))
             _LOGGER.debug("Available ports sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.debug("Cannot get available ports sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning("Cannot get available ports sensors for {}: {}".format(self._host, ex))
         return sensors
     ### <- GET SENSORS LIST
 
