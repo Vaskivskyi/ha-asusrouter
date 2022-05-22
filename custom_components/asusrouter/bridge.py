@@ -9,7 +9,7 @@ from typing import Any
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from asusrouter import AsusDevice, AsusRouter, ConnectedDevice
+from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 
 from homeassistant.const import (
     CONF_HOST,
@@ -162,6 +162,8 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         try:
             await self._api.async_connect()
             self._identity = await self._async_get_device_identity()
+        except AsusRouterError as ex:
+            raise ex
         except Exception as ex:
             raise ConfigEntryNotReady from ex
 
@@ -170,6 +172,12 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
         """Disconnect from the device"""
 
         await self._api.async_disconnect()
+
+
+    async def async_clean(self) -> None:
+        """Cleanup"""
+
+        await self._api.connection.async_cleanup()
 
 
     async def _async_get_device_identity(self) -> AsusDevice:

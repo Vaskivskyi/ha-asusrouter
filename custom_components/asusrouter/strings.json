@@ -1,17 +1,34 @@
 {
     "config": {
         "step": {
+            "discovery": {
+                "description": "How to find your device",
+                "data": {
+                    "host": "Hostname / IP address"
+                }
+            },
+            "credentials": {
+                "description": "Credentials (the same as for the device web panel)",
+                "data": {
+                    "username": "[%key:common::config_flow::data::username%]",
+                    "password": "[%key:common::config_flow::data::password%]",
+                    "ssl": "Use SSL connection"
+                }
+            },
             "device": {
                 "description": "Parameters to connect to the device",
                 "data": {
-                    "name": "The name for device (blank to use device model)",
-                    "host": "Hostname / IP address",
                     "username": "[%key:common::config_flow::data::username%]",
                     "password": "[%key:common::config_flow::data::password%]",
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
                     "verify_ssl": "[%key:common::config_flow::data::verify_ssl%]",
-                    "cert_path": "Certificate path",
+                    "cert_path": "Certificate path"
+                }
+            },
+            "operation_mode": {
+                "description": "Operation mode",
+                "data": {
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control"
                 }
@@ -21,10 +38,19 @@
                 "data": {
                     "interfaces": "Select network interfaces to monitor"
                 }
+            },
+            "name": {
+                "description": "Rename your device",
+                "data": {
+                    "name": "Leave blank to use device model as the name"
+                }
             }
         },
         "error": {
+            "connection_refused": "Connection refused",
             "error": "[%key:common::config_flow::error::cannot_connect%]",
+            "login_blocked": "Login is blocked by the device. Please, wait",
+            "wrong_credentials": "Wrong credentials",
             "unknown": "Unknown error",
             "password_missing": "Password is missing",
             "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address"

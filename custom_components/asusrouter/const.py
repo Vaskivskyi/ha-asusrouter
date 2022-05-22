@@ -6,6 +6,9 @@ from datetime import timedelta
 from typing import Any
 
 from homeassistant.const import (
+    CONF_PORT,
+    CONF_VERIFY_SSL,
+    CONF_SSL,
     DATA_GIGABYTES,
     DATA_RATE_MEGABITS_PER_SECOND,
     Platform,
@@ -47,6 +50,21 @@ DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
 
 
+# Simplified setup
+SIMPLE_SETUP_PARAMETERS = {
+    "ssl": {
+        CONF_PORT: DEFAULT_PORTS["ssl"],
+        CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
+        CONF_CERT_PATH: "",
+    },
+    "no_ssl": {
+        CONF_PORT: DEFAULT_PORTS["no_ssl"],
+        CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
+        CONF_CERT_PATH: "",
+    },
+}
+
+
 # Sensors types
 SENSORS_TYPE_CPU = "cpu"
 SENSORS_TYPE_DEVICES = "devices"
@@ -66,9 +84,12 @@ SENSORS_RAM = ["total", "free", "used", "usage"]
 
 
 # Types of results on actions
+RESULT_CONNECTION_REFUSED = "connection_refused"
 RESULT_ERROR = "error"
+RESULT_LOGIN_BLOCKED = "login_blocked"
 RESULT_SUCCESS = "success"
 RESULT_UNKNOWN = "unknown"
+RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 
 
 # Constants
