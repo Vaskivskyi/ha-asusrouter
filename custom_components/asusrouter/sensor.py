@@ -35,6 +35,7 @@ from .const import (
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
+    SENSORS_TYPE_WAN,
 )
 
 from .dataclass import AsusRouterAttributeDescription, AsusRouterSensorDescription
@@ -132,6 +133,21 @@ SENSORS = {
             "LAN_6": "LAN 6",
             "LAN_7": "LAN 7",
             "LAN_8": "LAN 8",
+        },
+    ),
+    (SENSORS_TYPE_WAN, "ip"): AsusRouterSensorDescription(
+        key = "ip",
+        key_group = SENSORS_TYPE_WAN,
+        name = "WAN IP",
+        icon = "mdi:ip",
+        entity_category = EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default = False,
+        extra_state_attributes = {
+            "ip_type": "Type",
+            "gateway": "Gateway",
+            "mask": "Mask",
+            "dns": "DNS",
+            "private_subnet": "Private subnet",
         },
     ),
 }

@@ -72,6 +72,7 @@ SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
 SENSORS_TYPE_PORTS = "ports"
 SENSORS_TYPE_RAM = "ram"
+SENSORS_TYPE_WAN = "wan"
 
 # Sensors
 SENSORS_CHANGE = ["change"]
@@ -81,6 +82,7 @@ SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 SENSORS_PORTS = ["WAN", "LAN"]
 SENSORS_RAM = ["total", "free", "used", "usage"]
+SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
 
 
 # Types of results on actions
