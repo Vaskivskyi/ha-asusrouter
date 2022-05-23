@@ -38,6 +38,8 @@ from .const import (
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
+    SENSORS_TYPE_WAN,
+    SENSORS_WAN,
 )
 
 
@@ -250,7 +252,11 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
             SENSORS_TYPE_PORTS: {
                 "sensors": await self._get_ports_sensors(),
                 "method": self._get_ports
-            }
+            },
+            SENSORS_TYPE_WAN: {
+                "sensors": SENSORS_WAN,
+                "method": self._get_wan
+            },
         }
         return sensors_types
 
@@ -318,6 +324,18 @@ class AsusRouterBridgeHTTP(AsusRouterBridge):
             raise UpdateFailed(ex) from ex
 
         return data
+
+
+    async def _get_wan(self) -> dict[str, Any]:
+        """Get WAN data"""
+
+        try:
+            data = await self._api.async_get_wan()
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
 
     ### <- GET DATA FROM DEVICE
 
