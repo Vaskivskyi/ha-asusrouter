@@ -58,14 +58,52 @@
     },
     "options": {
         "step": {
-            "init": {
-                "title": "ASUS Router options",
+            "options": {
+                "description": "Select configurations to change",
                 "data": {
-                    "interfaces": "Select network interfaces to monitor",
-                    "cache_device_time": "Caching time for device discovery",
-                    "cache_time": "Data caching time"
+                    "device": "Credentials and connection settings",
+                    "operation_mode": "Operation mode",
+                    "interfaces": "Interfaces to monitor"
+                }
+            },
+            "device": {
+                "description": "Parameters to connect to the device",
+                "data": {
+                    "username": "[%key:common::config_flow::data::username%]",
+                    "password": "[%key:common::config_flow::data::password%]",
+                    "port": "Port (0 to use default value)",
+                    "ssl": "Use SSL connection",
+                    "verify_ssl": "[%key:common::config_flow::data::verify_ssl%]",
+                    "cert_path": "Certificate path"
+                }
+            },
+            "operation_mode": {
+                "description": "Operation mode",
+                "data": {
+                    "enable_monitor": "Enable device monitoring",
+                    "enable_control": "Enable device control"
+                }
+            },
+            "interfaces": {
+                "description": "Interfaces to monitor",
+                "data": {
+                    "interfaces": "Select network interfaces to monitor"
+                }
+            },
+            "confirmation": {
+                "description": "Please, reload the integration",
+                "data": {
+                    "confirm": "I understand, that I need to reload the integration in order to apply the new configuration. In order to do this, I will click the integration menu (3 dots) and press 'Reload'"
                 }
             }
+        },
+        "error": {
+            "connection_refused": "Connection refused",
+            "error": "[%key:common::config_flow::error::cannot_connect%]",
+            "login_blocked": "Login is blocked by the device. Please, wait",
+            "not_confirmed": "You have to confirm",
+            "unknown": "Unknown error",
+            "wrong_credentials": "Wrong credentials"
         }
     }
 }

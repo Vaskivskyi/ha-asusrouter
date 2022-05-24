@@ -47,10 +47,10 @@ class AsusRouterBridge(ABC):
     """The Base Bridge abstract class"""
 
     @staticmethod
-    def get_bridge(hass : HomeAssistant, conf : dict[str, Any], options : dict[str, Any] | None = None) -> AsusRouterBridge:
+    def get_bridge(hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> AsusRouterBridge:
         """Get Bridge instance"""
 
-        return AsusRouterBridgeHTTP(conf)
+        return AsusRouterBridgeHTTP(configs, options)
 
 
     def __init__(self) -> None:
@@ -125,29 +125,31 @@ class AsusRouterBridge(ABC):
 class AsusRouterBridgeHTTP(AsusRouterBridge):
     """Bridge for AsusRouter HTTP library"""
 
-    def __init__(self, conf : dict[str, Any]) -> None:
+    def __init__(self, configs : dict[str, Any], options : dict[str, Any] = dict()) -> None:
         """Initialise bridge"""
 
         super().__init__()
-        self._api = self._get_api(conf)
-        self._host = conf[CONF_HOST]
+        self._configs = configs.copy()
+        self._configs.update(options)
+        self._api = self._get_api(self._configs)
+        self._host = self._configs[CONF_HOST]
 
 
     @staticmethod
-    def _get_api(conf : dict[str, Any]) -> AsusRouter:
+    def _get_api(configs : dict[str, Any]) -> AsusRouter:
         """Get the AsusWrtHttp API"""
 
         return AsusRouter(
-            host = conf[CONF_HOST],
-            username = conf[CONF_USERNAME],
-            password = conf[CONF_PASSWORD],
-            port = conf[CONF_PORT],
-            use_ssl = conf[CONF_SSL],
-            cert_check = conf[CONF_VERIFY_SSL],
-            cert_path = conf.get(CONF_CERT_PATH, ""),
-            cache_time = conf.get(CONF_CACHE_TIME, 3),
-            enable_monitor = conf.get(CONF_ENABLE_MONITOR),
-            enable_control = conf.get(CONF_ENABLE_CONTROL),
+            host = configs[CONF_HOST],
+            username = configs[CONF_USERNAME],
+            password = configs[CONF_PASSWORD],
+            port = configs[CONF_PORT],
+            use_ssl = configs[CONF_SSL],
+            cert_check = configs[CONF_VERIFY_SSL],
+            cert_path = configs.get(CONF_CERT_PATH, ""),
+            cache_time = configs.get(CONF_CACHE_TIME, 3),
+            enable_monitor = configs.get(CONF_ENABLE_MONITOR),
+            enable_control = configs.get(CONF_ENABLE_CONTROL),
         )
 
 

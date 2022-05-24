@@ -28,6 +28,7 @@ PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]
 # Configurartion keys
 CONF_CACHE_TIME = "cache_time"
 CONF_CERT_PATH = "cert_path"
+CONF_CONFIRM = "confirm"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_INTERFACES = "interfaces"
@@ -92,6 +93,10 @@ RESULT_LOGIN_BLOCKED = "login_blocked"
 RESULT_SUCCESS = "success"
 RESULT_UNKNOWN = "unknown"
 RESULT_WRONG_CREDENTIALS = "wrong_credentials"
+
+# Types of steps
+STEP_TYPE_COMPLETE = "complete"
+STEP_TYPE_SIMPLE = "simplified"
 
 
 # Constants

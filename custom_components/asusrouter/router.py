@@ -202,9 +202,9 @@ class AsusRouterObj:
 
         self._api : AsusRouterBridge | None = None
         self._host : str = entry.data[CONF_HOST]
-        self._port : str = entry.data[CONF_PORT]
+        self._port : str = entry.options[CONF_PORT]
 
-        self._name : str = entry.data[CONF_NAME]
+        self._name : str = entry.options[CONF_NAME]
 
         self._mac : str | None = None
         self._model : str = "ASUS Router"
