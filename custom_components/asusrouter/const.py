@@ -29,6 +29,7 @@ PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]
 CONF_CACHE_TIME = "cache_time"
 CONF_CERT_PATH = "cert_path"
 CONF_CONFIRM = "confirm"
+CONF_CONSIDER_HOME = "consider_home"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_INTERFACES = "interfaces"
@@ -39,13 +40,14 @@ CONF_REQ_RELOAD = [CONF_INTERFACES]
 
 # Default configuration
 DEFAULT_CACHE_TIME = 5
+DEFAULT_CONSIDER_HOME = 45
 DEFAULT_ENABLE_CONTROL = False
 DEFAULT_ENABLE_MONITOR = True
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
 DELAULT_INTERFACES = ["WAN"]
 DEFAULT_PORT = 0
 DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
-DEFAULT_SCAN_INTERVAL = timedelta(seconds = 30)
+DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SSL = False
 DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
