@@ -136,12 +136,9 @@ class AsusRouterDevInfo:
             self._name = dev_info.name
             self._ip = dev_info.ip
             self._last_activity = utc_point_in_time
-            if dev_info.online:
-                self._connected = True
+            self._connected = True if dev_info.online else False
             if dev_info.connected_since:
-                ### EDIT THIS WHEN
-                ### AsusRouter library fixes datetime object to have timezone
-                self._connection_time = dev_info.connected_since.replace(tzinfo = timezone.utc)
+                self._connection_time = dev_info.connected_since
         elif self._connected:
             self._connected = (
                 utc_point_in_time - self._last_activity
