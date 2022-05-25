@@ -230,7 +230,7 @@ class AsusRouterObj:
     async def setup(self) -> None:
         """Setup an AsusRouter object"""
 
-        self._api = AsusRouterBridge.get_bridge(self.hass, dict(self._entry.data), self._options)
+        self._api = AsusRouterBridge(self.hass, dict(self._entry.data), self._options)
 
         try:
             await self._api.async_connect()

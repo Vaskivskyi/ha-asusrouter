@@ -43,89 +43,10 @@ from .const import (
 )
 
 
-class AsusRouterBridge(ABC):
-    """The Base Bridge abstract class"""
+class AsusRouterBridge():
+    """Bridge for AsusRouter library"""
 
-    @staticmethod
-    def get_bridge(hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> AsusRouterBridge:
-        """Get Bridge instance"""
-
-        return AsusRouterBridgeHTTP(configs, options)
-
-
-    def __init__(self) -> None:
-        """Initialize Bridge"""
-
-        self._api = None
-
-        self._mac : str | None = None
-        self._serial : str | None = None
-        self._model : str = "ASUS Router"
-        self._vendor : str = "ASUSTek"
-        self._firmware : str | None = None
-
-
-    @property
-    def is_connected(self) -> bool:
-        """Get connected status"""
-        return False
-
-
-    @abstractmethod
-    async def async_connect(self) -> None:
-        """Connect to the device"""
-
-
-    @abstractmethod
-    async def async_disconnect(self) -> None:
-        """Disconnect to the device"""
-
-
-    @abstractmethod
-    async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
-        """Get list of connected devices"""
-
-
-    async def get_mac(self) -> str | None:
-        """Get label mac information"""
-
-        return self._mac
-
-
-    async def get_serial(self) -> str | None:
-        """Get serial information"""
-
-        return self._serial
-
-
-    async def get_model(self) -> str | None:
-        """Get model information"""
-
-        return self._model
-
-
-    async def get_vendor(self) -> str | None:
-        """Get vendor information"""
-
-        return self._vendor
-
-
-    async def get_firmware(self) -> str | None:
-        """Get firmware information"""
-
-        return self._firmware
-
-
-    async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
-        """Return a dictionary of available sensors for this bridge"""
-
-        return {}
-
-
-class AsusRouterBridgeHTTP(AsusRouterBridge):
-    """Bridge for AsusRouter HTTP library"""
-
-    def __init__(self, configs : dict[str, Any], options : dict[str, Any] = dict()) -> None:
+    def __init__(self, hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> None:
         """Initialise bridge"""
 
         super().__init__()

@@ -85,7 +85,7 @@ def _check_errors(errors : dict[str, Any]) -> bool:
 async def _async_get_network_interfaces(hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> list[str]:
     """Return list of possible to monitor network interfaces"""
 
-    api = AsusRouterBridge.get_bridge(hass, configs, options)
+    api = AsusRouterBridge(hass, configs, options)
 
     try:
         labels = await api.async_get_network_interfaces()
@@ -117,7 +117,7 @@ async def _async_check_connection(hass : HomeAssistant, configs : dict[str, Any]
 
         _LOGGER.debug("Setup ({}) initiated".format(step_type))
 
-    api = AsusRouterBridge.get_bridge(hass, configs_to_use)
+    api = AsusRouterBridge(hass, configs_to_use)
 
     try:
         await api.async_connect()
