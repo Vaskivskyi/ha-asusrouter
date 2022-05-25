@@ -20,8 +20,9 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_PORT,
-    CONF_VERIFY_SSL,
+    CONF_SCAN_INTERVAL,
     CONF_SSL,
+    CONF_VERIFY_SSL,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
@@ -30,12 +31,15 @@ from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
     CONF_CONFIRM,
+    CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
     DEFAULT_CACHE_TIME,
+    DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
+    DEFAULT_SCAN_INTERVAL,
     DELAULT_INTERFACES,
     DEFAULT_PORT,
     DEFAULT_SSL,
@@ -271,6 +275,33 @@ def _create_form_operation_mode(user_input : dict[str, Any] = dict()) -> vol.Sch
     return vol.Schema(schema)
 
 
+def _create_form_times(user_input : dict[str, Any] = dict()) -> vol.Schema:
+    """Create a form for the 'times' step"""
+
+    schema = {
+        vol.Required(
+            CONF_CACHE_TIME,
+            default = user_input.get(
+                CONF_CACHE_TIME, DEFAULT_CACHE_TIME
+            ),
+        ): int,
+        vol.Required(
+            CONF_SCAN_INTERVAL,
+            default = user_input.get(
+                CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+            ),
+        ): int,
+        vol.Required(
+            CONF_CONSIDER_HOME,
+            default = user_input.get(
+                CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME
+            ),
+        ): int,
+    }
+
+    return vol.Schema(schema)
+
+
 def _create_form_interfaces(user_input : dict[str, Any] = dict(), default : list[str] = list()) -> vol.Schema:
     """Create a form for the 'interfaces' step"""
 
@@ -335,7 +366,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
             "credentials": self.async_step_operation_mode,
             "credentials_error": self.async_step_device,
             "device": self.async_step_operation_mode,
-            "operation_mode": self.async_step_interfaces,
+            "operation_mode": self.async_step_times,
+            "times": self.async_step_interfaces,
             "interfaces": self.async_step_name,
             "name": self.async_step_finish,
         }
@@ -469,7 +501,25 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         return await self.async_select_step(step_id)
 
 
-    # Step #4 (optional if monitoring is enabled) - network interfaces to monitor
+    # Step #4 - times
+    async def async_step_times(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+        """Step to select times"""
+
+        step_id = "times"
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id = step_id,
+                data_schema = _create_form_times(user_input),
+            )
+
+        self._options.update(user_input)
+
+        return await self.async_select_step(step_id)
+
+
+    # Step #5 (optional if monitoring is enabled) - network interfaces to monitor
     async def async_step_interfaces(self, user_input : dict[str, Any] | None = None) -> FlowResult:
         """Step to select interfaces for traffic monitoring"""
 
@@ -489,7 +539,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         return await self.async_select_step(step_id)
 
 
-    # Step #5 - select device name
+    # Step #6 - select device name
     async def async_step_name(self, user_input : dict[str, Any] | None = None) -> FlowResult:
         """Name the device step"""
 
@@ -542,7 +592,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._steps = {
             "options": self.async_step_device,
             "device": self.async_step_operation_mode,
-            "operation_mode": self.async_step_interfaces,
+            "operation_mode": self.async_step_times,
+            "times": self.async_step_interfaces,
             "interfaces": self.async_step_confirmation,
             "confirmation": self.async_step_finish,
         }
@@ -648,6 +699,23 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_show_form(
                 step_id = step_id,
                 data_schema = _create_form_operation_mode(user_input),
+            )
+
+        self._options.update(user_input)
+
+        return await self.async_select_step(step_id)
+
+
+    async def async_step_times(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+        """Step to select times"""
+
+        step_id = "times"
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id = step_id,
+                data_schema = _create_form_times(user_input),
             )
 
         self._options.update(user_input)

@@ -11,7 +11,6 @@ from typing import Any, TypeVar
 
 from homeassistant.components.device_tracker.const import (
     CONF_CONSIDER_HOME,
-    DEFAULT_CONSIDER_HOME,
     DOMAIN as TRACKER_DOMAIN,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -21,8 +20,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_PORT,
-    CONF_VERIFY_SSL,
+    CONF_SCAN_INTERVAL,
     CONF_SSL,
+    CONF_VERIFY_SSL,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -41,6 +41,7 @@ from .const import (
     CONF_ENABLE_MONITOR,
     CONF_REQ_RELOAD,
     DEFAULT_CACHE_TIME,
+    DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_HTTP,
@@ -65,12 +66,13 @@ _T = TypeVar("_T")
 class AsusRouterSensorHandler:
     """Data handler for AsusRouter sensors"""
 
-    def __init__(self, hass : HomeAssistant, api : AsusRouterBridge) -> None:
+    def __init__(self, hass : HomeAssistant, api : AsusRouterBridge, scan_interval : int = DEFAULT_SCAN_INTERVAL) -> None:
         """Initialise data handler"""
 
         self._hass = hass
         self._api = api
         self._connected_devices = 0
+        self._scan_interval = timedelta(seconds = scan_interval)
 
 
     async def _get_connected_devices(self) -> dict[str, int]:
@@ -106,7 +108,7 @@ class AsusRouterSensorHandler:
             _LOGGER,
             name = sensor_type,
             update_method = method,
-            update_interval = DEFAULT_SCAN_INTERVAL if should_poll else None,
+            update_interval = self._scan_interval if should_poll else None,
         )
         await coordinator.async_refresh()
 
@@ -198,10 +200,13 @@ class AsusRouterObj:
         self._entry = entry
 
         self._api : AsusRouterBridge | None = None
-        self._host : str = entry.data[CONF_HOST]
-        self._port : str = entry.options[CONF_PORT]
 
-        self._name : str = entry.options[CONF_NAME]
+        self._options = entry.options.copy()
+
+        self._host : str = entry.data[CONF_HOST]
+        self._port : str = self._options[CONF_PORT]
+
+        self._name : str = self._options[CONF_NAME]
 
         self._mac : str | None = None
         self._model : str = "ASUS Router"
@@ -217,16 +222,6 @@ class AsusRouterObj:
         self._sensors_coordinator : dict[str, Any] = {}
 
         self._on_close : list[Callable] = []
-
-        self._options = {
-            CONF_SSL: DEFAULT_SSL,
-            CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
-            CONF_CACHE_TIME: DEFAULT_CACHE_TIME,
-            CONF_ENABLE_MONITOR: DEFAULT_ENABLE_MONITOR, 
-            CONF_ENABLE_CONTROL: DEFAULT_ENABLE_CONTROL,
-        }
-
-        self._options.update(entry.options)
 
         if self._port == DEFAULT_PORT:
             self._port = DEFAULT_PORTS["ssl"] if self._options[CONF_VERIFY_SSL] else DEFAULT_PORTS["no_ssl"]
@@ -293,7 +288,7 @@ class AsusRouterObj:
         await self.init_sensors_coordinator()
 
         self.async_on_close(
-            async_track_time_interval(self.hass, self.update_all, DEFAULT_SCAN_INTERVAL)
+            async_track_time_interval(self.hass, self.update_all, timedelta(seconds = self._options[CONF_SCAN_INTERVAL]))
         )
 
 
@@ -329,7 +324,7 @@ class AsusRouterObj:
             if api_devices[device].online:
                 self._connected_devices += 1
         consider_home = self._options.get(
-            CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME.total_seconds()
+            CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME
         )
 
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
@@ -355,7 +350,7 @@ class AsusRouterObj:
         if self._sensors_data_handler:
             return
 
-        self._sensors_data_handler = AsusRouterSensorHandler(self.hass, self._api)
+        self._sensors_data_handler = AsusRouterSensorHandler(self.hass, self._api, self._options[CONF_SCAN_INTERVAL])
         self._sensors_data_handler.update_device_count(self._connected_devices)
 
         sensors_types = await self._api.async_get_available_sensors()

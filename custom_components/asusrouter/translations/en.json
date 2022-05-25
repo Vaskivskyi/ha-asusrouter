@@ -33,6 +33,14 @@
                     "enable_control": "Enable device control"
                 }
             },
+            "times": {
+                "description": "Time constants",
+                "data": {
+                    "cache_time": "Caching time for the device data",
+                    "scan_interval": "Interval to update entities",
+                    "consider_home": "Consider device at home for (after last 'online' state)"
+                }
+            },
             "interfaces": {
                 "description": "Interfaces to monitor",
                 "data": {
@@ -63,6 +71,7 @@
                 "data": {
                     "device": "Credentials and connection settings",
                     "operation_mode": "Operation mode",
+                    "times": "Time constants",
                     "interfaces": "Interfaces to monitor"
                 }
             },
@@ -82,6 +91,14 @@
                 "data": {
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control"
+                }
+            },
+            "times": {
+                "description": "Time constants",
+                "data": {
+                    "cache_time": "Caching time for the device data",
+                    "scan_interval": "Interval to update entities",
+                    "consider_home": "Consider device at home for (after last 'online' state)"
                 }
             },
             "interfaces": {
