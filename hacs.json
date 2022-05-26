@@ -1,6 +1,5 @@
 {
   "name": "AsusRouter",
   "content_in_root": false,
-  "iot_class": "local_poll",
   "homeassistant": "2022.4.0"
 }
