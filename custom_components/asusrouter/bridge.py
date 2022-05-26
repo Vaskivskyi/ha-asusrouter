@@ -54,6 +54,7 @@ class AsusRouterBridge():
         self._configs.update(options)
         self._api = self._get_api(self._configs)
         self._host = self._configs[CONF_HOST]
+        self._identity : AsusDevice | None = None
 
 
     @staticmethod
@@ -67,10 +68,10 @@ class AsusRouterBridge():
             port = configs[CONF_PORT],
             use_ssl = configs[CONF_SSL],
             cert_check = configs[CONF_VERIFY_SSL],
-            cert_path = configs.get(CONF_CERT_PATH, ""),
-            cache_time = configs.get(CONF_CACHE_TIME, 3),
-            enable_monitor = configs.get(CONF_ENABLE_MONITOR),
-            enable_control = configs.get(CONF_ENABLE_CONTROL),
+            cert_path = configs[CONF_CERT_PATH],
+            cache_time = configs[CONF_CACHE_TIME],
+            enable_monitor = configs[CONF_ENABLE_MONITOR],
+            enable_control = configs[CONF_ENABLE_CONTROL],
         )
 
 
@@ -112,7 +113,7 @@ class AsusRouterBridge():
 
 
     async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
-        """Get list of connected devices"""
+        """Get dict of connected devices"""
 
         try:
             api_devices = await self._api.async_get_devices()
@@ -258,8 +259,6 @@ class AsusRouterBridge():
             raise UpdateFailed(ex) from ex
 
         return data
-
-
     ### <- GET DATA FROM DEVICE
 
 
@@ -281,7 +280,7 @@ class AsusRouterBridge():
 
         try:
             sensors = []
-            labels = await self._api.async_get_network_labels()
+            labels = await self.async_get_network_interfaces()
             for label in labels:
                 for el in SENSORS_NETWORK_STAT:
                     sensors.append("{}_{}".format(label, el))
@@ -310,9 +309,11 @@ class AsusRouterBridge():
     ### <- GET SENSORS LIST
 
 
-    async def async_get_network_interfaces(self):
-        """"""
+    ### GENERAL USAGE METHODS ->
+    async def async_get_network_interfaces(self) -> list[str]:
+        """Return list of network interfaces of the device"""
 
         return await self._api.async_get_network_labels()
+    ### <- GENERAL USAGE METHODS
 
 
