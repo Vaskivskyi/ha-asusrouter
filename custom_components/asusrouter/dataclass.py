@@ -8,6 +8,7 @@ from collections.abc import Callable
 
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.light import LightEntityDescription
 from homeassistant.helpers.entity import EntityDescription
 
 
@@ -30,5 +31,13 @@ class ARSensorDescription(AREntityDescription, SensorEntityDescription):
 @dataclass
 class ARBinarySensorDescription(AREntityDescription, BinarySensorEntityDescription):
     """Describe AsusRouter sensor"""
+
+
+@dataclass
+class ARLightDescription(AREntityDescription, LightEntityDescription):
+    """Describe AsusRouter light"""
+
+    icon_on: str | None = None
+    icon_off: str | None = None
 
 
