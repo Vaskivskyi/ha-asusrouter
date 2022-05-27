@@ -384,7 +384,7 @@ def _create_form_confirmation(
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     """Handle config flow for AsusRouter"""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self):
         """Initialise config flow"""
