@@ -283,12 +283,12 @@ def _create_form_operation_mode(
     """Create a form for the 'operation_mode' step"""
 
     schema = {
-        vol.Required(
-            CONF_ENABLE_MONITOR,
-            default = user_input.get(
-                CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR
-            ),
-        ): bool,
+        # vol.Required(
+        #     CONF_ENABLE_MONITOR,
+        #     default = user_input.get(
+        #         CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR
+        #     ),
+        # ): bool,
         vol.Required(
             CONF_ENABLE_CONTROL,
             default = user_input.get(
@@ -585,7 +585,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
         step_id = "interfaces"
 
-        if self._options[CONF_ENABLE_MONITOR]:
+        if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
             if not user_input:
                 user_input = self._options.copy()
                 user_input["interfaces"] = await _async_get_network_interfaces(self.hass, self._configs, self._options)
@@ -829,7 +829,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         ):
             return await self.async_select_step(step_id)
 
-        if self._options[CONF_ENABLE_MONITOR]:
+        if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
             if not user_input:
                 user_input = self._options.copy()
                 selected = user_input["interfaces"].copy()
