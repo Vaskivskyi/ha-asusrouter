@@ -799,6 +799,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "times"
 
+        if (not step_id in self._selection
+            or self._selection[step_id] == False
+        ):
+            return await self.async_select_step(step_id)
+
         if not user_input:
             user_input = self._options.copy()
             return self.async_show_form(
