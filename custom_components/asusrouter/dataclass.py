@@ -27,6 +27,11 @@ class AsusRouterSensorDescription(AsusRouterEntityDescription, SensorEntityDescr
 
 
 @dataclass
+class ARBinarySensorDescription(AsusRouterEntityDescription, SensorEntityDescription):
+    """Describe AsusRouter sensor"""
+
+
+@dataclass
 class AsusRouterAttributeDescription(AsusRouterEntityDescription, SensorEntityDescription):
     """Describe AsusRouter attribute"""
 
