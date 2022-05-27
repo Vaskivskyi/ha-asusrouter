@@ -74,7 +74,8 @@ class ARLightLED(LightEntity):
         self._icon_on = description.icon_on
         self._icon_off = description.icon_off
 
-        self._state : bool | None = None
+        self._state : bool = self.api.led
+        self.update_icon()
 
 
     @property
@@ -84,7 +85,7 @@ class ARLightLED(LightEntity):
         return self._state
 
 
-    async def async_update_icon(self) -> None:
+    def update_icon(self) -> None:
         """Update icon"""
 
         if self._state:
@@ -103,7 +104,7 @@ class ARLightLED(LightEntity):
 
         try:
             result = await self.api.async_service_led_set("on")
-            await self.async_update_icon()
+            self.update_icon()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
@@ -118,7 +119,7 @@ class ARLightLED(LightEntity):
 
         try:
             result = await self.api.async_service_led_set("off")
-            await self.async_update_icon()
+            self.update_icon()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
@@ -129,6 +130,6 @@ class ARLightLED(LightEntity):
         """Update state from the device"""
 
         self._state = await self.api.async_service_led_get()
-        await self.async_update_icon()
+        self.update_icon()
 
 
