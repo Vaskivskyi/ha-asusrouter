@@ -1,4 +1,4 @@
-"""Support for AsusRouter routers"""
+"""AsusRouter device trackers"""
 
 from __future__ import annotations
 
@@ -9,13 +9,22 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DATA_ASUSROUTER, DOMAIN
-from .router import AsusRouterDevInfo, AsusRouterObj
+from .const import (
+    DATA_ASUSROUTER,
+    DEFAULT_DEVICE_NAME,
+    DOMAIN,
+)
+from .router import (
+    AsusRouterDevInfo,
+    AsusRouterObj,
+)
 
-DEFAULT_DEVICE_NAME = "Unknown device"
 
-
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up device tracker for AsusRouter component"""
 
     router = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
@@ -35,7 +44,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
 
 @callback
-def add_entities(router: AsusRouterObj, async_add_entities: AddEntitiesCallback, tracked: set[str]) -> None:
+def add_entities(
+    router: AsusRouterObj,
+    async_add_entities: AddEntitiesCallback,
+    tracked: set[str],
+) -> None:
     """Add new tracker entities from the router"""
 
     new_tracked = []
@@ -57,7 +70,11 @@ class AsusRouterConnectedDevice(ScannerEntity):
     _attr_should_poll = False
 
 
-    def __init__(self, router: AsusRouterObj, device: AsusRouterDevInfo) -> None:
+    def __init__(
+        self,
+        router: AsusRouterObj,
+        device: AsusRouterDevInfo,
+    ) -> None:
         """Initialize connected device"""
 
         self._router = router

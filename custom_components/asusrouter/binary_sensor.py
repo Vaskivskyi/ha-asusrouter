@@ -1,4 +1,4 @@
-"""Support for getting status from a Pi-hole system."""
+"""AsusRouter binary sensors"""
 
 from __future__ import annotations
 
@@ -7,7 +7,10 @@ _LOGGER = logging.getLogger(__name__)
 
 from typing import Any
 
-from homeassistant.components.binary_sensor import BinarySensorEntity, DEVICE_CLASS_CONNECTIVITY
+from homeassistant.components.binary_sensor import (
+    BinarySensorEntity,
+    DEVICE_CLASS_CONNECTIVITY,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
@@ -20,11 +23,11 @@ from homeassistant.helpers.update_coordinator import (
 from .const import (
     DATA_ASUSROUTER,
     DOMAIN,
+    KEY_COORDINATOR,
     SENSORS_TYPE_WAN,
 )
-
 from .dataclass import ARBinarySensorDescription
-from .router import AsusRouterObj, KEY_COORDINATOR
+from .router import AsusRouterObj
 
 
 BINARY_SENSORS = {
@@ -47,7 +50,11 @@ BINARY_SENSORS = {
 }
 
 
-async def async_setup_entry(hass : HomeAssistant, entry : ConfigEntry, async_add_entities : AddEntitiesCallback) -> None:
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Setup AsusRouter binary sensors"""
 
     router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
@@ -75,7 +82,7 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
         router: AsusRouterObj,
         description: ARBinarySensorDescription,
     ) -> None:
-        """Initialize AsusRouter sensor"""
+        """Initialize AsusRouter binary sensor"""
 
         super().__init__(coordinator)
         self.entity_description: ARBinarySensorDescription = description
@@ -99,16 +106,16 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Return extra state attributes"""
 
         description = self.entity_description
-        _extra_state_attributes = description.extra_state_attributes
-        if _extra_state_attributes is None:
+        _attributes = description.extra_state_attributes
+        if not _attributes:
             return {}
 
-        attrs = {}
+        attributes = {}
 
-        for attr in _extra_state_attributes:
+        for attr in _attributes:
             if attr in self.coordinator.data:
-                attrs[_extra_state_attributes[attr]] = self.coordinator.data[attr]
+                attributes[_attributes[attr]] = self.coordinator.data[attr]
 
-        return attrs
+        return attributes
 
 

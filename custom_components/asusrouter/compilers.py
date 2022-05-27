@@ -1,18 +1,20 @@
-"""Compilers module for AsusRouter"""
+"""AsusRouter compilers"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from .dataclass import AsusRouterSensorDescription
 from .const import (
     KEY_SENSOR_ID,
     SENSORS_PARAM_NETWORK,
     SENSORS_TYPE_NETWORK_STAT,
 )
+from .dataclass import ARSensorDescription
 
 
-def list_sensors_network(interfaces : list[str] | None = None) -> dict[str, Any]:
+def list_sensors_network(
+    interfaces: list[str] | None = None,
+) -> dict[str, Any]:
     """Compile a list of network sensors"""
 
     sensors = dict()
@@ -25,7 +27,7 @@ def list_sensors_network(interfaces : list[str] | None = None) -> dict[str, Any]
             data = SENSORS_PARAM_NETWORK[type]
             key = KEY_SENSOR_ID.format(interface, type)
             sensors.update({
-                (SENSORS_TYPE_NETWORK_STAT, key): AsusRouterSensorDescription(
+                (SENSORS_TYPE_NETWORK_STAT, key): ARSensorDescription(
                     key = key,
                     key_group = SENSORS_TYPE_NETWORK_STAT,
                     name = data["name"].format(interface) or None,
