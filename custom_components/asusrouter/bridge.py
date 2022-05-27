@@ -5,11 +5,8 @@ from __future__ import annotations
 import logging
 _LOGGER = logging.getLogger(__name__)
 
-from typing import Any
-from abc import ABC, abstractmethod
 from datetime import datetime
-
-from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
+from typing import Any
 
 from homeassistant.const import (
     CONF_HOST,
@@ -21,14 +18,25 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.update_coordinator import UpdateFailed
+
+from asusrouter import (
+    AsusDevice,
+    AsusRouter,
+    AsusRouterError,
+    ConnectedDevice,
+)
 
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
+    DEFAULT_CACHE_TIME,
+    DEFAULT_ENABLE_CONTROL,
+    DEFAULT_ENABLE_MONITOR,
+    DEFAULT_PORT,
+    DEFAULT_VERIFY_SSL,
     SENSORS_MISC,
     SENSORS_NETWORK_STAT,
     SENSORS_PORTS,
@@ -43,35 +51,42 @@ from .const import (
 )
 
 
-class AsusRouterBridge():
+class ARBridge():
     """Bridge for AsusRouter library"""
 
-    def __init__(self, hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> None:
-        """Initialise bridge"""
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        configs: dict[str, Any],
+        options: dict[str, Any] = dict(),
+    ) -> None:
+        """Initialize bridge"""
 
         super().__init__()
         self._configs = configs.copy()
         self._configs.update(options)
         self._api = self._get_api(self._configs)
         self._host = self._configs[CONF_HOST]
-        self._identity : AsusDevice | None = None
+        self._identity: AsusDevice | None = None
 
 
     @staticmethod
-    def _get_api(configs : dict[str, Any]) -> AsusRouter:
-        """Get the AsusWrtHttp API"""
+    def _get_api(
+        configs: dict[str, Any],
+    ) -> AsusRouter:
+        """Get AsusRouter API"""
 
         return AsusRouter(
             host = configs[CONF_HOST],
             username = configs[CONF_USERNAME],
             password = configs[CONF_PASSWORD],
-            port = configs[CONF_PORT],
+            port = configs.get(CONF_PORT, DEFAULT_PORT),
             use_ssl = configs[CONF_SSL],
-            cert_check = configs[CONF_VERIFY_SSL],
-            cert_path = configs[CONF_CERT_PATH],
-            cache_time = configs[CONF_CACHE_TIME],
-            enable_monitor = configs[CONF_ENABLE_MONITOR],
-            enable_control = configs[CONF_ENABLE_CONTROL],
+            cert_check = configs.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
+            cert_path = configs.get(CONF_CERT_PATH, ""),
+            cache_time = configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
+            enable_monitor = configs.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR),
+            enable_control = configs.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
         )
 
 
@@ -107,7 +122,7 @@ class AsusRouterBridge():
 
 
     async def _async_get_device_identity(self) -> AsusDevice:
-        """Load device info"""
+        """Load device identity"""
 
         return await self._api.async_get_identity()
 
@@ -154,7 +169,7 @@ class AsusRouterBridge():
 
 
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
-        """Return a dictionary of available sensors for this bridge."""
+        """Get a dictionary of available sensors"""
 
         sensors_types = {
             SENSORS_TYPE_CPU: {
@@ -187,7 +202,7 @@ class AsusRouterBridge():
 
     ### GET DATA FROM DEVICE ->
     async def _get_cpu(self) -> dict[str, Any]:
-        """Get CPU data from router"""
+        """Get CPU data from the device"""
 
         try:
             data = await self._api.async_get_cpu()
@@ -198,7 +213,7 @@ class AsusRouterBridge():
 
 
     async def _get_ram(self) -> dict[str, Any]:
-        """Get RAM data from router"""
+        """Get RAM data from the device"""
 
         try:
             data = await self._api.async_get_ram()
@@ -209,7 +224,7 @@ class AsusRouterBridge():
 
 
     async def _get_network_stat(self) -> dict[str, Any]:
-        """Get network data from router"""
+        """Get network data from device"""
 
         try:
             data = await self._api.async_get_network()
@@ -220,7 +235,7 @@ class AsusRouterBridge():
 
 
     async def _get_misc(self) -> dict[str, Any]:
-        """Get MISC sensors"""
+        """Get MISC sensors from the device"""
 
         data = dict()
         await self._api.async_monitor_misc()
@@ -230,7 +245,7 @@ class AsusRouterBridge():
 
 
     async def _get_ports(self) -> dict[str, dict[str, int]]:
-        """Get ports status"""
+        """Get ports status from the device"""
 
         data = dict()
         try:
@@ -251,7 +266,7 @@ class AsusRouterBridge():
 
 
     async def _get_wan(self) -> dict[str, Any]:
-        """Get WAN data"""
+        """Get WAN data from the device"""
 
         try:
             data = await self._api.async_get_wan()
@@ -264,7 +279,7 @@ class AsusRouterBridge():
 
     ### GET SENSORS LIST ->
     async def _get_cpu_sensors(self):
-        """Check the available CPU sensors"""
+        """Get the available CPU sensors"""
 
         try:
             sensors = await self._api.async_get_cpu_labels()
@@ -276,7 +291,7 @@ class AsusRouterBridge():
 
 
     async def _get_network_stat_sensors(self):
-        """Check the available network stat sensors"""
+        """Get the available network stat sensors"""
 
         try:
             sensors = []
@@ -291,7 +306,7 @@ class AsusRouterBridge():
 
 
     async def _get_ports_sensors(self):
-        """Check the available ports sensors"""
+        """Get the available ports sensors"""
 
         try:
             sensors = []
@@ -311,7 +326,7 @@ class AsusRouterBridge():
 
     ### GENERAL USAGE METHODS ->
     async def async_get_network_interfaces(self) -> list[str]:
-        """Return list of network interfaces of the device"""
+        """Get the list of network interfaces of the device"""
 
         return await self._api.async_get_network_labels()
     ### <- GENERAL USAGE METHODS

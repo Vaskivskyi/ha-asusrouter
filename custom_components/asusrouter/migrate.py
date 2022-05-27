@@ -10,7 +10,7 @@ from homeassistant.const import (
 CONF_USE_SSL = "use_ssl"
 
 # Values to replace from to
-DEPRECATED : dict[dict[str, str]] = dict()
+DEPRECATED: dict[dict[str, str]] = dict()
 DEPRECATED["1_2"] = {
     CONF_USE_SSL: CONF_SSL,
 }

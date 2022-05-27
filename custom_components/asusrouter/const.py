@@ -1,4 +1,4 @@
-"""ASUS Router component constants"""
+"""AsusRouter constants"""
 
 from __future__ import annotations
 from datetime import timedelta
@@ -41,6 +41,7 @@ CONF_REQ_RELOAD = [CONF_INTERFACES]
 # Default configuration
 DEFAULT_CACHE_TIME = 5
 DEFAULT_CONSIDER_HOME = 45
+DEFAULT_DEVICE_NAME = "Unknown device"
 DEFAULT_ENABLE_CONTROL = False
 DEFAULT_ENABLE_MONITOR = True
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
@@ -113,7 +114,7 @@ KEY_COORDINATOR = "coordinator"
 # Params to generate sensors
 KEY_SENSOR_ID = "{}_{}"
 
-SENSORS_PARAM : dict[str, dict[str, Any]] = {
+SENSORS_PARAM: dict[str, dict[str, Any]] = {
     "key": {},
     "key_group": {},
     "name": {},
@@ -125,7 +126,7 @@ SENSORS_PARAM : dict[str, dict[str, Any]] = {
     "extra_state_attributes": {},
 }
 
-SENSORS_PARAM_NETWORK : dict[str, dict[str, Any]] = {
+SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
     "rx": {
         "name": "{} Download",
         "icon": "mdi:download-outline",

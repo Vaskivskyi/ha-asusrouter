@@ -1,19 +1,15 @@
-"""Config flow for AsusRouter integration"""
+"""AsusRouter config flow"""
 
 from __future__ import annotations
 
 import logging
 _LOGGER = logging.getLogger(__name__)
 
-from typing import Any
-
 import socket
-
+from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.data_entry_flow import FlowResult
-
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
@@ -24,8 +20,18 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import (
+    HomeAssistant,
+    callback,
+)
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
+
+from asusrouter import (
+    AsusRouterConnectionError,
+    AsusRouterLoginBlockError,
+    AsusRouterLoginError,
+)
 
 from .const import (
     CONF_CACHE_TIME,
@@ -56,12 +62,12 @@ from .const import (
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
 )
-
-from .bridge import AsusRouterBridge
-from asusrouter import AsusRouterConnectionError, AsusRouterLoginBlockError, AsusRouterLoginError
+from .bridge import ARBridge
 
 
-def _check_host(host : str) -> str | None:
+def _check_host(
+    host: str,
+) -> str | None:
     """Get the IP address for the hostname"""
 
     try:
@@ -70,7 +76,9 @@ def _check_host(host : str) -> str | None:
         return None
 
 
-def _check_errors(errors : dict[str, Any]) -> bool:
+def _check_errors(
+    errors: dict[str, Any],
+) -> bool:
     """Check for errors"""
 
     if ("base" in errors
@@ -82,10 +90,14 @@ def _check_errors(errors : dict[str, Any]) -> bool:
     return False
 
 
-async def _async_get_network_interfaces(hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict()) -> list[str]:
+async def _async_get_network_interfaces(
+    hass: HomeAssistant,
+    configs: dict[str, Any],
+    options: dict[str, Any] = dict(),
+) -> list[str]:
     """Return list of possible to monitor network interfaces"""
 
-    api = AsusRouterBridge(hass, configs, options)
+    api = ARBridge(hass, configs, options)
 
     try:
         labels = await api.async_get_network_interfaces()
@@ -96,7 +108,12 @@ async def _async_get_network_interfaces(hass : HomeAssistant, configs : dict[str
         return DELAULT_INTERFACES
 
 
-async def _async_check_connection(hass : HomeAssistant, configs : dict[str, Any], options : dict[str, Any] = dict(), simple : bool = False) -> dict[str, Any]:
+async def _async_check_connection(
+    hass: HomeAssistant,
+    configs: dict[str, Any],
+    options: dict[str, Any] = dict(),
+    simple: bool = False,
+) -> dict[str, Any]:
     """Check connection to the device with provided configurations"""
 
     step_type = STEP_TYPE_COMPLETE
@@ -117,7 +134,7 @@ async def _async_check_connection(hass : HomeAssistant, configs : dict[str, Any]
 
         _LOGGER.debug("Setup ({}) initiated".format(step_type))
 
-    api = AsusRouterBridge(hass, configs_to_use)
+    api = ARBridge(hass, configs_to_use)
 
     try:
         await api.async_connect()
@@ -167,7 +184,9 @@ async def _async_check_connection(hass : HomeAssistant, configs : dict[str, Any]
     return result
 
 
-def _create_form_discovery(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_discovery(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'discovery' step"""
 
     schema = {
@@ -182,7 +201,9 @@ def _create_form_discovery(user_input : dict[str, Any] = dict()) -> vol.Schema:
     return vol.Schema(schema)
 
 
-def _create_form_credentials(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_credentials(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'credentials' step"""
 
     schema = {
@@ -209,7 +230,9 @@ def _create_form_credentials(user_input : dict[str, Any] = dict()) -> vol.Schema
     return vol.Schema(schema)
 
 
-def _create_form_device(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_device(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'device' step"""
 
     schema = {
@@ -254,7 +277,9 @@ def _create_form_device(user_input : dict[str, Any] = dict()) -> vol.Schema:
     return vol.Schema(schema)
 
 
-def _create_form_operation_mode(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_operation_mode(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'operation_mode' step"""
 
     schema = {
@@ -275,7 +300,9 @@ def _create_form_operation_mode(user_input : dict[str, Any] = dict()) -> vol.Sch
     return vol.Schema(schema)
 
 
-def _create_form_times(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_times(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'times' step"""
 
     schema = {
@@ -302,7 +329,10 @@ def _create_form_times(user_input : dict[str, Any] = dict()) -> vol.Schema:
     return vol.Schema(schema)
 
 
-def _create_form_interfaces(user_input : dict[str, Any] = dict(), default : list[str] = list()) -> vol.Schema:
+def _create_form_interfaces(
+    user_input: dict[str, Any] = dict(),
+    default: list[str] = list(),
+) -> vol.Schema:
     """Create a form for the 'interfaces' step"""
 
     schema = {
@@ -317,7 +347,9 @@ def _create_form_interfaces(user_input : dict[str, Any] = dict(), default : list
     return vol.Schema(schema)
 
 
-def _create_form_name(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_name(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'name' step"""
 
     schema = {
@@ -332,7 +364,9 @@ def _create_form_name(user_input : dict[str, Any] = dict()) -> vol.Schema:
     return vol.Schema(schema)
 
 
-def _create_form_confirmation(user_input : dict[str, Any] = dict()) -> vol.Schema:
+def _create_form_confirmation(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
     """Create a form for the 'confirmation' step"""
 
     schema = {
@@ -357,10 +391,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
         self._configs = dict()
         self._options = dict()
-        self._unique_id : str | None = None
+        self._unique_id: str | None = None
         self._simple = False
 
-        # Dictionary last_step : next_step
+        # Dictionary last_step: next_step
         self._steps = {
             "discovery": self.async_step_credentials,
             "credentials": self.async_step_operation_mode,
@@ -373,7 +407,11 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
         }
 
 
-    async def async_select_step(self, last_step : str | None = None, errors : dict[str, Any] = dict()) -> FlowResult:
+    async def async_select_step(
+        self,
+        last_step: str | None = None,
+        errors: dict[str, Any] = dict(),
+    ) -> FlowResult:
         """Step selector"""
 
         if last_step:
@@ -391,14 +429,20 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
     ### USER SETUP -->
 
 
-    async def async_step_user(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_user(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Flow initiated by user"""
 
         return await self.async_step_discovery(user_input)
 
 
     # Step #1 - discover the device
-    async def async_step_discovery(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_discovery(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Device discovery step"""
 
         step_id = "discovery"
@@ -426,7 +470,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #2 - credentials and SSL (simplified setup)
-    async def async_step_credentials(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_credentials(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Credentials step"""
 
         step_id = "credentials"
@@ -458,7 +505,11 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #2b (optional) - complete device setup
-    async def async_step_device(self, user_input : dict[str, Any] | None = None, errors : dict[str, str] = dict()) -> FlowResult:
+    async def async_step_device(
+        self,
+        user_input: dict[str, Any] | None = None,
+        errors: dict[str, str] = dict(),
+    ) -> FlowResult:
         """Step to completely setup the device"""
 
         step_id = "device"
@@ -484,7 +535,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #3 - operation mode
-    async def async_step_operation_mode(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_operation_mode(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select operation mode"""
 
         step_id = "operation_mode"
@@ -502,7 +556,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #4 - times
-    async def async_step_times(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_times(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select times"""
 
         step_id = "times"
@@ -520,7 +577,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #5 (optional if monitoring is enabled) - network interfaces to monitor
-    async def async_step_interfaces(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_interfaces(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select interfaces for traffic monitoring"""
 
         step_id = "interfaces"
@@ -540,7 +600,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step #6 - select device name
-    async def async_step_name(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_name(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Name the device step"""
 
         step_id = "name"
@@ -558,7 +621,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 
 
     # Step Finish
-    async def async_step_finish(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_finish(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Finish setup"""
 
         return self.async_create_entry(
@@ -578,17 +644,20 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain = DOMAIN):
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Options flow for AsusRouter"""
 
-    def __init__(self, config_entry : config_entries.ConfigEntry) -> None:
+    def __init__(
+        self,
+        config_entry: config_entries.ConfigEntry,
+    ) -> None:
         """Initialize options flow"""
 
         self.config_entry = config_entry
 
         self._selection = dict()
-        self._configs : dict[str, Any] = self.config_entry.data.copy()
-        self._host : str = self._configs[CONF_HOST]
-        self._options : dict[str, Any] = self.config_entry.options.copy()
+        self._configs: dict[str, Any] = self.config_entry.data.copy()
+        self._host: str = self._configs[CONF_HOST]
+        self._options: dict[str, Any] = self.config_entry.options.copy()
 
-        # Dictionary last_step : next_step
+        # Dictionary last_step: next_step
         self._steps = {
             "options": self.async_step_device,
             "device": self.async_step_operation_mode,
@@ -599,7 +668,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         }
 
 
-    async def async_select_step(self, last_step : str | None = None, errors : dict[str, Any] = dict()) -> FlowResult:
+    async def async_select_step(
+        self,
+        last_step: str | None = None,
+        errors: dict[str, Any] = dict(),
+    ) -> FlowResult:
         """Step selector"""
 
         if last_step:
@@ -614,13 +687,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             raise ValueError("Step name was not provided")
 
 
-    async def async_step_init(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_init(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Options flow"""
 
         return await self.async_step_options(user_input)
 
 
-    async def async_step_options(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_options(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select options to change"""
 
         step_id = "options"
@@ -653,7 +732,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         )
 
 
-    async def async_step_device(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_device(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select options to change"""
 
         step_id = "device"
@@ -684,7 +766,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         )
 
 
-    async def async_step_operation_mode(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_operation_mode(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select options to change"""
 
         step_id = "operation_mode"
@@ -706,7 +791,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return await self.async_select_step(step_id)
 
 
-    async def async_step_times(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_times(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select times"""
 
         step_id = "times"
@@ -723,7 +811,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return await self.async_select_step(step_id)
 
 
-    async def async_step_interfaces(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_interfaces(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to select options to change"""
 
         step_id = "interfaces"
@@ -752,7 +843,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return await self.async_select_step(step_id)
 
 
-    async def async_step_confirmation(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_confirmation(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Step to confirm changes"""
 
         step_id = "confirmation"
@@ -778,7 +872,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
 
     # Step Finish
-    async def async_step_finish(self, user_input : dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_finish(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
         """Finish setup"""
 
         return self.async_create_entry(
