@@ -22,7 +22,7 @@ from homeassistant.components.sensor import (
 DOMAIN = "asusrouter"
 DATA_ASUSROUTER = DOMAIN
 
-PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]
+PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER, Platform.BINARY_SENSOR]
 
 
 # Configurartion keys
