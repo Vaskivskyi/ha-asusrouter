@@ -1,19 +1,44 @@
 {
     "config": {
         "step": {
-            "device": {
-                "description": "Parâmetros para se conectar ao roteador",
+            "discovery": {
+                "description": "Como encontrar seu dispositivo",
                 "data": {
-                    "name": "Nome do dispositivo (deixe em branco para usar o modelo do dispositivo)",
-                    "host": "Nome do host/endereço IP",
+                    "host": "Host / Endereço IP"
+                }
+            },
+            "credentials": {
+                "description": "Credenciais (as mesmas do painel da web do dispositivo)",
+                "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
-                    "port": "Porta (0 para usar o valor padrão)",
+                    "ssl": "Usar conexão SSL"
+                }
+            },
+            "device": {
+                "description": "Parâmetros para conectar ao dispositivo",
+                "data": {
+                    "username": "Nome de usuário",
+                    "password": "Senha",
+                    "port": "Port (0 to use default value)",
                     "ssl": "Usar conexão SSL",
-                    "verify_ssl": "Verificar SSL na conexão",
-                    "cert_path": "Caminho do certificado",
+                    "verify_ssl": "Verificar certificado SSL",
+                    "cert_path": "Caminho do certificado"
+                }
+            },
+            "operation_mode": {
+                "description": "Modo de operação",
+                "data": {
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
                     "enable_control": "Ativar o controle do dispositivo"
+                }
+            },
+            "times": {
+                "description": "Constantes de tempo",
+                "data": {
+                    "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "scan_interval": "Intervalo para atualizar entidades",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
                 }
             },
             "interfaces": {
@@ -21,10 +46,19 @@
                 "data": {
                     "interfaces": "Selecione interfaces de rede para monitorar"
                 }
+            },
+            "name": {
+                "description": "Renomeie seu dispositivo",
+                "data": {
+                    "name": "Deixe em branco para usar o modelo do dispositivo como o nome"
+                }
             }
         },
         "error": {
+            "connection_refused": "Conexão recusada",
             "error": "Falhou ao conectar",
+            "login_blocked": "O login é bloqueado pelo dispositivo. Por favor, espere",
+            "wrong_credentials": "Credenciais erradas",
             "unknown": "Erro desconhecido",
             "password_missing": "Falta a senha",
             "cannot_resolve_host": "Não pode resolver o nome do host. Tente com o endereço IP"
@@ -32,14 +66,61 @@
     },
     "options": {
         "step": {
-            "init": {
-                "title": "Opções de roteador ASUS",
+            "options": {
+                "description": "Selecione as configurações a serem alteradas",
                 "data": {
-                    "interfaces": "Selecione interfaces de rede para monitorar",
-                    "cache_device_time": "Tempo de armazenamento em cache para descoberta de dispositivos",
-                    "cache_time": "Tempo de cache de dados"
+                    "device": "Credenciais e configurações de conexão",
+                    "operation_mode": "Modo de operação",
+                    "times": "Constantes de tempo",
+                    "interfaces": "Interfaces para monitorar"
+                }
+            },
+            "device": {
+                "description": "Parâmetros para conectar ao dispositivo",
+                "data": {
+                    "username": "Nome de usuário",
+                    "password": "Senha",
+                    "port": "Porta (0 para usar o valor padrão)",
+                    "ssl": "Usar conexão SSL",
+                    "verify_ssl": "Verificar certificado SSL",
+                    "cert_path": "Caminho do certificadoh"
+                }
+            },
+            "operation_mode": {
+                "description": "Modo de operação",
+                "data": {
+                    "enable_monitor": "Ativar o monitoramento do dispositivo",
+                    "enable_control": "Ativar o controle do dispositivo"
+                }
+            },
+            "times": {
+                "description": "Constantes de tempo",
+                "data": {
+                    "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "scan_interval": "Intervalo para atualizar entidades",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
+                }
+            },
+            "interfaces": {
+                "description": "Interfaces para monitorar",
+                "data": {
+                    "interfaces": "Selecione interfaces de rede para monitorar"
+                }
+            },
+            "confirmation": {
+                "description": "Por favor, recarregue a integração",
+                "data": {
+                    "confirm": "Entendo que preciso recarregar a integração para aplicar a nova configuração. Para fazer isso, vou clicar no menu de integração (3 pontos) e pressionar 'Recarregar'"
                 }
             }
+        },
+        "error": {
+            "connection_refused": "Conexão recusada",
+            "error": "Falhou ao conectar",
+            "login_blocked": "O login é bloqueado pelo dispositivo. Por favor, espere",
+            "not_confirmed": "Você tem que confirmar",
+            "unknown": "Erro desconhecido",
+            "wrong_credentials": "Credenciais erradas"
         }
     }
 }
