@@ -1,13 +1,12 @@
 [![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE) [![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz)<a href="https://github.com/Vaskivskyi/ha-asusrouter/actions/workflows/build.yaml"><img src="https://img.shields.io/github/workflow/status/Vaskivskyi/ha-asusrouter/Build?style=for-the-badge" alt="Build Status" align="right" /></a>
 
-## AsusRouter - a custom Home Assistant integration
+## AsusRouter - Monitor and control your Asus router from Home Assistant
 
 AsusRouter is a custom integration for Home Assistant to monitor and control your Asus router using [AsusRouter](https://github.com/Vaskivskyi/asusrouter) python library.
 
-It uses the native Asus HTTP(S) API - the same way the web panel works and relies on local communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
+The integration uses the native Asus HTTP(S) API - the same way the web panel or mobile app works and relies on direct communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
 
 You could always help with its development by providing your feedback.
-
 
 ## Installation
 
@@ -18,8 +17,7 @@ You can add this repository in your HACS:
 
 #### Manual
 
-Copy content of `custom_components/asusrouter/` to `custom_components/asusrouter/` in your Home Assistant folder.
-
+Copy content of the [stable branch](https://github.com/Vaskivskyi/ha-asusrouter/tree/stable) `custom_components/asusrouter/` to `custom_components/asusrouter/` in your Home Assistant folder.
 
 ## Usage
 
@@ -29,30 +27,37 @@ After AsusRouter is installed, you can add your device from Home Assistant UI.
 
 To connect to the device you need to provide the following data:
 - IP address or hostname
+
 - Username (the one you use for login in the Asus web panel)
 - Password
+- Whether to use an SSL connection
 
-You can also specify:
-- Port for the connection (if not provided, the default value `80` or `8443` will be used depending on the SSL settings)
-- Whether SSL connection should be used
-- Whether SSL certificate should be checked
-- Path to the certificate (if it is not added to the `Trusted Root Authorities`)
+With version 0.3.0 of the integration, its setup for a new device has become simpler and cleaner. If your device uses default connection settings, you will probably never need to type in all the possible settings. Our [Setup documentation](https://github.com/Vaskivskyi/ha-asusrouter/blob/main/docs/setup.md) may provide you with detailed information on the configuration flow.
 
-If you are not sure about one of the settings above, please check your device settings in the web panel (`Administration - System - Local Access Config`).
+#### Reconfiguration
 
-Integration options:
-- Enable device monitoring (defaults as `True`, will add sensors as listed in the next sections)
-- Enable device control (defaults as `False`, reserved for the further services and switches, not yet implemented)
-
-#### Selecting network interfaces for monitoring
-
-This feature is available both during the initial integration setup and via the `Configure` button on the Integrations page. Entities for the newly selected network interfaces will be created automatically. Removal of the entities which you don't need anymore should be done manually.
+Almost all the integration settings can be reconfigured later via the `Configure` button on the Integrations page without the need to remove your device and add it again.
 
 [![Open your Home Assistant instance and show your integrations.](https://my.home-assistant.io/badges/integrations.svg)](https://my.home-assistant.io/redirect/integrations/)
 
-#### Sensors
+#### Selecting network interfaces for monitoring
 
-Integration provides several types of sensors:
+Entities for the newly selected network interfaces will be created automatically. Removal of the entities which you don't need anymore should be done manually.
+
+#### Lights
+
+These entities require `Device control` to be enabled in the integration settings. Some of the entities may not be available for your device because of their firmware limitation.
+
+<details>
+<summary>LED</summary>
+
+*(enabled by default)*
+  - name: `led`
+  - description: Light entity allows user to control LED state of the device
+  - not available for: `RT-AC66U`
+</details>
+
+#### Sensors
 
 <details>
 <summary>Network traffic and speed</summary>
@@ -132,8 +137,41 @@ Possible network interfaces (can be changed via the `Configure` button for the c
   - description: Sensor value represents the total speed on all the connected LAN / WAN ports. E.g. if 2 ports arer connected in `1 Gb/s` mode and 1 - in `100 Mb/s` mode, this value will be `2100 Mb/s`.
 </details>
 
+<details>
+<summary>WAN IP sensor</summary>
+
+*(disabled by default)*
+
+  - name: `wan_ip`
+  - attributes:
+    - `Type` - type of the IP (may be `static`, `dhcp` and more)
+    - `Gateway`
+    - `Mask`
+    - `DNS`
+    - `Private subnet`
+  - description: Sensor value represents the current external IP address of the device
+</details>
+
 [^traffic]: Asus routers calculate traffic as an 8-digit HEX, so it overflows each 4 294 967 296 bytes (4 GB). One can either use [Long-term statistics](#long-term-statistics) or create a [`utility_meter`](https://www.home-assistant.io/integrations/utility_meter/) for more control and the possibility to monitor traffic above the limitation.
 [^units]: The integration uses 2^10 conversion factors in calculations - the same way as native Asus software. If you would like to use 10^3 factors, all the sensors provide raw data in bytes or bits/s.
+
+#### Binary sensors
+
+<details>
+<summary>WAN status</summary>
+
+*(disabled by default)*
+
+  - name: `wan`
+  - attributes:
+    - `IP`
+    - `Type` - type of the IP (may be `static`, `dhcp` and more)
+    - `Gateway`
+    - `Mask`
+    - `DNS`
+    - `Private subnet`
+  - description: Sensor value represents the internet connection of the device
+</details>
 
 #### Device trackers
 
@@ -160,7 +198,6 @@ If the connected device's MAC address is known to Home Assistant (e.g. it was se
 
 The long-term statistics is supported for all the sensors, but `boot_time`.
 
-
 ## More features
 
 #### Secondary WAN (USB)
@@ -177,25 +214,25 @@ There will be an error in your log in this case.
 
 If you are experiencing multiple errors in your log (more than 5 in a row) or integration does not provide any data 5 minutes after a reboot, please report it to the Issues. The more data you provide, the easier it will be to fix the problem.
 
-
 ## Supported devices
 
 The list of supported devices includes (but is not limited to):
 
 802.11 AC models:
-- `RT-AC66U`
+- `RT-AC66U` (without LED control, firmware limitation)
 - `RT-AC86U` (a known issue https://github.com/Vaskivskyi/ha-asusrouter/issues/29, produces warnings in the log)
 - `RT-ACRH13`
 
 802.11 AX models:
 - `RT-AX58U`
+- `RT-AX68U`
 - `RT-AX86U`
 - `RT-AX88U`
 - `RT-AX89X`
+- `RT-AX92U`
 - `ZenWiFi AX (XT8)`
 
 If your device is not listed but is confirmed to work, you are welcome to open PR with a proposed change to this list. Alternatively, you can open an issue with the device model and it will be added to the list.
-
 
 ## Support the integration
 
@@ -214,7 +251,6 @@ Testing the integration with different devices would help a lot in the developme
 This integration is a free-time project. If you like it, you can support me by buying a coffee.
 
 <a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 40px !important;"></a>
-
 
 ## Thanks to
 
