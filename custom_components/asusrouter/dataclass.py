@@ -1,20 +1,20 @@
-"""AsusRouter dataclasses"""
+"""AsusRouter dataclasses."""
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Callable
 
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
-from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.light import LightEntityDescription
+from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.helpers.entity import EntityDescription
 
 
 @dataclass
 class AREntityDescription(EntityDescription):
-    """Describe AsusRouter entity"""
+    """Describe AsusRouter entity."""
 
     key_group: Callable[[dict], str] | None = None
     value: Callable[[Any], Any] = lambda val: val
@@ -25,19 +25,17 @@ class AREntityDescription(EntityDescription):
 
 @dataclass
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
-    """Describe AsusRouter sensor"""
+    """Describe AsusRouter sensor."""
 
 
 @dataclass
 class ARBinarySensorDescription(AREntityDescription, BinarySensorEntityDescription):
-    """Describe AsusRouter sensor"""
+    """Describe AsusRouter sensor."""
 
 
 @dataclass
 class ARLightDescription(AREntityDescription, LightEntityDescription):
-    """Describe AsusRouter light"""
+    """Describe AsusRouter light."""
 
     icon_on: str | None = None
     icon_off: str | None = None
-
-

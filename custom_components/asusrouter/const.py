@@ -1,28 +1,28 @@
 """AsusRouter constants"""
 
 from __future__ import annotations
-from datetime import timedelta
 
 from typing import Any
 
+from homeassistant.components.sensor import SensorStateClass
 from homeassistant.const import (
     CONF_PORT,
     CONF_VERIFY_SSL,
-    CONF_SSL,
     DATA_GIGABYTES,
     DATA_RATE_MEGABITS_PER_SECOND,
     Platform,
 )
-from homeassistant.components.sensor import (
-    SensorStateClass,
-)
-
 
 # Main integrartion info
 DOMAIN = "asusrouter"
 DATA_ASUSROUTER = DOMAIN
 
-PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER, Platform.BINARY_SENSOR, Platform.LIGHT]
+PLATFORMS = [
+    Platform.SENSOR,
+    Platform.DEVICE_TRACKER,
+    Platform.BINARY_SENSOR,
+    Platform.LIGHT,
+]
 
 
 # Configurartion keys
@@ -35,7 +35,15 @@ CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_INTERFACES = "interfaces"
 
 # Configuration keys that rerquire reload of integration
-CONF_REQ_RELOAD = [CONF_INTERFACES]
+CONF_REQ_RELOAD = [
+    CONF_CACHE_TIME,
+    CONF_CERT_PATH,
+    CONF_CONFIRM,
+    CONF_CONSIDER_HOME,
+    CONF_ENABLE_CONTROL,
+    CONF_ENABLE_MONITOR,
+    CONF_INTERFACES,
+]
 
 
 # Default configuration
@@ -81,7 +89,17 @@ SENSORS_TYPE_WAN = "wan"
 # Sensors
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = ["number"]
-SENSORS_CPU = ["total", "core_1", "core_2", "core_3", "core_4", "core_5", "core_6", "core_7", "core_8"]
+SENSORS_CPU = [
+    "total",
+    "core_1",
+    "core_2",
+    "core_3",
+    "core_4",
+    "core_5",
+    "core_6",
+    "core_7",
+    "core_8",
+]
 SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 SENSORS_PORTS = ["WAN", "LAN"]
@@ -164,5 +182,3 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "raw_attribute": "bits/s",
     },
 }
-
-

@@ -1,15 +1,16 @@
-"""AsusRouter binary sensors"""
+"""AsusRouter binary sensors."""
 
 from __future__ import annotations
 
 import logging
+
 _LOGGER = logging.getLogger(__name__)
 
 from typing import Any
 
 from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
     DEVICE_CLASS_CONNECTIVITY,
+    BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -20,25 +21,19 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import (
-    DATA_ASUSROUTER,
-    DOMAIN,
-    KEY_COORDINATOR,
-    SENSORS_TYPE_WAN,
-)
+from .const import DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR, SENSORS_TYPE_WAN
 from .dataclass import ARBinarySensorDescription
 from .router import AsusRouterObj
 
-
 BINARY_SENSORS = {
     (SENSORS_TYPE_WAN, "status"): ARBinarySensorDescription(
-        key = "status",
-        key_group = SENSORS_TYPE_WAN,
-        name = "WAN",
-        entity_category = EntityCategory.DIAGNOSTIC,
-        device_class = DEVICE_CLASS_CONNECTIVITY,
-        entity_registry_enabled_default = True,
-        extra_state_attributes = {
+        key="status",
+        key_group=SENSORS_TYPE_WAN,
+        name="WAN",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=DEVICE_CLASS_CONNECTIVITY,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
             "ip": "IP",
             "ip_type": "Type",
             "gateway": "Gateway",
@@ -55,7 +50,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter binary sensors"""
+    """Setup AsusRouter binary sensors."""
 
     router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
     entities = []
@@ -65,8 +60,15 @@ async def async_setup_entry(
         for sensor_description in BINARY_SENSORS:
             try:
                 if sensor_description[0] in sensor_data:
-                    if BINARY_SENSORS[sensor_description].key in sensor_data[sensor_description[0]]:
-                        entities.append(ARBinarySensor(coordinator, router, BINARY_SENSORS[sensor_description]))
+                    if (
+                        BINARY_SENSORS[sensor_description].key
+                        in sensor_data[sensor_description[0]]
+                    ):
+                        entities.append(
+                            ARBinarySensor(
+                                coordinator, router, BINARY_SENSORS[sensor_description]
+                            )
+                        )
             except Exception as ex:
                 _LOGGER.warning(ex)
 
@@ -74,7 +76,7 @@ async def async_setup_entry(
 
 
 class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
-    """AsusRouter binary sensor"""
+    """AsusRouter binary sensor."""
 
     def __init__(
         self,
@@ -82,7 +84,7 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
         router: AsusRouterObj,
         description: ARBinarySensorDescription,
     ) -> None:
-        """Initialize AsusRouter binary sensor"""
+        """Initialize AsusRouter binary sensor."""
 
         super().__init__(coordinator)
         self.entity_description: ARBinarySensorDescription = description
@@ -93,17 +95,15 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_unique_id = "{} {}".format(DOMAIN, self.name)
         self._attr_device_info = router.device_info
 
-
     @property
     def is_on(self) -> bool:
-        """Return state"""
+        """Return state."""
 
         return self.coordinator.data.get(self.entity_description.key)
 
-
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes"""
+        """Return extra state attributes."""
 
         description = self.entity_description
         _attributes = description.extra_state_attributes
@@ -117,5 +117,3 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
                 attributes[_attributes[attr]] = self.coordinator.data[attr]
 
         return attributes
-
-
