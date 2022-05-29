@@ -1,12 +1,13 @@
-"""AsusRouter sensors"""
+"""AsusRouter sensors."""
 
 from __future__ import annotations
 
 import logging
+
 _LOGGER = logging.getLogger(__name__)
 
-from typing import Any
 from numbers import Real
+from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -14,10 +15,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    DATA_RATE_MEGABITS_PER_SECOND,
-    PERCENTAGE,
-)
+from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -26,6 +24,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
+from .compilers import list_sensors_network
 from .const import (
     CONF_INTERFACES,
     DATA_ASUSROUTER,
@@ -37,41 +36,38 @@ from .const import (
     SENSORS_TYPE_RAM,
     SENSORS_TYPE_WAN,
 )
-
-from .compilers import list_sensors_network
 from .dataclass import ARSensorDescription
-from .router import AsusRouterObj, KEY_COORDINATOR
-
+from .router import KEY_COORDINATOR, AsusRouterObj
 
 SENSORS = {
     (SENSORS_TYPE_DEVICES, "number"): ARSensorDescription(
-        key = "number",
-        key_group = SENSORS_TYPE_DEVICES,
-        name = "Connected Devices",
-        icon = "mdi:router-network",
-        state_class = SensorStateClass.MEASUREMENT,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = True,
+        key="number",
+        key_group=SENSORS_TYPE_DEVICES,
+        name="Connected Devices",
+        icon="mdi:router-network",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
     ),
     (SENSORS_TYPE_MISC, "boottime"): ARSensorDescription(
-        key = "boottime",
-        key_group = SENSORS_TYPE_MISC,
-        name = "Boot Time",
-        icon = "mdi:restart",
-        device_class = SensorDeviceClass.TIMESTAMP,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
+        key="boottime",
+        key_group=SENSORS_TYPE_MISC,
+        name="Boot Time",
+        icon="mdi:restart",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     (SENSORS_TYPE_CPU, "total"): ARSensorDescription(
-        key = "total",
-        key_group = SENSORS_TYPE_CPU,
-        name = "CPU",
-        icon = "mdi:cpu-32-bit",
-        state_class = SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement = PERCENTAGE,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
-        extra_state_attributes = {
+        key="total",
+        key_group=SENSORS_TYPE_CPU,
+        name="CPU",
+        icon="mdi:cpu-32-bit",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
             "core_1": "Core 1",
             "core_2": "Core 2",
             "core_3": "Core 3",
@@ -83,31 +79,31 @@ SENSORS = {
         },
     ),
     (SENSORS_TYPE_RAM, "usage"): ARSensorDescription(
-        key = "usage",
-        key_group = SENSORS_TYPE_RAM,
-        name = "RAM",
-        icon = "mdi:memory",
-        state_class = SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement = PERCENTAGE,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
-        precision = 2,
-        extra_state_attributes = {
+        key="usage",
+        key_group=SENSORS_TYPE_RAM,
+        name="RAM",
+        icon="mdi:memory",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        precision=2,
+        extra_state_attributes={
             "total": "Total",
             "free": "Free",
             "used": "Used",
         },
     ),
     (SENSORS_TYPE_PORTS, "WAN_total"): ARSensorDescription(
-        key = "WAN_total",
-        key_group = SENSORS_TYPE_PORTS,
-        name = "WAN Speed",
-        icon = "mdi:ethernet-cable",
-        state_class = SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement = DATA_RATE_MEGABITS_PER_SECOND,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
-        extra_state_attributes = {
+        key="WAN_total",
+        key_group=SENSORS_TYPE_PORTS,
+        name="WAN Speed",
+        icon="mdi:ethernet-cable",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
             "WAN_0": "WAN 0",
             "WAN_1": "WAN 1",
             "WAN_2": "WAN 2",
@@ -115,15 +111,15 @@ SENSORS = {
         },
     ),
     (SENSORS_TYPE_PORTS, "LAN_total"): ARSensorDescription(
-        key = "LAN_total",
-        key_group = SENSORS_TYPE_PORTS,
-        name = "LAN Speed",
-        icon = "mdi:ethernet-cable",
-        state_class = SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement = DATA_RATE_MEGABITS_PER_SECOND,
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
-        extra_state_attributes = {
+        key="LAN_total",
+        key_group=SENSORS_TYPE_PORTS,
+        name="LAN Speed",
+        icon="mdi:ethernet-cable",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
             "LAN_1": "LAN 1",
             "LAN_2": "LAN 2",
             "LAN_3": "LAN 3",
@@ -135,13 +131,13 @@ SENSORS = {
         },
     ),
     (SENSORS_TYPE_WAN, "ip"): ARSensorDescription(
-        key = "ip",
-        key_group = SENSORS_TYPE_WAN,
-        name = "WAN IP",
-        icon = "mdi:ip",
-        entity_category = EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default = False,
-        extra_state_attributes = {
+        key="ip",
+        key_group=SENSORS_TYPE_WAN,
+        name="WAN IP",
+        icon="mdi:ip",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
             "ip_type": "Type",
             "gateway": "Gateway",
             "mask": "Mask",
@@ -157,7 +153,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter sensors"""
+    """Setup AsusRouter sensors."""
 
     router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
     entities = []
@@ -169,8 +165,13 @@ async def async_setup_entry(
         for sensor_description in SENSORS:
             try:
                 if sensor_description[0] in sensor_data:
-                    if SENSORS[sensor_description].key in sensor_data[sensor_description[0]]:
-                        entities.append(ARSensor(coordinator, router, SENSORS[sensor_description]))
+                    if (
+                        SENSORS[sensor_description].key
+                        in sensor_data[sensor_description[0]]
+                    ):
+                        entities.append(
+                            ARSensor(coordinator, router, SENSORS[sensor_description])
+                        )
             except Exception as ex:
                 _LOGGER.warning(ex)
 
@@ -178,7 +179,7 @@ async def async_setup_entry(
 
 
 class ARSensor(CoordinatorEntity, SensorEntity):
-    """AsusRouter sensor"""
+    """AsusRouter sensor."""
 
     def __init__(
         self,
@@ -186,7 +187,7 @@ class ARSensor(CoordinatorEntity, SensorEntity):
         router: AsusRouterObj,
         description: ARSensorDescription,
     ) -> None:
-        """Initialize AsusRouter sensor"""
+        """Initialize AsusRouter sensor."""
 
         super().__init__(coordinator)
         self.entity_description: ARSensorDescription = description
@@ -197,29 +198,23 @@ class ARSensor(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = "{} {}".format(DOMAIN, self.name)
         self._attr_device_info = router.device_info
 
-
     @property
     def native_value(
         self,
     ) -> float | str | None:
-        """Return state"""
+        """Return state."""
 
         description = self.entity_description
         state = self.coordinator.data.get(description.key)
-        if (
-            state is not None
-            and description.factor
-            and isinstance(state, Real)
-        ):
+        if state is not None and description.factor and isinstance(state, Real):
             return round(state / description.factor, description.precision)
         return state
-
 
     @property
     def extra_state_attributes(
         self,
     ) -> dict[str, Any]:
-        """Return extra state attributes"""
+        """Return extra state attributes."""
 
         description = self.entity_description
         _attributes = description.extra_state_attributes
@@ -233,5 +228,3 @@ class ARSensor(CoordinatorEntity, SensorEntity):
                 attributes[_attributes[attr]] = self.coordinator.data[attr]
 
         return attributes
-
-

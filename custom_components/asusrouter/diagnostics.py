@@ -1,10 +1,10 @@
-"""AsusRouter diagnostics"""
+"""AsusRouter diagnostics."""
 
 from __future__ import annotations
 
 from typing import Any
-import attr
 
+import attr
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -15,12 +15,10 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
-from .const import (
-    DATA_ASUSROUTER,
-    DOMAIN,
-)
+from .const import DATA_ASUSROUTER, DOMAIN
 from .router import AsusRouterObj
 
 TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
@@ -31,7 +29,7 @@ async def async_get_config_entry_diagnostics(
     hass: HomeAssistant,
     entry: ConfigEntry,
 ) -> dict[str, dict[str, Any]]:
-    """Return diagnostics for a config entry"""
+    """Return diagnostics for a config entry."""
 
     data = {"entry": async_redact_data(entry.as_dict(), TO_REDACT)}
 
@@ -88,5 +86,3 @@ async def async_get_config_entry_diagnostics(
         )
 
     return data
-
-

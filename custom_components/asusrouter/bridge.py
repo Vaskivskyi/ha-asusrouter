@@ -1,13 +1,15 @@
-"""AsusRouter bridge"""
+"""AsusRouter bridge."""
 
 from __future__ import annotations
 
 import logging
+
 _LOGGER = logging.getLogger(__name__)
 
 from datetime import datetime
 from typing import Any
 
+from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -19,13 +21,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import UpdateFailed
-
-from asusrouter import (
-    AsusDevice,
-    AsusRouter,
-    AsusRouterError,
-    ConnectedDevice,
-)
 
 from .const import (
     CONF_CACHE_TIME,
@@ -51,8 +46,8 @@ from .const import (
 )
 
 
-class ARBridge():
-    """Bridge for AsusRouter library"""
+class ARBridge:
+    """Bridge for AsusRouter library."""
 
     def __init__(
         self,
@@ -60,7 +55,7 @@ class ARBridge():
         configs: dict[str, Any],
         options: dict[str, Any] = dict(),
     ) -> None:
-        """Initialize bridge"""
+        """Initialize bridge."""
 
         super().__init__()
         self._configs = configs.copy()
@@ -69,36 +64,33 @@ class ARBridge():
         self._host = self._configs[CONF_HOST]
         self._identity: AsusDevice | None = None
 
-
     @staticmethod
     def _get_api(
         configs: dict[str, Any],
     ) -> AsusRouter:
-        """Get AsusRouter API"""
+        """Get AsusRouter API."""
 
         return AsusRouter(
-            host = configs[CONF_HOST],
-            username = configs[CONF_USERNAME],
-            password = configs[CONF_PASSWORD],
-            port = configs.get(CONF_PORT, DEFAULT_PORT),
-            use_ssl = configs[CONF_SSL],
-            cert_check = configs.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
-            cert_path = configs.get(CONF_CERT_PATH, ""),
-            cache_time = configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
-            enable_monitor = configs.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR),
-            enable_control = configs.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
+            host=configs[CONF_HOST],
+            username=configs[CONF_USERNAME],
+            password=configs[CONF_PASSWORD],
+            port=configs.get(CONF_PORT, DEFAULT_PORT),
+            use_ssl=configs[CONF_SSL],
+            cert_check=configs.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
+            cert_path=configs.get(CONF_CERT_PATH, ""),
+            cache_time=configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
+            enable_monitor=configs.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR),
+            enable_control=configs.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
         )
-
 
     @property
     def is_connected(self) -> bool:
-        """Get connected status"""
+        """Get connected status."""
 
         return self._api.connected
 
-
     async def async_connect(self) -> None:
-        """Connect to the device"""
+        """Connect to the device."""
 
         try:
             await self._api.async_connect()
@@ -108,101 +100,81 @@ class ARBridge():
         except Exception as ex:
             raise ConfigEntryNotReady from ex
 
-
     async def async_disconnect(self) -> None:
-        """Disconnect from the device"""
+        """Disconnect from the device."""
 
         await self._api.async_disconnect()
 
-
     async def async_clean(self) -> None:
-        """Cleanup"""
+        """Cleanup."""
 
         await self._api.connection.async_cleanup()
 
-
     async def _async_get_device_identity(self) -> AsusDevice:
-        """Load device identity"""
+        """Load device identity."""
 
         return await self._api.async_get_identity()
 
-
     async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
-        """Get dict of connected devices"""
+        """Get dict of connected devices."""
 
         try:
             api_devices = await self._api.async_get_devices()
         except Exception as ex:
             raise UpdateFailed(ex) from ex
-        
+
         return api_devices
 
-
     async def get_firmware(self) -> str | None:
-        """Get firmware information"""
+        """Get firmware information."""
 
         return self._identity.firmware()
 
-
     async def get_mac(self) -> str | None:
-        """Get MAC information"""
+        """Get MAC information."""
 
         return self._identity.mac
 
-
     async def get_serial(self) -> str | None:
-        """Get serial information"""
+        """Get serial information."""
 
         return self._identity.serial
 
-
     async def get_model(self) -> str | None:
-        """Get model information"""
+        """Get model information."""
 
         return self._identity.model
 
-
     async def get_vendor(self) -> str | None:
-        """Get vendor information"""
+        """Get vendor information."""
 
         return self._identity.brand
 
-
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
-        """Get a dictionary of available sensors"""
+        """Get a dictionary of available sensors."""
 
         sensors_types = {
             SENSORS_TYPE_CPU: {
                 "sensors": await self._get_cpu_sensors(),
-                "method": self._get_cpu
+                "method": self._get_cpu,
             },
-            SENSORS_TYPE_RAM: {
-                "sensors": SENSORS_RAM,
-                "method": self._get_ram
-            },
+            SENSORS_TYPE_RAM: {"sensors": SENSORS_RAM, "method": self._get_ram},
             SENSORS_TYPE_NETWORK_STAT: {
                 "sensors": await self._get_network_stat_sensors(),
-                "method": self._get_network_stat
+                "method": self._get_network_stat,
             },
-            SENSORS_TYPE_MISC: {
-                "sensors": SENSORS_MISC,
-                "method": self._get_misc
-            },
+            SENSORS_TYPE_MISC: {"sensors": SENSORS_MISC, "method": self._get_misc},
             SENSORS_TYPE_PORTS: {
                 "sensors": await self._get_ports_sensors(),
-                "method": self._get_ports
+                "method": self._get_ports,
             },
-            SENSORS_TYPE_WAN: {
-                "sensors": SENSORS_WAN,
-                "method": self._get_wan
-            },
+            SENSORS_TYPE_WAN: {"sensors": SENSORS_WAN, "method": self._get_wan},
         }
         return sensors_types
 
-
     ### GET DATA FROM DEVICE ->
     async def _get_cpu(self) -> dict[str, Any]:
-        """Get CPU data from the device"""
+        """Get CPU data from the device."""
 
         try:
             data = await self._api.async_get_cpu()
@@ -211,9 +183,8 @@ class ARBridge():
 
         return data
 
-
     async def _get_ram(self) -> dict[str, Any]:
-        """Get RAM data from the device"""
+        """Get RAM data from the device."""
 
         try:
             data = await self._api.async_get_ram()
@@ -222,9 +193,8 @@ class ARBridge():
 
         return data
 
-
     async def _get_network_stat(self) -> dict[str, Any]:
-        """Get network data from device"""
+        """Get network data from device."""
 
         try:
             data = await self._api.async_get_network()
@@ -233,9 +203,8 @@ class ARBridge():
 
         return data
 
-
     async def _get_misc(self) -> dict[str, Any]:
-        """Get MISC sensors from the device"""
+        """Get MISC sensors from the device."""
 
         data = dict()
         await self._api.async_monitor_misc()
@@ -243,9 +212,8 @@ class ARBridge():
 
         return data
 
-
     async def _get_ports(self) -> dict[str, dict[str, int]]:
-        """Get ports status from the device"""
+        """Get ports status from the device."""
 
         data = dict()
         try:
@@ -264,9 +232,8 @@ class ARBridge():
 
         return data
 
-
     async def _get_wan(self) -> dict[str, Any]:
-        """Get WAN data from the device"""
+        """Get WAN data from the device."""
 
         try:
             data = await self._api.async_get_wan()
@@ -274,24 +241,25 @@ class ARBridge():
             raise UpdateFailed(ex) from ex
 
         return data
-    ### <- GET DATA FROM DEVICE
 
+    ### <- GET DATA FROM DEVICE
 
     ### GET SENSORS LIST ->
     async def _get_cpu_sensors(self):
-        """Get the available CPU sensors"""
+        """Get the available CPU sensors."""
 
         try:
             sensors = await self._api.async_get_cpu_labels()
             _LOGGER.debug("Available CPU sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.warning("Cannot get available CPU sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning(
+                "Cannot get available CPU sensors for {}: {}".format(self._host, ex)
+            )
             sensors = ["total"]
         return sensors
 
-
     async def _get_network_stat_sensors(self):
-        """Get the available network stat sensors"""
+        """Get the available network stat sensors."""
 
         try:
             sensors = []
@@ -301,12 +269,15 @@ class ARBridge():
                     sensors.append("{}_{}".format(label, el))
             _LOGGER.debug("Available network stat sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.warning("Cannot get available network stat sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning(
+                "Cannot get available network stat sensors for {}: {}".format(
+                    self._host, ex
+                )
+            )
         return sensors
 
-
     async def _get_ports_sensors(self):
-        """Get the available ports sensors"""
+        """Get the available ports sensors."""
 
         try:
             sensors = []
@@ -319,16 +290,17 @@ class ARBridge():
                         sensors.append("{}_{}".format(type, port))
             _LOGGER.debug("Available ports sensors: {}".format(sensors))
         except Exception as ex:
-            _LOGGER.warning("Cannot get available ports sensors for {}: {}".format(self._host, ex))
+            _LOGGER.warning(
+                "Cannot get available ports sensors for {}: {}".format(self._host, ex)
+            )
         return sensors
-    ### <- GET SENSORS LIST
 
+    ### <- GET SENSORS LIST
 
     ### GENERAL USAGE METHODS ->
     async def async_get_network_interfaces(self) -> list[str]:
-        """Get the list of network interfaces of the device"""
+        """Get the list of network interfaces of the device."""
 
         return await self._api.async_get_network_labels()
+
     ### <- GENERAL USAGE METHODS
-
-
