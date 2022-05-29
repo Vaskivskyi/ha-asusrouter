@@ -91,8 +91,8 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self.router = router
         self.coordinator = coordinator
 
-        self._attr_name = "{} {}".format(router._name, description.name)
-        self._attr_unique_id = "{} {}".format(DOMAIN, self.name)
+        self._attr_name = f"{router._name} {description.name}"
+        self._attr_unique_id = f"{DOMAIN} {self.name}"
         self._attr_device_info = router.device_info
 
     @property

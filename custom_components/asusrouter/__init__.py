@@ -95,7 +95,7 @@ async def async_migrate_entry(
     """Migrate old entry."""
 
     version = entry.version
-    _LOGGER.debug("Migrating from version {}".format(entry.version))
+    _LOGGER.debug(f"Migrating from version {entry.version}")
 
     new_entry = {**entry.data}
     new_options = {**entry.options}
@@ -108,16 +108,16 @@ async def async_migrate_entry(
         new_options[CONF_CACHE_TIME] = DEFAULT_CACHE_TIME
         new_options[CONF_CONSIDER_HOME] = DEFAULT_CONSIDER_HOME
 
-    while "{}_{}".format(version, version + 1) in DEPRECATED:
-        for key_old in DEPRECATED["{}_{}".format(version, version + 1)]:
-            key_new = DEPRECATED["{}_{}".format(version, version + 1)][key_old]
+    while f"{version}_{version + 1}" in DEPRECATED:
+        for key_old in DEPRECATED[f"{version}_{version + 1}"]:
+            key_new = DEPRECATED[f"{version}_{version + 1}"][key_old]
             new_entry[key_new] = new_entry[key_old]
             new_entry.pop(key_old)
 
         version += 1
 
-    while "{}_{}".format(version, version + 1) in MOVE_TO_OPTIONS:
-        for key in MOVE_TO_OPTIONS["{}_{}".format(version, version + 1)]:
+    while f"{version}_{version + 1}" in MOVE_TO_OPTIONS:
+        for key in MOVE_TO_OPTIONS[f"{version}_{version + 1}"]:
             new_options[key] = new_entry[key]
             new_entry.pop(key)
 
@@ -126,6 +126,6 @@ async def async_migrate_entry(
     entry.version = version
     hass.config_entries.async_update_entry(entry, data=new_entry, options=new_options)
 
-    _LOGGER.info("Migration to version {} successful".format(entry.version))
+    _LOGGER.info(f"Migration to version {entry.version} successful")
 
     return True
