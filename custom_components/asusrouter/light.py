@@ -63,8 +63,8 @@ class ARLightLED(LightEntity):
         self.router = router
         self.api = router.api._api
 
-        self._attr_name = "{} {}".format(router._name, description.name)
-        self._attr_unique_id = "{} {}".format(DOMAIN, self.name)
+        self._attr_name = f"{router._name} {description.name}"
+        self._attr_unique_id = f"{DOMAIN} {self.name}"
         self._attr_device_info = router.device_info
         self._icon_on = description.icon_on
         self._icon_off = description.icon_off
@@ -100,7 +100,7 @@ class ARLightLED(LightEntity):
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
-            _LOGGER.error("LED control has returned an exception: {}".format(ex))
+            _LOGGER.error(f"LED control has returned an exception: {ex}")
 
     async def async_turn_off(
         self,
@@ -114,7 +114,7 @@ class ARLightLED(LightEntity):
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
-            _LOGGER.error("LED control has returned an exception: {}".format(ex))
+            _LOGGER.error(f"LED control has returned an exception: {ex}")
 
     async def async_update(self) -> None:
         """Update state from the device."""

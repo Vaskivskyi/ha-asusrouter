@@ -95,7 +95,7 @@ class AsusRouterSensorHandler:
         elif update_method is not None:
             method = update_method
         else:
-            raise RuntimeError("Unknown sensor type: {}".format(sensor_type))
+            raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
         coordinator = DataUpdateCoordinator(
             self._hass,
@@ -308,22 +308,20 @@ class AsusRouterObj:
         """Update AsusRouter devices tracker."""
 
         new_device = False
-        _LOGGER.debug("Checking devices for ASUS router {}".format(self._host))
+        _LOGGER.debug(f"Updating AsusRouter device list for '{self._host}'")
         try:
             api_devices = await self._api.async_get_connected_devices()
         except OSError as ex:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    "Error connecting to ASUS router {} for device update: {}".format(
-                        self._host, ex
-                    )
+                    f"Error connecting to '{self._host}' for device update: {ex}"
                 )
             return
 
         if self._connect_error:
             self._connect_error = False
-            _LOGGER.info("Reconnected to ASUS router {}".format(self._host))
+            _LOGGER.info(f"Reconnected to '{self._host}'")
 
         self._connected_devices = 0
         for device in api_devices:
@@ -448,13 +446,13 @@ class AsusRouterObj:
     def signal_device_new(self) -> str:
         """Event specific per AsusRouter entry to signal new device."""
 
-        return "{}-device-new".format(DOMAIN)
+        return f"{DOMAIN}-device-new"
 
     @property
     def signal_device_update(self) -> str:
         """Event specific per AsusRouter entry to signal updates in devices."""
 
-        return "{}-device-update".format(DOMAIN)
+        return f"{DOMAIN}-device-update"
 
     @property
     def devices(self) -> dict[str, Any]:

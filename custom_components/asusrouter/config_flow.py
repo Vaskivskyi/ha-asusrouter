@@ -103,9 +103,7 @@ async def _async_get_network_interfaces(
         return labels
     except Exception as ex:
         _LOGGER.debug(
-            "Cannot get available network stat sensors for {}: {}".format(
-                configs[CONF_HOST], ex
-            )
+            f"Cannot get available network stat sensors for {configs[CONF_HOST]}: {ex}"
         )
         return DELAULT_INTERFACES
 
@@ -138,7 +136,7 @@ async def _async_check_connection(
         )
         step_type = STEP_TYPE_SIMPLE
 
-        _LOGGER.debug("Setup ({}) initiated".format(step_type))
+        _LOGGER.debug(f"Setup ({step_type}) initiated")
 
     api = ARBridge(hass, configs_to_use)
 
@@ -146,16 +144,14 @@ async def _async_check_connection(
         await api.async_connect()
     # Credentials error
     except AsusRouterLoginError:
-        _LOGGER.error("Error during connection to '{}'. Wrong credentials".format(host))
+        _LOGGER.error(f"Error during connection to '{host}'. Wrong credentials")
         return {
             "errors": RESULT_WRONG_CREDENTIALS,
         }
     # Login blocked by the device
     except AsusRouterLoginBlockError as ex:
         _LOGGER.error(
-            "Device '{}' has reported block for the login (to many wrong attempts were made). Please try again in {} seconds".format(
-                host, ex.timeout
-            )
+            f"Device '{host}' has reported block for the login (to many wrong attempts were made). Please try again in {ex.timeout} seconds"
         )
         return {
             "errors": RESULT_LOGIN_BLOCKED,
@@ -164,15 +160,11 @@ async def _async_check_connection(
     except AsusRouterConnectionError as ex:
         if simple:
             _LOGGER.debug(
-                "Simplified setup failed for {}. Switching to the complete mode. Original exception of type {}: {}".format(
-                    host, type(ex), ex
-                )
+                f"Simplified setup failed for {host}. Switching to the complete mode. Original exception of type {type(ex)}: {ex}"
             )
         else:
             _LOGGER.error(
-                "Connection refused by {}. Check SSL and port settings. Original exception: {}".format(
-                    host, ex
-                )
+                f"Connection refused by {host}. Check SSL and port settings. Original exception: {ex}"
             )
         return {
             "errors": RESULT_CONNECTION_REFUSED,
@@ -181,15 +173,11 @@ async def _async_check_connection(
     except Exception as ex:
         if simple:
             _LOGGER.debug(
-                "Simplified setup failed for {}. Switching to the complete mode. Original exception of type {}: {}".format(
-                    host, type(ex), ex
-                )
+                f"Simplified setup failed for {host}. Switching to the complete mode. Original exception of type {type(ex)}: {ex}"
             )
         else:
             _LOGGER.error(
-                "Unknown error of type '{}' during connection to {}: {}".format(
-                    type(ex), host, ex
-                )
+                f"Unknown error of type '{type(ex)}' during connection to {host}: {ex}"
             )
         return {
             "errors": RESULT_UNKNOWN,
@@ -205,7 +193,7 @@ async def _async_check_connection(
 
     result["configs"] = configs_to_use
 
-    _LOGGER.debug("Setup ({}) successful".format(step_type))
+    _LOGGER.debug(f"Setup ({step_type}) successful")
 
     return result
 
@@ -381,13 +369,11 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if last_step:
             if last_step in self._steps:
                 if _check_errors(errors):
-                    return await self._steps["{}_error".format(last_step)](
-                        errors=errors
-                    )
+                    return await self._steps[f"{last_step}_error"](errors=errors)
                 else:
                     return await self._steps[last_step]()
             else:
-                raise ValueError("Unknown value of last_step: {}".format(last_step))
+                raise ValueError(f"Unknown value of last_step: {last_step}")
         else:
             raise ValueError("Step name was not provided")
 
@@ -641,13 +627,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if last_step:
             if last_step in self._steps:
                 if _check_errors(errors):
-                    return await self._steps["{}_error".format(last_step)](
-                        errors=errors
-                    )
+                    return await self._steps[f"{last_step}_error"](errors=errors)
                 else:
                     return await self._steps[last_step]()
             else:
-                raise ValueError("Unknown value of last_step: {}".format(last_step))
+                raise ValueError(f"Unknown value of last_step: {last_step}")
         else:
             raise ValueError("Step name was not provided")
 

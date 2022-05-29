@@ -221,11 +221,12 @@ class ARBridge:
 
             for type in SENSORS_PORTS:
                 if type in raw:
-                    data["{}_total".format(type)] = 0
+                    _total = f"{type}_total"
+                    data[_total] = 0
                     for port in raw[type]:
-                        data["{}_{}".format(type, port)] = raw[type][port]
-                        data["{}_total".format(type)] += raw[type][port]
-                    if data["{}_total".format(type)] > 0:
+                        data[f"{type}_{port}"] = raw[type][port]
+                        data[_total] += raw[type][port]
+                    if data[_total] > 0:
                         data[type] = True
         except (OSError, ValueError) as ex:
             raise UpdateFailed(ex) from ex
@@ -250,11 +251,9 @@ class ARBridge:
 
         try:
             sensors = await self._api.async_get_cpu_labels()
-            _LOGGER.debug("Available CPU sensors: {}".format(sensors))
+            _LOGGER.debug(f"Available CPU sensors: {sensors}")
         except Exception as ex:
-            _LOGGER.warning(
-                "Cannot get available CPU sensors for {}: {}".format(self._host, ex)
-            )
+            _LOGGER.warning(f"Cannot get available CPU sensors for {self._host}: {ex}")
             sensors = ["total"]
         return sensors
 
@@ -266,13 +265,11 @@ class ARBridge:
             labels = await self.async_get_network_interfaces()
             for label in labels:
                 for el in SENSORS_NETWORK_STAT:
-                    sensors.append("{}_{}".format(label, el))
-            _LOGGER.debug("Available network stat sensors: {}".format(sensors))
+                    sensors.append(f"{label}_{el}")
+            _LOGGER.debug(f"Available network stat sensors: {sensors}")
         except Exception as ex:
             _LOGGER.warning(
-                "Cannot get available network stat sensors for {}: {}".format(
-                    self._host, ex
-                )
+                f"Cannot get available network stat sensors for {self._host}: {ex}"
             )
         return sensors
 
@@ -285,13 +282,13 @@ class ARBridge:
             for type in SENSORS_PORTS:
                 if type in data:
                     sensors.append(type)
-                    sensors.append("{}_total".format(type))
+                    sensors.append(f"{type}_total")
                     for port in data[type]:
-                        sensors.append("{}_{}".format(type, port))
-            _LOGGER.debug("Available ports sensors: {}".format(sensors))
+                        sensors.append(f"{type}_{port}")
+            _LOGGER.debug(f"Available ports sensors: {sensors}")
         except Exception as ex:
             _LOGGER.warning(
-                "Cannot get available ports sensors for {}: {}".format(self._host, ex)
+                f"Cannot get available ports sensors for {self._host}: {ex}"
             )
         return sensors
 
