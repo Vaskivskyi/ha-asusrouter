@@ -204,7 +204,7 @@ def _create_form_discovery(
     """Create a form for the 'discovery' step."""
 
     schema = {
-        vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, "")): str,
+        vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, "")): cv.string,
     }
 
     return vol.Schema(schema)
@@ -218,9 +218,9 @@ def _create_form_credentials(
     schema = {
         vol.Required(
             CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
-        ): str,
-        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): str,
-        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): bool,
+        ): cv.string,
+        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): cv.string,
+        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): cv.boolean,
     }
 
     return vol.Schema(schema)
@@ -234,17 +234,17 @@ def _create_form_device(
     schema = {
         vol.Required(
             CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
-        ): str,
-        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): str,
-        vol.Optional(CONF_PORT, default=user_input.get(CONF_PORT, DEFAULT_PORT)): int,
-        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): bool,
+        ): cv.string,
+        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): cv.string,
+        vol.Optional(CONF_PORT, default=user_input.get(CONF_PORT, DEFAULT_PORT)): cv.positive_int,
+        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): cv.boolean,
         vol.Optional(
             CONF_VERIFY_SSL, default=user_input.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL)
-        ): bool,
+        ): cv.boolean,
         vol.Optional(
             CONF_CERT_PATH,
             default=user_input.get(CONF_CERT_PATH, ""),
-        ): str,
+        ): cv.string,
     }
 
     return vol.Schema(schema)
@@ -265,7 +265,7 @@ def _create_form_operation_mode(
         vol.Required(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
-        ): bool,
+        ): cv.boolean,
     }
 
     return vol.Schema(schema)
@@ -280,15 +280,15 @@ def _create_form_times(
         vol.Required(
             CONF_CACHE_TIME,
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
-        ): int,
+        ): cv.positive_int,
         vol.Required(
             CONF_SCAN_INTERVAL,
             default=user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-        ): int,
+        ): cv.positive_int,
         vol.Required(
             CONF_CONSIDER_HOME,
             default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
-        ): int,
+        ): cv.positive_int,
     }
 
     return vol.Schema(schema)
@@ -316,7 +316,7 @@ def _create_form_name(
     """Create a form for the 'name' step."""
 
     schema = {
-        vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "")): str,
+        vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "")): cv.string,
     }
 
     return vol.Schema(schema)
@@ -328,7 +328,7 @@ def _create_form_confirmation(
     """Create a form for the 'confirmation' step."""
 
     schema = {
-        vol.Optional(CONF_CONFIRM, default=user_input.get(CONF_CONFIRM, False)): bool,
+        vol.Optional(CONF_CONFIRM, default=user_input.get(CONF_CONFIRM, False)): cv.boolean,
     }
 
     return vol.Schema(schema)
