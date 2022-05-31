@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.config_entries import ConfigEntry
@@ -110,21 +112,26 @@ class AsusRouterConnectedDevice(ScannerEntity):
 
         return "mdi:lan-connect" if self._device.is_connected else "mdi:lan-disconnect"
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return extra state attributes."""
+
+        _attributes = self._device.extra_state_attributes
+        if not _attributes:
+            return {}
+
+        attributes = {}
+
+        for attr in _attributes:
+            attributes[attr] = _attributes[attr]
+
+        return attributes
+
     @callback
     def async_on_demand_update(self) -> None:
         """Update the state."""
 
         self._device = self._router.devices[self._device.mac]
-        self._attr_extra_state_attributes = {}
-        if self._device.last_activity:
-            self._attr_extra_state_attributes[
-                "last_time_reachable"
-            ] = self._device.last_activity.isoformat(timespec="seconds")
-
-        if self._device.connection_time:
-            self._attr_extra_state_attributes[
-                "connection_time"
-            ] = self._device.connection_time.isoformat(timespec="seconds")
         self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
