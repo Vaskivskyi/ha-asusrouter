@@ -34,11 +34,26 @@ from homeassistant.util import dt as dt_util
 from .bridge import ARBridge
 from .const import (
     CONF_REQ_RELOAD,
+    CONNECTION_BLOCKED,
+    CONNECTION_CONNECTED,
+    CONNECTION_DISCONNECTED,
+    CONNECTION_TYPE_2G,
+    CONNECTION_TYPE_5G,
+    CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
+    DEVICE_ATTRIBUTE_CONNECTION_TIME,
+    DEVICE_ATTRIBUTE_CONNECTION_TYPE,
+    DEVICE_ATTRIBUTE_INTERNET,
+    DEVICE_ATTRIBUTE_IP_METHOD,
+    DEVICE_ATTRIBUTE_LAST_ACTIVITY,
+    DEVICE_ATTRIBUTE_RSSI,
+    DEVICE_ATTRIBUTE_RX_SPEED,
+    DEVICE_ATTRIBUTE_TX_SPEED,
+    DEVICE_ATTRIBUTES,
     DOMAIN,
     KEY_COORDINATOR,
     SENSORS_CONNECTED_DEVICES,
@@ -122,9 +137,8 @@ class AsusRouterDevInfo:
         self._mac = mac
         self._name = name
         self._ip: str | None = None
-        self._last_activity: datetime | None = None
         self._connected: bool = False
-        self._connection_time: str | None = None
+        self._extra_state_attributes: dict[str, Any] = dict()
 
     def update(
         self,
@@ -137,16 +151,86 @@ class AsusRouterDevInfo:
 
         if dev_info:
             self._name = dev_info.name
-            self._ip = dev_info.ip
-            self._last_activity = utc_point_in_time
-            self._connected = True if dev_info.online else False
-            if dev_info.connected_since:
-                self._connection_time = dev_info.connected_since
+            # Online
+            if dev_info.online:
+                self._ip = dev_info.ip
+                # State
+                self._connected = True
+                # Connection time
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_CONNECTION_TIME
+                ] = dev_info.connected_since
+                # Connection type
+                con_type = dev_info.connection_type
+                if con_type == 0:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_WIRED
+                elif con_type == 1:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_2G
+                elif con_type == 2:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_5G
+                # Internet
+                if dev_info.internet_mode:
+                    self._extra_state_attributes[DEVICE_ATTRIBUTE_INTERNET] = (
+                        CONNECTION_CONNECTED
+                        if dev_info.internet_state
+                        else CONNECTION_DISCONNECTED
+                    )
+                else:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_INTERNET
+                    ] = CONNECTION_BLOCKED
+                # IP method
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_IP_METHOD
+                ] = dev_info.ip_method
+                # Last activity
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_LAST_ACTIVITY
+                ] = utc_point_in_time
+                # RSSI
+                self._extra_state_attributes[DEVICE_ATTRIBUTE_RSSI] = dev_info.rssi
+                # Connection speed
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_RX_SPEED
+                ] = dev_info.rx_speed
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_TX_SPEED
+                ] = dev_info.tx_speed
+            # Offline
+            elif (
+                DEVICE_ATTRIBUTE_LAST_ACTIVITY in self._extra_state_attributes
+                and self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
+                is not None
+                and (
+                    utc_point_in_time
+                    - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
+                ).total_seconds()
+                > consider_home
+            ):
+                # Reset state
+                self._connected = False
+                # Reset IP
+                self._ip = None
+                # Reset attributes
+                for el in DEVICE_ATTRIBUTES:
+                    self._extra_state_attributes[el] = None
         elif self._connected:
+            # Reset state if needed
             self._connected = (
-                utc_point_in_time - self._last_activity
+                utc_point_in_time
+                - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
             ).total_seconds() < consider_home
+            # Reset IP
             self._ip = None
+            ## Reset attributes
+            for el in DEVICE_ATTRIBUTES:
+                self._extra_state_attributes[el] = None
 
     @property
     def is_connected(self):
@@ -173,16 +257,10 @@ class AsusRouterDevInfo:
         return self._ip
 
     @property
-    def last_activity(self):
-        """Return device last activity."""
+    def extra_state_attributes(self):
+        """Return extrar state attributes."""
 
-        return self._last_activity
-
-    @property
-    def connection_time(self):
-        """Return connection time."""
-
-        return self._connection_time
+        return self._extra_state_attributes
 
 
 class AsusRouterObj:
