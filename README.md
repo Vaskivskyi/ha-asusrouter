@@ -185,7 +185,7 @@ Device trackers are disabled by default if HA doesn't know the device. The gener
 
 - `connection_time` - time of connection to the router (only wireless devices)
 - `connection_type` - type of connection (`Wired`, `2.4 GHz`, `5 GHz`). Implementation of `6 GHz` requires a test device.
-- `hostname` - name of the connected device as stated before
+- `host_name` - name of the connected device as stated before
 - `internet` - internet connection of the device (`connected`, `disconnected` or `blocked` - if internet access is restricted by router)
 - `ip`
 - `ip_method` - (`Manual`, `DHCP` and other)
