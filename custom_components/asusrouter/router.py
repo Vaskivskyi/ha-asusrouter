@@ -465,7 +465,7 @@ class AsusRouterObj:
         """Close the connection."""
 
         if self._api is not None:
-            self._api.async_disconnect()
+            await self._api.async_disconnect()
         self._api = None
 
         for func in self._on_close:
