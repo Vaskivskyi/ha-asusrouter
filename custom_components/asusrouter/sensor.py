@@ -89,8 +89,8 @@ SENSORS = {
         entity_registry_enabled_default=False,
         precision=2,
         extra_state_attributes={
-            "total": "total",
             "free": "free",
+            "total": "total",
             "used": "used",
         },
     ),
@@ -138,11 +138,11 @@ SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            "ip_type": "type",
+            "dns": "dns",
             "gateway": "gateway",
             "mask": "mask",
-            "dns": "dns",
             "private_subnet": "private_subnet",
+            "ip_type": "type",
         },
     ),
 }
