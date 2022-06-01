@@ -68,12 +68,12 @@ These entities require `Device control` to be enabled in the integration setting
   - names: `{}_download` / `{}_upload` [^traffic]
   - units: `GB` [^units]
   - attributes:
-    - `Bytes` - raw data from device
+    - `bytes` - raw data from device
 - **Speed**:
   - names: `{}_download_speed` / `{}_upload_speed`
   - units: `Mb/s`
   - attributes:
-    - `Bits/s` - raw data from device
+    - `bits/s` - raw data from device
 
 Possible network interfaces (can be changed via the `Configure` button for the configuration):
 - `WAN` - traffic to your ISP (*Some of the devices do not report WAN data, refer to the [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues/30). If your device also doesn't show such sensors, please add your information to this issue*)
@@ -90,7 +90,7 @@ Possible network interfaces (can be changed via the `Configure` button for the c
   - name: `cpu`
   - units: `%`
   - attributes:
-    - `Core X` - usage by corer `x`
+    - `core_X` - usage by corer `x`
   - description: Sensor shows average CPU usage.
 </details>
 
@@ -101,9 +101,9 @@ Possible network interfaces (can be changed via the `Configure` button for the c
   - name: `ram`
   - units: `%`
   - attributes (all in `KB`, as device reports):
-    - `Total`
-    - `Free`
-    - `Used`
+    - `free`
+    - `total`
+    - `used`
   - description: Sensor represents RAM usage of the device. In most cases, it slowly increases with time. On reboot, RAM usage drops. 
 </details>
 
@@ -133,7 +133,7 @@ Possible network interfaces (can be changed via the `Configure` button for the c
   - names: `lan_speed` / `wan_speed`
   - units: `Mb/s`
   - attributes:
-    - `LAN x` / `WAN x` - represents speed of each port `x` in `Mb/s`
+    - `lan_X` / `wan_X` - represents speed of each port `x` in `Mb/s`
   - description: Sensor value represents the total speed on all the connected LAN / WAN ports. E.g. if 2 ports arer connected in `1 Gb/s` mode and 1 - in `100 Mb/s` mode, this value will be `2100 Mb/s`.
 </details>
 
@@ -144,11 +144,11 @@ Possible network interfaces (can be changed via the `Configure` button for the c
 
   - name: `wan_ip`
   - attributes:
-    - `Type` - type of the IP (may be `static`, `dhcp` and more)
-    - `Gateway`
-    - `Mask`
-    - `DNS`
-    - `Private subnet`
+    - `dns`
+    - `gateway`
+    - `ip_type` - type of the IP (may be `static`, `dhcp` and more)
+    - `mask`
+    - `private_subnet`
   - description: Sensor value represents the current external IP address of the device
 </details>
 
@@ -164,12 +164,12 @@ Possible network interfaces (can be changed via the `Configure` button for the c
 
   - name: `wan`
   - attributes:
-    - `IP`
-    - `Type` - type of the IP (may be `static`, `dhcp` and more)
-    - `Gateway`
-    - `Mask`
-    - `DNS`
-    - `Private subnet`
+    - `dns`
+    - `gateway`
+    - `ip`
+    - `ip_type` - type of the IP (may be `static`, `dhcp` and more)
+    - `mask`
+    - `private_subnet`
   - description: Sensor value represents the internet connection of the device
 </details>
 
