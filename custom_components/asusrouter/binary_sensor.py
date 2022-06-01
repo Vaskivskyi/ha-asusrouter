@@ -34,12 +34,12 @@ BINARY_SENSORS = {
         device_class=DEVICE_CLASS_CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            "ip": "IP",
-            "ip_type": "Type",
-            "gateway": "Gateway",
-            "mask": "Mask",
-            "dns": "DNS",
-            "private_subnet": "Private subnet",
+            "dns": "dns",
+            "gateway": "gateway",
+            "ip": "ip",
+            "ip_type": "type",
+            "mask": "mask",
+            "private_subnet": "private_subnet",
         },
     ),
 }
