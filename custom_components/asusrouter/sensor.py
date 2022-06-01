@@ -140,9 +140,9 @@ SENSORS = {
         extra_state_attributes={
             "dns": "dns",
             "gateway": "gateway",
+            "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
-            "ip_type": "type",
         },
     ),
 }
