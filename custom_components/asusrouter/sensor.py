@@ -15,7 +15,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE
+from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -34,6 +34,7 @@ from .const import (
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
+    SENSORS_TYPE_TEMPERATURE,
     SENSORS_TYPE_WAN,
 )
 from .dataclass import ARSensorDescription
@@ -144,6 +145,39 @@ SENSORS = {
             "mask": "mask",
             "private_subnet": "private_subnet",
         },
+    ),
+    (SENSORS_TYPE_TEMPERATURE, "cpu"): ARSensorDescription(
+        key="cpu",
+        key_group=SENSORS_TYPE_TEMPERATURE,
+        name="Temperature CPU",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=TEMP_CELSIUS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    (SENSORS_TYPE_TEMPERATURE, "2ghz"): ARSensorDescription(
+        key="2ghz",
+        key_group=SENSORS_TYPE_TEMPERATURE,
+        name="Temperature 2.4 GHz",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=TEMP_CELSIUS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    (SENSORS_TYPE_TEMPERATURE, "5ghz"): ARSensorDescription(
+        key="5ghz",
+        key_group=SENSORS_TYPE_TEMPERATURE,
+        name="Temperature 5 GHz",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=TEMP_CELSIUS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
 }
 

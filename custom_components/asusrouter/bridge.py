@@ -41,6 +41,7 @@ from .const import (
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
+    SENSORS_TYPE_TEMPERATURE,
     SENSORS_TYPE_WAN,
     SENSORS_WAN,
 )
@@ -169,6 +170,10 @@ class ARBridge:
                 "method": self._get_ports,
             },
             SENSORS_TYPE_WAN: {"sensors": SENSORS_WAN, "method": self._get_wan},
+            SENSORS_TYPE_TEMPERATURE: {
+                "sensors": await self._get_temperature_sensors(),
+                "method": self._get_temperature,
+            },
         }
         return sensors_types
 
@@ -243,6 +248,16 @@ class ARBridge:
 
         return data
 
+    async def _get_temperature(self) -> dict[str, Any]:
+        """Get temperarture data frrom the device."""
+
+        try:
+            data = await self._api.async_get_temperature()
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
     ### <- GET DATA FROM DEVICE
 
     ### GET SENSORS LIST ->
@@ -290,6 +305,19 @@ class ARBridge:
             _LOGGER.warning(
                 f"Cannot get available ports sensors for {self._host}: {ex}"
             )
+        return sensors
+
+    async def _get_temperature_sensors(self):
+        """Get the available temperature sensors."""
+
+        try:
+            sensors = await self._api.async_get_temperature_labels()
+            _LOGGER.debug(f"Available temperature sensors: {sensors}")
+        except Exception as ex:
+            _LOGGER.warning(
+                f"Cannot get available temperature sensors for {self._host}: {ex}"
+            )
+            sensors = list()
         return sensors
 
     ### <- GET SENSORS LIST
