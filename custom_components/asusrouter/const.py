@@ -84,6 +84,7 @@ SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
 SENSORS_TYPE_PORTS = "ports"
 SENSORS_TYPE_RAM = "ram"
+SENSORS_TYPE_TEMPERATURE = "temperature"
 SENSORS_TYPE_WAN = "wan"
 
 # Sensors
