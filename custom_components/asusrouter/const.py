@@ -84,6 +84,7 @@ SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
 SENSORS_TYPE_PORTS = "ports"
 SENSORS_TYPE_RAM = "ram"
+SENSORS_TYPE_SYSINFO = "sysinfo"
 SENSORS_TYPE_TEMPERATURE = "temperature"
 SENSORS_TYPE_WAN = "wan"
 
@@ -105,6 +106,7 @@ SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 SENSORS_PORTS = ["WAN", "LAN"]
 SENSORS_RAM = ["total", "free", "used", "usage"]
+SENSORS_SYSINFO = ["load_avg_1", "load_avg_5", "load_avg_15"]
 SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
 
 

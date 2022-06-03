@@ -36,11 +36,13 @@ from .const import (
     SENSORS_NETWORK_STAT,
     SENSORS_PORTS,
     SENSORS_RAM,
+    SENSORS_SYSINFO,
     SENSORS_TYPE_CPU,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
+    SENSORS_TYPE_SYSINFO,
     SENSORS_TYPE_TEMPERATURE,
     SENSORS_TYPE_WAN,
     SENSORS_WAN,
@@ -174,6 +176,10 @@ class ARBridge:
                 "sensors": await self._get_temperature_sensors(),
                 "method": self._get_temperature,
             },
+            SENSORS_TYPE_SYSINFO: {
+                "sensors": await self._get_sysinfo_sensors(),
+                "method": self._get_sysinfo,
+            },
         }
         return sensors_types
 
@@ -249,10 +255,20 @@ class ARBridge:
         return data
 
     async def _get_temperature(self) -> dict[str, Any]:
-        """Get temperarture data frrom the device."""
+        """Get temperarture data from the device."""
 
         try:
             data = await self._api.async_get_temperature()
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
+    async def _get_sysinfo(self) -> dict[str, Any]:
+        """Get sysinfo data from the device."""
+
+        try:
+            data = await self._api.async_get_sysinfo()
         except (OSError, ValueError) as ex:
             raise UpdateFailed(ex) from ex
 
@@ -305,6 +321,25 @@ class ARBridge:
             _LOGGER.warning(
                 f"Cannot get available ports sensors for {self._host}: {ex}"
             )
+        return sensors
+
+    async def _get_sysinfo_sensors(self):
+        """Get the available sysinfo sensors."""
+
+        sensors = list()
+
+        if self._identity.sysinfo:
+            try:
+                data = await self._api.async_get_sysinfo()
+                for type in SENSORS_SYSINFO:
+                    if type in data:
+                        sensors.append(type)
+                _LOGGER.debug(f"Available sysinfo sensors: {sensors}")
+            except Exception as ex:
+                _LOGGER.warning(
+                    f"Cannot get available sysinfo sensors for {self._host}: {ex}"
+                )
+
         return sensors
 
     async def _get_temperature_sensors(self):
