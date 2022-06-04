@@ -1,5 +1,9 @@
 name: Report a device support
 description: Does your device work well with the integration? Or not? Report it
+title: "[Device support] <title>"
+labels: ["documentation"]
+assignees:
+  - vaskivskyi
 body:
   - type: markdown
     attributes:
@@ -54,7 +58,7 @@ body:
       description: >
         Do all the features work well for your device?
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
 
 

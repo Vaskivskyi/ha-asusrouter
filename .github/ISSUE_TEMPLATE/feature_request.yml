@@ -1,5 +1,9 @@
 name: Submit a new feature request for AsusRouter integration
 description: Do you want a new feature for AsusRouter integration?
+title: "[Feature] <title>"
+labels: ["enhancement"]
+assignees:
+  - vaskivskyi
 body:
   - type: markdown
     attributes:
@@ -28,8 +32,8 @@ body:
       description: >
         Is this feature only for some specific device(s)? E.g. RGB support has a limited range 
       options:
-        - No
-        - Yes
+        - "No"
+        - "Yes"
   - type: dropdown
     id: firmware_type
     attributes:
@@ -37,5 +41,5 @@ body:
       description: >
         Does this feature require a non-stock firmware (AsusWRT-Merlin)?
       options:
-        - No
-        - Yes
+        - "No"
+        - "Yes"
