@@ -241,13 +241,13 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX92U`
 - `ZenWiFi AX (XT8)`
 
-If your device is not listed but is confirmed to work, you are welcome to open PR with a proposed change to this list. Alternatively, you can open an issue with the device model and it will be added to the list.
+If your device is not listed but is confirmed to work, you can open a [Device support](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose) issue with the device model and it will be added to the list.
 
 ## Support the integration
 
 ### Issues and Pull requests
 
-If you have found an issue working with the integration or just want to ask for a new feature, please fill in a new [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues).
+If you have found an issue working with the integration or just want to ask for a new feature, please fill in a new [issue](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose).
 
 You are also welcome to submit [pull requests](https://github.com/Vaskivskyi/ha-asusrouter/pulls) to the repository!
 
