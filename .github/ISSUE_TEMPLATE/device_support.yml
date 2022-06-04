@@ -1,0 +1,60 @@
+name: Report a device support
+description: Does your device work well with the integration? Or not? Report it
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please, only submit device support using this form. If you would like to report a bug, use the [bug report][forms] form.
+        To submit a feature request, use the [feature request][forms] form.
+
+        [forms]: https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose
+  - type: textarea
+    attributes:
+      label: The problem
+      description: >
+        Use this field for a short description if you would like.
+  - type: markdown
+    attributes:
+      value: >
+        # Environment and device
+  - type: input
+    id: device
+    validations:
+      required: true
+    attributes:
+      label: Your device model
+      description: >
+        Please, put in the full model of your device, as stated in the web panel of your router (or on the Asus webpage), e.g. `RT-AX88U`.
+      placeholder: RT-
+  - type: dropdown
+    id: firmware_type
+    validations:
+      required: true
+    attributes:
+      label: Firmware type
+      description: >
+        What kind of firmware you are using? Is it a stock AsusWRT or AsusWRT-Merlin?
+      options:
+        - Stock
+        - Merlin
+  - type: input
+    id: firmware_version
+    validations:
+      required: true
+    attributes:
+      label: Firmware version
+      description: >
+        Please, provide the full version of the firrmware, e.g. `3.0.0.4.386.5_2` or `3.0.0.4.386_48631-g10d88e5`
+      placeholder: 3.0.0.4.
+  - type: dropdown
+    validations:
+      required: true
+    attributes:
+      label: Does everything work well?
+      description: >
+        Do all the features work well for your device?
+      options:
+        - Yes
+        - No
+
+
