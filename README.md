@@ -2,9 +2,11 @@
 
 ## AsusRouter - Monitor and control your Asus router from Home Assistant
 
-AsusRouter is a custom integration for Home Assistant to monitor and control your Asus router using [AsusRouter](https://github.com/Vaskivskyi/asusrouter) python library.
+`AsusRouter` is a custom integration for Home Assistant to monitor and control your Asus router using [AsusRouter](https://github.com/Vaskivskyi/asusrouter) python library.
 
 The integration uses the native Asus HTTP(S) API - the same way the web panel or mobile app works and relies on direct communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
+
+Both the stock AsusWRT and the AsusWRT-Merlin firmware are supported.
 
 You could always help with its development by providing your feedback.
 
@@ -230,6 +232,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-ACRH13`
 
 802.11 AX models:
+- `RT-AX55`
 - `RT-AX58U`
 - `RT-AX68U`
 - `RT-AX86U`
@@ -261,5 +264,3 @@ This integration is a free-time project. If you like it, you can support me by b
 ## Thanks to
 
 The initial codebase for this integration is highly based on Home Assistant core integration [AsusWRT](https://www.home-assistant.io/integrations/asuswrt/) and [ollo69/ha_asuswrt_custom](https://github.com/ollo69/ha_asuswrt_custom).
-
-
