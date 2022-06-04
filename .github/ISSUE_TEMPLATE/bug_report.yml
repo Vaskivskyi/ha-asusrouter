@@ -1,5 +1,9 @@
-name: Report an issue with AsusRouter integration
+name: Bug report
 description: Report an issue with AsusRouter Integration
+title: "[Bug] <title>"
+labels: ["bug"]
+assignees:
+  - vaskivskyi
 body:
   - type: markdown
     attributes:
