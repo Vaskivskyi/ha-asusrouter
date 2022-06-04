@@ -98,11 +98,13 @@ async def _async_get_network_interfaces(
     api = ARBridge(hass, configs, options)
 
     try:
+        if not api.is_connected:
+            await api.async_connect()
         labels = await api.async_get_network_interfaces()
         await api.async_disconnect()
         return labels
     except Exception as ex:
-        _LOGGER.debug(
+        _LOGGER.warning(
             f"Cannot get available network stat sensors for {configs[CONF_HOST]}: {ex}"
         )
         return DELAULT_INTERFACES
