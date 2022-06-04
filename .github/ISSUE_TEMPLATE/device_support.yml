@@ -1,6 +1,6 @@
-name: Report a device support
+name: Device support
 description: Does your device work well with the integration? Or not? Report it
-title: "[Device support] <title>"
+title: "[Device support] "
 labels: ["documentation"]
 assignees:
   - vaskivskyi

@@ -1,6 +1,6 @@
-name: Submit a new feature request for AsusRouter integration
+name: Feature request
 description: Do you want a new feature for AsusRouter integration?
-title: "[Feature] <title>"
+title: "[Feature] "
 labels: ["enhancement"]
 assignees:
   - vaskivskyi

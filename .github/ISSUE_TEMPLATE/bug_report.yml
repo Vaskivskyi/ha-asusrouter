@@ -1,6 +1,6 @@
 name: Bug report
 description: Report an issue with AsusRouter Integration
-title: "[Bug] <title>"
+title: "[Bug] "
 labels: ["bug"]
 assignees:
   - vaskivskyi
