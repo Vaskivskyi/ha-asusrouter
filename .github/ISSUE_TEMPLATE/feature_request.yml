@@ -1,0 +1,41 @@
+name: Submit a new feature request for AsusRouter integration
+description: Do you want a new feature for AsusRouter integration?
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please, only submit feature requests using this form. If you would like to report a bug, use the [bug report][forms] form.
+        To add a new device to the compatibility list, use the [device support][forms] form.
+
+        [forms]: https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: The problem
+      description: >
+        Please, describe your idea. The more details you provide, the easier it would be to understand it.
+
+        How would this be useful?
+  - type: markdown
+    attributes:
+      value: >
+        # Environment and device
+  - type: dropdown
+    id: device
+    attributes:
+      label: Specific device(s)?
+      description: >
+        Is this feature only for some specific device(s)? E.g. RGB support has a limited range 
+      options:
+        - No
+        - Yes
+  - type: dropdown
+    id: firmware_type
+    attributes:
+      label: Firmware type
+      description: >
+        Does this feature require a non-stock firmware (AsusWRT-Merlin)?
+      options:
+        - No
+        - Yes

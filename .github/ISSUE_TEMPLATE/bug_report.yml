@@ -4,24 +4,27 @@ body:
   - type: markdown
     attributes:
       value: >
-        Please, only report bugs using this form. If you would like to submit a feature request, use the [feature request][] form.
+        Please, only report bugs using this form. If you would like to submit a feature request, use the [feature request][forms] form.
+        To add a new device to the compatibility list, use the [device support][forms] form.
 
-        [fr]: 
+        [forms]: https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose
   - type: textarea
     validations:
       required: true
     attributes:
       label: The problem
       description: >
-        Please, describe the issue. More details you provide, easier it would be to understand the issue.
+        Please, describe the issue. The more details you provide, the easier it would be to understand the issue.
 
-        Keep in mind, the description should also be clear, so I will be able to help you with it.
+        Keep in mind, that the description should also be clear, so I will be able to help you with it.
   - type: markdown
     attributes:
       value: >
         # Environment and device
   - type: input
     id: device
+    validations:
+      required: true
     attributes:
       label: Your device model
       description: >
@@ -29,6 +32,8 @@ body:
       placeholder: RT-
   - type: dropdown
     id: firmware_type
+    validations:
+      required: true
     attributes:
       label: Firmware type
       description: >
@@ -38,6 +43,8 @@ body:
         - Merlin
   - type: input
     id: firmware_version
+    validations:
+      required: true
     attributes:
       label: Firmware version
       description: >
@@ -45,6 +52,8 @@ body:
       placeholder: 3.0.0.4.
   - type: input
     id: integration_version
+    validations:
+      required: true
     attributes:
       label: Integration version with the issue
       description: >
@@ -81,23 +90,24 @@ body:
       label: Is there anything useful in the logs?
       description: >
         By default, Home Assistant shows only logs on levels `error` and `warning`.
-        If there is nothing on these levels, you may enable `debug` logging for the integrartion.
-        To do this, add the following yaml code to your `configuration.yaml`
+        If there is nothing on these levels, you may enable `debug` logging for the integration.
+        To do this, add the following YAML code to your `configuration.yaml`
 
         logger:
           logs:
             custom_components.asusrouter: debug
             asusrouter: debug
 
-        Debug logging highly increases log file size. Don't keep it on for a long time, if not needed.
+        Debug logging highly increases the log file size. Don't keep it on for a long time, if not needed.
       render: txt
   - type: textarea
     attributes:
       label: Diagnostics information
       placeholder: "drag-and-drop the diagnostics data file here (do not copy-and-paste the content)"
       description: >
-        AsusRouter allows collection the diagnostics. If this is possible, please, collect the diagnostics and upload it here.
-        <ins>Just drag-and-drop that file into the textbox below.</ins>**
+        AsusRouter allows collection of the diagnostics. If this is possible, please, collect the diagnostics file and upload it here.
+        
+        ***<ins>Just drag-and-drop that file into the textbox below.</ins>***
   - type: textarea
     attributes:
       label: Additional information
