@@ -1,0 +1,105 @@
+name: Report an issue with AsusRouter integration
+description: Report an issue with AsusRouter Integration
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please, only report bugs using this form. If you would like to submit a feature request, use the [feature request][] form.
+
+        [fr]: 
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: The problem
+      description: >
+        Please, describe the issue. More details you provide, easier it would be to understand the issue.
+
+        Keep in mind, the description should also be clear, so I will be able to help you with it.
+  - type: markdown
+    attributes:
+      value: >
+        # Environment and device
+  - type: input
+    id: device
+    attributes:
+      label: Your device model
+      description: >
+        Please, put in the full model of your device, as stated in the web panel of your router (or on the Asus webpage), e.g. `RT-AX88U`.
+      placeholder: RT-
+  - type: dropdown
+    id: firmware_type
+    attributes:
+      label: Firmware type
+      description: >
+        What kind of firmware you are using? Is it a stock AsusWRT or AsusWRT-Merlin?
+      options:
+        - Stock
+        - Merlin
+  - type: input
+    id: firmware_version
+    attributes:
+      label: Firmware version
+      description: >
+        Please, provide the full version of the firrmware, e.g. `3.0.0.4.386.5_2` or `3.0.0.4.386_48631-g10d88e5`
+      placeholder: 3.0.0.4.
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version with the issue
+      description: >
+        The version of the integration with the issue
+  - type: dropdown
+    id: integration_method
+    validations:
+      required: true
+    attributes:
+      label: Method of the integration installation
+      description: >
+        Did you install the integration from the HACS or manually installed it?
+      options:
+        - HACS
+        - Manual (stable branch)
+        - Manual (main branch)
+  - type: input
+    id: version
+    validations:
+      required: true
+    attributes:
+      label: What version and type of Home Assistant installation do you use
+      placeholder: Core 2022.6.0
+      description: >
+        Can be found in: [Settings -> About](https://my.home-assistant.io/redirect/info/).
+
+        [![Open your Home Assistant instance and show your Home Assistant version information.](https://my.home-assistant.io/badges/info.svg)](https://my.home-assistant.io/redirect/info/)
+  - type: markdown
+    attributes:
+      value: >
+        # Details
+  - type: textarea
+    attributes:
+      label: Is there anything useful in the logs?
+      description: >
+        By default, Home Assistant shows only logs on levels `error` and `warning`.
+        If there is nothing on these levels, you may enable `debug` logging for the integrartion.
+        To do this, add the following yaml code to your `configuration.yaml`
+
+        logger:
+          logs:
+            custom_components.asusrouter: debug
+            asusrouter: debug
+
+        Debug logging highly increases log file size. Don't keep it on for a long time, if not needed.
+      render: txt
+  - type: textarea
+    attributes:
+      label: Diagnostics information
+      placeholder: "drag-and-drop the diagnostics data file here (do not copy-and-paste the content)"
+      description: >
+        AsusRouter allows collection the diagnostics. If this is possible, please, collect the diagnostics and upload it here.
+        <ins>Just drag-and-drop that file into the textbox below.</ins>**
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: >
+        If you have any additional information for us, use the field below.
