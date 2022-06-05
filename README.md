@@ -248,6 +248,7 @@ If you are experiencing multiple errors in your log (more than 5 in a row) or in
 The list of supported devices includes (but is not limited to):
 
 802.11 AC models:
+- `DSL-AC68U`
 - `RT-AC66U` (without LED control, firmware limitation)
 - `RT-AC86U` (a known issue https://github.com/Vaskivskyi/ha-asusrouter/issues/29, produces warnings in the log)
 - `RT-ACRH13`
