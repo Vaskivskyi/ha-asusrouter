@@ -14,7 +14,7 @@ body:
         [forms]: https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose
   - type: textarea
     attributes:
-      label: The problem
+      label: Anything you want to mention?
       description: >
         Use this field for a short description if you would like.
   - type: markdown
