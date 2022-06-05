@@ -37,7 +37,7 @@ BINARY_SENSORS = {
             "dns": "dns",
             "gateway": "gateway",
             "ip": "ip",
-            "ip_type": "type",
+            "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
         },
