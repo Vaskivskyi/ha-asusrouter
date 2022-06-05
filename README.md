@@ -263,6 +263,9 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX92U`
 - `ZenWiFi AX (XT8)`
 
+Non-Asus devices:
+- `Netgear R7000` (FW: **Merlin**)
+
 If your device is not listed but is confirmed to work, you can open a [Device Support](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose) issue with the device model and it will be added to the list.
 
 ## Support the integration
