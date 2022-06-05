@@ -257,7 +257,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX55`
 - `RT-AX58U`
 - `RT-AX68U`
-- `RT-AX82U`
+- `RT-AX82U` (shown as `RT-AX58U_IPA`)
 - `RT-AX86U`
 - `RT-AX88U`
 - `RT-AX89X`
