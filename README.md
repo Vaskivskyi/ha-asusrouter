@@ -62,6 +62,44 @@ These entities require `Device control` to be enabled in the integration setting
 #### Sensors
 
 <details>
+<summary>Boot time sensor</summary>
+
+*(disabled by default)*
+  - name: `boot_time`
+  - units: ` `
+  - description: Sensor represents the last time the device was rebooted.
+</details>
+
+<details>
+<summary>Connected devices sensor</summary>
+
+*(enabled by default)*
+  - name: `connected_devices`
+  - units: ` `
+  - description: Sensor shows the total number of devices connected.
+</details>
+
+<details>
+<summary>CPU usage sensor</summary>
+
+*(disabled by default)*
+  - name: `cpu`
+  - units: `%`
+  - attributes:
+    - `core_X` - usage by corer `x`
+  - description: Sensor shows average CPU usage.
+</details>
+
+<details>
+<summary>Load average sensors <b>(FW: Merlin only)</b></summary>
+
+*(disabled by default)*
+  - names: `load_average_{}_min` for `1`, `5` and `15` minutes
+  - description: Sensors represent average load in the usual Linux way. Sensors rely on the `sysinfo`, available only with the Merlin firmware.
+
+</details>
+
+<details>
 <summary>Network traffic and speed</summary>
 
 *(enabled by default)*
@@ -86,14 +124,15 @@ Possible network interfaces (can be changed via the `Configure` button for the c
 </details>
 
 <details>
-<summary>CPU usage sensor</summary>
+<summary>Ports connection sensors</summary>
 
 *(disabled by default)*
-  - name: `cpu`
-  - units: `%`
+
+  - names: `lan_speed` / `wan_speed`
+  - units: `Mb/s`
   - attributes:
-    - `core_X` - usage by corer `x`
-  - description: Sensor shows average CPU usage.
+    - `lan_X` / `wan_X` - represents speed of each port `x` in `Mb/s`
+  - description: Sensor value represents the total speed on all the connected LAN / WAN ports. E.g. if 2 ports arer connected in `1 Gb/s` mode and 1 - in `100 Mb/s` mode, this value will be `2100 Mb/s`.
 </details>
 
 <details>
@@ -110,33 +149,15 @@ Possible network interfaces (can be changed via the `Configure` button for the c
 </details>
 
 <details>
-<summary>Connected devices sensor</summary>
-
-*(enabled by default)*
-  - name: `connected_devices`
-  - units: ` `
-  - description: Sensor shows the total number of devices connected.
-</details>
-
-<details>
-<summary>Boot time sensor</summary>
-
-*(disabled by default)*
-  - name: `boot_time`
-  - units: ` `
-  - description: Sensor represents the last time the device was rebooted.
-</details>
-
-<details>
-<summary>Ports connection sensors</summary>
+<summary>Temperature sensors</summary>
 
 *(disabled by default)*
 
-  - names: `lan_speed` / `wan_speed`
-  - units: `Mb/s`
-  - attributes:
-    - `lan_X` / `wan_X` - represents speed of each port `x` in `Mb/s`
-  - description: Sensor value represents the total speed on all the connected LAN / WAN ports. E.g. if 2 ports arer connected in `1 Gb/s` mode and 1 - in `100 Mb/s` mode, this value will be `2100 Mb/s`.
+**Availability of sensors depends on your device and firmware**
+
+  - names: `temperature_{}` for `cpu` (CPU), `2_4_ghz` (2.4 GHz module), `5_ghz` (5 GHz module)
+  - units: `°C` (native)
+  - description: Sensors represent temperature value of the corresponding module. Entities are created only for the sensors available for your device and firmware.
 </details>
 
 <details>
@@ -190,7 +211,7 @@ Device trackers are disabled by default if HA doesn't know the device. The gener
 - `host_name` - name of the connected device as stated before
 - `internet` - internet connection of the device (`connected`, `disconnected` or `blocked` - if internet access is restricted by router)
 - `ip`
-- `ip_method` - (`Manual`, `DHCP` and other)
+- `ip_type` - (`Manual`, `DHCP` and other)
 - `last_activity` - last time device was seen online in HA
 - `mac`
 - `rssi` - (only wireless devices)
@@ -241,7 +262,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX92U`
 - `ZenWiFi AX (XT8)`
 
-If your device is not listed but is confirmed to work, you can open a [Device support](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose) issue with the device model and it will be added to the list.
+If your device is not listed but is confirmed to work, you can open a [Device Support](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose) issue with the device model and it will be added to the list.
 
 ## Support the integration
 
