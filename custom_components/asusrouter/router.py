@@ -48,7 +48,7 @@ from .const import (
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_INTERNET,
-    DEVICE_ATTRIBUTE_IP_METHOD,
+    DEVICE_ATTRIBUTE_IP_TYPE,
     DEVICE_ATTRIBUTE_LAST_ACTIVITY,
     DEVICE_ATTRIBUTE_RSSI,
     DEVICE_ATTRIBUTE_RX_SPEED,
@@ -187,7 +187,7 @@ class AsusRouterDevInfo:
                     ] = CONNECTION_BLOCKED
                 # IP method
                 self._extra_state_attributes[
-                    DEVICE_ATTRIBUTE_IP_METHOD
+                    DEVICE_ATTRIBUTE_IP_TYPE
                 ] = dev_info.ip_method
                 # Last activity
                 self._extra_state_attributes[
