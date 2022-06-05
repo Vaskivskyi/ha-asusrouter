@@ -253,6 +253,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-ACRH13`
 
 802.11 AX models:
+- `GT-AX11000`
 - `RT-AX55`
 - `RT-AX58U`
 - `RT-AX68U`
