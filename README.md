@@ -264,6 +264,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX89X`
 - `RT-AX92U`
 - `ZenWiFi AX (XT8)`
+- `ZenWiFi AX Mini (XD4)`
 
 Non-Asus devices:
 - `Netgear R7000` (FW: **Merlin**)
