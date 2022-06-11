@@ -43,7 +43,7 @@ async def async_setup_entry(
         if router.api._identity.led:
             entities.append(ARLightLED(router, LED_DESCRIPTION))
 
-    async_add_entities(entities)
+    async_add_entities(entities, True)
 
 
 class ARLightLED(LightEntity):
@@ -68,8 +68,7 @@ class ARLightLED(LightEntity):
         self._attr_device_info = router.device_info
         self._icon_on = description.icon_on
         self._icon_off = description.icon_off
-
-        self._state: bool = self.api.led
+        
         self.update_icon()
 
     @property
