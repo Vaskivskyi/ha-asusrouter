@@ -21,6 +21,7 @@ class AREntityDescription(EntityDescription):
     factor: int | None = None
     precision: int = 3
     extra_state_attributes: dict[str, Any] | None = None
+    subkey: list[str] | None = None
 
 
 @dataclass
@@ -39,3 +40,13 @@ class ARLightDescription(AREntityDescription, LightEntityDescription):
 
     icon_on: str | None = None
     icon_off: str | None = None
+
+
+@dataclass
+class ARSwitchDescription(AREntityDescription, LightEntityDescription):
+    """Describe AsusRouter switch."""
+
+    icon_on: str | None = None
+    icon_off: str | None = None
+    service_on: str | None = None
+    service_off: str | None = None

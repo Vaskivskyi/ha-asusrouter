@@ -22,6 +22,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
+from . import helpers
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
@@ -44,7 +45,9 @@ from .const import (
     SENSORS_TYPE_RAM,
     SENSORS_TYPE_SYSINFO,
     SENSORS_TYPE_TEMPERATURE,
+    SENSORS_TYPE_VPN,
     SENSORS_TYPE_WAN,
+    SENSORS_VPN,
     SENSORS_WAN,
 )
 
@@ -171,6 +174,10 @@ class ARBridge:
                 "sensors": await self._get_ports_sensors(),
                 "method": self._get_ports,
             },
+            SENSORS_TYPE_VPN: {
+                "sensors": await self._get_vpn_sensors(),
+                "method": self._get_vpn,
+            },
             SENSORS_TYPE_WAN: {"sensors": SENSORS_WAN, "method": self._get_wan},
             SENSORS_TYPE_TEMPERATURE: {
                 "sensors": await self._get_temperature_sensors(),
@@ -239,6 +246,18 @@ class ARBridge:
                         data[_total] += raw[type][port]
                     if data[_total] > 0:
                         data[type] = True
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
+    async def _get_vpn(self) -> dict[str, Any]:
+        """Get VPN data from the device."""
+
+        try:
+            data = helpers.as_dict(
+                helpers.flatten_dict(await self._api.async_get_vpn())
+            )
         except (OSError, ValueError) as ex:
             raise UpdateFailed(ex) from ex
 
@@ -353,6 +372,23 @@ class ARBridge:
                 f"Cannot get available temperature sensors for {self._host}: {ex}"
             )
             sensors = list()
+        return sensors
+
+    async def _get_vpn_sensors(self):
+        """Get the available VPN sensors."""
+
+        sensors = list()
+
+        try:
+            data = await self._api.async_get_vpn()
+            for vpn in data:
+                for sensor in SENSORS_VPN:
+                    sensors.append(f"{vpn}_{sensor}")
+                sensors.append(f"{vpn}_state")
+            _LOGGER.debug(f"Available VPN sensors: {sensors}")
+        except Exception as ex:
+            _LOGGER.warning(f"Cannot get available VPN sensors for {self._host}: {ex}")
+
         return sensors
 
     ### <- GET SENSORS LIST
