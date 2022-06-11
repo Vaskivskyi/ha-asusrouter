@@ -9,7 +9,7 @@ _LOGGER = logging.getLogger(__name__)
 from typing import Any
 
 from homeassistant.components.binary_sensor import (
-    DEVICE_CLASS_CONNECTIVITY,
+    BinarySensorDeviceClass,
     BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -21,7 +21,14 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR, SENSORS_TYPE_WAN
+from .compilers import list_sensors_vpn_clients
+from .const import (
+    CONF_ENABLE_CONTROL,
+    DATA_ASUSROUTER,
+    DOMAIN,
+    KEY_COORDINATOR,
+    SENSORS_TYPE_WAN,
+)
 from .dataclass import ARBinarySensorDescription
 from .router import AsusRouterObj
 
@@ -31,7 +38,7 @@ BINARY_SENSORS = {
         key_group=SENSORS_TYPE_WAN,
         name="WAN",
         entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=DEVICE_CLASS_CONNECTIVITY,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
             "dns": "dns",
@@ -54,6 +61,9 @@ async def async_setup_entry(
 
     router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
     entities = []
+
+    if not entry.options[CONF_ENABLE_CONTROL]:
+        BINARY_SENSORS.update(list_sensors_vpn_clients(5))
 
     for sensor_data in router._sensors_coordinator.values():
         coordinator = sensor_data[KEY_COORDINATOR]
