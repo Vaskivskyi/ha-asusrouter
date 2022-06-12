@@ -15,9 +15,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_switches_vpn_clients
-from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR
+from .const import CONF_ENABLE_CONTROL
 from .dataclass import ARSwitchDescription
-from .entity import AREntity
+from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import AsusRouterObj
 
 SWITCHES = {}
@@ -25,36 +25,18 @@ SWITCHES = {}
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Setup AsusRouter switches."""
 
-    router: AsusRouterObj = hass.data[DOMAIN][config_entry.entry_id][DATA_ASUSROUTER]
-    entities = []
-
-    if config_entry.options[CONF_ENABLE_CONTROL]:
+    if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(list_switches_vpn_clients(5))
 
-    for sensor_data in router._sensors_coordinator.values():
-        coordinator = sensor_data[KEY_COORDINATOR]
-        for sensor_description in SWITCHES:
-            try:
-                if sensor_description[0] in sensor_data:
-                    if (
-                        SWITCHES[sensor_description].key
-                        in sensor_data[sensor_description[0]]
-                    ):
-                        entities.append(
-                            ARSwitch(coordinator, router, SWITCHES[sensor_description])
-                        )
-            except Exception as ex:
-                _LOGGER.warning(ex)
-
-    async_add_entities(entities, True)
+    await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
 
 
-class ARSwitch(AREntity, SwitchEntity):
+class ARSwitch(ARBinaryEntity, SwitchEntity):
     """AsusRouter switch."""
 
     def __init__(
@@ -66,31 +48,8 @@ class ARSwitch(AREntity, SwitchEntity):
         """Initialize AsusRouter switch."""
 
         super().__init__(coordinator, router, description)
-        self._icon_onoff = (
-            True if description.icon_on and description.icon_off else False
-        )
         self._service_on = description.service_on
         self._service_off = description.service_off
-
-        self.full_state: dict[str, Any] = dict()
-
-    @property
-    def is_on(self) -> bool:
-        """Get switch state."""
-
-        return self.coordinator.data.get(self.entity_description.key)
-
-    @property
-    def icon(self) -> str | None:
-        """Get switch icon."""
-
-        if self._icon_onoff:
-            if self.coordinator.data.get(self.entity_description.key):
-                return self.entity_description.icon_on
-            else:
-                return self.entity_description.icon_off
-        else:
-            return self.entity_description.icon
 
     async def async_turn_on(
         self,

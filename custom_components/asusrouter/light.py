@@ -13,79 +13,54 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN
+from .const import CONF_ENABLE_CONTROL, SENSORS_TYPE_LIGHT
 from .dataclass import ARLightDescription
+from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import AsusRouterObj
 
-LED_DESCRIPTION = ARLightDescription(
-    key="LED",
-    name="LED",
-    icon="mdi:led-outline",
-    icon_on="mdi:led-on",
-    icon_off="mdi:led-off",
-    entity_category=EntityCategory.CONFIG,
-    entity_registry_enabled_default=True,
-)
+LIGHTS = {
+    (SENSORS_TYPE_LIGHT, "led"): ARLightDescription(
+        key="led",
+        key_group=SENSORS_TYPE_LIGHT,
+        name="LED",
+        icon="mdi:led-outline",
+        icon_on="mdi:led-on",
+        icon_off="mdi:led-off",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
+    ),
+}
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Setup AsusRouter lights."""
 
-    router: AsusRouterObj = hass.data[DOMAIN][config_entry.entry_id][DATA_ASUSROUTER]
-    entities = []
+    if not entry.options[CONF_ENABLE_CONTROL]:
+        return
 
-    if config_entry.options[CONF_ENABLE_CONTROL]:
-        if router.api._identity.led:
-            entities.append(ARLightLED(router, LED_DESCRIPTION))
-
-    async_add_entities(entities, True)
+    await async_setup_ar_entry(hass, entry, async_add_entities, LIGHTS, ARLightLED)
 
 
-class ARLightLED(LightEntity):
+class ARLightLED(ARBinaryEntity, LightEntity):
     """AsusRouter LED light."""
 
     _attr_supported_color_modes = {ColorMode.ONOFF}
 
     def __init__(
         self,
+        coordinator: DataUpdateCoordinator,
         router: AsusRouterObj,
         description: ARLightDescription,
     ) -> None:
         """Initialize AsusRouter LED light."""
 
-        super().__init__()
-        self.entity_description: ARLightDescription = description
-        self.router = router
-        self.api = router.api._api
-
-        self._attr_name = f"{router._name} {description.name}"
-        self._attr_unique_id = f"{DOMAIN} {self.name}"
-        self._attr_device_info = router.device_info
-        self._icon_on = description.icon_on
-        self._icon_off = description.icon_off
-        
-        self.update_icon()
-
-    @property
-    def is_on(self) -> bool:
-        """Get LED state."""
-
-        return self._state
-
-    def update_icon(self) -> None:
-        """Update icon."""
-
-        if self._state:
-            if self._icon_on:
-                self.entity_description.icon = self._icon_on
-        else:
-            if self._icon_off:
-                self.entity_description.icon = self._icon_off
+        super().__init__(coordinator, router, description)
 
     async def async_turn_on(
         self,
@@ -95,7 +70,6 @@ class ARLightLED(LightEntity):
 
         try:
             result = await self.api.async_service_led_set("on")
-            self.update_icon()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
@@ -109,7 +83,6 @@ class ARLightLED(LightEntity):
 
         try:
             result = await self.api.async_service_led_set("off")
-            self.update_icon()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
@@ -119,4 +92,3 @@ class ARLightLED(LightEntity):
         """Update state from the device."""
 
         self._state = await self.api.async_service_led_get()
-        self.update_icon()

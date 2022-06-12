@@ -24,8 +24,6 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .compilers import list_sensors_network
 from .const import (
     CONF_INTERFACES,
-    DATA_ASUSROUTER,
-    DOMAIN,
     SENSORS_TYPE_CPU,
     SENSORS_TYPE_DEVICES,
     SENSORS_TYPE_MISC,
@@ -36,8 +34,8 @@ from .const import (
     SENSORS_TYPE_WAN,
 )
 from .dataclass import ARSensorDescription
-from .entity import AREntity
-from .router import KEY_COORDINATOR, AsusRouterObj
+from .entity import AREntity, async_setup_ar_entry
+from .router import AsusRouterObj
 
 SENSORS = {
     (SENSORS_TYPE_DEVICES, "number"): ARSensorDescription(
@@ -215,27 +213,9 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter sensors."""
 
-    router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
-    entities = []
-
     SENSORS.update(list_sensors_network(entry.options[CONF_INTERFACES]))
 
-    for sensor_data in router._sensors_coordinator.values():
-        coordinator = sensor_data[KEY_COORDINATOR]
-        for sensor_description in SENSORS:
-            try:
-                if sensor_description[0] in sensor_data:
-                    if (
-                        SENSORS[sensor_description].key
-                        in sensor_data[sensor_description[0]]
-                    ):
-                        entities.append(
-                            ARSensor(coordinator, router, SENSORS[sensor_description])
-                        )
-            except Exception as ex:
-                _LOGGER.warning(ex)
-
-    async_add_entities(entities, True)
+    await async_setup_ar_entry(hass, entry, async_add_entities, SENSORS, ARSensor)
 
 
 class ARSensor(AREntity, SensorEntity):
