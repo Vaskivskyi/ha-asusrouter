@@ -16,10 +16,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_sensors_vpn_clients
 from .const import (
@@ -30,6 +27,7 @@ from .const import (
     SENSORS_TYPE_WAN,
 )
 from .dataclass import ARBinarySensorDescription
+from .entity import AREntity
 from .router import AsusRouterObj
 
 BINARY_SENSORS = {
@@ -85,7 +83,7 @@ async def async_setup_entry(
     async_add_entities(entities, True)
 
 
-class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class ARBinarySensor(AREntity, BinarySensorEntity):
     """AsusRouter binary sensor."""
 
     def __init__(
@@ -96,34 +94,10 @@ class ARBinarySensor(CoordinatorEntity, BinarySensorEntity):
     ) -> None:
         """Initialize AsusRouter binary sensor."""
 
-        super().__init__(coordinator)
-        self.entity_description: ARBinarySensorDescription = description
-        self.router = router
-        self.coordinator = coordinator
-
-        self._attr_name = f"{router._name} {description.name}"
-        self._attr_unique_id = f"{DOMAIN} {self.name}"
-        self._attr_device_info = router.device_info
+        super().__init__(coordinator, router, description)
 
     @property
     def is_on(self) -> bool:
         """Return state."""
 
         return self.coordinator.data.get(self.entity_description.key)
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-
-        description = self.entity_description
-        _attributes = description.extra_state_attributes
-        if not _attributes:
-            return {}
-
-        attributes = {}
-
-        for attr in _attributes:
-            if attr in self.coordinator.data:
-                attributes[_attributes[attr]] = self.coordinator.data[attr]
-
-        return attributes

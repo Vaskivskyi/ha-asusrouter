@@ -12,19 +12,12 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_switches_vpn_clients
-from .const import (
-    CONF_ENABLE_CONTROL,
-    DATA_ASUSROUTER,
-    DOMAIN,
-    KEY_COORDINATOR,
-)
+from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR
 from .dataclass import ARSwitchDescription
+from .entity import AREntity
 from .router import AsusRouterObj
 
 SWITCHES = {}
@@ -61,7 +54,7 @@ async def async_setup_entry(
     async_add_entities(entities, True)
 
 
-class ARSwitch(CoordinatorEntity, SwitchEntity):
+class ARSwitch(AREntity, SwitchEntity):
     """AsusRouter switch."""
 
     def __init__(
@@ -72,14 +65,7 @@ class ARSwitch(CoordinatorEntity, SwitchEntity):
     ) -> None:
         """Initialize AsusRouter switch."""
 
-        super().__init__(coordinator)
-        self.entity_description: ARSwitchDescription = description
-        self.router = router
-        self.api = router.api._api
-
-        self._attr_name = f"{router._name} {description.name}"
-        self._attr_unique_id = f"{DOMAIN} {self.name}"
-        self._attr_device_info = router.device_info
+        super().__init__(coordinator, router, description)
         self._icon_onoff = (
             True if description.icon_on and description.icon_off else False
         )
@@ -135,20 +121,3 @@ class ARSwitch(CoordinatorEntity, SwitchEntity):
                 _LOGGER.debug("Switch state was not set!")
         except Exception as ex:
             _LOGGER.error(f"Switch control has returned an exception: {ex}")
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-
-        description = self.entity_description
-        _attributes = description.extra_state_attributes
-        if not _attributes:
-            return {}
-
-        attributes = {}
-
-        for attr in _attributes:
-            if attr in self.coordinator.data:
-                attributes[_attributes[attr]] = self.coordinator.data[attr]
-
-        return attributes
