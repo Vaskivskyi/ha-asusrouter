@@ -33,12 +33,14 @@ from .const import (
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_PORT,
     DEFAULT_VERIFY_SSL,
+    SENSORS_LIGHT,
     SENSORS_MISC,
     SENSORS_NETWORK_STAT,
     SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
     SENSORS_TYPE_CPU,
+    SENSORS_TYPE_LIGHT,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_PORTS,
@@ -187,6 +189,10 @@ class ARBridge:
                 "sensors": await self._get_sysinfo_sensors(),
                 "method": self._get_sysinfo,
             },
+            SENSORS_TYPE_LIGHT: {
+                "sensors": SENSORS_LIGHT,
+                "method": self._get_light,
+            }
         }
         return sensors_types
 
@@ -292,6 +298,11 @@ class ARBridge:
             raise UpdateFailed(ex) from ex
 
         return data
+
+    async def _get_light(self) -> dict[str, Any]:
+        """Get light data from the device."""
+
+        return {"led": self._api.led}
 
     ### <- GET DATA FROM DEVICE
 

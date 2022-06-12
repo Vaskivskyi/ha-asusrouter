@@ -21,13 +21,10 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .compilers import list_sensors_vpn_clients
 from .const import (
     CONF_ENABLE_CONTROL,
-    DATA_ASUSROUTER,
-    DOMAIN,
-    KEY_COORDINATOR,
     SENSORS_TYPE_WAN,
 )
 from .dataclass import ARBinarySensorDescription
-from .entity import AREntity
+from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import AsusRouterObj
 
 BINARY_SENSORS = {
@@ -57,33 +54,13 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter binary sensors."""
 
-    router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
-    entities = []
-
     if not entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.update(list_sensors_vpn_clients(5))
 
-    for sensor_data in router._sensors_coordinator.values():
-        coordinator = sensor_data[KEY_COORDINATOR]
-        for sensor_description in BINARY_SENSORS:
-            try:
-                if sensor_description[0] in sensor_data:
-                    if (
-                        BINARY_SENSORS[sensor_description].key
-                        in sensor_data[sensor_description[0]]
-                    ):
-                        entities.append(
-                            ARBinarySensor(
-                                coordinator, router, BINARY_SENSORS[sensor_description]
-                            )
-                        )
-            except Exception as ex:
-                _LOGGER.warning(ex)
-
-    async_add_entities(entities, True)
+    await async_setup_ar_entry(hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor)
 
 
-class ARBinarySensor(AREntity, BinarySensorEntity):
+class ARBinarySensor(ARBinaryEntity, BinarySensorEntity):
     """AsusRouter binary sensor."""
 
     def __init__(
@@ -95,9 +72,3 @@ class ARBinarySensor(AREntity, BinarySensorEntity):
         """Initialize AsusRouter binary sensor."""
 
         super().__init__(coordinator, router, description)
-
-    @property
-    def is_on(self) -> bool:
-        """Return state."""
-
-        return self.coordinator.data.get(self.entity_description.key)

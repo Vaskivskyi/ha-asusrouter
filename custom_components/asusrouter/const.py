@@ -81,6 +81,7 @@ SIMPLE_SETUP_PARAMETERS = {
 # Sensors types
 SENSORS_TYPE_CPU = "cpu"
 SENSORS_TYPE_DEVICES = "devices"
+SENSORS_TYPE_LIGHT = "light"
 SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
 SENSORS_TYPE_PORTS = "ports"
@@ -104,6 +105,7 @@ SENSORS_CPU = [
     "core_7",
     "core_8",
 ]
+SENSORS_LIGHT = ["led"]
 SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
 SENSORS_PORTS = ["WAN", "LAN"]
