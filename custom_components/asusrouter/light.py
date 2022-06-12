@@ -15,7 +15,7 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_ENABLE_CONTROL, SENSORS_TYPE_LIGHT
+from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, SENSORS_TYPE_LIGHT
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import AsusRouterObj
@@ -41,7 +41,10 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter lights."""
 
-    if not entry.options[CONF_ENABLE_CONTROL]:
+    if (
+        not entry.options[CONF_ENABLE_CONTROL]
+        or not hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER].api._identity.led
+    ):
         return
 
     await async_setup_ar_entry(hass, entry, async_add_entities, LIGHTS, ARLightLED)
