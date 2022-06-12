@@ -59,6 +59,39 @@ These entities require `Device control` to be enabled in the integration setting
   - not available for: `RT-AC66U`
 </details>
 
+#### Switches
+
+These entities require `Device control` to be enabled in the integration settings. Some of the entities may not be available for your device because of their firmware limitation.
+
+Please, keep in mind. Some switches require processing time. In the Home Assistant, this will look like the switch didn't work and clicked back to the initial state. But it will get the correct value on the next state update.
+
+<details>
+<summary>OpenVPN Client</summary>
+
+*(enabled by default)*
+  - name: `openvpn_client_x`
+  - description: Switch entity allows turning on / off available OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
+  - attributes:
+    - `error_code`
+    - `status` - status of the connection (`disconnected`, `connecting`, `connected`)
+  - attributes **(FW: Merlin-only)**:
+    - `auth_read`
+    - `local_ip`
+    - `post_compress_bytes`
+    - `post_decompress_bytes`
+    - `pre_compress_bytes`
+    - `pre_decompress_bytes`
+    - `public_ip`
+    - `server_auth`
+    - `server_ip`
+    - `server_port`
+    - `tcp_udp_read_bytes`
+    - `tcp_udp_write_bytes`
+    - `tun_tap_read_bytes`
+    - `tun_tap_write_bytes`
+    - `update_time`
+</details>
+
 #### Sensors
 
 <details>
@@ -181,6 +214,33 @@ Possible network interfaces (can be changed via the `Configure` button for the c
 #### Binary sensors
 
 <details>
+<summary>OpenVPN Client <b>(non-control mode only, instead of switch)</b></summary>
+
+*(enabled by default)*
+  - name: `openvpn_client_x`
+  - description: Sensor value represents the current state of the OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
+  - attributes:
+    - `error_code`
+    - `status` - status of the connection (`disconnected`, `connecting`, `connected`)
+  - attributes **(FW: Merlin-only)**:
+    - `auth_read`
+    - `local_ip`
+    - `post_compress_bytes`
+    - `post_decompress_bytes`
+    - `pre_compress_bytes`
+    - `pre_decompress_bytes`
+    - `public_ip`
+    - `server_auth`
+    - `server_ip`
+    - `server_port`
+    - `tcp_udp_read_bytes`
+    - `tcp_udp_write_bytes`
+    - `tun_tap_read_bytes`
+    - `tun_tap_write_bytes`
+    - `update_time`
+</details>
+
+<details>
 <summary>WAN status</summary>
 
 *(disabled by default)*
@@ -258,7 +318,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX55`
 - `RT-AX58U`
 - `RT-AX68U`
-- `RT-AX82U` (shown as `RT-AX58U_IPA`)
+- `RT-AX82U`
 - `RT-AX86U`
 - `RT-AX88U`
 - `RT-AX89X`
@@ -292,3 +352,5 @@ This integration is a free-time project. If you like it, you can support me by b
 ## Thanks to
 
 The initial codebase for this integration is highly based on Home Assistant core integration [AsusWRT](https://www.home-assistant.io/integrations/asuswrt/) and [ollo69/ha_asuswrt_custom](https://github.com/ollo69/ha_asuswrt_custom).
+
+
