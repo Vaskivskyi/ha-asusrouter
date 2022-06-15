@@ -48,6 +48,7 @@ from .const import (
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_INTERNET,
+    DEVICE_ATTRIBUTE_INTERNET_MODE,
     DEVICE_ATTRIBUTE_IP_TYPE,
     DEVICE_ATTRIBUTE_LAST_ACTIVITY,
     DEVICE_ATTRIBUTE_RSSI,
@@ -175,16 +176,12 @@ class AsusRouterDevInfo:
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_5G
                 # Internet
-                if dev_info.internet_mode:
-                    self._extra_state_attributes[DEVICE_ATTRIBUTE_INTERNET] = (
-                        CONNECTION_CONNECTED
-                        if dev_info.internet_state
-                        else CONNECTION_DISCONNECTED
-                    )
-                else:
-                    self._extra_state_attributes[
-                        DEVICE_ATTRIBUTE_INTERNET
-                    ] = CONNECTION_BLOCKED
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_INTERNET_MODE
+                ] = dev_info.internet_mode
+                self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_INTERNET
+                ] = dev_info.internet_state
                 # IP method
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_IP_TYPE
