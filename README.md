@@ -311,7 +311,7 @@ The list of supported devices includes (but is not limited to):
 802.11 AC models:
 - `DSL-AC68U`
 - `RT-AC66U` (without LED control, firmware limitation)
-- `RT-AC86U` (a known issue https://github.com/Vaskivskyi/ha-asusrouter/issues/29, produces warnings in the log)
+- `RT-AC86U`
 - `RT-ACRH13`
 
 802.11 AX models:
