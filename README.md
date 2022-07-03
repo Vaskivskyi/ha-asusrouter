@@ -320,7 +320,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX58U`
 - `RT-AX68U`
 - `RT-AX82U`
-- `RT-AX86U`
+- `RT-AX86U` / `RT-AX86S` (reported as RT-AX86U)
 - `RT-AX88U`
 - `RT-AX89X`
 - `RT-AX92U`
