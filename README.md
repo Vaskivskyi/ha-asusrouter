@@ -324,6 +324,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-AX88U`
 - `RT-AX89X`
 - `RT-AX92U`
+- `TUF-AX5400`
 - `ZenWiFi AX (XT8)`
 - `ZenWiFi AX Mini (XD4)`
 
