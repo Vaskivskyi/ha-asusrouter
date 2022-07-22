@@ -315,6 +315,7 @@ The list of supported devices includes (but is not limited to):
 - `RT-ACRH13`
 
 802.11 AX models:
+- `DSL-AX82U`
 - `GT-AX11000`
 - `RT-AX55`
 - `RT-AX58U`
