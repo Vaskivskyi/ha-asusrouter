@@ -6,7 +6,7 @@
 
 The integration uses the native Asus HTTP(S) API - the same way the web panel or mobile app works and relies on direct communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
 
-Both the stock AsusWRT and the AsusWRT-Merlin firmware are supported.
+Both the stock AsusWRT and the AsusWRT-Merlin firmware are supported. Currently, firmware versions 3.x.x are supported. FW 5.x.x is NOT supported (a testing device is required).
 
 You could always help with its development by providing your feedback.
 
@@ -305,6 +305,8 @@ There will be an error in your log in this case.
 If you are experiencing multiple errors in your log (more than 5 in a row) or integration does not provide any data 5 minutes after a reboot, please report it to the Issues. The more data you provide, the easier it will be to fix the problem.
 
 ## Supported devices
+
+**Currently, firmware versions 3.x.x are supported. FW 5.x.x is NOT supported (a testing device is required).**
 
 The list of supported devices includes (but is not limited to):
 
