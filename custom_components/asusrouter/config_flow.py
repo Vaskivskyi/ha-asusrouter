@@ -355,6 +355,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             "credentials": self.async_step_operation_mode,
             "credentials_error": self.async_step_device,
             "device": self.async_step_operation_mode,
+            "device_error": self.async_step_device,
             "operation_mode": self.async_step_times,
             "times": self.async_step_interfaces,
             "interfaces": self.async_step_name,
