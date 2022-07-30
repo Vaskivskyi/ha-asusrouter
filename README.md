@@ -315,6 +315,7 @@ The list of supported devices includes (but is not limited to):
 
 802.11 AC models:
 - `DSL-AC68U`
+- `RT-AC51U` (without LED control, firmware limitation)
 - `RT-AC66U` (without LED control, firmware limitation)
 - `RT-AC86U`
 - `RT-ACRH13`
