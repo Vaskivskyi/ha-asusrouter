@@ -310,6 +310,9 @@ If you are experiencing multiple errors in your log (more than 5 in a row) or in
 
 The list of supported devices includes (but is not limited to):
 
+802.11 N models:
+- `RT-N66U` (without LED control, Merlin 380.70 recommended)
+
 802.11 AC models:
 - `DSL-AC68U`
 - `RT-AC66U` (without LED control, firmware limitation)
