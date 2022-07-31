@@ -46,6 +46,9 @@ SENSORS = {
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
+        extra_state_attributes={
+            "devices": "devices",
+        },
     ),
     (SENSORS_TYPE_MISC, "boottime"): ARSensorDescription(
         key="boottime",

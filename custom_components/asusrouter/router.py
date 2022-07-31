@@ -78,22 +78,31 @@ class AsusRouterSensorHandler:
         self._hass = hass
         self._api = api
         self._connected_devices = 0
+        self._connected_devices_list: list[str] = list()
         self._scan_interval = timedelta(seconds=scan_interval)
 
     async def _get_connected_devices(self) -> dict[str, int]:
         """Return number of connected devices."""
 
-        return {SENSORS_CONNECTED_DEVICES[0]: self._connected_devices}
+        return {
+            SENSORS_CONNECTED_DEVICES[0]: self._connected_devices,
+            SENSORS_CONNECTED_DEVICES[1]: self._connected_devices_list,
+        }
 
     def update_device_count(
         self,
         conn_devices: int,
+        list_devices: list[str],
     ) -> bool:
         """Update connected devices attribute."""
 
-        if self._connected_devices == conn_devices:
+        if (
+            self._connected_devices == conn_devices
+            and self._connected_devices_list == list_devices
+        ):
             return False
         self._connected_devices = conn_devices
+        self._connected_devices_list = list_devices
         return True
 
     async def get_coordinator(
@@ -290,6 +299,7 @@ class AsusRouterObj:
 
         self._devices: dict[str, Any] = {}
         self._connected_devices: int = 0
+        self._connected_devices_list: list[str] = list()
         self._connect_error: bool = False
 
         self._sensors_data_handler: AsusRouterSensorHandler | None = None
@@ -399,9 +409,13 @@ class AsusRouterObj:
             _LOGGER.info(f"Reconnected to '{self._host}'")
 
         self._connected_devices = 0
+        self._connected_devices_list = list()
         for device in api_devices:
             if api_devices[device].online:
                 self._connected_devices += 1
+                self._connected_devices_list.append(
+                    f"{api_devices[device].mac}/{api_devices[device].ip}/{api_devices[device].name}"
+                )
         consider_home = self._options.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME)
 
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
@@ -429,7 +443,9 @@ class AsusRouterObj:
         self._sensors_data_handler = AsusRouterSensorHandler(
             self.hass, self._api, self._options[CONF_SCAN_INTERVAL]
         )
-        self._sensors_data_handler.update_device_count(self._connected_devices)
+        self._sensors_data_handler.update_device_count(
+            self._connected_devices, self._connected_devices_list
+        )
 
         sensors_types = await self._api.async_get_available_sensors()
         sensors_types[SENSORS_TYPE_DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
@@ -455,7 +471,9 @@ class AsusRouterObj:
             coordinator = self._sensors_coordinator[SENSORS_TYPE_DEVICES][
                 KEY_COORDINATOR
             ]
-            if self._sensors_data_handler.update_device_count(self._connected_devices):
+            if self._sensors_data_handler.update_device_count(
+                self._connected_devices, self._connected_devices_list
+            ):
                 await coordinator.async_refresh()
 
     async def close(self) -> None:

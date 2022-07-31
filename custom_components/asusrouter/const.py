@@ -93,7 +93,7 @@ SENSORS_TYPE_WAN = "wan"
 
 # Sensors
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = ["number"]
+SENSORS_CONNECTED_DEVICES = ["number", "devices"]
 SENSORS_CPU = [
     "total",
     "core_1",
