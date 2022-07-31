@@ -8,8 +8,22 @@ from homeassistant.components.sensor import SensorStateClass
 from homeassistant.const import (
     CONF_PORT,
     CONF_VERIFY_SSL,
+    DATA_BITS,
+    DATA_BYTES,
+    DATA_GIGABITS,
     DATA_GIGABYTES,
+    DATA_KILOBITS,
+    DATA_KILOBYTES,
+    DATA_MEGABITS,
+    DATA_MEGABYTES,
+    DATA_RATE_BITS_PER_SECOND,
+    DATA_RATE_BYTES_PER_SECOND,
+    DATA_RATE_GIGABITS_PER_SECOND,
+    DATA_RATE_GIGABYTES_PER_SECOND,
+    DATA_RATE_KILOBITS_PER_SECOND,
+    DATA_RATE_KILOBYTES_PER_SECOND,
     DATA_RATE_MEGABITS_PER_SECOND,
+    DATA_RATE_MEGABYTES_PER_SECOND,
     Platform,
 )
 
@@ -34,6 +48,9 @@ CONF_CONSIDER_HOME = "consider_home"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_INTERFACES = "interfaces"
+CONF_UNITS = "units"
+CONF_UNITS_SPEED = "units_speed"
+CONF_UNITS_TRAFFIC = "units_traffic"
 
 # Configuration keys that rerquire reload of integration
 CONF_REQ_RELOAD = [
@@ -59,6 +76,8 @@ DEFAULT_PORT = 0
 DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
 DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SSL = False
+DEFAULT_UNITS_SPEED = DATA_RATE_MEGABITS_PER_SECOND
+DEFAULT_UNITS_TRAFFIC = DATA_GIGABYTES
 DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
 
@@ -150,6 +169,27 @@ STEP_TYPE_SIMPLE = "simplified"
 CONVERT_TO_MEGA = 1048576
 CONVERT_TO_GIGA = 1073741824
 
+CONVERT_SPEED = {
+    DATA_RATE_BITS_PER_SECOND: 1,
+    DATA_RATE_KILOBITS_PER_SECOND: 1024,
+    DATA_RATE_MEGABITS_PER_SECOND: 1048576,
+    DATA_RATE_GIGABITS_PER_SECOND: 1073741824,
+    DATA_RATE_BYTES_PER_SECOND: 8,
+    DATA_RATE_KILOBYTES_PER_SECOND: 8192,
+    DATA_RATE_MEGABYTES_PER_SECOND: 8388608,
+    DATA_RATE_GIGABYTES_PER_SECOND: 8589934592,
+}
+CONVERT_TRAFFIC = {
+    DATA_BITS: 0.125,
+    DATA_KILOBITS: 128,
+    DATA_MEGABITS: 131072,
+    DATA_GIGABITS: 134217728,
+    DATA_BYTES: 1,
+    DATA_KILOBYTES: 1024,
+    DATA_MEGABYTES: 1048576,
+    DATA_GIGABYTES: 1073741824,
+}
+
 
 # Keys
 KEY_COORDINATOR = "coordinator"
@@ -178,8 +218,7 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "name": "{} Download",
         "icon": "mdi:download-outline",
         "state_class": SensorStateClass.TOTAL_INCREASING,
-        "native_unit_of_measurement": DATA_GIGABYTES,
-        "factor": CONVERT_TO_GIGA,
+        "factor": CONVERT_TRAFFIC,
         "entity_registry_enabled_default": True,
         "raw_attribute": "bytes",
     },
@@ -187,8 +226,7 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "name": "{} Upload",
         "icon": "mdi:upload-outline",
         "state_class": SensorStateClass.TOTAL_INCREASING,
-        "native_unit_of_measurement": DATA_GIGABYTES,
-        "factor": CONVERT_TO_GIGA,
+        "factor": CONVERT_TRAFFIC,
         "entity_registry_enabled_default": True,
         "raw_attribute": "bytes",
     },
@@ -196,8 +234,7 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "name": "{} Download Speed",
         "icon": "mdi:download-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
-        "native_unit_of_measurement": DATA_RATE_MEGABITS_PER_SECOND,
-        "factor": CONVERT_TO_MEGA,
+        "factor": CONVERT_SPEED,
         "entity_registry_enabled_default": True,
         "raw_attribute": "bits/s",
     },
@@ -205,8 +242,7 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "name": "{} Upload Speed",
         "icon": "mdi:upload-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
-        "native_unit_of_measurement": DATA_RATE_MEGABITS_PER_SECOND,
-        "factor": CONVERT_TO_MEGA,
+        "factor": CONVERT_SPEED,
         "entity_registry_enabled_default": True,
         "raw_attribute": "bits/s",
     },

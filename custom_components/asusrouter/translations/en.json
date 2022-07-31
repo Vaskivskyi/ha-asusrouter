@@ -44,7 +44,9 @@
             "interfaces": {
                 "description": "Interfaces to monitor",
                 "data": {
-                    "interfaces": "Select network interfaces to monitor"
+                    "interfaces": "Select network interfaces to monitor",
+                    "units_speed": "Units for speed",
+                    "units_traffic": "Units for traffic"
                 }
             },
             "name": {
@@ -104,7 +106,9 @@
             "interfaces": {
                 "description": "Interfaces to monitor",
                 "data": {
-                    "interfaces": "Select network interfaces to monitor"
+                    "interfaces": "Select network interfaces to monitor",
+                    "units_speed": "Units for speed",
+                    "units_traffic": "Units for traffic"
                 }
             },
             "confirmation": {

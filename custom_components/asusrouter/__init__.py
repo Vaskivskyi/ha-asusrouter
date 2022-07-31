@@ -14,10 +14,14 @@ from .const import (
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
     CONF_INTERFACES,
+    CONF_UNITS_SPEED,
+    CONF_UNITS_TRAFFIC,
     DATA_ASUSROUTER,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_UNITS_SPEED,
+    DEFAULT_UNITS_TRAFFIC,
     DELAULT_INTERFACES,
     DOMAIN,
     PLATFORMS,
@@ -107,6 +111,11 @@ async def async_migrate_entry(
         new_options[CONF_SCAN_INTERVAL] = DEFAULT_SCAN_INTERVAL
         new_options[CONF_CACHE_TIME] = DEFAULT_CACHE_TIME
         new_options[CONF_CONSIDER_HOME] = DEFAULT_CONSIDER_HOME
+
+    if version == 3:
+        new_options[CONF_UNITS_SPEED] = DEFAULT_UNITS_SPEED
+        new_options[CONF_UNITS_TRAFFIC] = DEFAULT_UNITS_TRAFFIC
+        version += 1
 
     while f"{version}_{version + 1}" in DEPRECATED:
         for key_old in DEPRECATED[f"{version}_{version + 1}"]:
