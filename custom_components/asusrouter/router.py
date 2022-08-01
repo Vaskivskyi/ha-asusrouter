@@ -10,7 +10,7 @@ from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
 from typing import Any, TypeVar
 
-from asusrouter import ConnectedDevice
+from asusrouter import AsusRouterConnectionError, ConnectedDevice
 from homeassistant.components.device_tracker.const import CONF_CONSIDER_HOME
 from homeassistant.components.device_tracker.const import DOMAIN as TRACKER_DOMAIN
 from homeassistant.config_entries import ConfigEntry
@@ -321,7 +321,7 @@ class AsusRouterObj:
 
         try:
             await self._api.async_connect()
-        except OSError as ex:
+        except (OSError, AsusRouterConnectionError) as ex:
             raise ConfigEntryNotReady from ex
 
         if not self._api.is_connected:
