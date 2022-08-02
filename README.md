@@ -109,6 +109,8 @@ Please, keep in mind. Some switches require processing time. In the Home Assista
 *(enabled by default)*
   - name: `connected_devices`
   - units: ` `
+  - attributes:
+    - `devices` - represents a list of all connected (active) devices as their `MAC/IP/Hostname`
   - description: Sensor shows the total number of devices connected.
 </details>
 
@@ -139,12 +141,12 @@ Please, keep in mind. Some switches require processing time. In the Home Assista
 
 - **Traffic**:
   - names: `{}_download` / `{}_upload` [^traffic]
-  - units: `GB` [^units]
+  - units: `GB` [^units] (default). Can be selected during / after the integration configuration.
   - attributes:
     - `bytes` - raw data from device
 - **Speed**:
   - names: `{}_download_speed` / `{}_upload_speed`
-  - units: `Mb/s`
+  - units: `Mb/s` (default). Can be selected during / after the integration configuration.
   - attributes:
     - `bits/s` - raw data from device
 

@@ -79,6 +79,8 @@ For a better understanding of how `consider home` works, here are two examples:
 
 **Values:**
 - `interfaces` - which network interfaces should be monitored
+- `units speed` - which units to use for the network interface speed. Default: `Mbit/s`
+- `units traffic` - which units to use for the network traffic. Default: `GB`
 
 ![Step #5. Network interfaces to monitor](Fig-Setup/Step-5.png)
 ## #6. Rename device
