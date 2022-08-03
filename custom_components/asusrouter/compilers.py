@@ -12,6 +12,8 @@ from homeassistant.components.binary_sensor import DEVICE_CLASS_CONNECTIVITY
 from homeassistant.helpers.entity import EntityCategory
 
 from .const import (
+    DEFAULT_UNITS_SPEED,
+    DEFAULT_UNITS_TRAFFIC,
     KEY_OVPN_CLIENT,
     KEY_SENSOR_ID,
     NAME_OVPN_CLIENT,
@@ -29,6 +31,8 @@ from .dataclass import (
 
 def list_sensors_network(
     interfaces: list[str] | None = None,
+    units_speed: str = DEFAULT_UNITS_SPEED,
+    units_traffic: str = DEFAULT_UNITS_TRAFFIC,
 ) -> dict[str, Any]:
     """Compile a list of network sensors."""
 
@@ -41,6 +45,9 @@ def list_sensors_network(
         for type in SENSORS_PARAM_NETWORK:
             data = SENSORS_PARAM_NETWORK[type]
             key = KEY_SENSOR_ID.format(interface, type)
+            units = units_traffic
+            if "Speed" in data["name"]:
+                units = units_speed
             sensors.update(
                 {
                     (SENSORS_TYPE_NETWORK_STAT, key): ARSensorDescription(
@@ -49,9 +56,8 @@ def list_sensors_network(
                         name=data["name"].format(interface) or None,
                         icon=data["icon"] or None,
                         state_class=data["state_class"] or None,
-                        native_unit_of_measurement=data["native_unit_of_measurement"]
-                        or None,
-                        factor=data["factor"] or None,
+                        native_unit_of_measurement=units or None,
+                        factor=data["factor"][units] or None,
                         entity_registry_enabled_default=data[
                             "entity_registry_enabled_default"
                         ]

@@ -6,7 +6,7 @@
 
 The integration uses the native Asus HTTP(S) API - the same way the web panel or mobile app works and relies on direct communications with your device. Even though this is not the primary purpose of the integration, one can configure it for usage with the remote device over the global network as well.
 
-Both the stock AsusWRT and the AsusWRT-Merlin firmware are supported.
+Both the stock AsusWRT and the AsusWRT-Merlin firmware are supported. Currently, firmware versions 3.x.x are supported. FW 5.x.x is NOT supported (a testing device is required).
 
 You could always help with its development by providing your feedback.
 
@@ -109,6 +109,8 @@ Please, keep in mind. Some switches require processing time. In the Home Assista
 *(enabled by default)*
   - name: `connected_devices`
   - units: ` `
+  - attributes:
+    - `devices` - represents a list of all connected (active) devices as their `MAC/IP/Hostname`
   - description: Sensor shows the total number of devices connected.
 </details>
 
@@ -139,12 +141,12 @@ Please, keep in mind. Some switches require processing time. In the Home Assista
 
 - **Traffic**:
   - names: `{}_download` / `{}_upload` [^traffic]
-  - units: `GB` [^units]
+  - units: `GB` [^units] (default). Can be selected during / after the integration configuration.
   - attributes:
     - `bytes` - raw data from device
 - **Speed**:
   - names: `{}_download_speed` / `{}_upload_speed`
-  - units: `Mb/s`
+  - units: `Mb/s` (default). Can be selected during / after the integration configuration.
   - attributes:
     - `bits/s` - raw data from device
 
@@ -306,24 +308,32 @@ If you are experiencing multiple errors in your log (more than 5 in a row) or in
 
 ## Supported devices
 
+**Currently, firmware versions 3.x.x are supported. FW 5.x.x is NOT supported (a testing device is required).**
+
 The list of supported devices includes (but is not limited to):
+
+802.11 N models:
+- `RT-N66U` (without LED control, Merlin 380.70 recommended)
 
 802.11 AC models:
 - `DSL-AC68U`
+- `RT-AC51U` (without LED control, firmware limitation)
 - `RT-AC66U` (without LED control, firmware limitation)
-- `RT-AC86U` (a known issue https://github.com/Vaskivskyi/ha-asusrouter/issues/29, produces warnings in the log)
+- `RT-AC86U`
 - `RT-ACRH13`
 
 802.11 AX models:
+- `DSL-AX82U`
 - `GT-AX11000`
 - `RT-AX55`
 - `RT-AX58U`
 - `RT-AX68U`
 - `RT-AX82U`
-- `RT-AX86U`
+- `RT-AX86U` / `RT-AX86S` (reported as RT-AX86U)
 - `RT-AX88U`
 - `RT-AX89X`
 - `RT-AX92U`
+- `TUF-AX5400`
 - `ZenWiFi AX (XT8)`
 - `ZenWiFi AX Mini (XD4)`
 

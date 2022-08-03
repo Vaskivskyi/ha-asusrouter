@@ -25,6 +25,22 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
+    DATA_BITS,
+    DATA_BYTES,
+    DATA_GIGABITS,
+    DATA_GIGABYTES,
+    DATA_KILOBITS,
+    DATA_KILOBYTES,
+    DATA_MEGABITS,
+    DATA_MEGABYTES,
+    DATA_RATE_BITS_PER_SECOND,
+    DATA_RATE_BYTES_PER_SECOND,
+    DATA_RATE_GIGABITS_PER_SECOND,
+    DATA_RATE_GIGABYTES_PER_SECOND,
+    DATA_RATE_KILOBITS_PER_SECOND,
+    DATA_RATE_KILOBYTES_PER_SECOND,
+    DATA_RATE_MEGABITS_PER_SECOND,
+    DATA_RATE_MEGABYTES_PER_SECOND,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
@@ -39,6 +55,8 @@ from .const import (
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
+    CONF_UNITS_SPEED,
+    CONF_UNITS_TRAFFIC,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
@@ -46,6 +64,8 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SSL,
+    DEFAULT_UNITS_SPEED,
+    DEFAULT_UNITS_TRAFFIC,
     DEFAULT_USERNAME,
     DEFAULT_VERIFY_SSL,
     DELAULT_INTERFACES,
@@ -221,8 +241,12 @@ def _create_form_credentials(
         vol.Required(
             CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
         ): cv.string,
-        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): cv.string,
-        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): cv.boolean,
+        vol.Required(
+            CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
+        ): cv.string,
+        vol.Optional(
+            CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
+        ): cv.boolean,
     }
 
     return vol.Schema(schema)
@@ -237,9 +261,15 @@ def _create_form_device(
         vol.Required(
             CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
         ): cv.string,
-        vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")): cv.string,
-        vol.Optional(CONF_PORT, default=user_input.get(CONF_PORT, DEFAULT_PORT)): cv.positive_int,
-        vol.Optional(CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)): cv.boolean,
+        vol.Required(
+            CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
+        ): cv.string,
+        vol.Optional(
+            CONF_PORT, default=user_input.get(CONF_PORT, DEFAULT_PORT)
+        ): cv.positive_int,
+        vol.Optional(
+            CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
+        ): cv.boolean,
         vol.Optional(
             CONF_VERIFY_SSL, default=user_input.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL)
         ): cv.boolean,
@@ -307,6 +337,36 @@ def _create_form_interfaces(
             CONF_INTERFACES,
             default=default,
         ): cv.multi_select({k: k for k in user_input["interfaces"]}),
+        vol.Required(
+            CONF_UNITS_SPEED,
+            default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
+        ): vol.In(
+            {
+                DATA_RATE_BITS_PER_SECOND: DATA_RATE_BITS_PER_SECOND,
+                DATA_RATE_KILOBITS_PER_SECOND: DATA_RATE_KILOBITS_PER_SECOND,
+                DATA_RATE_MEGABITS_PER_SECOND: DATA_RATE_MEGABITS_PER_SECOND,
+                DATA_RATE_GIGABITS_PER_SECOND: DATA_RATE_GIGABITS_PER_SECOND,
+                DATA_RATE_BYTES_PER_SECOND: DATA_RATE_BYTES_PER_SECOND,
+                DATA_RATE_KILOBYTES_PER_SECOND: DATA_RATE_KILOBYTES_PER_SECOND,
+                DATA_RATE_MEGABYTES_PER_SECOND: DATA_RATE_MEGABYTES_PER_SECOND,
+                DATA_RATE_GIGABYTES_PER_SECOND: DATA_RATE_GIGABYTES_PER_SECOND,
+            }
+        ),
+        vol.Required(
+            CONF_UNITS_TRAFFIC,
+            default=user_input.get(CONF_UNITS_TRAFFIC, DEFAULT_UNITS_TRAFFIC),
+        ): vol.In(
+            {
+                DATA_BITS: DATA_BITS,
+                DATA_KILOBITS: DATA_KILOBITS,
+                DATA_MEGABITS: DATA_MEGABITS,
+                DATA_GIGABITS: DATA_GIGABITS,
+                DATA_BYTES: DATA_BYTES,
+                DATA_KILOBYTES: DATA_KILOBYTES,
+                DATA_MEGABYTES: DATA_MEGABYTES,
+                DATA_GIGABYTES: DATA_GIGABYTES,
+            }
+        ),
     }
 
     return vol.Schema(schema)
@@ -330,7 +390,9 @@ def _create_form_confirmation(
     """Create a form for the 'confirmation' step."""
 
     schema = {
-        vol.Optional(CONF_CONFIRM, default=user_input.get(CONF_CONFIRM, False)): cv.boolean,
+        vol.Optional(
+            CONF_CONFIRM, default=user_input.get(CONF_CONFIRM, False)
+        ): cv.boolean,
     }
 
     return vol.Schema(schema)
@@ -339,7 +401,7 @@ def _create_form_confirmation(
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle config flow for AsusRouter."""
 
-    VERSION = 3
+    VERSION = 4
 
     def __init__(self):
         """Initialise config flow."""
@@ -355,6 +417,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             "credentials": self.async_step_operation_mode,
             "credentials_error": self.async_step_device,
             "device": self.async_step_operation_mode,
+            "device_error": self.async_step_device,
             "operation_mode": self.async_step_times,
             "times": self.async_step_interfaces,
             "interfaces": self.async_step_name,

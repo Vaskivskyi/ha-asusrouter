@@ -18,7 +18,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
-from .const import DATA_ASUSROUTER, DOMAIN
+from .const import DATA_ASUSROUTER, DEVICE_ATTRIBUTE_LAST_ACTIVITY, DOMAIN
 from .router import AsusRouterObj
 
 TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
@@ -81,7 +81,11 @@ async def async_get_config_entry_diagnostics(
             {
                 "name": device.name,
                 "ip_address": device.ip,
-                "last_activity": device.last_activity,
+                "last_activity": device.extra_state_attributes[
+                    DEVICE_ATTRIBUTE_LAST_ACTIVITY
+                ]
+                if DEVICE_ATTRIBUTE_LAST_ACTIVITY in device.extra_state_attributes
+                else None,
             }
         )
 

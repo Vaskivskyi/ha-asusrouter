@@ -24,6 +24,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .compilers import list_sensors_network
 from .const import (
     CONF_INTERFACES,
+    CONF_UNITS_SPEED,
+    CONF_UNITS_TRAFFIC,
     SENSORS_TYPE_CPU,
     SENSORS_TYPE_DEVICES,
     SENSORS_TYPE_MISC,
@@ -46,6 +48,9 @@ SENSORS = {
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
+        extra_state_attributes={
+            "devices": "devices",
+        },
     ),
     (SENSORS_TYPE_MISC, "boottime"): ARSensorDescription(
         key="boottime",
@@ -213,7 +218,13 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter sensors."""
 
-    SENSORS.update(list_sensors_network(entry.options[CONF_INTERFACES]))
+    SENSORS.update(
+        list_sensors_network(
+            entry.options[CONF_INTERFACES],
+            entry.options[CONF_UNITS_SPEED],
+            entry.options[CONF_UNITS_TRAFFIC],
+        )
+    )
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SENSORS, ARSensor)
 
