@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback, ServiceCall
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import format_mac
@@ -34,9 +34,6 @@ from homeassistant.util import dt as dt_util
 from .bridge import ARBridge
 from .const import (
     CONF_REQ_RELOAD,
-    CONNECTION_BLOCKED,
-    CONNECTION_CONNECTED,
-    CONNECTION_DISCONNECTED,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_WIRED,
@@ -333,7 +330,9 @@ class AsusRouterObj:
 
             await self._api.async_reboot()
 
-        self.hass.services.async_register(DOMAIN, "service_reboot", async_service_reboot)
+        self.hass.services.async_register(
+            DOMAIN, "service_reboot", async_service_reboot
+        )
 
         self._mac = await self._api.get_mac()
         self._serial = await self._api.get_serial()
