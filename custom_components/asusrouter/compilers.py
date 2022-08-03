@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 from typing import Any
 
 from homeassistant.components.binary_sensor import DEVICE_CLASS_CONNECTIVITY
