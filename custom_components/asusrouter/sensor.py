@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 from numbers import Real
-from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,

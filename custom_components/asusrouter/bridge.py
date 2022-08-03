@@ -192,7 +192,7 @@ class ARBridge:
             SENSORS_TYPE_LIGHT: {
                 "sensors": SENSORS_LIGHT,
                 "method": self._get_light,
-            }
+            },
         }
         return sensors_types
 
@@ -417,4 +417,5 @@ class ARBridge:
         """Reboot the device."""
 
         return await self._api.async_service_reboot()
+
     ### <- SERVICES

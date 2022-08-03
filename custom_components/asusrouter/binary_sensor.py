@@ -6,8 +6,6 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
-from typing import Any
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -19,10 +17,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_sensors_vpn_clients
-from .const import (
-    CONF_ENABLE_CONTROL,
-    SENSORS_TYPE_WAN,
-)
+from .const import CONF_ENABLE_CONTROL, SENSORS_TYPE_WAN
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import AsusRouterObj
@@ -57,7 +52,9 @@ async def async_setup_entry(
     if not entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.update(list_sensors_vpn_clients(5))
 
-    await async_setup_ar_entry(hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor)
+    await async_setup_ar_entry(
+        hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor
+    )
 
 
 class ARBinarySensor(ARBinaryEntity, BinarySensorEntity):
