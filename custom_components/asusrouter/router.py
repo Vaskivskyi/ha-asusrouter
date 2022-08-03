@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_VERIFY_SSL,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback, ServiceCall
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import format_mac
@@ -326,6 +326,14 @@ class AsusRouterObj:
 
         if not self._api.is_connected:
             raise ConfigEntryNotReady
+
+        # Services
+        async def async_service_reboot(service: ServiceCall):
+            """Handle reboot."""
+
+            await self._api.async_reboot()
+
+        self.hass.services.async_register(DOMAIN, "service_reboot", async_service_reboot)
 
         self._mac = await self._api.get_mac()
         self._serial = await self._api.get_serial()

@@ -411,3 +411,10 @@ class ARBridge:
         return await self._api.async_get_network_labels()
 
     ### <- GENERAL USAGE METHODS
+
+    ### SERVICES ->
+    async def async_reboot(self) -> bool:
+        """Reboot the device."""
+
+        return await self._api.async_service_reboot()
+    ### <- SERVICES
