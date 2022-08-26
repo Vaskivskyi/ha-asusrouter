@@ -9,9 +9,9 @@ The integration uses the native HTTP(S) API (the same way as WebUI) and relies o
 
 #### Firmware limitations
 
-Firmware versions 3.x.x are fully supported (older versions might have a limited amount of sensors available).
+Firmware versions `3.0.0.4.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` for the stock or `386.7` for Merlin FW.
 
-Firmware 5.x.x (some DSL models) is **NOT supported** yet (a testing device is required).
+Firmware `5.x.x` (some DSL models) is **NOT supported** (not AsusWRT).
 
 ## Installation
 
@@ -287,7 +287,7 @@ Please, keep this in mind. Some `lights` / `switches` might require processing t
 
 ## Tested devices
 
-The integration supports virtually **any** AsusWRT-powered device with **firmware 3.x.x**.
+The integration supports virtually **any** AsusWRT-powered device with firmware `3.0.0.4.x`.
 
 This list provides only the models tested by me or other users. If your device is not listed yet but works well, please open a [Device Support](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose) ticket with the device model and it will be added to the list.
 
@@ -315,11 +315,11 @@ This list provides only the models tested by me or other users. If your device i
 
 </td><td><b>Merlin</b>: 380.70+</td><td></td></tr>
 
-<tr><td>Not-supported (yet)</td><td>
+<tr><td><b>Not supported</b></td><td>
 
-`DSL-AC68VG`
+`DSL-AC68VG` (non-compatible FW)
 
-</td><td></td><td>Testing device with FW 5.x.x requiered</td></tr>
+</td><td></td><td></td></tr>
 
 </table>
 
