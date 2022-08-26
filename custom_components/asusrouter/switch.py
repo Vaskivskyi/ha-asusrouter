@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .compilers import list_switches_vpn_clients
+from .compilers import list_switches_vpn_clients, list_switches_wlan
 from .const import CONF_ENABLE_CONTROL
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -32,6 +32,7 @@ async def async_setup_entry(
 
     if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(list_switches_vpn_clients(5))
+        SWITCHES.update(list_switches_wlan(3))
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
 
@@ -49,7 +50,10 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
 
         super().__init__(coordinator, router, description)
         self._service_on = description.service_on
+        self._service_on_args = description.service_on_args
         self._service_off = description.service_off
+        self._service_off_args = description.service_off_args
+        self._service_expect_modify = description.service_expect_modify
 
     async def async_turn_on(
         self,
@@ -59,7 +63,9 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
 
         try:
             result = await self.api.async_service_run(
-                self._service_on, expect_modify=False
+                self._service_on,
+                arguments=self._service_on_args,
+                expect_modify=self._service_expect_modify,
             )
             if not result:
                 _LOGGER.debug("Switch state was not set!")
@@ -74,7 +80,9 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
 
         try:
             result = await self.api.async_service_run(
-                self._service_off, expect_modify=False
+                self._service_off,
+                arguments=self._service_off_args,
+                expect_modify=self._service_expect_modify,
             )
             if not result:
                 _LOGGER.debug("Switch state was not set!")

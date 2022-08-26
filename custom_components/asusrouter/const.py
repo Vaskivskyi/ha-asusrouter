@@ -109,6 +109,7 @@ SENSORS_TYPE_SYSINFO = "sysinfo"
 SENSORS_TYPE_TEMPERATURE = "temperature"
 SENSORS_TYPE_VPN = "vpn"
 SENSORS_TYPE_WAN = "wan"
+SENSORS_TYPE_WLAN = "wlan"
 
 # Sensors
 SENSORS_CHANGE = ["change"]
@@ -150,6 +151,28 @@ SENSORS_VPN = {
     "datetime": "update_time",
 }
 SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
+SENSORS_WLAN = {
+    "auth_mode_x": "auth_method",
+    "channel": "channel",
+    "bw": "channel_bandwidth",
+    "chanspec": "chanspec",
+    "country_code": "country_code",
+    "gmode_check": "gmode_check",
+    "wpa_gtk_rekey": "group_key_rotation",
+    "closed": "hidden",
+    "maclist_x": "maclist_x",
+    "macmode": "macmode",
+    "mbo_enable": "mbo_enable",
+    "mfp": "mfp",
+    "nmode_x": "mode",
+    "wpa_psk": "password",
+    "radius_ipaddr": "radius_ipaddr",
+    "radius_key": "radius_key",
+    "radius_port": "radius_port",
+    "ssid": "ssid",
+    "crypto": "wpa_encryption",
+    "optimizexbox_ckb": "xbox_optimized",
+}
 
 
 # Types of results on actions
@@ -196,9 +219,17 @@ KEY_COORDINATOR = "coordinator"
 
 NAME_OVPN_CLIENT = "OpenVPN Client"
 
+NAME_WLAN = {
+    0: "Wireless 2.4 GHz",
+    1: "Wireless 5 GHz",
+    2: "Wireless 5 GHz (2)",
+    3: "Wireless 6 GHz",
+}
+
 
 # Params to generate sensors
 KEY_OVPN_CLIENT = "vpn_client"
+KEY_WLAN = "wl"
 KEY_SENSOR_ID = "{}_{}"
 
 SENSORS_PARAM: dict[str, dict[str, Any]] = {

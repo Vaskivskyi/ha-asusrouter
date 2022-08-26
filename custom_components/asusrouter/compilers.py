@@ -12,11 +12,15 @@ from .const import (
     DEFAULT_UNITS_TRAFFIC,
     KEY_OVPN_CLIENT,
     KEY_SENSOR_ID,
+    KEY_WLAN,
     NAME_OVPN_CLIENT,
+    NAME_WLAN,
     SENSORS_PARAM_NETWORK,
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_VPN,
+    SENSORS_TYPE_WLAN,
     SENSORS_VPN,
+    SENSORS_WLAN,
 )
 from .dataclass import (
     ARBinarySensorDescription,
@@ -121,6 +125,78 @@ def list_switches_vpn_clients(number: int | None = None) -> dict[str, Any]:
                     icon_off="mdi:close-network-outline",
                     service_on=f"start_vpnclient{num}",
                     service_off=f"stop_vpnclient{num}",
+                    entity_category=EntityCategory.CONFIG,
+                    entity_registry_enabled_default=True,
+                    extra_state_attributes=extra_state_attributes,
+                )
+            }
+        )
+
+    return sensors
+
+
+def list_sensors_wlan(number: int | None = None) -> dict[str, Any]:
+    """Compile a list of wlan sensors."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for id in range(0, number + 1):
+        wlan = f"{KEY_WLAN}{id}"
+        extra_state_attributes = dict()
+        for key in SENSORS_WLAN:
+            extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
+        sensors.update(
+            {
+                (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARBinarySensorDescription(
+                    key=f"{wlan}_radio",
+                    key_group=SENSORS_TYPE_WLAN,
+                    name=f"{NAME_WLAN[id]}",
+                    device_class=DEVICE_CLASS_CONNECTIVITY,
+                    entity_registry_enabled_default=True,
+                    extra_state_attributes=extra_state_attributes,
+                )
+            }
+        )
+
+    return sensors
+
+
+def list_switches_wlan(number: int | None = None) -> dict[str, Any]:
+    """Compile a list of wlan switches."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for id in range(0, number + 1):
+        wlan = f"{KEY_WLAN}{id}"
+        extra_state_attributes = dict()
+        for key in SENSORS_WLAN:
+            extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
+        sensors.update(
+            {
+                (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARSwitchDescription(
+                    key=f"{wlan}_radio",
+                    key_group=SENSORS_TYPE_WLAN,
+                    name=f"{NAME_WLAN[id]}",
+                    icon="mdi:wifi",
+                    icon_on="mdi:wifi",
+                    icon_off="mdi:wifi-off",
+                    service_on="restart_wireless",
+                    service_on_args={
+                        "action_mode": "apply",
+                        f"wl{id}_radio": 1,
+                    },
+                    service_off="restart_wireless",
+                    service_off_args={
+                        "action_mode": "apply",
+                        f"wl{id}_radio": 0,
+                    },
+                    service_expect_modify=True,
                     entity_category=EntityCategory.CONFIG,
                     entity_registry_enabled_default=True,
                     extra_state_attributes=extra_state_attributes,

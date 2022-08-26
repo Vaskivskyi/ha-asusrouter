@@ -52,4 +52,7 @@ class ARSwitchDescription(ARBinaryDescription, SwitchEntityDescription):
     """Describe AsusRouter switch."""
 
     service_on: str | None = None
+    service_on_args: dict[str, Any] | None = None
     service_off: str | None = None
+    service_off_args: dict[str, Any] | None = None
+    service_expect_modify: bool = False
