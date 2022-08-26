@@ -49,8 +49,10 @@ from .const import (
     SENSORS_TYPE_TEMPERATURE,
     SENSORS_TYPE_VPN,
     SENSORS_TYPE_WAN,
+    SENSORS_TYPE_WLAN,
     SENSORS_VPN,
     SENSORS_WAN,
+    SENSORS_WLAN,
 )
 
 
@@ -181,6 +183,10 @@ class ARBridge:
                 "method": self._get_vpn,
             },
             SENSORS_TYPE_WAN: {"sensors": SENSORS_WAN, "method": self._get_wan},
+            SENSORS_TYPE_WLAN: {
+                "sensors": await self._get_wlan_sensors(),
+                "method": self._get_wlan,
+            },
             SENSORS_TYPE_TEMPERATURE: {
                 "sensors": await self._get_temperature_sensors(),
                 "method": self._get_temperature,
@@ -274,6 +280,16 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_wan()
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
+    async def _get_wlan(self) -> dict[str, Any]:
+        """Get WLAN data from the device."""
+
+        try:
+            data = await self._api.async_get_wlan()
         except (OSError, ValueError) as ex:
             raise UpdateFailed(ex) from ex
 
@@ -399,6 +415,23 @@ class ARBridge:
             _LOGGER.debug(f"Available VPN sensors: {sensors}")
         except Exception as ex:
             _LOGGER.warning(f"Cannot get available VPN sensors for {self._host}: {ex}")
+
+        return sensors
+
+    async def _get_wlan_sensors(self):
+        """Get the available WLAN sensors."""
+
+        sensors = list()
+
+        try:
+            data = await self._api.async_get_wlan_ids()
+            for id in data:
+                for sensor in SENSORS_WLAN:
+                    sensors.append(f"wl{id}_{sensor}")
+                sensors.append(f"wl{id}_radio")
+            _LOGGER.debug(f"Available WLAN sensors: {sensors}")
+        except Exception as ex:
+            _LOGGER.warning(f"Cannot get available WLAN sensors for {self._host}: {ex}")
 
         return sensors
 
