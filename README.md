@@ -1,4 +1,4 @@
-[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE)<a href="https://github.com/Vaskivskyi/ha-asusrouter/actions/workflows/build.yaml"><img src="https://img.shields.io/github/workflow/status/Vaskivskyi/ha-asusrouter/Build?style=for-the-badge" alt="Build Status" align="right" /></a>
+[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE)<a href="https://github.com/Vaskivskyi/ha-asusrouter/actions/workflows/build.yaml"><img src="https://img.shields.io/github/workflow/status/Vaskivskyi/ha-asusrouter/Build?style=for-the-badge" alt="Build Status" align="right" /></a><br/>
 [![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz) [![Community forum discussion](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge&color=yellow)](https://community.home-assistant.io/t/custom-component-asusrouter-integration/416111)<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 28px !important;" align="right" /></a>
 
 ## Monitor and control your AsusWRT-powered router from Home Assistant
@@ -47,11 +47,10 @@ Almost all the integration settings can be reconfigured later via the `Configure
 #### Binary sensors
 
 <details>
-<summary>OpenVPN Client <b>(non-control mode only, instead of switch)</b></summary>
+<summary>OpenVPN Client (<b>non-control mode only</b>)</summary>
 
 *(enabled by default)*
   - name: `openvpn_client_x`
-  - description: Sensor value represents the current state of the OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
   - attributes:
     - `error_code`
     - `status` - status of the connection (`disconnected`, `connecting`, `connected`)
@@ -71,6 +70,7 @@ Almost all the integration settings can be reconfigured later via the `Configure
     - `tun_tap_read_bytes`
     - `tun_tap_write_bytes`
     - `update_time`
+  - description: Sensor value represents the current state of the OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
 </details>
 
 <details>
@@ -87,6 +87,35 @@ Almost all the integration settings can be reconfigured later via the `Configure
     - `mask`
     - `private_subnet`
   - description: Sensor value represents the internet connection of the device
+</details>
+
+<details>
+<summary>WiFi (<b>non-control mode only</b>)</summary>
+
+*(enabled by default)*
+  - name: `wireless_{}`, where `{}` can be `2_4_ghz`, `5_ghz`, `5_ghz_2`, `6_ghz`
+  - attributes:
+    - `auth_method`
+    - `channel`
+    - `channel_bandwidth`
+    - `chanspec`
+    - `country_code`
+    - `gmode_check`
+    - `group_key_rotation`
+    - `hidden`
+    - `maclist_x`
+    - `macmode`
+    - `mbo_enable`
+    - `mfp`
+    - `mode`
+    - `password`
+    - `radius_ipaddr`
+    - `radius_key`
+    - `radius_port`
+    - `ssid`
+    - `wpa_encryption`
+    - `xbox_optimized`
+  - description: Sensor value represents the current value of the WiFi network
 </details>
 
 #### Device trackers
@@ -263,7 +292,6 @@ Please, keep this in mind. Some `lights` / `switches` might require processing t
 
 *(enabled by default)*
   - name: `openvpn_client_x`
-  - description: Switch entity allows turning on / off available OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
   - attributes:
     - `error_code`
     - `status` - status of the connection (`disconnected`, `connecting`, `connected`)
@@ -283,6 +311,36 @@ Please, keep this in mind. Some `lights` / `switches` might require processing t
     - `tun_tap_read_bytes`
     - `tun_tap_write_bytes`
     - `update_time`
+  - description: Switch entity allows turning on / off available OpenVPN client. Please, note, that both `connected` and `connecting` status will correspond to the switch being in the `On` state
+</details>
+
+<details>
+<summary>WiFi (<b>non-control mode only</b>)</summary>
+
+*(enabled by default)*
+  - name: `wireless_{}`, where `{}` can be `2_4_ghz`, `5_ghz`, `5_ghz_2`, `6_ghz`
+  - attributes:
+    - `auth_method`
+    - `channel`
+    - `channel_bandwidth`
+    - `chanspec`
+    - `country_code`
+    - `gmode_check`
+    - `group_key_rotation`
+    - `hidden`
+    - `maclist_x`
+    - `macmode`
+    - `mbo_enable`
+    - `mfp`
+    - `mode`
+    - `password`
+    - `radius_ipaddr`
+    - `radius_key`
+    - `radius_port`
+    - `ssid`
+    - `wpa_encryption`
+    - `xbox_optimized`
+  - description: Switch entity allows turning on / off WiFi network
 </details>
 
 ## Tested devices
@@ -297,14 +355,14 @@ This list provides only the models tested by me or other users. If your device i
 
 <tr><td>Full support</td><td>
 
-**802.11ax**: `DSL-AX82U`, `GT-AX11000`, `RT-AX55`, `RT-AX58U`, `RT-AX68U`, `RT-AX82U`, `RT-AX86U`, `RT-AX86S` (reported as `RT-AX86U`), `RT-AX88U`, `RT-AX89X`, `RT-AX92U`, `TUF-AX5400`, `ZenWiFi AX (XT8)`, `ZenWiFi AX Mini (XD4)`
+**802.11ax**: `DSL-AX82U`, `GT-AX11000`, `RT-AX55`, `RT-AX58U`, `RT-AX68U`, `RT-AX82U`, `RT-AX86U`, `RT-AX86S` (reported as `RT-AX86U`), `RT-AX88U`, `RT-AX89X`, `RT-AX92U`, `TUF-AX5400`, `ZenWiFi AX (XT8)`, `ZenWiFi AX Mini (XD4)`<br/>
 **802.11ac**: `DSL-AC68U`, `RT-AC86U`, `RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
 
 <tr><td>Limited support</td><td>
 
-**802.11ac**: `RT-AC51U`, `RT-AC66U`
+**802.11ac**: `RT-AC51U`, `RT-AC66U`<br/>
 **802.11n**: `RT-N66U`
 
 </td><td><b>Stock</b>: Latest available<b><br/>Merlin</b>: 380.70+</td><td>no LED control</td></tr>
@@ -340,5 +398,6 @@ This integration is a free-time project. If you like it, you can support me by b
 ## Thanks to
 
 The initial codebase for this integration is highly based on Home Assistant core integration [AsusWRT](https://www.home-assistant.io/integrations/asuswrt/) and [ollo69/ha_asuswrt_custom](https://github.com/ollo69/ha_asuswrt_custom).
+
 
 

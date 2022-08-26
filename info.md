@@ -17,6 +17,7 @@ The integration uses the native HTTP(S) API (the same way as WebUI) and relies o
 - Ports (LAN/WAN) connection
 - Temperatures
 - WAN IP and status
+- WiFi networks status
 
 #### Device trackers
 
@@ -31,6 +32,7 @@ All the following entities require `Device control` to be enabled in the integra
 #### Switches
 
 - OpenVPN clients (`on`/`off`)
+- WiFi networks (`on`/`off`)
 
 Please, refer to the GitHub [Readme](https://github.com/Vaskivskyi/ha-asusrouter/) for detailed information on the available sensors and controls.
 
