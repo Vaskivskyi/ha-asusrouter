@@ -6,6 +6,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+import aiohttp
 from datetime import datetime
 from typing import Any
 
@@ -20,6 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
@@ -70,13 +72,15 @@ class ARBridge:
         super().__init__()
         self._configs = configs.copy()
         self._configs.update(options)
-        self._api = self._get_api(self._configs)
+        session = async_get_clientsession(hass)
+        self._api = self._get_api(self._configs, session)
         self._host = self._configs[CONF_HOST]
         self._identity: AsusDevice | None = None
 
     @staticmethod
     def _get_api(
         configs: dict[str, Any],
+        session: aiohttp.ClientSession
     ) -> AsusRouter:
         """Get AsusRouter API."""
 
@@ -91,6 +95,7 @@ class ARBridge:
             cache_time=configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
             enable_monitor=configs.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR),
             enable_control=configs.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
+            session=session,
         )
 
     @property
