@@ -73,6 +73,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
 
         try:
             result = await self.api.async_service_led_set("on")
+            await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:
@@ -86,6 +87,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
 
         try:
             result = await self.api.async_service_led_set("off")
+            await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
         except Exception as ex:

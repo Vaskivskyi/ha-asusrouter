@@ -4,7 +4,7 @@ categories:
     label: "breaking"
   - title: ":rocket: Features"
     label: "enhancement"
-  - title: ":lady_beetle: Fixes"
+  - title: ":bug: Fixes"
     label: "bug"
   - title: ":racehorse: Performance"
     label: "performance"

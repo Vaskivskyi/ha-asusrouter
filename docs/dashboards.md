@@ -1,10 +1,251 @@
 ## Dashboards ideas for AsusRouter integration
 
-### Simple status dashboard
+### Simple dashboard
 
-Sensors provided by the integration can be used for a simple status dashboard.
+![Simple AsusRouter dashboard](Fig-Dashboard-Simple.png)
 
-In this case, the following custom cards are used:
+<details>
+<summary>List of custom cards</summary>
+
+- [stack-in-card](https://github.com/custom-cards/stack-in-card)
+- [text-divider-row](https://github.com/iantrich/text-divider-row)
+- [mushroom-entity-card](https://github.com/piitaya/lovelace-mushroom) & mushroom-light-card
+</details>
+
+<details>
+<summary>YAML code</summary>
+
+*Replace `rt_ax88u` with your device*
+
+```yaml
+type: custom:stack-in-card
+cards:
+  - type: entities
+    title: Router
+    icon: mdi:earth
+    entities:
+      - type: custom:text-divider-row
+        text: Internet
+        align: left
+  - type: grid
+    square: false
+    columns: 3
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_wan_ip
+        name: WAN IP
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        fill_container: true
+      - type: entities
+        entities:
+          - type: custom:mushroom-entity-card
+            entity: sensor.rt_ax88u_wan_upload_speed
+            name: Upload
+            primary_info: state
+            secondary_info: name
+            layout: horizontal
+            icon: ''
+            fill_container: false
+            icon_type: none
+          - type: custom:mushroom-entity-card
+            entity: sensor.rt_ax88u_wan_download_speed
+            name: Download
+            primary_info: state
+            secondary_info: name
+            layout: horizontal
+            icon_type: none
+      - type: entities
+        entities:
+          - type: custom:mushroom-entity-card
+            entity: sensor.rt_ax88u_wan_upload
+            name: Upload
+            primary_info: state
+            secondary_info: name
+            layout: horizontal
+            icon: ''
+            fill_container: false
+            icon_type: none
+          - type: custom:mushroom-entity-card
+            entity: sensor.rt_ax88u_wan_download
+            name: Download
+            primary_info: state
+            secondary_info: name
+            layout: horizontal
+            icon_type: none
+  - type: entities
+    entities:
+      - type: custom:text-divider-row
+        text: Controls
+        align: left
+  - type: grid
+    square: false
+    columns: 3
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_wireless_5_ghz
+        name: 5 GHz
+        primary_info: name
+        secondary_info: state
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_wireless_2_4_ghz
+        name: 2.4 GHz
+        primary_info: name
+        secondary_info: state
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-light-card
+        entity: light.rt_ax88u_led
+        name: LED
+        primary_info: name
+        secondary_info: state
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+  - type: entities
+    entities:
+      - type: custom:text-divider-row
+        text: OpenVPN
+        align: left
+  - square: false
+    columns: 5
+    type: grid
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_openvpn_client_1
+        name: Pirate
+        primary_info: name
+        secondary_info: none
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_openvpn_client_2
+        name: Client 2
+        primary_info: name
+        secondary_info: none
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_openvpn_client_3
+        name: Client 3
+        primary_info: name
+        secondary_info: none
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_openvpn_client_4
+        name: Client 4
+        primary_info: name
+        secondary_info: none
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+      - type: custom:mushroom-entity-card
+        entity: switch.rt_ax88u_openvpn_client_5
+        name: Proton
+        primary_info: name
+        secondary_info: none
+        layout: vertical
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        double_tap_action:
+          action: none
+  - type: entities
+    entities:
+      - type: custom:text-divider-row
+        text: Diagnostics
+        align: left
+  - type: grid
+    square: false
+    columns: 3
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_cpu
+        name: CPU
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_ram
+        name: RAM
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_connected_devices
+        name: Devices
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_temperature_cpu
+        name: CPU
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_temperature_5_ghz
+        name: 5 GHz
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+      - type: custom:mushroom-entity-card
+        entity: sensor.rt_ax88u_temperature_2_4_ghz
+        name: 2.4 GHz
+        primary_info: state
+        secondary_info: name
+        layout: vertical
+        icon_color: disabled
+
+```
+</details>
+
+### Status dashboard
+
+![Status AsusRouter dashboard](Fig-Dashboard-1.png)
 
 <details>
 <summary>List of custom cards</summary>
@@ -13,10 +254,6 @@ In this case, the following custom cards are used:
 - [text-divider-row](https://github.com/iantrich/text-divider-row)
 - [mini-graph-card](https://github.com/kalkih/mini-graph-card)
 </details>
-
-![Simple AsusRouter status dashboard](Fig-Dashboard-1.png)
-
-Fig. 1. Simple AsusRouter status dashboard
 
 <details>
 <summary>YAML code</summary>
@@ -85,9 +322,9 @@ cards:
 </details>
 
 
-### For those who like to control everything
+### Idea for those who like to monitor everything
 
-The followind custom cards are used:
+![Detailed AsusRouter health dashboard](Fig-Dashboard-2.png)
 
 <details>
 <summary>List of custom cards</summary>
@@ -95,10 +332,6 @@ The followind custom cards are used:
 - [stack-in-card](https://github.com/custom-cards/stack-in-card)
 - [multiple-entity-row](https://github.com/benct/lovelace-multiple-entity-row)
 </details>
-
-![Detailed AsusRouter health dashboard](Fig-Dashboard-2.png)
-
-Fig. 2. Detailed AsusRouter health dashboard. Please, note that RAM attributes are recalculated inside the custom card with 1/1000 factor. To have a correct value, one would need to divide by 1024.
 
 <details>
 <summary>YAML code</summary>

@@ -67,6 +67,7 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
                 arguments=self._service_on_args,
                 expect_modify=self._service_expect_modify,
             )
+            await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("Switch state was not set!")
         except Exception as ex:
@@ -84,6 +85,7 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
                 arguments=self._service_off_args,
                 expect_modify=self._service_expect_modify,
             )
+            await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("Switch state was not set!")
         except Exception as ex:

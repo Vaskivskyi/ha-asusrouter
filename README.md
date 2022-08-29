@@ -315,7 +315,7 @@ Please, keep this in mind. Some `lights` / `switches` might require processing t
 </details>
 
 <details>
-<summary>WiFi (<b>non-control mode only</b>)</summary>
+<summary>WiFi</summary>
 
 *(enabled by default)*
   - name: `wireless_{}`, where `{}` can be `2_4_ghz`, `5_ghz`, `5_ghz_2`, `6_ghz`
