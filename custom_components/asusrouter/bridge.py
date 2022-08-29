@@ -300,6 +300,16 @@ class ARBridge:
 
         return data
 
+    async def _get_wlan(self) -> dict[str, Any]:
+        """Get WLAN data from the device."""
+
+        try:
+            data = await self._api.async_get_wlan()
+        except (OSError, ValueError) as ex:
+            raise UpdateFailed(ex) from ex
+
+        return data
+
     async def _get_temperature(self) -> dict[str, Any]:
         """Get temperarture data from the device."""
 
