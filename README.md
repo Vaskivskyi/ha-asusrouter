@@ -362,7 +362,7 @@ This list provides only the models tested by me or other users. If your device i
 
 <tr><td>Limited support</td><td>
 
-**802.11ac**: `RT-AC51U`, `RT-AC66U`<br/>
+**802.11ac**: `RT-AC51U`, `RT-AC66U`, `RT-ACRH17` (reported as `RT-AC82U`)<br/>
 **802.11n**: `RT-N66U`
 
 </td><td><b>Stock</b>: Latest available<b><br/>Merlin</b>: 380.70+</td><td>no LED control</td></tr>
