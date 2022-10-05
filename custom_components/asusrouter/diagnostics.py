@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_CONNECTIONS,
     ATTR_IDENTIFIERS,
+    CONF_DEVICES,
     CONF_PASSWORD,
     CONF_UNIQUE_ID,
     CONF_USERNAME,
@@ -23,6 +24,8 @@ from .router import AsusRouterObj
 
 TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
 TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
+TO_REDACT_STATE = {"WAN IP"}
+TO_REDACT_ATTRS = {CONF_DEVICES, CONF_PASSWORD, "ip", "ssid"}
 
 
 async def async_get_config_entry_diagnostics(
@@ -65,6 +68,12 @@ async def async_get_config_entry_diagnostics(
             state_dict.pop("entity_id", None)
             # The context doesn't provide useful information in this case.
             state_dict.pop("context", None)
+            # Remove sensitive info from attributes.
+            if "attributes" in state_dict:
+                state_dict["attributes"] = async_redact_data(dict(state_dict["attributes"]), TO_REDACT_ATTRS)
+            # Remove sensitive info from sensors states.
+            if any(el in entity_entry.original_name for el in TO_REDACT_STATE):
+                state_dict = async_redact_data(state_dict, "state")
 
         data["device"]["entities"][entity_entry.entity_id] = {
             **async_redact_data(
