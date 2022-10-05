@@ -10,7 +10,7 @@ import aiohttp
 from datetime import datetime
 from typing import Any
 
-from asusrouter import AsusDevice, AsusRouter, AsusRouterError, AsusRouterServerDisconnectedError, ConnectedDevice
+from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -135,7 +135,7 @@ class ARBridge:
 
         try:
             api_devices = await self._api.async_get_devices()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return api_devices
@@ -213,7 +213,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_cpu()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -223,7 +223,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_ram()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -233,7 +233,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_network()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -263,7 +263,7 @@ class ARBridge:
                         data[_total] += raw[type][port]
                     if data[_total] > 0:
                         data[type] = True
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -275,7 +275,7 @@ class ARBridge:
             data = helpers.as_dict(
                 helpers.flatten_dict(await self._api.async_get_vpn())
             )
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -285,7 +285,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_wan()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -295,7 +295,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_wlan()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -315,7 +315,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_temperature()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data
@@ -325,7 +325,7 @@ class ARBridge:
 
         try:
             data = await self._api.async_get_sysinfo()
-        except (OSError, ValueError, AsusRouterServerDisconnectedError) as ex:
+        except (OSError, ValueError, AsusRouterError) as ex:
             raise UpdateFailed(ex) from ex
 
         return data

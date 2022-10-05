@@ -130,7 +130,7 @@ cards:
     cards:
       - type: custom:mushroom-entity-card
         entity: switch.rt_ax88u_openvpn_client_1
-        name: Pirate
+        name: Client 1
         primary_info: name
         secondary_info: none
         layout: vertical
@@ -178,7 +178,7 @@ cards:
           action: none
       - type: custom:mushroom-entity-card
         entity: switch.rt_ax88u_openvpn_client_5
-        name: Proton
+        name: Client 5
         primary_info: name
         secondary_info: none
         layout: vertical
