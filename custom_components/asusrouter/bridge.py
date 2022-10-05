@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 import aiohttp
 from datetime import datetime
-from typing import Any
+import logging
+from typing import Any, Awaitable, Callable, TypeVar
 
 from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 from homeassistant.const import (
@@ -57,6 +54,10 @@ from .const import (
     SENSORS_WLAN,
 )
 
+_T = TypeVar("_T")
+
+_LOGGER = logging.getLogger(__name__)
+
 
 class ARBridge:
     """Bridge for AsusRouter library."""
@@ -78,10 +79,7 @@ class ARBridge:
         self._identity: AsusDevice | None = None
 
     @staticmethod
-    def _get_api(
-        configs: dict[str, Any],
-        session: aiohttp.ClientSession
-    ) -> AsusRouter:
+    def _get_api(configs: dict[str, Any], session: aiohttp.ClientSession) -> AsusRouter:
         """Get AsusRouter API."""
 
         return AsusRouter(
@@ -176,7 +174,7 @@ class ARBridge:
             SENSORS_TYPE_RAM: {"sensors": SENSORS_RAM, "method": self._get_ram},
             SENSORS_TYPE_NETWORK_STAT: {
                 "sensors": await self._get_network_stat_sensors(),
-                "method": self._get_network_stat,
+                "method": self._get_network,
             },
             SENSORS_TYPE_MISC: {"sensors": SENSORS_MISC, "method": self._get_misc},
             SENSORS_TYPE_PORTS: {
@@ -208,35 +206,25 @@ class ARBridge:
         return sensors_types
 
     ### GET DATA FROM DEVICE ->
+    # General method
+    async def _get_data(self, method: Callable[[], Awaitable[_T]]) -> list[Any]:
+        """Get data from the device."""
+
+        try:
+            return await method()
+        except (OSError, ValueError, AsusRouterError) as ex:
+            raise UpdateFailed(ex) from ex
+
+    # Sensor-specific methods
     async def _get_cpu(self) -> dict[str, Any]:
         """Get CPU data from the device."""
 
-        try:
-            data = await self._api.async_get_cpu()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
+        return await self._get_data(self._api.async_get_cpu)
 
-        return data
+    async def _get_light(self) -> dict[str, Any]:
+        """Get light data from the device."""
 
-    async def _get_ram(self) -> dict[str, Any]:
-        """Get RAM data from the device."""
-
-        try:
-            data = await self._api.async_get_ram()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
-
-    async def _get_network_stat(self) -> dict[str, Any]:
-        """Get network data from device."""
-
-        try:
-            data = await self._api.async_get_network()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
+        return {"led": self._api.led}
 
     async def _get_misc(self) -> dict[str, Any]:
         """Get MISC sensors from the device."""
@@ -246,6 +234,16 @@ class ARBridge:
         data["boottime"] = datetime.fromisoformat(self._api.boottime)
 
         return data
+
+    async def _get_network(self) -> dict[str, Any]:
+        """Get network data from device."""
+
+        return await self._get_data(self._api.async_get_network)
+
+    async def _get_ram(self) -> dict[str, Any]:
+        """Get RAM data from the device."""
+
+        return await self._get_data(self._api.async_get_ram)
 
     async def _get_ports(self) -> dict[str, dict[str, int]]:
         """Get ports status from the device."""
@@ -268,6 +266,16 @@ class ARBridge:
 
         return data
 
+    async def _get_sysinfo(self) -> dict[str, Any]:
+        """Get sysinfo data from the device."""
+
+        return await self._get_data(self._api.async_get_sysinfo)
+
+    async def _get_temperature(self) -> dict[str, Any]:
+        """Get temperarture data from the device."""
+
+        return await self._get_data(self._api.async_get_temperature)
+
     async def _get_vpn(self) -> dict[str, Any]:
         """Get VPN data from the device."""
 
@@ -283,47 +291,12 @@ class ARBridge:
     async def _get_wan(self) -> dict[str, Any]:
         """Get WAN data from the device."""
 
-        try:
-            data = await self._api.async_get_wan()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
+        return await self._get_data(self._api.async_get_wan)
 
     async def _get_wlan(self) -> dict[str, Any]:
         """Get WLAN data from the device."""
 
-        try:
-            data = await self._api.async_get_wlan()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
-
-    async def _get_temperature(self) -> dict[str, Any]:
-        """Get temperarture data from the device."""
-
-        try:
-            data = await self._api.async_get_temperature()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
-
-    async def _get_sysinfo(self) -> dict[str, Any]:
-        """Get sysinfo data from the device."""
-
-        try:
-            data = await self._api.async_get_sysinfo()
-        except (OSError, ValueError, AsusRouterError) as ex:
-            raise UpdateFailed(ex) from ex
-
-        return data
-
-    async def _get_light(self) -> dict[str, Any]:
-        """Get light data from the device."""
-
-        return {"led": self._api.led}
+        return await self._get_data(self._api.async_get_wlan)
 
     ### <- GET DATA FROM DEVICE
 
