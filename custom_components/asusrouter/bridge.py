@@ -214,7 +214,11 @@ class ARBridge:
 
     ### GET DATA FROM DEVICE ->
     # General method
-    async def _get_data(self, method: Callable[[], Awaitable[_T]], process: Callable[[dict[str, Any]], dict[str, Any]] | None = None) -> dict[str, Any]:
+    async def _get_data(
+        self,
+        method: Callable[[], Awaitable[_T]],
+        process: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Get data from the device."""
 
         try:
@@ -331,43 +335,67 @@ class ARBridge:
             _LOGGER.debug(f"Available `{type}` sensors: {sensors}")
         except Exception as ex:
             sensors = DEFAULT_SENSORS[type] if defaults else list()
-            _LOGGER.debug(f"Cannot get available `{type}` sensors with exception: {ex}. Will use the following list: {sensors}")
+            _LOGGER.debug(
+                f"Cannot get available `{type}` sensors with exception: {ex}. Will use the following list: {sensors}"
+            )
         return sensors
 
     async def _get_sensors_cpu(self) -> list[str]:
         """Get the available CPU sensors."""
 
-        return await self._get_sensors(self.api.async_get_cpu_labels, type=SENSORS_TYPE_CPU, defaults=True)
+        return await self._get_sensors(
+            self.api.async_get_cpu_labels, type=SENSORS_TYPE_CPU, defaults=True
+        )
 
     async def _get_sensors_network_stat(self) -> list[str]:
         """Get the available network stat sensors."""
 
-        return await self._get_sensors(self.async_get_network_interfaces, self._process_sensors_network_stat, type=SENSORS_TYPE_NETWORK_STAT)
+        return await self._get_sensors(
+            self.async_get_network_interfaces,
+            self._process_sensors_network_stat,
+            type=SENSORS_TYPE_NETWORK_STAT,
+        )
 
     async def _get_sensors_ports(self) -> list[str]:
         """Get the available ports sensors."""
 
-        return await self._get_sensors(self.api.async_get_ports, self._process_sensors_ports, type=SENSORS_TYPE_PORTS)
+        return await self._get_sensors(
+            self.api.async_get_ports,
+            self._process_sensors_ports,
+            type=SENSORS_TYPE_PORTS,
+        )
 
     async def _get_sensors_sysinfo(self) -> list[str]:
         """Get the available sysinfo sensors."""
 
-        return await self._get_sensors(self.api.async_get_sysinfo, self._process_sensors_sysinfo, type=SENSORS_TYPE_SYSINFO)
+        return await self._get_sensors(
+            self.api.async_get_sysinfo,
+            self._process_sensors_sysinfo,
+            type=SENSORS_TYPE_SYSINFO,
+        )
 
     async def _get_sensors_temperature(self) -> list[str]:
         """Get the available temperature sensors."""
 
-        return await self._get_sensors(self.api.async_get_temperature_labels, type=SENSORS_TYPE_TEMPERATURE)
+        return await self._get_sensors(
+            self.api.async_get_temperature_labels, type=SENSORS_TYPE_TEMPERATURE
+        )
 
     async def _get_sensors_vpn(self) -> list[str]:
         """Get the available VPN sensors."""
 
-        return await self._get_sensors(self.api.async_get_vpn, self._process_sensors_vpn, type=SENSORS_TYPE_VPN)
+        return await self._get_sensors(
+            self.api.async_get_vpn, self._process_sensors_vpn, type=SENSORS_TYPE_VPN
+        )
 
     async def _get_sensors_wlan(self) -> list[str]:
         """Get the available WLAN sensors."""
 
-        return await self._get_sensors(self.api.async_get_wlan_ids, self._process_sensors_wlan, type=SENSORS_TYPE_WLAN)
+        return await self._get_sensors(
+            self.api.async_get_wlan_ids,
+            self._process_sensors_wlan,
+            type=SENSORS_TYPE_WLAN,
+        )
 
     ### <- GET SENSORS LIST
 
@@ -385,7 +413,7 @@ class ARBridge:
     @staticmethod
     def _process_sensors_ports(raw: list[str]) -> list[str]:
         """Process ports sensors."""
-        
+
         sensors = list()
         for type in SENSORS_PORTS:
             if type in raw:
