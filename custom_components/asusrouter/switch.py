@@ -18,7 +18,7 @@ from .compilers import list_switches_vpn_clients, list_switches_wlan
 from .const import CONF_ENABLE_CONTROL
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
-from .router import AsusRouterObj
+from .router import ARDevice
 
 SWITCHES = {}
 
@@ -43,7 +43,7 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: ARSwitchDescription,
     ) -> None:
         """Initialize AsusRouter switch."""

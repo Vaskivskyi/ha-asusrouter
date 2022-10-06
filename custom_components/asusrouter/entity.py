@@ -18,7 +18,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .const import DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR
 from .dataclass import AREntityDescription
-from .router import AsusRouterObj
+from .router import ARDevice
 
 
 async def async_setup_ar_entry(
@@ -30,10 +30,10 @@ async def async_setup_ar_entry(
 ) -> None:
     """Setup AsusRouter entities."""
 
-    router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
     entities = []
 
-    for sensor_data in router._sensors_coordinator.values():
+    for sensor_data in router._sensor_coordinator.values():
         coordinator = sensor_data[KEY_COORDINATOR]
         for sensor_description in sensors:
             try:
@@ -59,7 +59,7 @@ class AREntity(CoordinatorEntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: AREntityDescription,
     ) -> None:
         """Initialize AsusRouter entity."""
@@ -67,10 +67,10 @@ class AREntity(CoordinatorEntity):
         super().__init__(coordinator)
         self.entity_description: AREntityDescription = description
         self.router = router
-        self.api = router.api._api
+        self.api = router.bridge.api
         self.coordinator = coordinator
 
-        self._attr_name = f"{router._name} {description.name}"
+        self._attr_name = f"{router._conf_name} {description.name}"
         self._attr_unique_id = f"{DOMAIN} {self.name}"
         self._attr_device_info = router.device_info
 
@@ -98,7 +98,7 @@ class ARBinaryEntity(AREntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: AREntityDescription,
     ) -> None:
         """Initialize AsusRouter binary entity."""

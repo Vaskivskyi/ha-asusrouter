@@ -18,7 +18,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, SENSORS_TYPE_LIGHT
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
-from .router import AsusRouterObj
+from .router import ARDevice
 
 LIGHTS = {
     (SENSORS_TYPE_LIGHT, "led"): ARLightDescription(
@@ -43,7 +43,7 @@ async def async_setup_entry(
 
     if (
         not entry.options[CONF_ENABLE_CONTROL]
-        or not hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER].api._identity.led
+        or not hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER].bridge._identity.led
     ):
         return
 
@@ -58,7 +58,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: ARLightDescription,
     ) -> None:
         """Initialize AsusRouter LED light."""
