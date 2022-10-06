@@ -334,11 +334,11 @@ class AsusRouterObj:
             DOMAIN, "service_reboot", async_service_reboot
         )
 
-        self._mac = await self._api.get_mac()
-        self._serial = await self._api.get_serial()
-        self._model = await self._api.get_model()
-        self._vendor = await self._api.get_vendor()
-        self._firmware = await self._api.get_firmware()
+        self._mac = self.api.mac
+        self._serial = self.api.serial
+        self._model = self.api.model
+        self._vendor = self.api.vendor
+        self._firmware = self.api.firmware
 
         if self._model is not None:
             if self._name is None or self._name == "":

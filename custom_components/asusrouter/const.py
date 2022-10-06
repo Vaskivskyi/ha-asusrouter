@@ -175,6 +175,9 @@ SENSORS_WLAN = {
 }
 
 
+DEFAULT_SENSORS: dict[str, list[str]] = {SENSORS_TYPE_CPU: ["total"]}
+
+
 # Types of results on actions
 RESULT_CONNECTION_REFUSED = "connection_refused"
 RESULT_ERROR = "error"
