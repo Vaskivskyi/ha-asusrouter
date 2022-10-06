@@ -32,7 +32,7 @@ from .const import (
 )
 from .dataclass import ARSensorDescription
 from .entity import AREntity, async_setup_ar_entry
-from .router import AsusRouterObj
+from .router import ARDevice
 
 SENSORS = {
     (SENSORS_TYPE_DEVICES, "number"): ARSensorDescription(
@@ -230,7 +230,7 @@ class ARSensor(AREntity, SensorEntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: ARSensorDescription,
     ) -> None:
         """Initialize AsusRouter sensor."""

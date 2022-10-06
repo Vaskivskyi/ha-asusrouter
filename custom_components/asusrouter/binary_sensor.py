@@ -20,7 +20,7 @@ from .compilers import list_sensors_vpn_clients, list_sensors_wlan
 from .const import CONF_ENABLE_CONTROL, SENSORS_TYPE_WAN
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
-from .router import AsusRouterObj
+from .router import ARDevice
 
 BINARY_SENSORS = {
     (SENSORS_TYPE_WAN, "status"): ARBinarySensorDescription(
@@ -66,7 +66,7 @@ class ARBinarySensor(ARBinaryEntity, BinarySensorEntity):
     def __init__(
         self,
         coordinator: DataUpdateCoordinator,
-        router: AsusRouterObj,
+        router: ARDevice,
         description: ARBinarySensorDescription,
     ) -> None:
         """Initialize AsusRouter binary sensor."""

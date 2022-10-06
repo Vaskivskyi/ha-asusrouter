@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import logging
-
-_LOGGER = logging.getLogger(__name__)
-
-from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
-from typing import Any, TypeVar
+import logging
+from typing import Any, Awaitable, Callable, TypeVar
 
-from asusrouter import AsusRouterConnectionError, ConnectedDevice
+from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 from homeassistant.components.device_tracker.const import CONF_CONSIDER_HOME
 from homeassistant.components.device_tracker.const import DOMAIN as TRACKER_DOMAIN
 from homeassistant.config_entries import ConfigEntry
@@ -60,20 +56,22 @@ from .const import (
 
 _T = TypeVar("_T")
 
+_LOGGER = logging.getLogger(__name__)
 
-class AsusRouterSensorHandler:
+
+class ARSensorHandler:
     """Data handler for AsusRouter sensors."""
 
     def __init__(
         self,
         hass: HomeAssistant,
-        api: ARBridge,
+        bridge: ARBridge,
         scan_interval: int = DEFAULT_SCAN_INTERVAL,
     ) -> None:
         """Initialise data handler."""
 
         self._hass = hass
-        self._api = api
+        self._bridge = bridge
         self._connected_devices = 0
         self._connected_devices_list: list[str] = list()
         self._scan_interval = timedelta(seconds=scan_interval)
@@ -131,7 +129,7 @@ class AsusRouterSensorHandler:
         return coordinator
 
 
-class AsusRouterDevInfo:
+class ARConnectedDevice:
     """Representation of an AsusRouter device info."""
 
     def __init__(
@@ -261,12 +259,12 @@ class AsusRouterDevInfo:
 
     @property
     def extra_state_attributes(self):
-        """Return extrar state attributes."""
+        """Return extra state attributes."""
 
         return self._extra_state_attributes
 
 
-class AsusRouterObj:
+class ARDevice:
     """Representatiion of AsusRouter."""
 
     def __init__(
@@ -279,70 +277,61 @@ class AsusRouterObj:
         self.hass = hass
         self._entry = entry
 
-        self._api: ARBridge | None = None
-
+        self._bridge: ARBridge | None = None
         self._options = entry.options.copy()
 
-        self._host: str = entry.data[CONF_HOST]
-        self._port: str = self._options[CONF_PORT]
+        # Device configs
+        self._conf_host: str = entry.data[CONF_HOST]
+        self._conf_name: str = self._options[CONF_NAME]
+        self._conf_port: int = self._options[CONF_PORT]
+        if self._conf_port == DEFAULT_PORT:
+            self._conf_port = (
+                DEFAULT_PORTS["ssl"]
+                if self._options[CONF_VERIFY_SSL]
+                else DEFAULT_PORTS["no_ssl"]
+            )
 
-        self._name: str = self._options[CONF_NAME]
-
-        self._mac: str | None = None
-        self._model: str = "ASUS Router"
-        self._vendor: str = "ASUSTek"
-        self._serial: str | None = None
-        self._firmware: str | None = None
+        # Device information
+        self._identity: AsusDevice | None = None
 
         self._devices: dict[str, Any] = {}
         self._connected_devices: int = 0
         self._connected_devices_list: list[str] = list()
         self._connect_error: bool = False
 
-        self._sensors_data_handler: AsusRouterSensorHandler | None = None
-        self._sensors_coordinator: dict[str, Any] = {}
+        self._sensor_handler: ARSensorHandler | None = None
+        self._sensor_coordinator: dict[str, Any] = {}
 
         self._on_close: list[Callable] = []
-
-        if self._port == DEFAULT_PORT:
-            self._port = (
-                DEFAULT_PORTS["ssl"]
-                if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_PORTS["no_ssl"]
-            )
 
     async def setup(self) -> None:
         """Setup an AsusRouter object."""
 
-        self._api = ARBridge(self.hass, dict(self._entry.data), self._options)
+        self.bridge = ARBridge(self.hass, dict(self._entry.data), self._options)
 
         try:
-            await self._api.async_connect()
+            await self.bridge.async_connect()
         except (OSError, AsusRouterConnectionError) as ex:
             raise ConfigEntryNotReady from ex
 
-        if not self._api.is_connected:
+        if not self.bridge.is_connected:
             raise ConfigEntryNotReady
 
         # Services
         async def async_service_reboot(service: ServiceCall):
             """Handle reboot."""
 
-            await self._api.async_reboot()
+            await self.bridge.async_reboot()
 
         self.hass.services.async_register(
             DOMAIN, "service_reboot", async_service_reboot
         )
 
-        self._mac = self.api.mac
-        self._serial = self.api.serial
-        self._model = self.api.model
-        self._vendor = self.api.vendor
-        self._firmware = self.api.firmware
+        self._identity = self.bridge.identity
 
-        if self._model is not None:
-            if self._name is None or self._name == "":
-                self._name = self._model
+        if self._identity.model is not None:
+            if self._conf_name is None or self._conf_name == "":
+                self._conf_name = self._identity.model
 
         # Load tracked entities from registry
         entity_reg = er.async_get(self.hass)
@@ -370,7 +359,7 @@ class AsusRouterObj:
                     entry.entity_id, new_unique_id=device_mac
                 )
 
-            self._devices[device_mac] = AsusRouterDevInfo(
+            self._devices[device_mac] = ARConnectedDevice(
                 device_mac, entry.original_name
             )
 
@@ -400,20 +389,20 @@ class AsusRouterObj:
         """Update AsusRouter devices tracker."""
 
         new_device = False
-        _LOGGER.debug(f"Updating AsusRouter device list for '{self._host}'")
+        _LOGGER.debug(f"Updating AsusRouter device list for '{self._conf_host}'")
         try:
-            api_devices = await self._api.async_get_connected_devices()
+            api_devices = await self.bridge.async_get_connected_devices()
         except OSError as ex:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    f"Error connecting to '{self._host}' for device update: {ex}"
+                    f"Error connecting to '{self._conf_host}' for device update: {ex}"
                 )
             return
 
         if self._connect_error:
             self._connect_error = False
-            _LOGGER.info(f"Reconnected to '{self._host}'")
+            _LOGGER.info(f"Reconnected to '{self._conf_host}'")
 
         self._connected_devices = 0
         self._connected_devices_list = list()
@@ -432,7 +421,7 @@ class AsusRouterObj:
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
-            device = AsusRouterDevInfo(device_mac)
+            device = ARConnectedDevice(device_mac)
             device.update(dev_info)
             self._devices[device_mac] = device
 
@@ -444,26 +433,26 @@ class AsusRouterObj:
     async def init_sensors_coordinator(self) -> None:
         """Initialize AsusRouter sensors coordinators."""
 
-        if self._sensors_data_handler:
+        if self._sensor_handler:
             return
 
-        self._sensors_data_handler = AsusRouterSensorHandler(
-            self.hass, self._api, self._options[CONF_SCAN_INTERVAL]
+        self._sensor_handler = ARSensorHandler(
+            self.hass, self.bridge, self._options[CONF_SCAN_INTERVAL]
         )
-        self._sensors_data_handler.update_device_count(
+        self._sensor_handler.update_device_count(
             self._connected_devices, self._connected_devices_list
         )
 
-        sensors_types = await self._api.async_get_available_sensors()
-        sensors_types[SENSORS_TYPE_DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
+        available_sensors = await self.bridge.async_get_available_sensors()
+        available_sensors[SENSORS_TYPE_DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
 
-        for sensor_type, sensor_def in sensors_types.items():
+        for sensor_type, sensor_def in available_sensors.items():
             if not (sensor_names := sensor_def.get("sensors")):
                 continue
-            coordinator = await self._sensors_data_handler.get_coordinator(
+            coordinator = await self._sensor_handler.get_coordinator(
                 sensor_type, update_method=sensor_def.get("method")
             )
-            self._sensors_coordinator[sensor_type] = {
+            self._sensor_coordinator[sensor_type] = {
                 KEY_COORDINATOR: coordinator,
                 sensor_type: sensor_names,
             }
@@ -471,14 +460,14 @@ class AsusRouterObj:
     async def _update_unpolled_sensors(self) -> None:
         """Request refresh for AsusRouter unpolled sensors."""
 
-        if not self._sensors_data_handler:
+        if not self._sensor_handler:
             return
 
-        if SENSORS_TYPE_DEVICES in self._sensors_coordinator:
-            coordinator = self._sensors_coordinator[SENSORS_TYPE_DEVICES][
+        if SENSORS_TYPE_DEVICES in self._sensor_coordinator:
+            coordinator = self._sensor_coordinator[SENSORS_TYPE_DEVICES][
                 KEY_COORDINATOR
             ]
-            if self._sensors_data_handler.update_device_count(
+            if self._sensor_handler.update_device_count(
                 self._connected_devices, self._connected_devices_list
             ):
                 await coordinator.async_refresh()
@@ -486,9 +475,9 @@ class AsusRouterObj:
     async def close(self) -> None:
         """Close the connection."""
 
-        if self._api is not None:
-            await self._api.async_disconnect()
-        self._api = None
+        if self.bridge is not None:
+            await self.bridge.async_disconnect()
+        self.bridge = None
 
         for func in self._on_close:
             func()
@@ -526,19 +515,19 @@ class AsusRouterObj:
 
         return DeviceInfo(
             identifiers={
-                (DOMAIN, self._mac),
-                (DOMAIN, self._serial),
+                (DOMAIN, self._identity.mac),
+                (DOMAIN, self._identity.serial),
             },
-            name=self._name,
-            model=self._model,
-            manufacturer=self._vendor,
-            sw_version=self._firmware,
+            name=self._conf_name,
+            model=self._identity.model,
+            manufacturer=self._identity.brand,
+            sw_version=self._identity.firmware(),
             configuration_url="{}://{}:{}".format(
                 DEFAULT_HTTP["ssl"]
                 if self._options[CONF_VERIFY_SSL]
                 else DEFAULT_HTTP["no_ssl"],
-                self._host,
-                self._port,
+                self._conf_host,
+                self._conf_port,
             ),
         )
 
@@ -567,7 +556,13 @@ class AsusRouterObj:
         return self._host
 
     @property
-    def api(self) -> ARBridge:
-        """Router API."""
+    def bridge(self) -> ARBridge:
+        """Router bridge."""
 
-        return self._api
+        return self._bridge
+
+    @bridge.setter
+    def bridge(self, value: ARBridge | None) -> None:
+        """Set router bridge"""
+
+        self._bridge = value

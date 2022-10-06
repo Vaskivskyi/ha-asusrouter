@@ -27,7 +27,7 @@ from .const import (
     PLATFORMS,
 )
 from .migrate import DEPRECATED, MOVE_TO_OPTIONS
-from .router import AsusRouterObj
+from .router import ARDevice
 
 
 async def async_setup_entry(
@@ -36,7 +36,7 @@ async def async_setup_entry(
 ) -> bool:
     """Setup AsurRouter platform."""
 
-    router = AsusRouterObj(hass, entry)
+    router = ARDevice(hass, entry)
     await router.setup()
 
     router.async_on_close(entry.add_update_listener(update_listener))

@@ -12,7 +12,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DATA_ASUSROUTER, DEFAULT_DEVICE_NAME, DOMAIN
-from .router import AsusRouterDevInfo, AsusRouterObj
+from .router import ARConnectedDevice, ARDevice
 
 
 async def async_setup_entry(
@@ -40,7 +40,7 @@ async def async_setup_entry(
 
 @callback
 def add_entities(
-    router: AsusRouterObj,
+    router: ARDevice,
     async_add_entities: AddEntitiesCallback,
     tracked: set[str],
 ) -> None:
@@ -66,8 +66,8 @@ class AsusRouterConnectedDevice(ScannerEntity):
 
     def __init__(
         self,
-        router: AsusRouterObj,
-        device: AsusRouterDevInfo,
+        router: ARDevice,
+        device: ARConnectedDevice,
     ) -> None:
         """Initialize connected device."""
 

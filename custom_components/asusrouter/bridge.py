@@ -98,8 +98,14 @@ class ARBridge:
         )
 
     @property
+    def identity(self) -> AsusDevice:
+        """Return identity."""
+
+        return self._identity
+
+    @property
     def is_connected(self) -> bool:
-        """Get connected status."""
+        """Return connection status."""
 
         return self.api.connected
 
@@ -115,7 +121,7 @@ class ARBridge:
 
         try:
             await self.api.async_connect()
-            self._identity = await self._async_get_device_identity()
+            self._identity = await self.api.async_get_identity()
         except Exception as ex:
             raise ConfigEntryNotReady from ex
 
@@ -130,45 +136,6 @@ class ARBridge:
         await self.api.connection.async_cleanup()
 
     ### <- CONNECTION
-
-    ### IDENTITY ->
-
-    async def _async_get_device_identity(self) -> AsusDevice:
-        """Load device identity."""
-
-        return await self.api.async_get_identity()
-
-    @property
-    def firmware(self) -> str | None:
-        """Return firmware information."""
-
-        return self._identity.firmware()
-
-    @property
-    def mac(self) -> str | None:
-        """Return MAC information."""
-
-        return self._identity.mac
-
-    @property
-    def model(self) -> str | None:
-        """Return model information."""
-
-        return self._identity.model
-
-    @property
-    def serial(self) -> str | None:
-        """Return serial information."""
-
-        return self._identity.serial
-
-    @property
-    def vendor(self) -> str | None:
-        """Return vendor information."""
-
-        return self._identity.brand
-
-    ### <- IDENTITY
 
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
         """Get a dictionary of available sensors."""
