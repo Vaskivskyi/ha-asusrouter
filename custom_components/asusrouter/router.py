@@ -29,7 +29,10 @@ from homeassistant.util import dt as dt_util
 
 from .bridge import ARBridge
 from .const import (
+    CONF_INTERVAL,
+    CONF_INTERVAL_DEVICES,
     CONF_REQ_RELOAD,
+    CONF_SPLIT_INTERVALS,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_WIRED,
@@ -38,6 +41,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SPLIT_INTERVALS,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_INTERNET,
@@ -66,7 +70,7 @@ class ARSensorHandler:
         self,
         hass: HomeAssistant,
         bridge: ARBridge,
-        scan_interval: int = DEFAULT_SCAN_INTERVAL,
+        options: dict[str, Any],
     ) -> None:
         """Initialise data handler."""
 
@@ -74,7 +78,10 @@ class ARSensorHandler:
         self._bridge = bridge
         self._connected_devices = 0
         self._connected_devices_list: list[str] = list()
-        self._scan_interval = timedelta(seconds=scan_interval)
+        self._options = options
+        self._split_intervals = options.get(
+            CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
+        )
 
     async def _get_connected_devices(self) -> dict[str, int]:
         """Return number of connected devices."""
@@ -117,12 +124,22 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
+        interval = timedelta(
+            seconds=self._options.get(
+                CONF_INTERVAL + sensor_type,
+                self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            )
+        )
+
         coordinator = DataUpdateCoordinator(
             self._hass,
             _LOGGER,
             name=sensor_type,
             update_method=method,
-            update_interval=self._scan_interval if should_poll else None,
+            update_interval=interval if should_poll else None,
+        )
+        _LOGGER.debug(
+            f"Coordinator initialized for `{sensor_type}`. Update interval: `{interval}`"
         )
         await coordinator.async_refresh()
 
@@ -373,7 +390,7 @@ class ARDevice:
             async_track_time_interval(
                 self.hass,
                 self.update_all,
-                timedelta(seconds=self._options[CONF_SCAN_INTERVAL]),
+                timedelta(seconds=self._options.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL)),
             )
         )
 
@@ -436,9 +453,7 @@ class ARDevice:
         if self._sensor_handler:
             return
 
-        self._sensor_handler = ARSensorHandler(
-            self.hass, self.bridge, self._options[CONF_SCAN_INTERVAL]
-        )
+        self._sensor_handler = ARSensorHandler(self.hass, self.bridge, self._options)
         self._sensor_handler.update_device_count(
             self._connected_devices, self._connected_devices_list
         )
