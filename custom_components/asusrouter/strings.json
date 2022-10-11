@@ -30,15 +30,28 @@
                 "description": "Operation mode",
                 "data": {
                     "enable_monitor": "Enable device monitoring",
-                    "enable_control": "Enable device control"
+                    "enable_control": "Enable device control",
+                    "split_intervals": "Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Time constants",
+            "intervals": {
+                "description": "Update intervals",
                 "data": {
-                    "cache_time": "Caching time for the device data",
-                    "scan_interval": "Interval to update entities",
-                    "consider_home": "Consider device at home for (after last 'online' state)"
+                    "cache_time": "Caching time",
+                    "interval_devices": "Device trackers update",
+                    "consider_home": "Consider device at home for (after last 'online' state)",
+                    "scan_interval": "Entities update",
+                    "interval_cpu": "CPU data",
+                    "interval_light": "Light data",
+                    "interval_misc": "Misc data",
+                    "interval_network_stat": "Network stat data",
+                    "interval_ports": "Ports data",
+                    "interval_ram": "RAM data",
+                    "interval_sysinfo": "Sysinfo data",
+                    "interval_temperature": "Temperature data",
+                    "interval_vpn": "VPN data",
+                    "interval_wan": "WAN data",
+                    "interval_wlan": "WLAN data"
                 }
             },
             "interfaces": {
@@ -73,7 +86,7 @@
                 "data": {
                     "device": "Credentials and connection settings",
                     "operation_mode": "Operation mode",
-                    "times": "Time constants",
+                    "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor"
                 }
             },
@@ -92,15 +105,28 @@
                 "description": "Operation mode",
                 "data": {
                     "enable_monitor": "Enable device monitoring",
-                    "enable_control": "Enable device control"
+                    "enable_control": "Enable device control",
+                    "split_intervals": "Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Time constants",
+            "intervals": {
+                "description": "Update intervals",
                 "data": {
-                    "cache_time": "Caching time for the device data",
-                    "scan_interval": "Interval to update entities",
-                    "consider_home": "Consider device at home for (after last 'online' state)"
+                    "cache_time": "Caching time",
+                    "interval_devices": "Device trackers update",
+                    "consider_home": "Consider device at home for (after last 'online' state)",
+                    "scan_interval": "Entities update",
+                    "interval_cpu": "CPU data",
+                    "interval_light": "Light data",
+                    "interval_misc": "Misc data",
+                    "interval_network_stat": "Network stat data",
+                    "interval_ports": "Ports data",
+                    "interval_ram": "RAM data",
+                    "interval_sysinfo": "Sysinfo data",
+                    "interval_temperature": "Temperature data",
+                    "interval_vpn": "VPN data",
+                    "interval_wan": "WAN data",
+                    "interval_wlan": "WLAN data"
                 }
             },
             "interfaces": {

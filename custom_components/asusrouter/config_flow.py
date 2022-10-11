@@ -52,6 +52,19 @@ from .const import (
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
+    CONF_INTERVAL_CPU,
+    CONF_INTERVAL_DEVICES,
+    CONF_INTERVAL_LIGHT,
+    CONF_INTERVAL_MISC,
+    CONF_INTERVAL_NETWORK_STAT,
+    CONF_INTERVAL_PORTS,
+    CONF_INTERVAL_RAM,
+    CONF_INTERVAL_SYSINFO,
+    CONF_INTERVAL_TEMPERATURE,
+    CONF_INTERVAL_VPN,
+    CONF_INTERVAL_WAN,
+    CONF_INTERVAL_WLAN,
+    CONF_SPLIT_INTERVALS,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
     DEFAULT_CACHE_TIME,
@@ -60,6 +73,7 @@ from .const import (
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SPLIT_INTERVALS,
     DEFAULT_SSL,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
@@ -300,15 +314,19 @@ def _create_form_operation_mode(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
         ): cv.boolean,
+        vol.Required(
+            CONF_SPLIT_INTERVALS,
+            default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
+        ): cv.boolean,
     }
 
     return vol.Schema(schema)
 
 
-def _create_form_times(
+def _create_form_intervals(
     user_input: dict[str, Any] = dict(),
 ) -> vol.Schema:
-    """Create a form for the 'times' step."""
+    """Create a form for the 'intervals' step."""
 
     schema = {
         vol.Required(
@@ -316,14 +334,80 @@ def _create_form_times(
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
         ): cv.positive_int,
         vol.Required(
-            CONF_SCAN_INTERVAL,
-            default=user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            CONF_INTERVAL_DEVICES,
+            default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
         ): cv.positive_int,
         vol.Required(
             CONF_CONSIDER_HOME,
             default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
         ): cv.positive_int,
     }
+
+    split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
+    conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+
+    if split == False:
+        schema.update(
+            {
+                vol.Optional(
+                    CONF_SCAN_INTERVAL,
+                    default=conf_scan_interval,
+                ): cv.positive_int,
+            }
+        )
+    elif split == True:
+        schema.update(
+            {
+                vol.Required(
+                    CONF_INTERVAL_CPU,
+                    default=user_input.get(CONF_INTERVAL_CPU, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_LIGHT,
+                    default=user_input.get(CONF_INTERVAL_LIGHT, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_MISC,
+                    default=user_input.get(CONF_INTERVAL_MISC, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_NETWORK_STAT,
+                    default=user_input.get(
+                        CONF_INTERVAL_NETWORK_STAT, conf_scan_interval
+                    ),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_PORTS,
+                    default=user_input.get(CONF_INTERVAL_PORTS, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_RAM,
+                    default=user_input.get(CONF_INTERVAL_RAM, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_SYSINFO,
+                    default=user_input.get(CONF_INTERVAL_SYSINFO, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_TEMPERATURE,
+                    default=user_input.get(
+                        CONF_INTERVAL_TEMPERATURE, conf_scan_interval
+                    ),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_VPN,
+                    default=user_input.get(CONF_INTERVAL_VPN, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_WAN,
+                    default=user_input.get(CONF_INTERVAL_WAN, conf_scan_interval),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_INTERVAL_WLAN,
+                    default=user_input.get(CONF_INTERVAL_WLAN, conf_scan_interval),
+                ): cv.positive_int,
+            }
+        )
 
     return vol.Schema(schema)
 
@@ -423,8 +507,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             "credentials_error": self.async_step_device,
             "device": self.async_step_operation_mode,
             "device_error": self.async_step_device,
-            "operation_mode": self.async_step_times,
-            "times": self.async_step_interfaces,
+            "operation_mode": self.async_step_intervals,
+            "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_name,
             "name": self.async_step_finish,
         }
@@ -577,20 +661,20 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_select_step(step_id)
 
-    # Step #4 - times
-    async def async_step_times(
+    # Step #4 - intervals
+    async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select times."""
+        """Step to select intervals."""
 
-        step_id = "times"
+        step_id = "intervals"
 
         if not user_input:
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_times(user_input),
+                data_schema=_create_form_intervals(user_input),
             )
 
         self._options.update(user_input)
@@ -682,8 +766,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._steps = {
             "options": self.async_step_device,
             "device": self.async_step_operation_mode,
-            "operation_mode": self.async_step_times,
-            "times": self.async_step_interfaces,
+            "operation_mode": self.async_step_intervals,
+            "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_confirmation,
             "confirmation": self.async_step_finish,
         }
@@ -794,13 +878,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return await self.async_select_step(step_id)
 
-    async def async_step_times(
+    async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select times."""
+        """Step to select intervals."""
 
-        step_id = "times"
+        step_id = "intervals"
 
         if not step_id in self._selection or self._selection[step_id] == False:
             return await self.async_select_step(step_id)
@@ -809,7 +893,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_times(user_input),
+                data_schema=_create_form_intervals(user_input),
             )
 
         self._options.update(user_input)

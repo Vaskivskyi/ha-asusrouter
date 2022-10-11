@@ -70,7 +70,9 @@ async def async_get_config_entry_diagnostics(
             state_dict.pop("context", None)
             # Remove sensitive info from attributes.
             if "attributes" in state_dict:
-                state_dict["attributes"] = async_redact_data(dict(state_dict["attributes"]), TO_REDACT_ATTRS)
+                state_dict["attributes"] = async_redact_data(
+                    dict(state_dict["attributes"]), TO_REDACT_ATTRS
+                )
             # Remove sensitive info from sensors states.
             if any(el in entity_entry.original_name for el in TO_REDACT_STATE):
                 state_dict = async_redact_data(state_dict, "state")

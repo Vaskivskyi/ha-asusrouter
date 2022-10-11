@@ -30,15 +30,28 @@
                 "description": "Modo de operação",
                 "data": {
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
-                    "enable_control": "Ativar o controle do dispositivo"
+                    "enable_control": "Ativar o controle do dispositivo",
+                    "split_intervals": "[NT] Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Constantes de tempo",
+            "intervals": {
+                "description": "[NT] Update intervals",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "interval_devices": "[NT] Device trackers update",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
+                    "interval_cpu": "[NT] CPU data",
+                    "interval_light": "[NT] Light data",
+                    "interval_misc": "[NT] Misc data",
+                    "interval_network_stat": "[NT] Network stat data",
+                    "interval_ports": "[NT] Ports data",
+                    "interval_ram": "[NT] RAM data",
+                    "interval_sysinfo": "[NT] Sysinfo data",
+                    "interval_temperature": "[NT] Temperature data",
+                    "interval_vpn": "[NT] VPN data",
+                    "interval_wan": "[NT] WAN data",
+                    "interval_wlan": "[NT] WLAN data"
                 }
             },
             "interfaces": {
@@ -71,7 +84,7 @@
                 "data": {
                     "device": "Credenciais e configurações de conexão",
                     "operation_mode": "Modo de operação",
-                    "times": "Constantes de tempo",
+                    "intervals": "[NT] Update intervals",
                     "interfaces": "Interfaces para monitorar"
                 }
             },
@@ -90,15 +103,28 @@
                 "description": "Modo de operação",
                 "data": {
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
-                    "enable_control": "Ativar o controle do dispositivo"
+                    "enable_control": "Ativar o controle do dispositivo",
+                    "split_intervals": "[NT] Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Constantes de tempo",
+            "intervals": {
+                "description": "[NT] Update intervals",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "interval_devices": "[NT] Device trackers update",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
+                    "interval_cpu": "[NT] CPU data",
+                    "interval_light": "[NT] Light data",
+                    "interval_misc": "[NT] Misc data",
+                    "interval_network_stat": "[NT] Network stat data",
+                    "interval_ports": "[NT] Ports data",
+                    "interval_ram": "[NT] RAM data",
+                    "interval_sysinfo": "[NT] Sysinfo data",
+                    "interval_temperature": "[NT] Temperature data",
+                    "interval_vpn": "[NT] VPN data",
+                    "interval_wan": "[NT] WAN data",
+                    "interval_wlan": "[NT] WLAN data"
                 }
             },
             "interfaces": {

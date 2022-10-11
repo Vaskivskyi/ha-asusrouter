@@ -30,15 +30,28 @@
                 "description": "Режим роботи",
                 "data": {
                     "enable_monitor": "Увімкнути моніторинг пристрою",
-                    "enable_control": "Увімкнути контроль пристрою"
+                    "enable_control": "Увімкнути контроль пристрою",
+                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
                 }
             },
-            "times": {
-                "description": "Часові константи",
+            "intervals": {
+                "description": "Інтервали оновлення",
                 "data": {
-                    "cache_device_time": "Час кешування статусу пристрою",
+                    "cache_time": "Час кешування",
+                    "interval_devices": "Оновлення device trackers",
+                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
-                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
+                    "interval_cpu": "Оновлення даних CPU",
+                    "interval_light": "Оновлення даних light",
+                    "interval_misc": "Оновлення даних misc",
+                    "interval_network_stat": "Оновлення даних network stat",
+                    "interval_ports": "Оновлення даних ports",
+                    "interval_ram": "Оновлення даних RAM",
+                    "interval_sysinfo": "Оновлення даних sysinfo",
+                    "interval_temperature": "Оновлення даних temperature",
+                    "interval_vpn": "Оновлення даних VPN",
+                    "interval_wan": "Оновлення даних WAN",
+                    "interval_wlan": "Оновлення даних WLAN"
                 }
             },
             "interfaces": {
@@ -73,7 +86,7 @@
                 "data": {
                     "device": "Облікові дані та налаштування підключення",
                     "operation_mode": "Режим роботи",
-                    "times": "Часові константи",
+                    "intervals": "Інтервали оновлення",
                     "interfaces": "Інтерфейси для відслідковування"
                 }
             },
@@ -92,15 +105,28 @@
                 "description": "Режим роботи",
                 "data": {
                     "enable_monitor": "Увімкнути моніторинг пристрою",
-                    "enable_control": "Увімкнути контроль пристрою"
+                    "enable_control": "Увімкнути контроль пристрою",
+                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
                 }
             },
-            "times": {
-                "description": "Часові константи",
+            "intervals": {
+                "description": "Інтервали оновлення",
                 "data": {
-                    "cache_device_time": "Час кешування статусу пристрою",
+                    "cache_time": "Час кешування",
+                    "interval_devices": "Оновлення device trackers",
+                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
-                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
+                    "interval_cpu": "Оновлення даних CPU",
+                    "interval_light": "Оновлення даних light",
+                    "interval_misc": "Оновлення даних misc",
+                    "interval_network_stat": "Оновлення даних network stat",
+                    "interval_ports": "Оновлення даних ports",
+                    "interval_ram": "Оновлення даних RAM",
+                    "interval_sysinfo": "Оновлення даних sysinfo",
+                    "interval_temperature": "Оновлення даних temperature",
+                    "interval_vpn": "Оновлення даних VPN",
+                    "interval_wan": "Оновлення даних WAN",
+                    "interval_wlan": "Оновлення даних WLAN"
                 }
             },
             "interfaces": {
