@@ -318,7 +318,7 @@ class ARBridge:
         """Get the available network stat sensors."""
 
         return await self._get_sensors(
-            self.async_get_network_interfaces,
+            self.api.async_get_network_labels,
             self._process_sensors_network_stat,
             type=SENSORS_TYPE_NETWORK_STAT,
         )
@@ -423,14 +423,6 @@ class ARBridge:
         return sensors
 
     ### <- PROCESS SENSORS LSIT
-
-    ### GENERAL USAGE METHODS ->
-    async def async_get_network_interfaces(self) -> list[str]:
-        """Get the list of network interfaces of the device."""
-
-        return await self.api.async_get_network_labels()
-
-    ### <- GENERAL USAGE METHODS
 
     ### SERVICES ->
     async def async_reboot(self) -> bool:
