@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 import socket
 from typing import Any
-
 import voluptuous as vol
+
 from asusrouter import (
     AsusRouterConnectionError,
     AsusRouterLoginBlockError,
@@ -81,6 +78,8 @@ from .const import (
     STEP_TYPE_SIMPLE,
 )
 
+_LOGGER = logging.getLogger(__name__)
+
 
 def _check_host(
     host: str,
@@ -115,17 +114,17 @@ async def _async_get_network_interfaces(
 ) -> list[str]:
     """Return list of possible to monitor network interfaces."""
 
-    api = ARBridge(hass, configs, options)
+    bridge = ARBridge(hass, configs, options)
 
     try:
-        if not api.is_connected:
-            await api.async_connect()
-        labels = await api.async_get_network_interfaces()
-        await api.async_disconnect()
+        if not bridge.is_connected:
+            await bridge.async_connect()
+        labels = await bridge.api.async_get_network_labels()
+        await bridge.async_disconnect()
         return labels
     except Exception as ex:
         _LOGGER.warning(
-            f"Cannot get available network stat sensors for {configs[CONF_HOST]}: {ex}"
+            f"Cannot get available network interfaces for {configs[CONF_HOST]}: {ex}"
         )
         return DELAULT_INTERFACES
 
@@ -158,12 +157,12 @@ async def _async_check_connection(
         )
         step_type = STEP_TYPE_SIMPLE
 
-        _LOGGER.debug(f"Setup ({step_type}) initiated")
+    _LOGGER.debug(f"Setup ({step_type}) initiated")
 
-    api = ARBridge(hass, configs_to_use)
+    bridge = ARBridge(hass, configs_to_use)
 
     try:
-        await api.async_connect()
+        await bridge.async_connect()
     # Credentials error
     except AsusRouterLoginError:
         _LOGGER.error(f"Error during connection to '{host}'. Wrong credentials")
@@ -206,10 +205,10 @@ async def _async_check_connection(
         }
     # Cleanup, so no unclosed sessions will be reported
     finally:
-        await api.async_clean()
+        await bridge.async_clean()
 
-    result["unique_id"] = await api.get_serial()
-    await api.async_disconnect()
+    result["unique_id"] = await bridge.get_serial()
+    await bridge.async_disconnect()
     for item in configs:
         configs_to_use.pop(item)
 
@@ -218,6 +217,9 @@ async def _async_check_connection(
     _LOGGER.debug(f"Setup ({step_type}) successful")
 
     return result
+
+
+### FORMS ->
 
 
 def _create_form_discovery(
@@ -396,6 +398,9 @@ def _create_form_confirmation(
     }
 
     return vol.Schema(schema)
+
+
+### <- FORMS
 
 
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -653,6 +658,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow."""
+
         return OptionsFlowHandler(config_entry)
 
 
