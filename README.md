@@ -355,14 +355,14 @@ This list provides only the models tested by me or other users. If your device i
 
 <tr><td>Full support</td><td>
 
-**802.11ax**: `DSL-AX82U`, `GT-AX11000`, `RT-AX55`, `RT-AX58U`, `RT-AX68U`, `RT-AX82U`, `RT-AX86U`, `RT-AX86S` (reported as `RT-AX86U`), `RT-AX88U`, `RT-AX89X`, `RT-AX92U`, `TUF-AX5400`, `ZenWiFi AX (XT8)`, `ZenWiFi AX Mini (XD4)`<br/>
-**802.11ac**: `DSL-AC68U`, `RT-AC86U`, `RT-ACRH13`
+**802.11ax**: `DSL-AX82U` ([link*](https://amzn.to/3rXo7md)), `GT-AX11000` ([link](https://amzn.to/3VpWgJa)), `RT-AX55` ([link](https://amzn.to/3MwlBwP)), `RT-AX58U` ([link](https://amzn.to/3Mrpu6a)), `RT-AX68U` ([link](https://amzn.to/3rS2jZy)), `RT-AX82U` ([link](https://amzn.to/3MslCC0)), `RT-AX86U` ([link](https://amzn.to/3CxEGdk)), `RT-AX86S` (reported as `RT-AX86U`) ([link](https://amzn.to/3g2YPAK)), `RT-AX88U` ([link](https://amzn.to/3RVEoTh)), `RT-AX89X` ([link](https://amzn.to/3fRXXi3)), `RT-AX92U` ([link](https://amzn.to/3EFz57O)), `TUF-AX5400` ([link](https://amzn.to/3MtthzR)), `ZenWiFi AX (XT8)` ([link](https://amzn.to/3Cn8tW4)), `ZenWiFi AX Mini (XD4)` ([link](https://amzn.to/3CTveTf))<br/>
+**802.11ac**: `DSL-AC68U` ([link](https://amzn.to/3CQ77oq)), `RT-AC86U` ([link](https://amzn.to/3VgJ60S)), `RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
 
 <tr><td>Limited support</td><td>
 
-**802.11ac**: `RT-AC51U`, `RT-AC66U`, `RT-ACRH17` (reported as `RT-AC82U`)<br/>
+**802.11ac**: `RT-AC51U` ([link](https://amzn.to/3VooPGF)), `RT-AC66U` ([link](https://amzn.to/3yBeldp)), `RT-ACRH17` (reported as `RT-AC82U`)<br/>
 **802.11n**: `RT-N66U`
 
 </td><td><b>Stock</b>: Latest available<b><br/>Merlin</b>: 380.70+</td><td>no LED control</td></tr>
@@ -380,6 +380,7 @@ This list provides only the models tested by me or other users. If your device i
 </td><td></td><td></td></tr>
 
 </table>
+* As an Amazon Associate I earn from qualifying purchases. Not like I ever got anything yet (:
 
 ## Support the integration
 
