@@ -356,16 +356,33 @@ This list provides only the models tested by me or other users. If your device i
 <tr><td>Full support</td><td>
 
 **802.11ax**:<br/>
-`DSL-AX82U` ([link*](https://amzn.to/3rXo7md)), `GT-AX11000` ([link](https://amzn.to/3VpWgJa)), `RT-AX55` ([link](https://amzn.to/3MwlBwP)), `RT-AX58U` ([link](https://amzn.to/3Mrpu6a)), `RT-AX68U` ([link](https://amzn.to/3rS2jZy)), `RT-AX82U` ([link](https://amzn.to/3MslCC0)), `RT-AX86U` ([link](https://amzn.to/3CxEGdk)), `RT-AX86S` (reported as `RT-AX86U`) ([link](https://amzn.to/3g2YPAK)), `RT-AX88U` ([link](https://amzn.to/3RVEoTh)), `RT-AX89X` ([link](https://amzn.to/3fRXXi3)), `RT-AX92U` ([link](https://amzn.to/3EFz57O)), `TUF-AX5400` ([link](https://amzn.to/3MtthzR)), `ZenWiFi AX (XT8)` ([link](https://amzn.to/3Cn8tW4)), `ZenWiFi AX Mini (XD4)` ([link](https://amzn.to/3CTveTf))<br/><br/>
+`DSL-AX82U` ([link*](https://amzn.to/3rXo7md)),<br/>
+`GT-AX11000` ([link](https://amzn.to/3VpWgJa)),<br/>
+`RT-AX55` ([link](https://amzn.to/3MwlBwP)),<br/>
+`RT-AX58U` ([link](https://amzn.to/3Mrpu6a)),<br/>
+`RT-AX68U` ([link](https://amzn.to/3rS2jZy)),<br/>
+`RT-AX82U` ([link](https://amzn.to/3MslCC0)),<br/>
+`RT-AX86U` ([link](https://amzn.to/3CxEGdk)),<br/>
+`RT-AX86S` (reported as `RT-AX86U`) ([link](https://amzn.to/3g2YPAK)),<br/>
+`RT-AX88U` ([link](https://amzn.to/3RVEoTh)),<br/>
+`RT-AX89X` ([link](https://amzn.to/3fRXXi3)),<br/>
+`RT-AX92U` ([link](https://amzn.to/3EFz57O)),<br/>
+`TUF-AX5400` ([link](https://amzn.to/3MtthzR)),<br/>
+`ZenWiFi AX (XT8)` ([link](https://amzn.to/3Cn8tW4)),<br/>
+`ZenWiFi AX Mini (XD4)` ([link](https://amzn.to/3CTveTf))<br/><br/>
 **802.11ac**:<br/>
-`DSL-AC68U` ([link](https://amzn.to/3CQ77oq)), `RT-AC86U` ([link](https://amzn.to/3VgJ60S)), `RT-ACRH13`
+`DSL-AC68U` ([link](https://amzn.to/3CQ77oq)),<br/>
+`RT-AC86U` ([link](https://amzn.to/3VgJ60S)),<br/>
+`RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
 
 <tr><td>Limited support</td><td>
 
 **802.11ac**:<br/>
-`RT-AC51U` ([link](https://amzn.to/3VooPGF)), `RT-AC66U` ([link](https://amzn.to/3yBeldp)), `RT-ACRH17` (reported as `RT-AC82U`)<br/><br/>
+`RT-AC51U` ([link](https://amzn.to/3VooPGF)),<br/>
+`RT-AC66U` ([link](https://amzn.to/3yBeldp)),<br/>
+`RT-ACRH17` (reported as `RT-AC82U`)<br/><br/>
 **802.11n**:<br/>
 `RT-N66U`
 
@@ -374,7 +391,8 @@ This list provides only the models tested by me or other users. If your device i
 <tr><td>Non-Asus devices</td><td>
 
 **Netgear**:<br/>
-`R6300V2`, `R7000`
+`R6300V2`,<br/>
+`R7000`
 
 </td><td><b>Merlin</b>: 380.70+</td><td></td></tr>
 
