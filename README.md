@@ -356,23 +356,23 @@ This list provides only the models tested by me or other users. If your device i
 <tr><td>Full support</td><td>
 
 **802.11ax**:<br/>
-`DSL-AX82U` ([link*](https://amzn.to/3rXo7md)),<br/>
-`GT-AX11000` ([link](https://amzn.to/3VpWgJa)),<br/>
-`RT-AX55` ([link](https://amzn.to/3MwlBwP)),<br/>
-`RT-AX58U` ([link](https://amzn.to/3Mrpu6a)),<br/>
-`RT-AX68U` ([link](https://amzn.to/3rS2jZy)),<br/>
-`RT-AX82U` ([link](https://amzn.to/3MslCC0)),<br/>
-`RT-AX86U` ([link](https://amzn.to/3CxEGdk)),<br/>
-`RT-AX86S` (reported as `RT-AX86U`) ([link](https://amzn.to/3g2YPAK)),<br/>
-`RT-AX88U` ([link](https://amzn.to/3RVEoTh)),<br/>
-`RT-AX89X` ([link](https://amzn.to/3fRXXi3)),<br/>
-`RT-AX92U` ([link](https://amzn.to/3EFz57O)),<br/>
-`TUF-AX5400` ([link](https://amzn.to/3MtthzR)),<br/>
-`ZenWiFi AX (XT8)` ([link](https://amzn.to/3Cn8tW4)),<br/>
-`ZenWiFi AX Mini (XD4)` ([link](https://amzn.to/3CTveTf))<br/><br/>
+`DSL-AX82U` (<a href="https://amzn.to/3rXo7md" target="_blank">link*</a>)<br/>
+`GT-AX11000` (<a href="https://amzn.to/3VpWgJa" target="_blank">link</a>)<br/>
+`RT-AX55` (<a href="https://amzn.to/3MwlBwP" target="_blank">link</a>)<br/>
+`RT-AX58U` (<a href="https://amzn.to/3Mrpu6a" target="_blank">link</a>)<br/>
+`RT-AX68U` (<a href="https://amzn.to/3rS2jZy" target="_blank">link</a>)<br/>
+`RT-AX82U` (<a href="https://amzn.to/3MslCC0" target="_blank">link</a>)<br/>
+`RT-AX86U` (<a href="https://amzn.to/3CxEGdk" target="_blank">link</a>)<br/>
+`RT-AX86S` (reported as `RT-AX86U`) (<a href="https://amzn.to/3g2YPAK" target="_blank">link</a>)<br/>
+`RT-AX88U` (<a href="https://amzn.to/3RVEoTh" target="_blank">link</a>)<br/>
+`RT-AX89X` (<a href="https://amzn.to/3fRXXi3" target="_blank">link</a>)<br/>
+`RT-AX92U` (<a href="https://amzn.to/3EFz57O" target="_blank">link</a>)<br/>
+`TUF-AX5400` (<a href="https://amzn.to/3MtthzR" target="_blank">link</a>)<br/>
+`ZenWiFi AX (XT8)` (<a href="https://amzn.to/3Cn8tW4" target="_blank">link</a>)<br/>
+`ZenWiFi AX Mini (XD4)` (<a href="https://amzn.to/3CTveTf" target="_blank">link</a>)<br/><br/>
 **802.11ac**:<br/>
-`DSL-AC68U` ([link](https://amzn.to/3CQ77oq)),<br/>
-`RT-AC86U` ([link](https://amzn.to/3VgJ60S)),<br/>
+`DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
+`RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
 `RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
@@ -380,8 +380,8 @@ This list provides only the models tested by me or other users. If your device i
 <tr><td>Limited support</td><td>
 
 **802.11ac**:<br/>
-`RT-AC51U` ([link](https://amzn.to/3VooPGF)),<br/>
-`RT-AC66U` ([link](https://amzn.to/3yBeldp)),<br/>
+`RT-AC51U` (<a href="https://amzn.to/3VooPGF" target="_blank">link</a>)<br/>
+`RT-AC66U` (<a href="https://amzn.to/3yBeldp" target="_blank">link</a>)<br/>
 `RT-ACRH17` (reported as `RT-AC82U`)<br/><br/>
 **802.11n**:<br/>
 `RT-N66U`
