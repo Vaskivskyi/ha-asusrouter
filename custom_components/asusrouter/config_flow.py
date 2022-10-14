@@ -221,7 +221,7 @@ async def _async_check_connection(
     finally:
         await bridge.async_clean()
 
-    result["unique_id"] = await bridge.get_serial()
+    result["unique_id"] = bridge.identity.serial
     await bridge.async_disconnect()
     for item in configs:
         configs_to_use.pop(item)
