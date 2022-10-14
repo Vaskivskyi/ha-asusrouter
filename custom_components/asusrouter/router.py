@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import logging
 from typing import Any, Awaitable, Callable, TypeVar
 
-from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 from homeassistant.components.device_tracker.const import CONF_CONSIDER_HOME
 from homeassistant.components.device_tracker.const import DOMAIN as TRACKER_DOMAIN
 from homeassistant.config_entries import ConfigEntry
@@ -26,6 +25,8 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
+
+from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 
 from .bridge import ARBridge
 from .const import (
@@ -392,7 +393,11 @@ class ARDevice:
             async_track_time_interval(
                 self.hass,
                 self.update_all,
-                timedelta(seconds=self._options.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL)),
+                timedelta(
+                    seconds=self._options.get(
+                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                    )
+                ),
             )
         )
 

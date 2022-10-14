@@ -11,7 +11,13 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CONF_TRACK_DEVICES, DATA_ASUSROUTER, DEFAULT_DEVICE_NAME, DEFAULT_TRACK_DEVICES, DOMAIN
+from .const import (
+    CONF_TRACK_DEVICES,
+    DATA_ASUSROUTER,
+    DEFAULT_DEVICE_NAME,
+    DEFAULT_TRACK_DEVICES,
+    DOMAIN,
+)
 from .router import ARConnectedDevice, ARDevice
 
 

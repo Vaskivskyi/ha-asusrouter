@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 from typing import Any
 
 from homeassistant.components.light import ColorMode, LightEntity
@@ -19,6 +16,8 @@ from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, SENSORS_TYPE_LI
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 LIGHTS = {
     (SENSORS_TYPE_LIGHT, "led"): ARLightDescription(

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import logging
 
-_LOGGER = logging.getLogger(__name__)
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
@@ -28,6 +26,8 @@ from .const import (
 )
 from .migrate import DEPRECATED, MOVE_TO_OPTIONS
 from .router import ARDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
