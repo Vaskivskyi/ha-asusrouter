@@ -24,7 +24,7 @@ from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
 from .bridge import ARBridge
@@ -409,7 +409,7 @@ class ARDevice:
         _LOGGER.debug(f"Updating AsusRouter device list for '{self._conf_host}'")
         try:
             api_devices = await self.bridge.async_get_connected_devices()
-        except OSError as ex:
+        except UpdateFailed as ex:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
