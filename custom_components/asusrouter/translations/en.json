@@ -2,13 +2,15 @@
     "config": {
         "step": {
             "discovery": {
+                "title": "Device location",
                 "description": "How to find your device",
                 "data": {
                     "host": "Hostname / IP address"
                 }
             },
             "credentials": {
-                "description": "Credentials (the same as for the device web panel)",
+                "title": "Credentials",
+                "description": "The same as for the device web panel",
                 "data": {
                     "username": "Username",
                     "password": "Password",
@@ -16,6 +18,7 @@
                 }
             },
             "device": {
+                "title": "Device settings",
                 "description": "Parameters to connect to the device",
                 "data": {
                     "username": "Username",
@@ -27,7 +30,7 @@
                 }
             },
             "operation_mode": {
-                "description": "Operation mode",
+                "title": "Operation mode",
                 "data": {
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
@@ -35,7 +38,8 @@
                 }
             },
             "intervals": {
-                "description": "Update intervals",
+                "title": "Update intervals",
+                "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
                     "interval_devices": "Device trackers update",
@@ -55,7 +59,7 @@
                 }
             },
             "interfaces": {
-                "description": "Interfaces to monitor",
+                "title": "Interfaces to monitor",
                 "data": {
                     "interfaces": "Select network interfaces to monitor",
                     "units_speed": "Units for speed",
@@ -63,26 +67,27 @@
                 }
             },
             "name": {
-                "description": "Rename your device",
+                "title": "Device name",
                 "data": {
                     "name": "Leave blank to use device model as the name"
                 }
             }
         },
         "error": {
+            "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address",
             "connection_refused": "Connection refused",
             "error": "Failed to connect",
             "login_blocked": "Login is blocked by the device. Please, wait",
-            "wrong_credentials": "Wrong credentials",
-            "unknown": "Unknown error",
             "password_missing": "Password is missing",
-            "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address"
+            "unknown": "Unknown error",
+            "wrong_credentials": "Wrong credentials"
         }
     },
     "options": {
         "step": {
             "options": {
-                "description": "Select configurations to change",
+                "title": "Configurations to change",
+                "description": "Please, select configurations you would like to change",
                 "data": {
                     "device": "Credentials and connection settings",
                     "operation_mode": "Operation mode",
@@ -91,6 +96,7 @@
                 }
             },
             "device": {
+                "title": "Device settings",
                 "description": "Parameters to connect to the device",
                 "data": {
                     "username": "Username",
@@ -102,7 +108,7 @@
                 }
             },
             "operation_mode": {
-                "description": "Operation mode",
+                "title": "Operation mode",
                 "data": {
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
@@ -110,7 +116,8 @@
                 }
             },
             "intervals": {
-                "description": "Update intervals",
+                "title": "Update intervals",
+                "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
                     "interval_devices": "Device trackers update",
@@ -130,7 +137,7 @@
                 }
             },
             "interfaces": {
-                "description": "Interfaces to monitor",
+                "title": "Interfaces to monitor",
                 "data": {
                     "interfaces": "Select network interfaces to monitor",
                     "units_speed": "Units for speed",
@@ -138,6 +145,7 @@
                 }
             },
             "confirmation": {
+                "title": "Reload required",
                 "description": "Please, reload the integration",
                 "data": {
                     "confirm": "I understand, that I need to reload the integration to apply the new configuration. To do this, I will click the integration menu (3 dots) and press 'Reload'"

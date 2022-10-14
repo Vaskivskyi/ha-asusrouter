@@ -2,13 +2,15 @@
     "config": {
         "step": {
             "discovery": {
+                "title": "[NT] Device location",
                 "description": "Cómo encontrar tu dispositivo",
                 "data": {
                     "host": "Nombre de equipo / Dirección IP"
                 }
             },
             "credentials": {
-                "description": "Credenciales (los mismos que en la interfaz Web)",
+                "title": "Credenciales",
+                "description": "Los mismos que en la interfaz Web",
                 "data": {
                     "username": "Usuario",
                     "password": "Contraseña",
@@ -16,6 +18,7 @@
                 }
             },
             "device": {
+                "title": "[NT] Device settings",
                 "description": "Parámetros para conectar al dispositivo",
                 "data": {
                     "username": "Usuario",
@@ -27,7 +30,7 @@
                 }
             },
             "operation_mode": {
-                "description": "Modo de funcionamiento",
+                "title": "Modo de funcionamiento",
                 "data": {
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Hablitar control del dispositivo",
@@ -35,7 +38,8 @@
                 }
             },
             "intervals": {
-                "description": "[NT] Update intervals",
+                "title": "[NT] Update intervals",
+                "description": "[NT] Values are in seconds",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
                     "interval_devices": "[NT] Device trackers update",
@@ -55,7 +59,7 @@
                 }
             },
             "interfaces": {
-                "description": "Interfaces a monitorizar",
+                "title": "Interfaces a monitorizar",
                 "data": {
                     "interfaces": "Seleccionar interfaces de red para monitorizar",
                     "units_speed": "Unidad de velocidad",
@@ -63,26 +67,27 @@
                 }
             },
             "name": {
-                "description": "Renombrar tu dispositivo",
+                "title": "[NT] Device name",
                 "data": {
                     "name": "Dejar en blanco para usar el modelo del dispositivo como nombre"
                 }
             }
         },
         "error": {
+            "cannot_resolve_host": "No se puede encontrar el nombre del equipo. Intenta con la dirección IP",
             "connection_refused": "Conexión rechazada",
             "error": "Fallo al conectar",
             "login_blocked": "Login bloqueado por el dispositivo. Por favor, espera",
-            "wrong_credentials": "Credenciales inválidos",
-            "unknown": "Error desconocido",
             "password_missing": "Falta la contraseña",
-            "cannot_resolve_host": "No se puede encontrar el nombre del equipo. Intenta con la dirección IP"
+            "unknown": "Error desconocido",
+            "wrong_credentials": "Credenciales inválidos"
         }
     },
     "options": {
         "step": {
             "options": {
-                "description": "Selecciona las configuraciones a cambiar",
+                "title": "[NT] Configurations to change",
+                "description": "[NT] Please, select configurations you would like to change",
                 "data": {
                     "device": "Credenciales y configuración de conexión",
                     "operation_mode": "Modo de funcionamiento",
@@ -91,6 +96,7 @@
                 }
             },
             "device": {
+                "title": "[NT] Device settings",
                 "description": "Parámetros para conectar al dispositivo",
                 "data": {
                     "username": "Usuario",
@@ -102,7 +108,7 @@
                 }
             },
             "operation_mode": {
-                "description": "Modo de funcionamiento",
+                "title": "Modo de funcionamiento",
                 "data": {
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Hablitar control del dispositivo",
@@ -110,7 +116,8 @@
                 }
             },
             "intervals": {
-                "description": "[NT] Update intervals",
+                "title": "[NT] Update intervals",
+                "description": "[NT] Values are in seconds",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
                     "interval_devices": "[NT] Device trackers update",
@@ -130,7 +137,7 @@
                 }
             },
             "interfaces": {
-                "description": "Interfaces a monitorizar",
+                "title": "Interfaces a monitorizar",
                 "data": {
                     "interfaces": "Seleccionar interfaces de red para monitorizar",
                     "units_speed": "Unidad de velocidad",
@@ -138,6 +145,7 @@
                 }
             },
             "confirmation": {
+                "title": "[NT] Reload required",
                 "description": "Por favor, recarga la integración",
                 "data": {
                     "confirm": "Entiendo que necesito recargar la integración para aplicar la nueva configuración. Para hacer esto, debo hacer click el el menú de la integración (los 3 puntos) y pulsar 'Recargar'"
