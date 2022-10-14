@@ -33,6 +33,7 @@ from .const import (
     CONF_INTERVAL_DEVICES,
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
+    CONF_TRACK_DEVICES,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_WIRED,
@@ -42,6 +43,7 @@ from .const import (
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
+    DEFAULT_TRACK_DEVICES,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_INTERNET,
@@ -404,6 +406,12 @@ class ARDevice:
 
     async def update_devices(self) -> None:
         """Update AsusRouter devices tracker."""
+
+        if self._options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
+            _LOGGER.debug(f"Device tracking is disabled")
+            return
+        else:
+            _LOGGER.debug(f"Device tracking is enabled")
 
         new_device = False
         _LOGGER.debug(f"Updating AsusRouter device list for '{self._conf_host}'")

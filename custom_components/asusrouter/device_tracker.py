@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DATA_ASUSROUTER, DEFAULT_DEVICE_NAME, DOMAIN
+from .const import CONF_TRACK_DEVICES, DATA_ASUSROUTER, DEFAULT_DEVICE_NAME, DEFAULT_TRACK_DEVICES, DOMAIN
 from .router import ARConnectedDevice, ARDevice
 
 
@@ -21,6 +21,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up device tracker for AsusRouter component."""
+
+    # If device tracking is disabled
+    if entry.options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
+        return
 
     router = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
     tracked: set = set()
@@ -52,14 +56,14 @@ def add_entities(
         if mac in tracked:
             continue
 
-        new_tracked.append(AsusRouterConnectedDevice(router, device))
+        new_tracked.append(ARDeviceEntity(router, device))
         tracked.add(mac)
 
     if new_tracked:
         async_add_entities(new_tracked)
 
 
-class AsusRouterConnectedDevice(ScannerEntity):
+class ARDeviceEntity(ScannerEntity):
     """Connected device class."""
 
     _attr_should_poll = False

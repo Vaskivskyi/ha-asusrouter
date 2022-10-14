@@ -32,6 +32,7 @@
             "operation_mode": {
                 "title": "Modo de funcionamiento",
                 "data": {
+                    "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Hablitar control del dispositivo",
                     "split_intervals": "[NT] Enable per-sensor update intervals"
@@ -110,6 +111,7 @@
             "operation_mode": {
                 "title": "Modo de funcionamiento",
                 "data": {
+                    "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Hablitar control del dispositivo",
                     "split_intervals": "[NT] Enable per-sensor update intervals"
