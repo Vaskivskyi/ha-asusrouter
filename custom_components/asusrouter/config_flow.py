@@ -65,6 +65,7 @@ from .const import (
     CONF_INTERVAL_WAN,
     CONF_INTERVAL_WLAN,
     CONF_SPLIT_INTERVALS,
+    CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
     DEFAULT_CACHE_TIME,
@@ -75,6 +76,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
     DEFAULT_SSL,
+    DEFAULT_TRACK_DEVICES,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
     DEFAULT_USERNAME,
@@ -311,6 +313,10 @@ def _create_form_operation_mode(
         #     ),
         # ): bool,
         vol.Required(
+            CONF_TRACK_DEVICES,
+            default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
+        ): cv.boolean,
+        vol.Required(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
         ): cv.boolean,
@@ -333,15 +339,19 @@ def _create_form_intervals(
             CONF_CACHE_TIME,
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
         ): cv.positive_int,
-        vol.Required(
-            CONF_INTERVAL_DEVICES,
-            default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
-        ): cv.positive_int,
-        vol.Required(
-            CONF_CONSIDER_HOME,
-            default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
-        ): cv.positive_int,
     }
+
+    if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
+        schema.update({
+            vol.Required(
+                CONF_INTERVAL_DEVICES,
+                default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
+            ): cv.positive_int,
+            vol.Required(
+                CONF_CONSIDER_HOME,
+                default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
+            ): cv.positive_int,
+        })
 
     split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
     conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
