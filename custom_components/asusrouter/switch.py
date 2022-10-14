@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
@@ -19,6 +16,8 @@ from .const import CONF_ENABLE_CONTROL
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 SWITCHES = {}
 

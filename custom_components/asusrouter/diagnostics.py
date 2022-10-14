@@ -2,30 +2,25 @@
 
 from __future__ import annotations
 
+import attr
 from typing import Any
 
-import attr
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    ATTR_CONNECTIONS,
-    ATTR_IDENTIFIERS,
-    CONF_DEVICES,
-    CONF_PASSWORD,
-    CONF_UNIQUE_ID,
-    CONF_USERNAME,
-)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
-from .const import DATA_ASUSROUTER, DEVICE_ATTRIBUTE_LAST_ACTIVITY, DOMAIN
+from .const import (
+    DATA_ASUSROUTER,
+    DEVICE_ATTRIBUTE_LAST_ACTIVITY,
+    DOMAIN,
+    TO_REDACT,
+    TO_REDACT_ATTRS,
+    TO_REDACT_DEV,
+    TO_REDACT_STATE,
+)
 from .router import ARDevice
-
-TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
-TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
-TO_REDACT_STATE = {"WAN IP"}
-TO_REDACT_ATTRS = {CONF_DEVICES, CONF_PASSWORD, "ip", "ssid"}
 
 
 async def async_get_config_entry_diagnostics(

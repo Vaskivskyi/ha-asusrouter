@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -19,6 +16,8 @@ from homeassistant.helpers.update_coordinator import (
 from .const import DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR
 from .dataclass import AREntityDescription
 from .router import ARDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_ar_entry(

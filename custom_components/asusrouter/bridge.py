@@ -7,7 +7,6 @@ from datetime import datetime
 import logging
 from typing import Any, Awaitable, Callable, TypeVar
 
-from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -20,6 +19,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
+
+from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
 
 from . import helpers
 from .const import (

@@ -7,11 +7,6 @@ import socket
 from typing import Any
 import voluptuous as vol
 
-from asusrouter import (
-    AsusRouterConnectionError,
-    AsusRouterLoginBlockError,
-    AsusRouterLoginError,
-)
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_HOST,
@@ -22,26 +17,16 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
-    DATA_BITS,
-    DATA_BYTES,
-    DATA_GIGABITS,
-    DATA_GIGABYTES,
-    DATA_KILOBITS,
-    DATA_KILOBYTES,
-    DATA_MEGABITS,
-    DATA_MEGABYTES,
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
+
+from asusrouter import (
+    AsusRouterConnectionError,
+    AsusRouterLoginBlockError,
+    AsusRouterLoginError,
+)
 
 from .bridge import ARBridge
 from .const import (
@@ -52,22 +37,14 @@ from .const import (
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
-    CONF_INTERVAL_CPU,
     CONF_INTERVAL_DEVICES,
-    CONF_INTERVAL_LIGHT,
-    CONF_INTERVAL_MISC,
-    CONF_INTERVAL_NETWORK_STAT,
-    CONF_INTERVAL_PORTS,
-    CONF_INTERVAL_RAM,
-    CONF_INTERVAL_SYSINFO,
-    CONF_INTERVAL_TEMPERATURE,
-    CONF_INTERVAL_VPN,
-    CONF_INTERVAL_WAN,
-    CONF_INTERVAL_WLAN,
+    CONF_INTERVALS,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
+    CONF_VALUES_DATA,
+    CONF_VALUES_DATARATE,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
@@ -306,12 +283,6 @@ def _create_form_operation_mode(
     """Create a form for the 'operation_mode' step."""
 
     schema = {
-        # vol.Required(
-        #     CONF_ENABLE_MONITOR,
-        #     default = user_input.get(
-        #         CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR
-        #     ),
-        # ): bool,
         vol.Required(
             CONF_TRACK_DEVICES,
             default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
@@ -342,16 +313,20 @@ def _create_form_intervals(
     }
 
     if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
-        schema.update({
-            vol.Required(
-                CONF_INTERVAL_DEVICES,
-                default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
-            ): cv.positive_int,
-            vol.Required(
-                CONF_CONSIDER_HOME,
-                default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
-            ): cv.positive_int,
-        })
+        schema.update(
+            {
+                vol.Required(
+                    CONF_INTERVAL_DEVICES,
+                    default=user_input.get(
+                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                    ),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_CONSIDER_HOME,
+                    default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
+                ): cv.positive_int,
+            }
+        )
 
     split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
     conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
@@ -369,53 +344,10 @@ def _create_form_intervals(
         schema.update(
             {
                 vol.Required(
-                    CONF_INTERVAL_CPU,
-                    default=user_input.get(CONF_INTERVAL_CPU, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_LIGHT,
-                    default=user_input.get(CONF_INTERVAL_LIGHT, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_MISC,
-                    default=user_input.get(CONF_INTERVAL_MISC, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_NETWORK_STAT,
-                    default=user_input.get(
-                        CONF_INTERVAL_NETWORK_STAT, conf_scan_interval
-                    ),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_PORTS,
-                    default=user_input.get(CONF_INTERVAL_PORTS, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_RAM,
-                    default=user_input.get(CONF_INTERVAL_RAM, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_SYSINFO,
-                    default=user_input.get(CONF_INTERVAL_SYSINFO, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_TEMPERATURE,
-                    default=user_input.get(
-                        CONF_INTERVAL_TEMPERATURE, conf_scan_interval
-                    ),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_VPN,
-                    default=user_input.get(CONF_INTERVAL_VPN, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_WAN,
-                    default=user_input.get(CONF_INTERVAL_WAN, conf_scan_interval),
-                ): cv.positive_int,
-                vol.Required(
-                    CONF_INTERVAL_WLAN,
-                    default=user_input.get(CONF_INTERVAL_WLAN, conf_scan_interval),
-                ): cv.positive_int,
+                    conf,
+                    default=user_input.get(conf, conf_scan_interval),
+                ): cv.positive_int
+                for conf in CONF_INTERVALS
             }
         )
 
@@ -436,33 +368,11 @@ def _create_form_interfaces(
         vol.Required(
             CONF_UNITS_SPEED,
             default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
-        ): vol.In(
-            {
-                DATA_RATE_BITS_PER_SECOND: DATA_RATE_BITS_PER_SECOND,
-                DATA_RATE_KILOBITS_PER_SECOND: DATA_RATE_KILOBITS_PER_SECOND,
-                DATA_RATE_MEGABITS_PER_SECOND: DATA_RATE_MEGABITS_PER_SECOND,
-                DATA_RATE_GIGABITS_PER_SECOND: DATA_RATE_GIGABITS_PER_SECOND,
-                DATA_RATE_BYTES_PER_SECOND: DATA_RATE_BYTES_PER_SECOND,
-                DATA_RATE_KILOBYTES_PER_SECOND: DATA_RATE_KILOBYTES_PER_SECOND,
-                DATA_RATE_MEGABYTES_PER_SECOND: DATA_RATE_MEGABYTES_PER_SECOND,
-                DATA_RATE_GIGABYTES_PER_SECOND: DATA_RATE_GIGABYTES_PER_SECOND,
-            }
-        ),
+        ): vol.In({datarate: datarate for datarate in CONF_VALUES_DATARATE}),
         vol.Required(
             CONF_UNITS_TRAFFIC,
             default=user_input.get(CONF_UNITS_TRAFFIC, DEFAULT_UNITS_TRAFFIC),
-        ): vol.In(
-            {
-                DATA_BITS: DATA_BITS,
-                DATA_KILOBITS: DATA_KILOBITS,
-                DATA_MEGABITS: DATA_MEGABITS,
-                DATA_GIGABITS: DATA_GIGABITS,
-                DATA_BYTES: DATA_BYTES,
-                DATA_KILOBYTES: DATA_KILOBYTES,
-                DATA_MEGABYTES: DATA_MEGABYTES,
-                DATA_GIGABYTES: DATA_GIGABYTES,
-            }
-        ),
+        ): vol.In({data: data for data in CONF_VALUES_DATA}),
     }
 
     return vol.Schema(schema)
