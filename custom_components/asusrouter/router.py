@@ -440,7 +440,11 @@ class ARDevice:
             if api_devices[device].online:
                 self._connected_devices += 1
                 self._connected_devices_list.append(
-                    f"{api_devices[device].mac}/{api_devices[device].ip}/{api_devices[device].name}"
+                    {
+                        "mac": api_devices[device].mac,
+                        "ip": api_devices[device].ip,
+                        "name": api_devices[device].name,
+                    }
                 )
         consider_home = self._options.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME)
 
