@@ -371,6 +371,7 @@ This list provides only the models tested by me or other users. If your device i
 `ZenWiFi AX (XT8)` (<a href="https://amzn.to/3Cn8tW4" target="_blank">link</a>)<br/>
 `ZenWiFi AX Mini (XD4)` (<a href="https://amzn.to/3CTveTf" target="_blank">link</a>)<br/><br/>
 **802.11ac**:<br/>
+`4G-AC55U`<br/>
 `DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
 `RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
 `RT-ACRH13`
