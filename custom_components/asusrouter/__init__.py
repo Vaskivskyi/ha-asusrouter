@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import logging
 
-_LOGGER = logging.getLogger(__name__)
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
@@ -27,7 +25,9 @@ from .const import (
     PLATFORMS,
 )
 from .migrate import DEPRECATED, MOVE_TO_OPTIONS
-from .router import AsusRouterObj
+from .router import ARDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -36,7 +36,7 @@ async def async_setup_entry(
 ) -> bool:
     """Setup AsurRouter platform."""
 
-    router = AsusRouterObj(hass, entry)
+    router = ARDevice(hass, entry)
     await router.setup()
 
     router.async_on_close(entry.add_update_listener(update_listener))

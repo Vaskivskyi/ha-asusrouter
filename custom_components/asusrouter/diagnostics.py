@@ -2,30 +2,25 @@
 
 from __future__ import annotations
 
+import attr
 from typing import Any
 
-import attr
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    ATTR_CONNECTIONS,
-    ATTR_IDENTIFIERS,
-    CONF_DEVICES,
-    CONF_PASSWORD,
-    CONF_UNIQUE_ID,
-    CONF_USERNAME,
-)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
-from .const import DATA_ASUSROUTER, DEVICE_ATTRIBUTE_LAST_ACTIVITY, DOMAIN
-from .router import AsusRouterObj
-
-TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
-TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
-TO_REDACT_STATE = {"WAN IP"}
-TO_REDACT_ATTRS = {CONF_DEVICES, CONF_PASSWORD, "ip", "ssid"}
+from .const import (
+    DATA_ASUSROUTER,
+    DEVICE_ATTRIBUTE_LAST_ACTIVITY,
+    DOMAIN,
+    TO_REDACT,
+    TO_REDACT_ATTRS,
+    TO_REDACT_DEV,
+    TO_REDACT_STATE,
+)
+from .router import ARDevice
 
 
 async def async_get_config_entry_diagnostics(
@@ -36,7 +31,7 @@ async def async_get_config_entry_diagnostics(
 
     data = {"entry": async_redact_data(entry.as_dict(), TO_REDACT)}
 
-    router: AsusRouterObj = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
 
     # Gather information how this AsusWrt device is represented in Home Assistant
     device_registry = dr.async_get(hass)
@@ -70,7 +65,9 @@ async def async_get_config_entry_diagnostics(
             state_dict.pop("context", None)
             # Remove sensitive info from attributes.
             if "attributes" in state_dict:
-                state_dict["attributes"] = async_redact_data(dict(state_dict["attributes"]), TO_REDACT_ATTRS)
+                state_dict["attributes"] = async_redact_data(
+                    dict(state_dict["attributes"]), TO_REDACT_ATTRS
+                )
             # Remove sensitive info from sensors states.
             if any(el in entity_entry.original_name for el in TO_REDACT_STATE):
                 state_dict = async_redact_data(state_dict, "state")

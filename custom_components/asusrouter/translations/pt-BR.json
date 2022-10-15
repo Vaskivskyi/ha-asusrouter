@@ -2,13 +2,15 @@
     "config": {
         "step": {
             "discovery": {
+                "title": "[NT] Device location",
                 "description": "Como encontrar seu dispositivo",
                 "data": {
                     "host": "Host / Endereço IP"
                 }
             },
             "credentials": {
-                "description": "Credenciais (as mesmas do painel da web do dispositivo)",
+                "title": "Credenciais",
+                "description": "As mesmas do painel da web do dispositivo",
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
@@ -16,6 +18,7 @@
                 }
             },
             "device": {
+                "title": "[NT] Device settings",
                 "description": "Parâmetros para conectar ao dispositivo",
                 "data": {
                     "username": "Nome de usuário",
@@ -27,55 +30,74 @@
                 }
             },
             "operation_mode": {
-                "description": "Modo de operação",
+                "title": "Modo de operação",
                 "data": {
+                    "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
-                    "enable_control": "Ativar o controle do dispositivo"
+                    "enable_control": "Ativar o controle do dispositivo",
+                    "split_intervals": "[NT] Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Constantes de tempo",
+            "intervals": {
+                "title": "[NT] Update intervals",
+                "description": "[NT] Values are in seconds",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "interval_devices": "[NT] Device trackers update",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
+                    "interval_cpu": "[NT] CPU data",
+                    "interval_light": "[NT] Light data",
+                    "interval_misc": "[NT] Misc data",
+                    "interval_network_stat": "[NT] Network stat data",
+                    "interval_ports": "[NT] Ports data",
+                    "interval_ram": "[NT] RAM data",
+                    "interval_sysinfo": "[NT] Sysinfo data",
+                    "interval_temperature": "[NT] Temperature data",
+                    "interval_vpn": "[NT] VPN data",
+                    "interval_wan": "[NT] WAN data",
+                    "interval_wlan": "[NT] WLAN data"
                 }
             },
             "interfaces": {
-                "description": "Interfaces para monitorar",
+                "title": "Interfaces para monitorar",
                 "data": {
-                    "interfaces": "Selecione interfaces de rede para monitorar"
+                    "interfaces": "Selecione interfaces de rede para monitorar",
+                    "units_speed": "[NT] Units for speed",
+                    "units_traffic": "[NT] Units for traffic"
                 }
             },
             "name": {
-                "description": "Renomeie seu dispositivo",
+                "title": "[NT] Device name",
                 "data": {
                     "name": "Deixe em branco para usar o modelo do dispositivo como o nome"
                 }
             }
         },
         "error": {
+            "cannot_resolve_host": "Não pode resolver o nome do host. Tente com o endereço IP",
             "connection_refused": "Conexão recusada",
             "error": "Falhou ao conectar",
             "login_blocked": "O login é bloqueado pelo dispositivo. Por favor, espere",
-            "wrong_credentials": "Credenciais erradas",
-            "unknown": "Erro desconhecido",
             "password_missing": "Falta a senha",
-            "cannot_resolve_host": "Não pode resolver o nome do host. Tente com o endereço IP"
+            "unknown": "Erro desconhecido",
+            "wrong_credentials": "Credenciais erradas"
         }
     },
     "options": {
         "step": {
             "options": {
-                "description": "Selecione as configurações a serem alteradas",
+                "title": "[NT] Configurations to change",
+                "description": "[NT] Please, select configurations you would like to change",
                 "data": {
                     "device": "Credenciais e configurações de conexão",
                     "operation_mode": "Modo de operação",
-                    "times": "Constantes de tempo",
+                    "intervals": "[NT] Update intervals",
                     "interfaces": "Interfaces para monitorar"
                 }
             },
             "device": {
+                "title": "[NT] Device settings",
                 "description": "Parâmetros para conectar ao dispositivo",
                 "data": {
                     "username": "Nome de usuário",
@@ -87,27 +109,45 @@
                 }
             },
             "operation_mode": {
-                "description": "Modo de operação",
+                "title": "Modo de operação",
                 "data": {
+                    "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
-                    "enable_control": "Ativar o controle do dispositivo"
+                    "enable_control": "Ativar o controle do dispositivo",
+                    "split_intervals": "[NT] Enable per-sensor update intervals"
                 }
             },
-            "times": {
-                "description": "Constantes de tempo",
+            "intervals": {
+                "title": "[NT] Update intervals",
+                "description": "[NT] Values are in seconds",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
+                    "interval_devices": "[NT] Device trackers update",
+                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')"
+                    "interval_cpu": "[NT] CPU data",
+                    "interval_light": "[NT] Light data",
+                    "interval_misc": "[NT] Misc data",
+                    "interval_network_stat": "[NT] Network stat data",
+                    "interval_ports": "[NT] Ports data",
+                    "interval_ram": "[NT] RAM data",
+                    "interval_sysinfo": "[NT] Sysinfo data",
+                    "interval_temperature": "[NT] Temperature data",
+                    "interval_vpn": "[NT] VPN data",
+                    "interval_wan": "[NT] WAN data",
+                    "interval_wlan": "[NT] WLAN data"
                 }
             },
             "interfaces": {
-                "description": "Interfaces para monitorar",
+                "title": "Interfaces para monitorar",
                 "data": {
-                    "interfaces": "Selecione interfaces de rede para monitorar"
+                    "interfaces": "Selecione interfaces de rede para monitorar",
+                    "units_speed": "[NT] Units for speed",
+                    "units_traffic": "[NT] Units for traffic"
                 }
             },
             "confirmation": {
+                "title": "[NT] Reload required",
                 "description": "Por favor, recarregue a integração",
                 "data": {
                     "confirm": "Entendo que preciso recarregar a integração para aplicar a nova configuração. Para fazer isso, vou clicar no menu de integração (3 pontos) e pressionar 'Recarregar'"

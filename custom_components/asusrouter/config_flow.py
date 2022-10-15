@@ -3,18 +3,10 @@
 from __future__ import annotations
 
 import logging
-
-_LOGGER = logging.getLogger(__name__)
-
 import socket
 from typing import Any
-
 import voluptuous as vol
-from asusrouter import (
-    AsusRouterConnectionError,
-    AsusRouterLoginBlockError,
-    AsusRouterLoginError,
-)
+
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_HOST,
@@ -25,26 +17,16 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
-    DATA_BITS,
-    DATA_BYTES,
-    DATA_GIGABITS,
-    DATA_GIGABYTES,
-    DATA_KILOBITS,
-    DATA_KILOBYTES,
-    DATA_MEGABITS,
-    DATA_MEGABYTES,
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
+
+from asusrouter import (
+    AsusRouterConnectionError,
+    AsusRouterLoginBlockError,
+    AsusRouterLoginError,
+)
 
 from .bridge import ARBridge
 from .const import (
@@ -55,15 +37,23 @@ from .const import (
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
     CONF_INTERFACES,
+    CONF_INTERVAL_DEVICES,
+    CONF_INTERVALS,
+    CONF_SPLIT_INTERVALS,
+    CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
+    CONF_VALUES_DATA,
+    CONF_VALUES_DATARATE,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SPLIT_INTERVALS,
     DEFAULT_SSL,
+    DEFAULT_TRACK_DEVICES,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
     DEFAULT_USERNAME,
@@ -80,6 +70,8 @@ from .const import (
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def _check_host(
@@ -115,17 +107,17 @@ async def _async_get_network_interfaces(
 ) -> list[str]:
     """Return list of possible to monitor network interfaces."""
 
-    api = ARBridge(hass, configs, options)
+    bridge = ARBridge(hass, configs, options)
 
     try:
-        if not api.is_connected:
-            await api.async_connect()
-        labels = await api.async_get_network_interfaces()
-        await api.async_disconnect()
+        if not bridge.is_connected:
+            await bridge.async_connect()
+        labels = await bridge.api.async_get_network_labels()
+        await bridge.async_disconnect()
         return labels
     except Exception as ex:
         _LOGGER.warning(
-            f"Cannot get available network stat sensors for {configs[CONF_HOST]}: {ex}"
+            f"Cannot get available network interfaces for {configs[CONF_HOST]}: {ex}"
         )
         return DELAULT_INTERFACES
 
@@ -158,12 +150,12 @@ async def _async_check_connection(
         )
         step_type = STEP_TYPE_SIMPLE
 
-        _LOGGER.debug(f"Setup ({step_type}) initiated")
+    _LOGGER.debug(f"Setup ({step_type}) initiated")
 
-    api = ARBridge(hass, configs_to_use)
+    bridge = ARBridge(hass, configs_to_use)
 
     try:
-        await api.async_connect()
+        await bridge.async_connect()
     # Credentials error
     except AsusRouterLoginError:
         _LOGGER.error(f"Error during connection to '{host}'. Wrong credentials")
@@ -206,10 +198,10 @@ async def _async_check_connection(
         }
     # Cleanup, so no unclosed sessions will be reported
     finally:
-        await api.async_clean()
+        await bridge.async_clean()
 
-    result["unique_id"] = await api.get_serial()
-    await api.async_disconnect()
+    result["unique_id"] = bridge.identity.serial
+    await bridge.async_disconnect()
     for item in configs:
         configs_to_use.pop(item)
 
@@ -218,6 +210,9 @@ async def _async_check_connection(
     _LOGGER.debug(f"Setup ({step_type}) successful")
 
     return result
+
+
+### FORMS ->
 
 
 def _create_form_discovery(
@@ -288,40 +283,73 @@ def _create_form_operation_mode(
     """Create a form for the 'operation_mode' step."""
 
     schema = {
-        # vol.Required(
-        #     CONF_ENABLE_MONITOR,
-        #     default = user_input.get(
-        #         CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR
-        #     ),
-        # ): bool,
+        vol.Required(
+            CONF_TRACK_DEVICES,
+            default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
+        ): cv.boolean,
         vol.Required(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
+        ): cv.boolean,
+        vol.Required(
+            CONF_SPLIT_INTERVALS,
+            default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
         ): cv.boolean,
     }
 
     return vol.Schema(schema)
 
 
-def _create_form_times(
+def _create_form_intervals(
     user_input: dict[str, Any] = dict(),
 ) -> vol.Schema:
-    """Create a form for the 'times' step."""
+    """Create a form for the 'intervals' step."""
 
     schema = {
         vol.Required(
             CONF_CACHE_TIME,
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
         ): cv.positive_int,
-        vol.Required(
-            CONF_SCAN_INTERVAL,
-            default=user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-        ): cv.positive_int,
-        vol.Required(
-            CONF_CONSIDER_HOME,
-            default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
-        ): cv.positive_int,
     }
+
+    if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
+        schema.update(
+            {
+                vol.Required(
+                    CONF_INTERVAL_DEVICES,
+                    default=user_input.get(
+                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                    ),
+                ): cv.positive_int,
+                vol.Required(
+                    CONF_CONSIDER_HOME,
+                    default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
+                ): cv.positive_int,
+            }
+        )
+
+    split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
+    conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+
+    if split == False:
+        schema.update(
+            {
+                vol.Optional(
+                    CONF_SCAN_INTERVAL,
+                    default=conf_scan_interval,
+                ): cv.positive_int,
+            }
+        )
+    elif split == True:
+        schema.update(
+            {
+                vol.Required(
+                    conf,
+                    default=user_input.get(conf, conf_scan_interval),
+                ): cv.positive_int
+                for conf in CONF_INTERVALS
+            }
+        )
 
     return vol.Schema(schema)
 
@@ -340,33 +368,11 @@ def _create_form_interfaces(
         vol.Required(
             CONF_UNITS_SPEED,
             default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
-        ): vol.In(
-            {
-                DATA_RATE_BITS_PER_SECOND: DATA_RATE_BITS_PER_SECOND,
-                DATA_RATE_KILOBITS_PER_SECOND: DATA_RATE_KILOBITS_PER_SECOND,
-                DATA_RATE_MEGABITS_PER_SECOND: DATA_RATE_MEGABITS_PER_SECOND,
-                DATA_RATE_GIGABITS_PER_SECOND: DATA_RATE_GIGABITS_PER_SECOND,
-                DATA_RATE_BYTES_PER_SECOND: DATA_RATE_BYTES_PER_SECOND,
-                DATA_RATE_KILOBYTES_PER_SECOND: DATA_RATE_KILOBYTES_PER_SECOND,
-                DATA_RATE_MEGABYTES_PER_SECOND: DATA_RATE_MEGABYTES_PER_SECOND,
-                DATA_RATE_GIGABYTES_PER_SECOND: DATA_RATE_GIGABYTES_PER_SECOND,
-            }
-        ),
+        ): vol.In({datarate: datarate for datarate in CONF_VALUES_DATARATE}),
         vol.Required(
             CONF_UNITS_TRAFFIC,
             default=user_input.get(CONF_UNITS_TRAFFIC, DEFAULT_UNITS_TRAFFIC),
-        ): vol.In(
-            {
-                DATA_BITS: DATA_BITS,
-                DATA_KILOBITS: DATA_KILOBITS,
-                DATA_MEGABITS: DATA_MEGABITS,
-                DATA_GIGABITS: DATA_GIGABITS,
-                DATA_BYTES: DATA_BYTES,
-                DATA_KILOBYTES: DATA_KILOBYTES,
-                DATA_MEGABYTES: DATA_MEGABYTES,
-                DATA_GIGABYTES: DATA_GIGABYTES,
-            }
-        ),
+        ): vol.In({data: data for data in CONF_VALUES_DATA}),
     }
 
     return vol.Schema(schema)
@@ -398,6 +404,9 @@ def _create_form_confirmation(
     return vol.Schema(schema)
 
 
+### <- FORMS
+
+
 class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle config flow for AsusRouter."""
 
@@ -418,8 +427,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             "credentials_error": self.async_step_device,
             "device": self.async_step_operation_mode,
             "device_error": self.async_step_device,
-            "operation_mode": self.async_step_times,
-            "times": self.async_step_interfaces,
+            "operation_mode": self.async_step_intervals,
+            "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_name,
             "name": self.async_step_finish,
         }
@@ -572,20 +581,20 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_select_step(step_id)
 
-    # Step #4 - times
-    async def async_step_times(
+    # Step #4 - intervals
+    async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select times."""
+        """Step to select intervals."""
 
-        step_id = "times"
+        step_id = "intervals"
 
         if not user_input:
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_times(user_input),
+                data_schema=_create_form_intervals(user_input),
             )
 
         self._options.update(user_input)
@@ -653,6 +662,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow."""
+
         return OptionsFlowHandler(config_entry)
 
 
@@ -676,8 +686,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._steps = {
             "options": self.async_step_device,
             "device": self.async_step_operation_mode,
-            "operation_mode": self.async_step_times,
-            "times": self.async_step_interfaces,
+            "operation_mode": self.async_step_intervals,
+            "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_confirmation,
             "confirmation": self.async_step_finish,
         }
@@ -788,13 +798,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return await self.async_select_step(step_id)
 
-    async def async_step_times(
+    async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select times."""
+        """Step to select intervals."""
 
-        step_id = "times"
+        step_id = "intervals"
 
         if not step_id in self._selection or self._selection[step_id] == False:
             return await self.async_select_step(step_id)
@@ -803,7 +813,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_times(user_input),
+                data_schema=_create_form_intervals(user_input),
             )
 
         self._options.update(user_input)
