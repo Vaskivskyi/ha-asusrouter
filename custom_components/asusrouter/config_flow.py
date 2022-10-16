@@ -310,17 +310,17 @@ def _create_form_intervals(
             CONF_CACHE_TIME,
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
         ): cv.positive_int,
+        vol.Required(
+            CONF_INTERVAL_DEVICES,
+            default=user_input.get(
+                CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+            ),
+        ): cv.positive_int,
     }
 
     if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
         schema.update(
             {
-                vol.Required(
-                    CONF_INTERVAL_DEVICES,
-                    default=user_input.get(
-                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
-                    ),
-                ): cv.positive_int,
                 vol.Required(
                     CONF_CONSIDER_HOME,
                     default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
