@@ -414,7 +414,6 @@ class ARDevice:
 
         if self._options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
             _LOGGER.debug(f"Device tracking is disabled")
-            return
         else:
             _LOGGER.debug(f"Device tracking is enabled")
 
