@@ -417,19 +417,19 @@ Here is the list of features being in process of development or considered for t
 <tr><td>Access Point mode</td><td><ol>
 <li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/156">#156</a>)</li>
 </ol></td><td>
-<b>on hold</b> (a device is required for development and testing)
+<b>on hold</b><br/>(a device is required for development and testing)
 </td></tr>
 
 <tr><td>AiMesh</td><td><ol>
 <li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/16">#16</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/161">#161</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/203">#203</a>)</li>
 </ol></td><td>
-<b>on hold</b> (a device with AiMesh support is required for development and testing)
+<b>on hold</b><br/>(a device with AiMesh support is required for development and testing)
 </td></tr>
 
 <tr><td>Aura RGB</td><td><ol>
 <li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/82">#82</a>)</li>
 </ol></td><td>
-<b>on hold</b> (a device with Aura RGB support is required for development and testing)
+<b>on hold</b><br/>(a device with Aura RGB support is required for development and testing)
 </td></tr>
 
 <tr><td>Connected device</td><td><ol>
