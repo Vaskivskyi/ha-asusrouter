@@ -132,6 +132,8 @@ class ARSensorHandler:
                 CONF_INTERVAL + sensor_type,
                 self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
             )
+            if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
+            else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         )
 
         coordinator = DataUpdateCoordinator(
@@ -414,7 +416,6 @@ class ARDevice:
 
         if self._options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
             _LOGGER.debug(f"Device tracking is disabled")
-            return
         else:
             _LOGGER.debug(f"Device tracking is enabled")
 
