@@ -373,6 +373,7 @@ This list provides only the models tested by me or other users. If your device i
 **802.11ac**:<br/>
 `4G-AC55U`<br/>
 `DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
+`RT-AC5300`<br/>
 `RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
 `RT-ACRH13`
 
