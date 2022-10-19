@@ -422,7 +422,7 @@ Here is the list of features being in process of development or considered for t
 </td></tr>
 
 <tr><td>AiMesh</td><td><ol>
-<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/16">#16</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/161">#161</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/203">#203</a>)</li>
+<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/16">#16</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/161">#161</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/203">#203</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/261">#261</a>)</li>
 </ol></td><td>
 <b>on hold</b><br/>(a device with AiMesh support is required for development and testing)
 </td></tr>
