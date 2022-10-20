@@ -95,4 +95,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
     async def async_update(self) -> None:
         """Update state from the device."""
 
-        self._state = await self.api.async_service_led_get()
+        try:
+            self._state = await self.api.async_service_led_get()
+        except Exception as ex:
+            _LOGGER.error(f"LED control has returned an exception: {ex}")
