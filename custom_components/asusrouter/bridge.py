@@ -194,7 +194,7 @@ class ARBridge:
             if process is not None:
                 return process(raw)
             return raw
-        except (OSError, ValueError, AsusRouterError) as ex:
+        except AsusRouterError as ex:
             raise UpdateFailed(ex) from ex
 
     # Connected devices
