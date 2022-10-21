@@ -373,6 +373,7 @@ This list provides only the models tested by me or other users. If your device i
 **802.11ac**:<br/>
 `4G-AC55U`<br/>
 `DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
+`RT-AC5300`<br/>
 `RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
 `RT-ACRH13`
 
@@ -405,6 +406,68 @@ This list provides only the models tested by me or other users. If your device i
 
 </table>
 * As an Amazon Associate I earn from qualifying purchases. Not like I ever got anything yet (:
+
+## New features development
+
+Here is the list of features being in process of development or considered for the future development. If you cannot find the feature you would like to have in the integration, please, open a [new feature request](https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose).
+
+<table>
+
+<tr><th>Group</th><th>Feature</th><th>Status</th></tr>
+
+<tr><td>Access Point mode</td><td><ol>
+<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/156">#156</a>)</li>
+</ol></td><td>
+<b>on hold</b><br/>(a device is required for development and testing)
+</td></tr>
+
+<tr><td>AiMesh</td><td><ol>
+<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/16">#16</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/161">#161</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/203">#203</a>, <a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/261">#261</a>)</li>
+</ol></td><td>
+<b>on hold</b><br/>(a device with AiMesh support is required for development and testing)
+</td></tr>
+
+<tr><td>Aura RGB</td><td><ol>
+<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/82">#82</a>)</li>
+</ol></td><td>
+<b>on hold</b><br/>(a device with Aura RGB support is required for development and testing)
+</td></tr>
+
+<tr><td>Connected device</td><td><ol>
+<li>Blocking internet access (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/146">#146</a>)</li>
+<li>Per-device traffic monitoring (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/220">#220</a>)</li>
+<li>Possibility to use DHCP `hostname` value for device tracking (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/119">#119</a>)</li>
+</ol></td><td>
+<b>in progress [1]<br/>considered [2,3]</b>
+</td></tr>
+
+<tr><td>Firmware</td><td><ol>
+<li>Available updates status (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/222">#222</a>)</li>
+</ol></td><td>
+<b>considered</b>
+</td></tr>
+
+<tr><td>Guest network</td><td><ol>
+<li>Enable / disable (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
+<li>Full control (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
+</ol></td><td>
+<b>in progress [1]<br/>considered [2]</b>
+</td></tr>
+
+<tr><td>Port forwarding</td><td><ol>
+<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/136">#136</a>)</li>
+</ol></td><td>
+<b>considered</b>
+</td></tr>
+
+<tr><td>VPN</td><td><ol>
+<li>OpenVPN server switches (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/224">#224</a>)</li>
+</ol></td><td>
+<b>considered</b>
+</td></tr>
+
+</table>
+
 
 ## Support the integration
 
