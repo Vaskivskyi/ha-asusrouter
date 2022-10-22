@@ -135,7 +135,9 @@ def list_switches_vpn_clients(number: int | None = None) -> dict[str, Any]:
     return sensors
 
 
-def list_sensors_wlan(number: int | None = None) -> dict[str, Any]:
+def list_sensors_wlan(
+    number: int | None = None, hide: list[str] = list()
+) -> dict[str, Any]:
     """Compile a list of wlan sensors."""
 
     sensors = dict()
@@ -147,7 +149,8 @@ def list_sensors_wlan(number: int | None = None) -> dict[str, Any]:
         wlan = f"{KEY_WLAN}{id}"
         extra_state_attributes = dict()
         for key in SENSORS_WLAN:
-            extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
+            if not key in hide and not SENSORS_WLAN[key] in hide:
+                extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
         sensors.update(
             {
                 (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARBinarySensorDescription(
@@ -164,7 +167,9 @@ def list_sensors_wlan(number: int | None = None) -> dict[str, Any]:
     return sensors
 
 
-def list_switches_wlan(number: int | None = None) -> dict[str, Any]:
+def list_switches_wlan(
+    number: int | None = None, hide: list[str] = list()
+) -> dict[str, Any]:
     """Compile a list of wlan switches."""
 
     sensors = dict()
@@ -176,7 +181,8 @@ def list_switches_wlan(number: int | None = None) -> dict[str, Any]:
         wlan = f"{KEY_WLAN}{id}"
         extra_state_attributes = dict()
         for key in SENSORS_WLAN:
-            extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
+            if not key in hide and not SENSORS_WLAN[key] in hide:
+                extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
         sensors.update(
             {
                 (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARSwitchDescription(

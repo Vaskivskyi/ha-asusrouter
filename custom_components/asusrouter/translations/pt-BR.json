@@ -67,6 +67,12 @@
                     "units_traffic": "[NT] Units for traffic"
                 }
             },
+            "security": {
+                "title": "[NT] Security",
+                "data": {
+                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
+                }
+            },
             "name": {
                 "title": "[NT] Device name",
                 "data": {
@@ -93,7 +99,8 @@
                     "device": "Credenciais e configurações de conexão",
                     "operation_mode": "Modo de operação",
                     "intervals": "[NT] Update intervals",
-                    "interfaces": "Interfaces para monitorar"
+                    "interfaces": "Interfaces para monitorar",
+                    "security": "[NT] Security options"
                 }
             },
             "device": {
@@ -144,6 +151,12 @@
                     "interfaces": "Selecione interfaces de rede para monitorar",
                     "units_speed": "[NT] Units for speed",
                     "units_traffic": "[NT] Units for traffic"
+                }
+            },
+            "security": {
+                "title": "[NT] Security",
+                "data": {
+                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
                 }
             },
             "confirmation": {
