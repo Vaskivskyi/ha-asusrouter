@@ -454,11 +454,21 @@ class ARDevice:
             dev_info = wrt_devices.pop(device_mac, None)
             device.update(dev_info, consider_home)
 
+        new_devices = list()
+
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
             device = ARConnectedDevice(device_mac)
             device.update(dev_info)
             self._devices[device_mac] = device
+            new_devices.append(device)
+
+        for device in new_devices:
+            self.hass.bus.fire("asusrouter_device_connected", {
+                "mac": device.mac,
+                "ip": device.ip,
+                "name": device.name,
+            })
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:
