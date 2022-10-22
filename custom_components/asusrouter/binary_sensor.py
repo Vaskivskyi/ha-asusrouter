@@ -15,7 +15,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_sensors_vpn_clients, list_sensors_wlan
-from .const import CONF_ENABLE_CONTROL, SENSORS_TYPE_WAN
+from .const import (
+    CONF_ENABLE_CONTROL,
+    CONF_HIDE_PASSWORDS,
+    CONF_PASSWORD,
+    DEFAULT_HIDE_PASSWORDS,
+    SENSORS_TYPE_WAN,
+)
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -49,9 +55,13 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter binary sensors."""
 
+    hide = list()
+    if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
+        hide.append(CONF_PASSWORD)
+
     if not entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.update(list_sensors_vpn_clients(5))
-        BINARY_SENSORS.update(list_sensors_wlan(3))
+        BINARY_SENSORS.update(list_sensors_wlan(3, hide))
 
     _LOGGER.debug(BINARY_SENSORS)
 

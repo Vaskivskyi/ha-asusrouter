@@ -12,7 +12,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_switches_vpn_clients, list_switches_wlan
-from .const import CONF_ENABLE_CONTROL
+from .const import (
+    CONF_ENABLE_CONTROL,
+    CONF_HIDE_PASSWORDS,
+    CONF_PASSWORD,
+    DEFAULT_HIDE_PASSWORDS,
+)
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -29,9 +34,13 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter switches."""
 
+    hide = list()
+    if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
+        hide.append(CONF_PASSWORD)
+
     if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(list_switches_vpn_clients(5))
-        SWITCHES.update(list_switches_wlan(3))
+        SWITCHES.update(list_switches_wlan(3, hide))
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
 
