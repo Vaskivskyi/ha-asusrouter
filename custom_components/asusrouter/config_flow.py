@@ -790,7 +790,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         errors = dict()
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if user_input:
@@ -821,7 +821,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "operation_mode"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if not user_input:
@@ -843,7 +843,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "intervals"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if not user_input:
@@ -865,7 +865,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "interfaces"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
@@ -895,6 +895,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Security step."""
 
         step_id = "security"
+
+        if self._selection.get(step_id, False) == False:
+            return await self.async_select_step(step_id)
 
         if not user_input:
             user_input = self._options.copy()
