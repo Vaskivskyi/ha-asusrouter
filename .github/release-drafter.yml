@@ -1,3 +1,8 @@
+exclude-contributors:
+  - 'Vaskivskyi'
+  - 'dependabot'
+exclude-labels:
+  - 'github'
 
 categories:
   - title: ":boom: Breaking Changes"
