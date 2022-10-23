@@ -10,19 +10,27 @@ on:
 
 jobs:
   hacs:
+    if: |
+      ${{ github.triggering_actor != 'dependabot[bot]' &&
+      github.event.label.name != 'github' &&
+      github.event.label.name != 'documentation' }}
     name: HACS
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v3"
       - name: HACS
         uses: "hacs/action@main"
         with:
           category: "integration"
 
   hassfest:
+    if: |
+      ${{ github.triggering_actor != 'dependabot[bot]' &&
+      github.event.label.name != 'github' &&
+      github.event.label.name != 'documentation' }}
     name: hassfest
     runs-on: "ubuntu-latest"
     steps:
-        - uses: "actions/checkout@v2"
+        - uses: "actions/checkout@v3"
         - uses: "home-assistant/actions/hassfest@master"
 

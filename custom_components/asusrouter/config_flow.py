@@ -36,6 +36,7 @@ from .const import (
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
+    CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
@@ -49,6 +50,7 @@ from .const import (
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
+    DEFAULT_HIDE_PASSWORDS,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
@@ -312,9 +314,7 @@ def _create_form_intervals(
         ): cv.positive_int,
         vol.Required(
             CONF_INTERVAL_DEVICES,
-            default=user_input.get(
-                CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
-            ),
+            default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
         ): cv.positive_int,
     }
 
@@ -378,6 +378,21 @@ def _create_form_interfaces(
     return vol.Schema(schema)
 
 
+def _create_form_security(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
+    """Create a form for the `security` step."""
+
+    schema = {
+        vol.Required(
+            CONF_HIDE_PASSWORDS,
+            default=user_input.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS),
+        ): cv.boolean,
+    }
+
+    return vol.Schema(schema)
+
+
 def _create_form_name(
     user_input: dict[str, Any] = dict(),
 ) -> vol.Schema:
@@ -429,7 +444,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             "device_error": self.async_step_device,
             "operation_mode": self.async_step_intervals,
             "intervals": self.async_step_interfaces,
-            "interfaces": self.async_step_name,
+            "interfaces": self.async_step_security,
+            "security": self.async_step_name,
             "name": self.async_step_finish,
         }
 
@@ -625,7 +641,27 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_select_step(step_id)
 
-    # Step #6 - select device name
+    # Step #6 - security options
+    async def async_step_security(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Security step."""
+
+        step_id = "security"
+
+        if not user_input:
+            user_input = dict()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_security(user_input),
+            )
+
+        self._options.update(user_input)
+
+        return await self.async_select_step(step_id)
+
+    # Step #7 - select device name
     async def async_step_name(
         self,
         user_input: dict[str, Any] | None = None,
@@ -688,7 +724,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "device": self.async_step_operation_mode,
             "operation_mode": self.async_step_intervals,
             "intervals": self.async_step_interfaces,
-            "interfaces": self.async_step_confirmation,
+            "interfaces": self.async_step_security,
+            "security": self.async_step_confirmation,
             "confirmation": self.async_step_finish,
         }
 
@@ -753,7 +790,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         errors = dict()
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if user_input:
@@ -784,7 +821,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "operation_mode"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if not user_input:
@@ -806,7 +843,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "intervals"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if not user_input:
@@ -828,7 +865,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         step_id = "interfaces"
 
-        if not step_id in self._selection or self._selection[step_id] == False:
+        if self._selection.get(step_id, False) == False:
             return await self.async_select_step(step_id)
 
         if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
@@ -848,6 +885,28 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 )
 
             self._options.update(user_input)
+
+        return await self.async_select_step(step_id)
+
+    async def async_step_security(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Security step."""
+
+        step_id = "security"
+
+        if self._selection.get(step_id, False) == False:
+            return await self.async_select_step(step_id)
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_security(user_input),
+            )
+
+        self._options.update(user_input)
 
         return await self.async_select_step(step_id)
 
