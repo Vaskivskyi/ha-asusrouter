@@ -10,6 +10,7 @@ on:
 
 jobs:
   hacs:
+    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
     name: HACS
     runs-on: "ubuntu-latest"
     steps:
@@ -20,6 +21,7 @@ jobs:
           category: "integration"
 
   hassfest:
+    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
     name: hassfest
     runs-on: "ubuntu-latest"
     steps:
