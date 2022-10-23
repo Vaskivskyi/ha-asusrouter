@@ -1,3 +1,7 @@
+exclude-contributors:
+  - 'Vaskivskyi'
+exclude-labels:
+  - 'github'
 
 categories:
   - title: ":boom: Breaking Changes"
