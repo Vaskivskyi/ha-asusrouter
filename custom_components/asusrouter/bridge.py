@@ -17,10 +17,12 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
+from asusrouter.util import converters
 
 from . import helpers
 from .const import (
@@ -34,6 +36,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
+    SENSORS_GWLAN,
     SENSORS_LIGHT,
     SENSORS_MISC,
     SENSORS_NETWORK_STAT,
@@ -41,6 +44,7 @@ from .const import (
     SENSORS_RAM,
     SENSORS_SYSINFO,
     SENSORS_TYPE_CPU,
+    SENSORS_TYPE_GWLAN,
     SENSORS_TYPE_LIGHT,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
@@ -54,6 +58,7 @@ from .const import (
     SENSORS_VPN,
     SENSORS_WAN,
     SENSORS_WLAN,
+    SERVICE_ALLOWED_ADJUST_GWLAN,
 )
 
 _T = TypeVar("_T")
@@ -79,6 +84,7 @@ class ARBridge:
         self._api = self._get_api(self._configs, session)
         self._host = self._configs[CONF_HOST]
         self._identity: AsusDevice | None = None
+        self.hass = hass
 
     @staticmethod
     def _get_api(configs: dict[str, Any], session: aiohttp.ClientSession) -> AsusRouter:
@@ -146,6 +152,10 @@ class ARBridge:
                 "sensors": await self._get_sensors_cpu(),
                 "method": self._get_data_cpu,
             },
+            SENSORS_TYPE_GWLAN: {
+                "sensors": await self._get_sensors_gwlan(),
+                "method": self._get_data_gwlan,
+            },
             SENSORS_TYPE_LIGHT: {
                 "sensors": SENSORS_LIGHT,
                 "method": self._get_data_light,
@@ -208,6 +218,11 @@ class ARBridge:
         """Get CPU data from the device."""
 
         return await self._get_data(self.api.async_get_cpu)
+
+    async def _get_data_gwlan(self) -> dict[str, Any]:
+        """Get GWLAN data from the device."""
+
+        return await self._get_data(self.api.async_get_gwlan)
 
     async def _get_data_light(self) -> dict[str, Any]:
         """Get light data from the device."""
@@ -315,6 +330,15 @@ class ARBridge:
             self.api.async_get_cpu_labels, type=SENSORS_TYPE_CPU, defaults=True
         )
 
+    async def _get_sensors_gwlan(self) -> list[str]:
+        """Get the available GWLAN sensors."""
+
+        return await self._get_sensors(
+            self.api.async_get_gwlan_ids,
+            self._process_sensors_gwlan,
+            type=SENSORS_TYPE_GWLAN,
+        )
+
     async def _get_sensors_network_stat(self) -> list[str]:
         """Get the available network stat sensors."""
 
@@ -368,6 +392,17 @@ class ARBridge:
     ### <- GET SENSORS LIST
 
     ### PROCESS SENSORS LIST->
+    @staticmethod
+    def _process_sensors_gwlan(raw: list[str]) -> list[str]:
+        """Process GWLAN sensors."""
+
+        sensors = list()
+        for id in raw:
+            for sensor in SENSORS_GWLAN:
+                sensors.append(f"wl{id}_{sensor}")
+            sensors.append(f"wl{id}_bss_enabled")
+        return sensors
+
     @staticmethod
     def _process_sensors_network_stat(raw: list[str]) -> list[str]:
         """Process network stat sensors."""
@@ -430,5 +465,58 @@ class ARBridge:
         """Reboot the device."""
 
         return await self.api.async_service_reboot()
+
+    async def async_adjust_wlan(self, **kwargs: Any) -> bool:
+        """Adjust WLAN settings"""
+
+        if not "raw" in kwargs:
+            return False
+
+        raw = kwargs["raw"]
+
+        # Check entity
+        entity_reg = er.async_get(self.hass)
+        entity = entity_reg.async_get(raw["entity_id"])
+        capabilities = entity.capabilities
+
+        args_raw = raw.copy()
+        args_raw.pop("entity_id")
+        args_raw.pop("area_id")
+
+        args = dict()
+
+        prefix = str()
+        if capabilities["api_type"] == SENSORS_TYPE_GWLAN:
+            prefix = f"wl{capabilities['api_id']}"
+
+            for arg in args_raw:
+                if arg in SERVICE_ALLOWED_ADJUST_GWLAN:
+                    args[arg] = (
+                        str(SERVICE_ALLOWED_ADJUST_GWLAN[arg](args_raw[arg]))
+                        if SERVICE_ALLOWED_ADJUST_GWLAN[arg] is not None
+                        else str(args_raw[arg])
+                    )
+
+            if "password" in args_raw:
+                args["wpa_psk"] = str(args_raw["password"])
+            if "state" in args_raw:
+                args["bss_enabled"] = str(converters.int_from_bool(args_raw["state"]))
+            if "expire" in args_raw:
+                args["expire_tmp"] = str(0)
+
+            # Name arguments correctly
+            service_args = {f"{prefix}_{arg}": args[arg] for arg in args}
+
+            # We need to specify unit/subunit, otherwise expiry timer will not reset
+            service_args["wl_unit"] = str(capabilities["api_id"][0])
+            service_args["wl_subunit"] = str(capabilities["api_id"][-1])
+
+            return await self.api.async_service_run(
+                service="restart_wireless;restart_firewall",
+                arguments=service_args,
+                expect_modify=True,
+            )
+        else:
+            return False
 
     ### <- SERVICES
