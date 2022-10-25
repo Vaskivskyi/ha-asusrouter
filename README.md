@@ -449,10 +449,10 @@ Here is the list of features being in process of development or considered for t
 </td></tr>
 
 <tr><td>Guest network</td><td><ol>
-<li>Enable / disable (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
-<li>Full control (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
+<li>Enable / disable</li>
+<li>Full control</li>
 </ol></td><td>
-<b>in progress [1]<br/>considered [2]</b>
+<b>expected in 0.11.0 [1]<br/>in progress [2]</b>
 </td></tr>
 
 <tr><td>Port forwarding</td><td><ol>
