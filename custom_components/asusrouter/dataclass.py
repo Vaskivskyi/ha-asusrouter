@@ -17,6 +17,7 @@ from homeassistant.helpers.entity import EntityDescription
 class AREntityDescription(EntityDescription):
     """Describe AsusRouter entity."""
 
+    capabilities: dict[str, Any] | None = None
     key_group: Callable[[dict], str] | None = None
     value: Callable[[Any], Any] = lambda val: val
     factor: int | None = None

@@ -349,6 +349,15 @@ class ARDevice:
             DOMAIN, "service_reboot", async_service_reboot
         )
 
+        async def async_service_adjust_wlan(service: ServiceCall):
+            """Handle WLAN adjust"""
+
+            await self.bridge.async_adjust_wlan(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "adjust_wlan", async_service_adjust_wlan
+        )
+
         self._identity = self.bridge.identity
 
         if self._identity.model is not None:
@@ -464,11 +473,14 @@ class ARDevice:
             new_devices.append(device)
 
         for device in new_devices:
-            self.hass.bus.fire("asusrouter_device_connected", {
-                "mac": device.mac,
-                "ip": device.ip,
-                "name": device.name,
-            })
+            self.hass.bus.fire(
+                "asusrouter_device_connected",
+                {
+                    "mac": device.mac,
+                    "ip": device.ip,
+                    "name": device.name,
+                },
+            )
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:

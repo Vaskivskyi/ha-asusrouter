@@ -10,12 +10,16 @@ from homeassistant.helpers.entity import EntityCategory
 from .const import (
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
+    KEY_GWLAN,
     KEY_OVPN_CLIENT,
     KEY_SENSOR_ID,
     KEY_WLAN,
+    NAME_GWLAN,
     NAME_OVPN_CLIENT,
     NAME_WLAN,
+    SENSORS_GWLAN,
     SENSORS_PARAM_NETWORK,
+    SENSORS_TYPE_GWLAN,
     SENSORS_TYPE_NETWORK_STAT,
     SENSORS_TYPE_VPN,
     SENSORS_TYPE_WLAN,
@@ -209,5 +213,96 @@ def list_switches_wlan(
                 )
             }
         )
+
+    return sensors
+
+
+def list_sensors_gwlan(
+    number: int | None = None, hide: list[str] = list()
+) -> dict[str, Any]:
+    """Compile a list of gwlan sensors."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for idm in range(0, number + 1):
+        for ida in range(1, number + 2):
+            wlan_name = f"{idm}.{ida}"
+            wlan = f"{KEY_GWLAN}{idm}.{ida}"
+            extra_state_attributes = dict()
+            for key in SENSORS_GWLAN:
+                if not key in hide and not SENSORS_GWLAN[key] in hide:
+                    extra_state_attributes[f"{wlan}_{key}"] = SENSORS_GWLAN[key]
+            sensors.update(
+                {
+                    (
+                        SENSORS_TYPE_GWLAN,
+                        f"{wlan}_bss_enabled",
+                    ): ARBinarySensorDescription(
+                        key=f"{wlan}_bss_enabled",
+                        key_group=SENSORS_TYPE_GWLAN,
+                        name=f"{NAME_GWLAN[wlan_name]}",
+                        device_class=DEVICE_CLASS_CONNECTIVITY,
+                        entity_registry_enabled_default=True,
+                        extra_state_attributes=extra_state_attributes,
+                    )
+                }
+            )
+
+    return sensors
+
+
+def list_switches_gwlan(
+    number: int | None = None, hide: list[str] = list()
+) -> dict[str, Any]:
+    """Compile a list of gwlan switches."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for idm in range(0, number + 1):
+        for ida in range(1, number + 2):
+            wlan_name = f"{idm}.{ida}"
+            wlan = f"{KEY_GWLAN}{idm}.{ida}"
+            extra_state_attributes = dict()
+            for key in SENSORS_GWLAN:
+                if not key in hide and not SENSORS_GWLAN[key] in hide:
+                    extra_state_attributes[f"{wlan}_{key}"] = SENSORS_GWLAN[key]
+            sensors.update(
+                {
+                    (SENSORS_TYPE_GWLAN, f"{wlan}_bss_enabled"): ARSwitchDescription(
+                        key=f"{wlan}_bss_enabled",
+                        key_group=SENSORS_TYPE_WLAN,
+                        name=f"{NAME_GWLAN[wlan_name]}",
+                        icon="mdi:wifi",
+                        icon_on="mdi:wifi",
+                        icon_off="mdi:wifi-off",
+                        service_on="restart_wireless;restart_firewall",
+                        service_on_args={
+                            "action_mode": "apply",
+                            f"wl{wlan_name}_bss_enabled": 1,
+                            f"wl{wlan_name}_expire": 0,
+                        },
+                        service_off="restart_wireless;restart_firewall",
+                        service_off_args={
+                            "action_mode": "apply",
+                            f"wl{wlan_name}_bss_enabled": 0,
+                        },
+                        device_class="wlan",
+                        capabilities={
+                            "api_type": SENSORS_TYPE_GWLAN,
+                            "api_id": wlan_name,
+                        },
+                        service_expect_modify=True,
+                        entity_category=EntityCategory.CONFIG,
+                        entity_registry_enabled_default=True,
+                        extra_state_attributes=extra_state_attributes,
+                    )
+                }
+            )
 
     return sensors

@@ -72,6 +72,7 @@ class AREntity(CoordinatorEntity):
         self._attr_name = f"{router._conf_name} {description.name}"
         self._attr_unique_id = f"{DOMAIN} {self.name}"
         self._attr_device_info = router.device_info
+        self._attr_capability_attributes = description.capabilities
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

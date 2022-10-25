@@ -1,3 +1,75 @@
 service_reboot:
   name: Reboot
   description: Reboot the device.
+adjust_wlan:
+  name: Adjust WLAN
+  description: Adjust settings of WLAN network. Please, provide only parameters you would like to change. Otherwise, the previous known values will be used.
+  fields:
+    entity_id:
+      name: Entity
+      description: WLAN entity
+      required: true
+      selector:
+        entity:
+          integration: asusrouter
+          device_class: wlan
+    state:
+      name: State
+      description: Off / On
+      selector:
+        boolean:
+    closed:
+      name: Hide SSID
+      description: Hide the network SSID
+      selector:
+        boolean:
+    ssid:
+      name: SSID
+      description: WLAN name
+      selector:
+        text:
+    password:
+      name: Password
+      description: WLAN password
+      selector:
+        text:
+          type: password
+    lanaccess:
+      name: LAN access
+      description: (Guest only) Allow LAN access
+      selector:
+        boolean:
+    sync_node:
+      name: AiMesh sync
+      description: (Guest only) Synchronize across all AiMesh nodes. When selected, guest network is created on all the nodes. When not selected - guest network is created only on the main router.
+      selector:
+        boolean:
+    bw_enabled:
+      name: Bandwidth limit
+      description: (Guest only) Limit bandwidth per connected device
+      selector:
+        boolean:
+    bw_dl:
+      name: Download limit
+      description: (Guest only) Limit download bandwidth per connected device (0 = unlimited)
+      selector:
+        number:
+          min: 0
+          mode: box
+          unit_of_measurement: kbit/s
+    bw_ul:
+      name: Upload limit
+      description: (Guest only) Limit upload bandwidth per connected device (0 = unlimited)
+      selector:
+        number:
+          min: 0
+          mode: box
+          unit_of_measurement: kbit/s
+    expire:
+      name: Expire
+      description: (Guest only) Set a time for which network will be active (0 = unlimited)
+      selector:
+        number:
+          min: 0
+          mode: box
+          unit_of_measurement: s
