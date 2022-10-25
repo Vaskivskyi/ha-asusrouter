@@ -13,7 +13,8 @@ jobs:
   hacs:
     if: |
       github.event.pull_request.label.name != 'documentation' &&
-      github.event.pull_request.label.name != 'github'
+      github.event.pull_request.label.name != 'github' &&
+      github.triggering_actor != 'dependabot[bot]'
     name: HACS
     runs-on: "ubuntu-latest"
     steps:
@@ -26,7 +27,8 @@ jobs:
   hassfest:
     if: |
       github.event.pull_request.label.name != 'documentation' &&
-      github.event.pull_request.label.name != 'github'
+      github.event.pull_request.label.name != 'github' &&
+      github.triggering_actor != 'dependabot[bot]'
     name: hassfest
     runs-on: "ubuntu-latest"
     steps:
