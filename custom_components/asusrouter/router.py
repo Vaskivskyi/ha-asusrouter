@@ -248,6 +248,16 @@ class ARConnectedDevice:
                 ).total_seconds()
                 > consider_home
             ):
+                # Notify
+                if self._connected == True:
+                    event_call(
+                        "asusrouter_device_disconnected",
+                        {
+                            "mac": self._mac,
+                            "ip": self._ip,
+                            "name": self._name,
+                        },
+                    )
                 # Reset state
                 self._connected = False
                 # Reset IP
@@ -261,6 +271,15 @@ class ARConnectedDevice:
                 utc_point_in_time
                 - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
             ).total_seconds() < consider_home
+            if self._connected == False:
+                event_call(
+                    "asusrouter_device_disconnected",
+                    {
+                        "mac": self._mac,
+                        "ip": self._ip,
+                        "name": self._name,
+                    },
+                )
             # Reset IP
             self._ip = None
             ## Reset attributes
