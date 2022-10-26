@@ -172,7 +172,7 @@ class ARConnectedDevice:
         self,
         dev_info: dict[str, ConnectedDevice] | None = None,
         consider_home: int = 0,
-        event_call: CALLBACK_TYPE | None = None
+        event_call: CALLBACK_TYPE | None = None,
     ):
         """Update AsusRouter device info."""
 
