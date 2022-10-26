@@ -167,10 +167,12 @@ class ARConnectedDevice:
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
 
+    @callback
     def update(
         self,
         dev_info: dict[str, ConnectedDevice] | None = None,
         consider_home: int = 0,
+        event_call: CALLBACK_TYPE | None = None,
     ):
         """Update AsusRouter device info."""
 
@@ -181,7 +183,17 @@ class ARConnectedDevice:
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
-                # State
+                # If not connected before
+                if self._connected == False:
+                    event_call(
+                        "asusrouter_device_reconnected",
+                        {
+                            "mac": self._mac,
+                            "ip": self._ip,
+                            "name": self._name,
+                        },
+                    )
+                # Set state
                 self._connected = True
                 # Connection time
                 self._extra_state_attributes[
@@ -461,19 +473,19 @@ class ARDevice:
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
         for device_mac, device in self._devices.items():
             dev_info = wrt_devices.pop(device_mac, None)
-            device.update(dev_info, consider_home)
+            device.update(dev_info, consider_home, event_call=self.fire_event)
 
         new_devices = list()
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
             device = ARConnectedDevice(device_mac)
-            device.update(dev_info)
+            device.update(dev_info, event_call=self.fire_event)
             self._devices[device_mac] = device
             new_devices.append(device)
 
         for device in new_devices:
-            self.hass.bus.fire(
+            self.fire_event(
                 "asusrouter_device_connected",
                 {
                     "mac": device.mac,
@@ -563,6 +575,17 @@ class ARDevice:
 
         self._options.update(new_options)
         return req_reload
+
+    def fire_event(
+        self,
+        event: str,
+        args: dict[str | Any] | None = None,
+    ):
+        """Fire HA event."""
+        self.hass.bus.fire(
+            event,
+            args,
+        )
 
     @property
     def device_info(self) -> DeviceInfo:
