@@ -42,6 +42,7 @@ DOMAIN = "asusrouter"
 KEY_COORDINATOR = "coordinator"
 PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.DEVICE_TRACKER,
     Platform.LIGHT,
     Platform.SENSOR,
