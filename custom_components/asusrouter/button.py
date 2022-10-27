@@ -30,6 +30,15 @@ BUTTONS = {
         device_class=ButtonDeviceClass.RESTART,
         service_expect_modify=False,
         entity_registry_enabled_default=True,
+    ),
+    "restart_firewall": ARButtonDescription(
+        key="restart_firewall",
+        name="Restart firewall",
+        icon="mdi:restart",
+        service="restart_firewall",
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
     )
 }
 
