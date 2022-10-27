@@ -32,7 +32,7 @@ BUTTONS = {
         entity_registry_enabled_default=True,
     ),
     "restart_firewall": ARButtonDescription(
-        key="restart_wirewall",
+        key="restart_firewall",
         name="Restart firewall",
         icon="mdi:restart",
         service="restart_firewall",
