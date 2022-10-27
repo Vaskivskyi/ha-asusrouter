@@ -39,6 +39,15 @@ BUTTONS = {
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
+    ),
+    "restart_wireless": ARButtonDescription(
+        key="restart_wireless",
+        name="Restart wireless",
+        icon="mdi:restart",
+        service="restart_wireless",
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
     )
 }
 
