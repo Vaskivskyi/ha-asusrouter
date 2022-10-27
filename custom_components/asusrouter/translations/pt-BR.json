@@ -100,6 +100,7 @@
                     "operation_mode": "Modo de operação",
                     "intervals": "[NT] Update intervals",
                     "interfaces": "Interfaces para monitorar",
+                    "events": "[NT] Home Assistant events",
                     "security": "[NT] Security options"
                 }
             },
@@ -151,6 +152,15 @@
                     "interfaces": "Selecione interfaces de rede para monitorar",
                     "units_speed": "[NT] Units for speed",
                     "units_traffic": "[NT] Units for traffic"
+                }
+            },
+            "events": {
+                "title": "[NT] Events",
+                "description": "[NT] Which events should be raised",
+                "data": {
+                    "device_connected": "[NT] Device connected (the device was not tracked before)",
+                    "device_disconnected": "[NT] Device disconnected",
+                    "device_reconnected": "[NT] Device reconnected (this device was already tracked before)"
                 }
             },
             "security": {
