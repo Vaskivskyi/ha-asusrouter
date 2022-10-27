@@ -125,3 +125,23 @@ class ARBinaryEntity(AREntity):
                 return self.entity_description.icon_off
         elif self.entity_description.icon:
             return self.entity_description.icon
+
+
+class ARButtonEntity:
+    """AsusRouter button entity."""
+
+    def __init__(
+        self,
+        router: ARDevice,
+        description: AREntityDescription,
+    ) -> None:
+        """Initialize AsusRouter button entity."""
+
+        self.entity_description: AREntityDescription = description
+        self.router = router
+        self.api = router.bridge.api
+
+        self._attr_name = f"{router._conf_name} {description.name}"
+        self._attr_unique_id = f"{DOMAIN} {self.name}"
+        self._attr_device_info = router.device_info
+        self._attr_capability_attributes = description.capabilities

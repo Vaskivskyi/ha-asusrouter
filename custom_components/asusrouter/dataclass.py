@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
+from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
@@ -56,4 +57,13 @@ class ARSwitchDescription(ARBinaryDescription, SwitchEntityDescription):
     service_on_args: dict[str, Any] | None = None
     service_off: str | None = None
     service_off_args: dict[str, Any] | None = None
+    service_expect_modify: bool = False
+
+
+@dataclass
+class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
+    """Describe AsusRouter button."""
+
+    service: str | None = None
+    service_args: dict[str, Any] | None = None
     service_expect_modify: bool = False
