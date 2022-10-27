@@ -50,6 +50,7 @@ from .const import (
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
+    DEFAULT_EVENT,
     DEFAULT_HIDE_PASSWORDS,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
@@ -373,6 +374,22 @@ def _create_form_interfaces(
             CONF_UNITS_TRAFFIC,
             default=user_input.get(CONF_UNITS_TRAFFIC, DEFAULT_UNITS_TRAFFIC),
         ): vol.In({data: data for data in CONF_VALUES_DATA}),
+    }
+
+    return vol.Schema(schema)
+
+
+def _create_form_events(
+    user_input: dict[str, Any] = dict(),
+) -> vol.Schema:
+    """Create a form for the `events` step."""
+
+    schema = {
+        vol.Optional(
+            conf,
+            default=user_input.get(conf, DEFAULT_EVENT[conf]),
+        ): cv.boolean
+        for conf in DEFAULT_EVENT
     }
 
     return vol.Schema(schema)
@@ -724,7 +741,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "device": self.async_step_operation_mode,
             "operation_mode": self.async_step_intervals,
             "intervals": self.async_step_interfaces,
-            "interfaces": self.async_step_security,
+            "interfaces": self.async_step_events,
+            "events": self.async_step_security,
             "security": self.async_step_confirmation,
             "confirmation": self.async_step_finish,
         }
@@ -885,6 +903,28 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 )
 
             self._options.update(user_input)
+
+        return await self.async_select_step(step_id)
+
+    async def async_step_events(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Events step."""
+
+        step_id = "events"
+
+        if self._selection.get(step_id, False) == False:
+            return await self.async_select_step(step_id)
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_events(user_input),
+            )
+
+        self._options.update(user_input)
 
         return await self.async_select_step(step_id)
 

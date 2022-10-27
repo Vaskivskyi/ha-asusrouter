@@ -100,6 +100,7 @@
                     "operation_mode": "Operation mode",
                     "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor",
+                    "events": "Home Assistant events",
                     "security": "Security options"
                 }
             },
@@ -151,6 +152,15 @@
                     "interfaces": "Select network interfaces to monitor",
                     "units_speed": "Units for speed",
                     "units_traffic": "Units for traffic"
+                }
+            },
+            "events": {
+                "title": "Events",
+                "description": "Which events should be raised",
+                "data": {
+                    "device_connected": "Device connected (the device was not tracked before)",
+                    "device_disconnected": "Device disconnected",
+                    "device_reconnected": "Device reconnected (this device was already tracked before)"
                 }
             },
             "security": {

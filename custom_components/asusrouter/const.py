@@ -160,6 +160,9 @@ CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_ENABLE_MONITOR = "enable_monitor"
+CONF_EVENT_DEVICE_CONNECTED = "device_connected"
+CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
+CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
 CONF_HIDE_PASSWORDS = "hide_passwords"
 CONF_INTERFACES = "interfaces"
 CONF_INTERVAL = "interval_"
@@ -221,6 +224,11 @@ DEFAULT_CONSIDER_HOME = 45
 DEFAULT_DEVICE_NAME = "Unknown device"
 DEFAULT_ENABLE_CONTROL = False
 DEFAULT_ENABLE_MONITOR = True
+DEFAULT_EVENT: dict[str, bool] = {
+    CONF_EVENT_DEVICE_CONNECTED: True,
+    CONF_EVENT_DEVICE_DISCONNECTED: False,
+    CONF_EVENT_DEVICE_RECONNECTED: False,
+}
 DEFAULT_HIDE_PASSWORDS = False
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
 DELAULT_INTERFACES = ["WAN"]

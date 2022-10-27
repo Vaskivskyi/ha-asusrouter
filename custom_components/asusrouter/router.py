@@ -30,6 +30,9 @@ from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 
 from .bridge import ARBridge
 from .const import (
+    CONF_EVENT_DEVICE_CONNECTED,
+    CONF_EVENT_DEVICE_DISCONNECTED,
+    CONF_EVENT_DEVICE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_REQ_RELOAD,
@@ -164,6 +167,11 @@ class ARConnectedDevice:
         self._mac = mac
         self._name = name
         self._ip: str | None = None
+        self.identity = {
+            "mac": self._mac,
+            "ip": self._ip,
+            "name": self._name,
+        }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
 
@@ -183,15 +191,12 @@ class ARConnectedDevice:
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
+                self.identity["ip"] = self._ip
                 # If not connected before
                 if self._connected == False:
                     event_call(
-                        "asusrouter_device_reconnected",
-                        {
-                            "mac": self._mac,
-                            "ip": self._ip,
-                            "name": self._name,
-                        },
+                        CONF_EVENT_DEVICE_RECONNECTED,
+                        self.identity,
                     )
                 # Set state
                 self._connected = True
@@ -251,12 +256,8 @@ class ARConnectedDevice:
                 # Notify
                 if self._connected == True:
                     event_call(
-                        "asusrouter_device_disconnected",
-                        {
-                            "mac": self._mac,
-                            "ip": self._ip,
-                            "name": self._name,
-                        },
+                        CONF_EVENT_DEVICE_DISCONNECTED,
+                        self.identity,
                     )
                 # Reset state
                 self._connected = False
@@ -273,12 +274,8 @@ class ARConnectedDevice:
             ).total_seconds() < consider_home
             if self._connected == False:
                 event_call(
-                    "asusrouter_device_disconnected",
-                    {
-                        "mac": self._mac,
-                        "ip": self._ip,
-                        "name": self._name,
-                    },
+                    CONF_EVENT_DEVICE_DISCONNECTED,
+                    self.identity,
                 )
             # Reset IP
             self._ip = None
@@ -505,12 +502,8 @@ class ARDevice:
 
         for device in new_devices:
             self.fire_event(
-                "asusrouter_device_connected",
-                {
-                    "mac": device.mac,
-                    "ip": device.ip,
-                    "name": device.name,
-                },
+                CONF_EVENT_DEVICE_CONNECTED,
+                device.identity,
             )
 
         async_dispatcher_send(self.hass, self.signal_device_update)
@@ -602,7 +595,7 @@ class ARDevice:
     ):
         """Fire HA event."""
         self.hass.bus.fire(
-            event,
+            f"{DOMAIN}_{event}",
             args,
         )
 
