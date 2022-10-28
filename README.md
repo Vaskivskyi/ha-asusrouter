@@ -376,6 +376,7 @@ This list provides only the models tested by me or other users. If your device i
 `DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
 `RT-AC5300`<br/>
 `RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
+`RT-AC88U` (<a href="https://amzn.to/3NhQOEE" target="_blank">link</a>)<br/>
 `RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
