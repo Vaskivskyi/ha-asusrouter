@@ -43,6 +43,7 @@ from .const import (
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
+    DEFAULT_INTERVALS,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
@@ -62,6 +63,7 @@ from .const import (
     KEY_COORDINATOR,
     SENSORS_CONNECTED_DEVICES,
     SENSORS_TYPE_DEVICES,
+    SENSORS_TYPE_FIRMWARE,
 )
 
 _T = TypeVar("_T")
@@ -130,14 +132,22 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
-        interval = timedelta(
-            seconds=self._options.get(
-                CONF_INTERVAL + sensor_type,
-                self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+        if sensor_type == SENSORS_TYPE_FIRMWARE:
+            interval = timedelta(
+                seconds=self._options.get(
+                    CONF_INTERVAL + sensor_type,
+                    DEFAULT_INTERVALS[CONF_INTERVAL + sensor_type],
+                )
             )
-            if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
-            else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-        )
+        else:
+            interval = timedelta(
+                seconds=self._options.get(
+                    CONF_INTERVAL + sensor_type,
+                    self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                )
+                if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
+                else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+            )
 
         coordinator = DataUpdateCoordinator(
             self._hass,

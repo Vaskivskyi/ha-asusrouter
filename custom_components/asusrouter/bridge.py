@@ -36,6 +36,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
+    SENSORS_FIRMWARE,
     SENSORS_GWLAN,
     SENSORS_LIGHT,
     SENSORS_MISC,
@@ -44,6 +45,7 @@ from .const import (
     SENSORS_RAM,
     SENSORS_SYSINFO,
     SENSORS_TYPE_CPU,
+    SENSORS_TYPE_FIRMWARE,
     SENSORS_TYPE_GWLAN,
     SENSORS_TYPE_LIGHT,
     SENSORS_TYPE_MISC,
@@ -152,6 +154,10 @@ class ARBridge:
                 "sensors": await self._get_sensors_cpu(),
                 "method": self._get_data_cpu,
             },
+            SENSORS_TYPE_FIRMWARE: {
+                "sensors": SENSORS_FIRMWARE,
+                "method": self._get_data_firmware,
+            },
             SENSORS_TYPE_GWLAN: {
                 "sensors": await self._get_sensors_gwlan(),
                 "method": self._get_data_gwlan,
@@ -218,6 +224,11 @@ class ARBridge:
         """Get CPU data from the device."""
 
         return await self._get_data(self.api.async_get_cpu)
+
+    async def _get_data_firmware(self) -> dict[str, Any]:
+        """Get firmware data from the device."""
+
+        return await self._get_data(self.api.async_get_firmware_update)
 
     async def _get_data_gwlan(self) -> dict[str, Any]:
         """Get GWLAN data from the device."""

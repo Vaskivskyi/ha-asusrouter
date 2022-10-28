@@ -11,6 +11,7 @@ from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
+from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.helpers.entity import EntityDescription
 
 
@@ -67,3 +68,8 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
     service: str | None = None
     service_args: dict[str, Any] | None = None
     service_expect_modify: bool = False
+
+
+@dataclass
+class ARUpdateDescription(ARBinaryDescription, UpdateEntityDescription):
+    """Describe AsusRouter update."""

@@ -38,6 +38,7 @@ from .const import (
     CONF_ENABLE_MONITOR,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
+    CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
     CONF_SPLIT_INTERVALS,
@@ -52,6 +53,7 @@ from .const import (
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_EVENT,
     DEFAULT_HIDE_PASSWORDS,
+    DEFAULT_INTERVALS,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
@@ -69,6 +71,7 @@ from .const import (
     RESULT_SUCCESS,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
+    SENSORS_TYPE_FIRMWARE,
     SIMPLE_SETUP_PARAMETERS,
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
@@ -339,6 +342,13 @@ def _create_form_intervals(
                     CONF_SCAN_INTERVAL,
                     default=conf_scan_interval,
                 ): cv.positive_int,
+                vol.Optional(
+                    CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
+                    default=user_input.get(
+                        CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
+                        DEFAULT_INTERVALS[CONF_INTERVAL + SENSORS_TYPE_FIRMWARE],
+                    ),
+                ): cv.positive_int,
             }
         )
     elif split == True:
@@ -346,7 +356,9 @@ def _create_form_intervals(
             {
                 vol.Required(
                     conf,
-                    default=user_input.get(conf, conf_scan_interval),
+                    default=user_input.get(
+                        conf, DEFAULT_INTERVALS.get(conf, conf_scan_interval)
+                    ),
                 ): cv.positive_int
                 for conf in CONF_INTERVALS
             }

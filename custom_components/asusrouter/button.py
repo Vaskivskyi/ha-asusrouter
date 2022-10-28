@@ -57,7 +57,7 @@ BUTTONS = {
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
-    )
+    ),
 }
 
 
