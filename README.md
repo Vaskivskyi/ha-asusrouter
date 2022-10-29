@@ -443,29 +443,10 @@ Here is the list of features being in process of development or considered for t
 <b>in progress [1]<br/>considered [2,3]</b>
 </td></tr>
 
-<tr><td>Firmware</td><td><ol>
-<li>Available updates status (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/222">#222</a>)</li>
-</ol></td><td>
-<b>expected in 0.11.0</b>
-</td></tr>
-
-<tr><td>Guest network</td><td><ol>
-<li>Enable / disable</li>
-<li>Full control</li>
-</ol></td><td>
-<b>expected in 0.11.0 [1, 2]</b>
-</td></tr>
-
 <tr><td>Port forwarding</td><td><ol>
 <li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/136">#136</a>)</li>
 </ol></td><td>
 <b>considered</b>
-</td></tr>
-
-<tr><td>VPN</td><td><ol>
-<li>OpenVPN server control (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/224">#224</a>)</li>
-</ol></td><td>
-<b>expected in 0.11.0</b>
 </td></tr>
 
 </table>
