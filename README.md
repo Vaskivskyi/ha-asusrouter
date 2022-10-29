@@ -463,9 +463,9 @@ Here is the list of features being in process of development or considered for t
 </td></tr>
 
 <tr><td>VPN</td><td><ol>
-<li>OpenVPN server switches (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/224">#224</a>)</li>
+<li>OpenVPN server control (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/224">#224</a>)</li>
 </ol></td><td>
-<b>considered</b>
+<b>expected in 0.11.0</b>
 </td></tr>
 
 </table>
