@@ -30,6 +30,9 @@ from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 
 from .bridge import ARBridge
 from .const import (
+    CONF_EVENT_DEVICE_CONNECTED,
+    CONF_EVENT_DEVICE_DISCONNECTED,
+    CONF_EVENT_DEVICE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_REQ_RELOAD,
@@ -40,6 +43,7 @@ from .const import (
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
+    DEFAULT_INTERVALS,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
@@ -59,6 +63,7 @@ from .const import (
     KEY_COORDINATOR,
     SENSORS_CONNECTED_DEVICES,
     SENSORS_TYPE_DEVICES,
+    SENSORS_TYPE_FIRMWARE,
 )
 
 _T = TypeVar("_T")
@@ -127,14 +132,22 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
-        interval = timedelta(
-            seconds=self._options.get(
-                CONF_INTERVAL + sensor_type,
-                self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+        if sensor_type == SENSORS_TYPE_FIRMWARE:
+            interval = timedelta(
+                seconds=self._options.get(
+                    CONF_INTERVAL + sensor_type,
+                    DEFAULT_INTERVALS[CONF_INTERVAL + sensor_type],
+                )
             )
-            if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
-            else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-        )
+        else:
+            interval = timedelta(
+                seconds=self._options.get(
+                    CONF_INTERVAL + sensor_type,
+                    self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                )
+                if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
+                else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+            )
 
         coordinator = DataUpdateCoordinator(
             self._hass,
@@ -164,13 +177,20 @@ class ARConnectedDevice:
         self._mac = mac
         self._name = name
         self._ip: str | None = None
+        self.identity = {
+            "mac": self._mac,
+            "ip": self._ip,
+            "name": self._name,
+        }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
 
+    @callback
     def update(
         self,
         dev_info: dict[str, ConnectedDevice] | None = None,
         consider_home: int = 0,
+        event_call: CALLBACK_TYPE | None = None,
     ):
         """Update AsusRouter device info."""
 
@@ -181,7 +201,14 @@ class ARConnectedDevice:
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
-                # State
+                self.identity["ip"] = self._ip
+                # If not connected before
+                if self._connected == False:
+                    event_call(
+                        CONF_EVENT_DEVICE_RECONNECTED,
+                        self.identity,
+                    )
+                # Set state
                 self._connected = True
                 # Connection time
                 self._extra_state_attributes[
@@ -236,6 +263,12 @@ class ARConnectedDevice:
                 ).total_seconds()
                 > consider_home
             ):
+                # Notify
+                if self._connected == True:
+                    event_call(
+                        CONF_EVENT_DEVICE_DISCONNECTED,
+                        self.identity,
+                    )
                 # Reset state
                 self._connected = False
                 # Reset IP
@@ -249,6 +282,11 @@ class ARConnectedDevice:
                 utc_point_in_time
                 - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
             ).total_seconds() < consider_home
+            if self._connected == False:
+                event_call(
+                    CONF_EVENT_DEVICE_DISCONNECTED,
+                    self.identity,
+                )
             # Reset IP
             self._ip = None
             ## Reset attributes
@@ -347,6 +385,15 @@ class ARDevice:
 
         self.hass.services.async_register(
             DOMAIN, "service_reboot", async_service_reboot
+        )
+
+        async def async_service_adjust_wlan(service: ServiceCall):
+            """Handle WLAN adjust"""
+
+            await self.bridge.async_adjust_wlan(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "adjust_wlan", async_service_adjust_wlan
         )
 
         self._identity = self.bridge.identity
@@ -452,23 +499,22 @@ class ARDevice:
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
         for device_mac, device in self._devices.items():
             dev_info = wrt_devices.pop(device_mac, None)
-            device.update(dev_info, consider_home)
+            device.update(dev_info, consider_home, event_call=self.fire_event)
 
         new_devices = list()
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
             device = ARConnectedDevice(device_mac)
-            device.update(dev_info)
+            device.update(dev_info, event_call=self.fire_event)
             self._devices[device_mac] = device
             new_devices.append(device)
 
         for device in new_devices:
-            self.hass.bus.fire("asusrouter_device_connected", {
-                "mac": device.mac,
-                "ip": device.ip,
-                "name": device.name,
-            })
+            self.fire_event(
+                CONF_EVENT_DEVICE_CONNECTED,
+                device.identity,
+            )
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:
@@ -551,6 +597,17 @@ class ARDevice:
 
         self._options.update(new_options)
         return req_reload
+
+    def fire_event(
+        self,
+        event: str,
+        args: dict[str | Any] | None = None,
+    ):
+        """Fire HA event."""
+        self.hass.bus.fire(
+            f"{DOMAIN}_{event}",
+            args,
+        )
 
     @property
     def device_info(self) -> DeviceInfo:

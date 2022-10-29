@@ -1,5 +1,6 @@
 [![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](LICENSE)<a href="https://github.com/Vaskivskyi/ha-asusrouter/actions/workflows/build.yaml"><img src="https://img.shields.io/github/workflow/status/Vaskivskyi/ha-asusrouter/Build?style=for-the-badge" alt="Build Status" align="right" /></a><br/>
-[![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz) [![Community forum discussion](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge&color=yellow)](https://community.home-assistant.io/t/custom-component-asusrouter-integration/416111)<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 28px !important;" align="right" /></a>
+[![HACS Default](https://img.shields.io/badge/HACS-default-blue.svg?style=for-the-badge)](https://hacs.xyz) [![Community forum discussion](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge&color=yellow)](https://community.home-assistant.io/t/custom-component-asusrouter-integration/416111)<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 28px !important;" align="right" /></a><br/>
+[![Installations](https://img.shields.io/endpoint?url=https://vaskivskyi.github.io/ha-custom-analytics/badges/asusrouter/total.json&style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-custom-analytics)
 
 ## Monitor and control your AsusWRT-powered router from Home Assistant
 
@@ -375,6 +376,7 @@ This list provides only the models tested by me or other users. If your device i
 `DSL-AC68U` (<a href="https://amzn.to/3CQ77oq" target="_blank">link</a>)<br/>
 `RT-AC5300`<br/>
 `RT-AC86U` (<a href="https://amzn.to/3VgJ60S" target="_blank">link</a>)<br/>
+`RT-AC88U` (<a href="https://amzn.to/3NhQOEE" target="_blank">link</a>)<br/>
 `RT-ACRH13`
 
 </td><td><b>Stock</b>: Any<br/><b>Merlin</b>: Any</td><td></td></tr>
@@ -441,27 +443,8 @@ Here is the list of features being in process of development or considered for t
 <b>in progress [1]<br/>considered [2,3]</b>
 </td></tr>
 
-<tr><td>Firmware</td><td><ol>
-<li>Available updates status (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/222">#222</a>)</li>
-</ol></td><td>
-<b>considered</b>
-</td></tr>
-
-<tr><td>Guest network</td><td><ol>
-<li>Enable / disable (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
-<li>Full control (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/213">#213</a>)</li>
-</ol></td><td>
-<b>in progress [1]<br/>considered [2]</b>
-</td></tr>
-
 <tr><td>Port forwarding</td><td><ol>
 <li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/136">#136</a>)</li>
-</ol></td><td>
-<b>considered</b>
-</td></tr>
-
-<tr><td>VPN</td><td><ol>
-<li>OpenVPN server switches (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/224">#224</a>)</li>
 </ol></td><td>
 <b>considered</b>
 </td></tr>

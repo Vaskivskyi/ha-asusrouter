@@ -5,15 +5,15 @@ on:
     branches:
       - main
   pull_request:
+    types: [labeled, opened, reopened]
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
   hacs:
     if: |
-      ${{ github.triggering_actor != 'dependabot[bot]' &&
-      github.event.label.name != 'github' &&
-      github.event.label.name != 'documentation' }}
+      github.event.pull_request.label.name != 'documentation' &&
+      github.event.pull_request.label.name != 'github'
     name: HACS
     runs-on: "ubuntu-latest"
     steps:
@@ -25,9 +25,8 @@ jobs:
 
   hassfest:
     if: |
-      ${{ github.triggering_actor != 'dependabot[bot]' &&
-      github.event.label.name != 'github' &&
-      github.event.label.name != 'documentation' }}
+      github.event.pull_request.label.name != 'documentation' &&
+      github.event.pull_request.label.name != 'github'
     name: hassfest
     runs-on: "ubuntu-latest"
     steps:

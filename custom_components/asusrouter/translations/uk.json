@@ -47,6 +47,7 @@
                     "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
+                    "interval_firmware": "Оновлення даних прошивки",
                     "interval_light": "Оновлення даних light",
                     "interval_misc": "Оновлення даних misc",
                     "interval_network_stat": "Оновлення даних network stat",
@@ -100,6 +101,7 @@
                     "operation_mode": "Режим роботи",
                     "intervals": "Інтервали оновлення",
                     "interfaces": "Інтерфейси для відслідковування",
+                    "events": "Події Home Assistant",
                     "security": "Налаштування безпеки"
                 }
             },
@@ -133,6 +135,7 @@
                     "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
+                    "interval_firmware": "Оновлення даних прошивки",
                     "interval_light": "Оновлення даних light",
                     "interval_misc": "Оновлення даних misc",
                     "interval_network_stat": "Оновлення даних network stat",
@@ -151,6 +154,15 @@
                     "interfaces": "Виберіть інтерфейси для відслідковування",
                     "units_speed": "Одиниці вимірювання швидкості",
                     "units_traffic": "Одиниці вимірювання трафіку"
+                }
+            },
+            "events": {
+                "title": "Події",
+                "description": "Які події повинні викликатися",
+                "data": {
+                    "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
+                    "device_disconnected": "Пристрій відключено",
+                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)"
                 }
             },
             "security": {

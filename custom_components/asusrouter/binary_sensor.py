@@ -14,7 +14,12 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .compilers import list_sensors_vpn_clients, list_sensors_wlan
+from .compilers import (
+    list_sensors_gwlan,
+    list_sensors_vpn_clients,
+    list_sensors_vpn_servers,
+    list_sensors_wlan,
+)
 from .const import (
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
@@ -61,9 +66,9 @@ async def async_setup_entry(
 
     if not entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.update(list_sensors_vpn_clients(5))
+        BINARY_SENSORS.update(list_sensors_vpn_servers(5))
         BINARY_SENSORS.update(list_sensors_wlan(3, hide))
-
-    _LOGGER.debug(BINARY_SENSORS)
+        BINARY_SENSORS.update(list_sensors_gwlan(3, hide))
 
     await async_setup_ar_entry(
         hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor

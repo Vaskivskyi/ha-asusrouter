@@ -47,6 +47,7 @@
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "[NT] CPU data",
+                    "interval_firmware": "[NT] Firmware data",
                     "interval_light": "[NT] Light data",
                     "interval_misc": "[NT] Misc data",
                     "interval_network_stat": "[NT] Network stat data",
@@ -100,6 +101,7 @@
                     "operation_mode": "Modo de funcionamiento",
                     "intervals": "[NT] Update intervals",
                     "interfaces": "Interfaces a monitorizar",
+                    "events": "[NT] Home Assistant events",
                     "security": "[NT] Security options"
                 }
             },
@@ -133,6 +135,7 @@
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "[NT] CPU data",
+                    "interval_firmware": "[NT] Firmware data",
                     "interval_light": "[NT] Light data",
                     "interval_misc": "[NT] Misc data",
                     "interval_network_stat": "[NT] Network stat data",
@@ -151,6 +154,15 @@
                     "interfaces": "Seleccionar interfaces de red para monitorizar",
                     "units_speed": "Unidad de velocidad",
                     "units_traffic": "Unidad de tráfico"
+                }
+            },
+            "events": {
+                "title": "[NT] Events",
+                "description": "[NT] Which events should be raised",
+                "data": {
+                    "device_connected": "[NT] Device connected (the device was not tracked before)",
+                    "device_disconnected": "[NT] Device disconnected",
+                    "device_reconnected": "[NT] Device reconnected (this device was already tracked before)"
                 }
             },
             "security": {

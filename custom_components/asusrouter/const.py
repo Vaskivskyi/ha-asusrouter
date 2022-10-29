@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from homeassistant.components.sensor import SensorStateClass
 from homeassistant.const import (
@@ -33,6 +33,8 @@ from homeassistant.const import (
     Platform,
 )
 
+from asusrouter.util import converters
+
 # INTEGRATION DATA -->
 
 DATA_ASUSROUTER = "asusrouter"
@@ -40,10 +42,12 @@ DOMAIN = "asusrouter"
 KEY_COORDINATOR = "coordinator"
 PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.DEVICE_TRACKER,
     Platform.LIGHT,
     Platform.SENSOR,
     Platform.SWITCH,
+    Platform.UPDATE,
 ]
 
 ### <-- INTEGRATION DATA
@@ -53,6 +57,8 @@ PLATFORMS = [
 # Types
 SENSORS_TYPE_CPU = "cpu"
 SENSORS_TYPE_DEVICES = "devices"
+SENSORS_TYPE_FIRMWARE = "firmware"
+SENSORS_TYPE_GWLAN = "gwlan"
 SENSORS_TYPE_LIGHT = "light"
 SENSORS_TYPE_MISC = "misc"
 SENSORS_TYPE_NETWORK_STAT = "network_stat"
@@ -78,6 +84,23 @@ SENSORS_CPU = [
     "core_7",
     "core_8",
 ]
+SENSORS_FIRMWARE = ["state"]
+SENSORS_GWLAN = {
+    "sync_node": "aimesh_sync",
+    "auth_mode_x": "auth_method",
+    "bw_enabled": "bw_limit",
+    "bw_dl": "bw_limit_download",
+    "bw_ul": "bw_limit_upload",
+    "expire": "expire",
+    "expire_tmp": "expire_in",
+    "closed": "hidden",
+    "lanaccess": "lan_access",
+    "maclist": "maclist",
+    "macmode": "macmode",
+    "wpa_psk": "password",
+    "ssid": "ssid",
+    "crypto": "wpa_encryption",
+}
 SENSORS_LIGHT = ["led"]
 SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
@@ -102,6 +125,10 @@ SENSORS_VPN = {
     "tun_tap_read": "tun_tap_read_bytes",
     "tun_tap_write": "tun_tap_write_bytes",
     "datetime": "update_time",
+}
+SENSORS_VPN_SERVER = {
+    "client_list": "client_list",
+    "routing_table": "routing_table",
 }
 SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
 SENSORS_WLAN = {
@@ -141,12 +168,17 @@ CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_ENABLE_MONITOR = "enable_monitor"
+CONF_EVENT_DEVICE_CONNECTED = "device_connected"
+CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
+CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
 CONF_HIDE_PASSWORDS = "hide_passwords"
 CONF_INTERFACES = "interfaces"
 CONF_INTERVAL = "interval_"
 CONF_INTERVAL_DEVICES = CONF_INTERVAL + SENSORS_TYPE_DEVICES
 CONF_INTERVALS = [
     CONF_INTERVAL + SENSORS_TYPE_CPU,
+    CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
+    CONF_INTERVAL + SENSORS_TYPE_GWLAN,
     CONF_INTERVAL + SENSORS_TYPE_LIGHT,
     CONF_INTERVAL + SENSORS_TYPE_MISC,
     CONF_INTERVAL + SENSORS_TYPE_NETWORK_STAT,
@@ -201,9 +233,15 @@ DEFAULT_CONSIDER_HOME = 45
 DEFAULT_DEVICE_NAME = "Unknown device"
 DEFAULT_ENABLE_CONTROL = False
 DEFAULT_ENABLE_MONITOR = True
+DEFAULT_EVENT: dict[str, bool] = {
+    CONF_EVENT_DEVICE_CONNECTED: True,
+    CONF_EVENT_DEVICE_DISCONNECTED: False,
+    CONF_EVENT_DEVICE_RECONNECTED: False,
+}
 DEFAULT_HIDE_PASSWORDS = False
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
 DELAULT_INTERFACES = ["WAN"]
+DEFAULT_INTERVALS = {CONF_INTERVAL + SENSORS_TYPE_FIRMWARE: 21600}
 DEFAULT_PORT = 0
 DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
 DEFAULT_SCAN_INTERVAL = 30
@@ -305,11 +343,32 @@ DEVICE_ATTRIBUTES: list[str] = [
 ]
 
 # Params to generate sensors
+KEY_GWLAN = "wl"
 KEY_OVPN_CLIENT = "vpn_client"
+KEY_OVPN_SERVER = "vpn_server"
 KEY_SENSOR_ID = "{}_{}"
 KEY_WLAN = "wl"
 
+NAME_GWLAN = {
+    "0.1": "Guest 2.4 GHz 1",
+    "0.2": "Guest 2.4 GHz 2",
+    "0.3": "Guest 2.4 GHz 3",
+    "0.4": "Guest 2.4 GHz 4",
+    "1.1": "Guest 5 GHz 1",
+    "1.2": "Guest 5 GHz 2",
+    "1.3": "Guest 5 GHz 3",
+    "1.4": "Guest 5 GHz 4",
+    "2.1": "Guest 5 GHz (2) 1",
+    "2.2": "Guest 5 GHz (2) 2",
+    "2.3": "Guest 5 GHz (2) 3",
+    "2.4": "Guest 5 GHz (2) 4",
+    "3.1": "Guest 6 GHz 1",
+    "3.2": "Guest 6 GHz 2",
+    "3.3": "Guest 6 GHz 3",
+    "3.4": "Guest 6 GHz 4",
+}
 NAME_OVPN_CLIENT = "OpenVPN Client"
+NAME_OVPN_SERVER = "OpenVPN Server"
 NAME_WLAN = {
     0: "Wireless 2.4 GHz",
     1: "Wireless 5 GHz",
@@ -374,3 +433,23 @@ TO_REDACT_STATE = {"WAN IP"}
 TO_REDACT_ATTRS = {CONF_DEVICES, CONF_PASSWORD, "ip", "ssid"}
 
 ### <-- DIAGNOSTICS
+
+### SERVICES -->
+
+SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
+    "sync_node": converters.int_from_bool,
+    "bw_enabled": converters.int_from_bool,
+    "bw_dl": None,
+    "bw_ul": None,
+    "expire": None,
+    "closed": converters.int_from_bool,
+    "lanaccess": converters.int_from_bool,
+    "ssid": None,
+}
+
+SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
+    "closed": converters.int_from_bool,
+    "ssid": None,
+}
+
+### <-- SERVICES
