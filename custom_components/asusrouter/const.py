@@ -126,6 +126,10 @@ SENSORS_VPN = {
     "tun_tap_write": "tun_tap_write_bytes",
     "datetime": "update_time",
 }
+SENSORS_VPN_SERVER = {
+    "client_list": "client_list",
+    "routing_table": "routing_table",
+}
 SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
@@ -341,6 +345,7 @@ DEVICE_ATTRIBUTES: list[str] = [
 # Params to generate sensors
 KEY_GWLAN = "wl"
 KEY_OVPN_CLIENT = "vpn_client"
+KEY_OVPN_SERVER = "vpn_server"
 KEY_SENSOR_ID = "{}_{}"
 KEY_WLAN = "wl"
 
@@ -363,6 +368,7 @@ NAME_GWLAN = {
     "3.4": "Guest 6 GHz 4",
 }
 NAME_OVPN_CLIENT = "OpenVPN Client"
+NAME_OVPN_SERVER = "OpenVPN Server"
 NAME_WLAN = {
     0: "Wireless 2.4 GHz",
     1: "Wireless 5 GHz",

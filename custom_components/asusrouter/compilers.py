@@ -12,10 +12,12 @@ from .const import (
     DEFAULT_UNITS_TRAFFIC,
     KEY_GWLAN,
     KEY_OVPN_CLIENT,
+    KEY_OVPN_SERVER,
     KEY_SENSOR_ID,
     KEY_WLAN,
     NAME_GWLAN,
     NAME_OVPN_CLIENT,
+    NAME_OVPN_SERVER,
     NAME_WLAN,
     SENSORS_GWLAN,
     SENSORS_PARAM_NETWORK,
@@ -24,6 +26,7 @@ from .const import (
     SENSORS_TYPE_VPN,
     SENSORS_TYPE_WLAN,
     SENSORS_VPN,
+    SENSORS_VPN_SERVER,
     SENSORS_WLAN,
 )
 from .dataclass import (
@@ -129,6 +132,69 @@ def list_switches_vpn_clients(number: int | None = None) -> dict[str, Any]:
                     icon_off="mdi:close-network-outline",
                     service_on=f"start_vpnclient{num}",
                     service_off=f"stop_vpnclient{num}",
+                    entity_category=EntityCategory.CONFIG,
+                    entity_registry_enabled_default=True,
+                    extra_state_attributes=extra_state_attributes,
+                )
+            }
+        )
+
+    return sensors
+
+
+def list_sensors_vpn_servers(number: int | None = None) -> dict[str, Any]:
+    """Compile a list of vpn sensors."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for num in range(1, number + 1):
+        vpn = f"{KEY_OVPN_SERVER}{num}"
+        extra_state_attributes = dict()
+        for key in SENSORS_VPN_SERVER:
+            extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
+        sensors.update(
+            {
+                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARBinarySensorDescription(
+                    key=f"{vpn}_state",
+                    key_group=SENSORS_TYPE_VPN,
+                    name=f"{NAME_OVPN_SERVER} {num}",
+                    device_class=DEVICE_CLASS_CONNECTIVITY,
+                    entity_registry_enabled_default=False,
+                    extra_state_attributes=extra_state_attributes,
+                )
+            }
+        )
+
+    return sensors
+
+
+def list_switches_vpn_servers(number: int | None = None) -> dict[str, Any]:
+    """Compile a list of vpn switches."""
+
+    sensors = dict()
+
+    if not number:
+        return sensors
+
+    for num in range(1, number + 1):
+        vpn = f"{KEY_OVPN_SERVER}{num}"
+        extra_state_attributes = dict()
+        for key in SENSORS_VPN_SERVER:
+            extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
+        sensors.update(
+            {
+                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARSwitchDescription(
+                    key=f"{vpn}_state",
+                    key_group=SENSORS_TYPE_VPN,
+                    name=f"{NAME_OVPN_SERVER} {num}",
+                    icon="mdi:network-outline",
+                    icon_on="mdi:check-network-outline",
+                    icon_off="mdi:close-network-outline",
+                    service_on=f"start_vpnserver{num}",
+                    service_off=f"stop_vpnserver{num}",
                     entity_category=EntityCategory.CONFIG,
                     entity_registry_enabled_default=True,
                     extra_state_attributes=extra_state_attributes,
