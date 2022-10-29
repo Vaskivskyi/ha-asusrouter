@@ -64,6 +64,7 @@ from .const import (
     SENSORS_WAN,
     SENSORS_WLAN,
     SERVICE_ALLOWED_ADJUST_GWLAN,
+    SERVICE_ALLOWED_ADJUST_WLAN,
 )
 
 _T = TypeVar("_T")
@@ -531,6 +532,30 @@ class ARBridge:
 
             return await self.api.async_service_run(
                 service="restart_wireless;restart_firewall",
+                arguments=service_args,
+                expect_modify=True,
+            )
+        elif capabilities["api_type"] == SENSORS_TYPE_WLAN:
+            prefix = f"wl{capabilities['api_id']}"
+
+            for arg in args_raw:
+                if arg in SERVICE_ALLOWED_ADJUST_WLAN:
+                    args[arg] = (
+                        str(SERVICE_ALLOWED_ADJUST_WLAN[arg](args_raw[arg]))
+                        if SERVICE_ALLOWED_ADJUST_WLAN[arg] is not None
+                        else str(args_raw[arg])
+                    )
+
+            if "password" in args_raw:
+                args["wpa_psk"] = str(args_raw["password"])
+            if "state" in args_raw:
+                args["radio"] = str(converters.int_from_bool(args_raw["state"]))
+
+            # Name arguments correctly
+            service_args = {f"{prefix}_{arg}": args[arg] for arg in args}
+
+            return await self.api.async_service_run(
+                service="restart_wireless",
                 arguments=service_args,
                 expect_modify=True,
             )

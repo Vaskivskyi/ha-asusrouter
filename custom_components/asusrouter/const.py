@@ -447,4 +447,9 @@ SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
     "ssid": None,
 }
 
+SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
+    "closed": converters.int_from_bool,
+    "ssid": None,
+}
+
 ### <-- SERVICES

@@ -272,6 +272,11 @@ def list_switches_wlan(
                         "action_mode": "apply",
                         f"wl{id}_radio": 0,
                     },
+                    device_class="wlan",
+                    capabilities={
+                        "api_type": SENSORS_TYPE_WLAN,
+                        "api_id": id,
+                    },
                     service_expect_modify=True,
                     entity_category=EntityCategory.CONFIG,
                     entity_registry_enabled_default=True,
