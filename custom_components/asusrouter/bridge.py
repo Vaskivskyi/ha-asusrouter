@@ -36,6 +36,8 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
+    KEY_OVPN_CLIENT,
+    KEY_OVPN_SERVER,
     SENSORS_FIRMWARE,
     SENSORS_GWLAN,
     SENSORS_LIGHT,
@@ -58,6 +60,7 @@ from .const import (
     SENSORS_TYPE_WAN,
     SENSORS_TYPE_WLAN,
     SENSORS_VPN,
+    SENSORS_VPN_SERVER,
     SENSORS_WAN,
     SENSORS_WLAN,
     SERVICE_ALLOWED_ADJUST_GWLAN,
@@ -453,8 +456,12 @@ class ARBridge:
 
         sensors = list()
         for vpn in raw:
-            for sensor in SENSORS_VPN:
-                sensors.append(f"{vpn}_{sensor}")
+            if KEY_OVPN_CLIENT in vpn:
+                for sensor in SENSORS_VPN:
+                    sensors.append(f"{vpn}_{sensor}")
+            elif KEY_OVPN_SERVER in vpn:
+                for sensor in SENSORS_VPN_SERVER:
+                    sensors.append(f"{vpn}_{sensor}")
             sensors.append(f"{vpn}_state")
         return sensors
 

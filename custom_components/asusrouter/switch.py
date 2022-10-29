@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .compilers import (
     list_switches_gwlan,
     list_switches_vpn_clients,
+    list_switches_vpn_servers,
     list_switches_wlan,
 )
 from .const import (
@@ -44,6 +45,7 @@ async def async_setup_entry(
 
     if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(list_switches_vpn_clients(5))
+        SWITCHES.update(list_switches_vpn_servers(2))
         SWITCHES.update(list_switches_wlan(3, hide))
         SWITCHES.update(list_switches_gwlan(3, hide))
 
