@@ -12,10 +12,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
-    CONF_ENABLE_CONTROL,
-    CONF_HIDE_PASSWORDS,
-    CONF_PASSWORD,
-    DEFAULT_HIDE_PASSWORDS,
     SENSORS_TYPE_FIRMWARE,
 )
 from .dataclass import ARUpdateDescription
@@ -31,22 +27,8 @@ UPDATES = {
         name="Firmware update",
         icon="mdi:update",
         extra_state_attributes={
-            "webs_state_update": "webs_state_update",
-            "webs_state_error": "webs_state_error",
-            "webs_state_info": "webs_state_info",
-            "webs_state_info_beta": "webs_state_info_beta",
-            "webs_state_REQinfo": "webs_state_REQinfo",
-            "webs_state_flag": "webs_state_flag",
-            "webs_state_upgrade": "webs_state_upgrade",
-            "webs_state_level": "webs_state_level",
-            "sig_state_flag": "sig_state_flag",
-            "sig_state_update": "sig_state_update",
-            "sig_state_upgrade": "sig_state_upgrade",
-            "sig_state_error": "sig_state_error",
-            "sig_ver": "sig_ver",
-            "cfg_check": "cfg_check",
-            "cfg_upgrade": "cfg_upgrade",
-            "hndwr_status": "hndwr_status",
+            "current": "current",
+            "available": "available",
         },
     )
 }
@@ -74,5 +56,5 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         """Initialize AsusRouter update."""
 
         super().__init__(coordinator, router, description)
-        self._attr_installed_version = self.extra_state_attributes["webs_state_REQinfo"]
-        self._attr_latest_version = self.extra_state_attributes["webs_state_info"]
+        self._attr_installed_version = self.extra_state_attributes["current"]
+        self._attr_latest_version = self.extra_state_attributes["available"]
