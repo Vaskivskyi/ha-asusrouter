@@ -198,6 +198,7 @@ class ARConnectedDevice:
 
         if dev_info:
             self._name = dev_info.name
+            self.identity["name"] = self._name
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
