@@ -198,6 +198,7 @@ class ARConnectedDevice:
 
         if dev_info:
             self._name = dev_info.name
+            self.identity["name"] = self._name
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
@@ -621,7 +622,7 @@ class ARDevice:
             name=self._conf_name,
             model=self._identity.model,
             manufacturer=self._identity.brand,
-            sw_version=self._identity.firmware(),
+            sw_version=str(self._identity.firmware),
             configuration_url="{}://{}:{}".format(
                 DEFAULT_HTTP["ssl"]
                 if self._options[CONF_VERIFY_SSL]
