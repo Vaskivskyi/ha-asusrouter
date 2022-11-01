@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "discovery": {
-                "title": "[NT] Device location",
+                "title": "Localizar dispositivo",
                 "description": "Cómo encontrar tu dispositivo",
                 "data": {
                     "host": "Nombre de equipo / Dirección IP"
@@ -18,7 +18,7 @@
                 }
             },
             "device": {
-                "title": "[NT] Device settings",
+                "title": "Configurar dispositivo",
                 "description": "Parámetros para conectar al dispositivo",
                 "data": {
                     "username": "Usuario",
@@ -32,32 +32,32 @@
             "operation_mode": {
                 "title": "Modo de funcionamiento",
                 "data": {
-                    "track_devices": "[NT] Enable device trackers",
+                    "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
-                    "enable_control": "Hablitar control del dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals"
+                    "enable_control": "Habilitar control del dispositivo",
+                    "split_intervals": "Habilitar intervalos de actualización por sensor"
                 }
             },
             "intervals": {
-                "title": "[NT] Update intervals",
-                "description": "[NT] Values are in seconds",
+                "title": "Intervalos de actualización",
+                "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "[NT] Device trackers update",
+                    "interval_devices": "Actualizar rastreadores de dispositivo",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
-                    "interval_cpu": "[NT] CPU data",
-                    "interval_firmware": "[NT] Firmware data",
-                    "interval_light": "[NT] Light data",
-                    "interval_misc": "[NT] Misc data",
-                    "interval_network_stat": "[NT] Network stat data",
-                    "interval_ports": "[NT] Ports data",
-                    "interval_ram": "[NT] RAM data",
-                    "interval_sysinfo": "[NT] Sysinfo data",
-                    "interval_temperature": "[NT] Temperature data",
-                    "interval_vpn": "[NT] VPN data",
-                    "interval_wan": "[NT] WAN data",
-                    "interval_wlan": "[NT] WLAN data"
+                    "interval_cpu": "Datos CPU",
+                    "interval_firmware": "Datos firmware",
+                    "interval_light": "Datos luces",
+                    "interval_misc": "Datos miscelánea",
+                    "interval_network_stat": "Datos estadísticas de red",
+                    "interval_ports": "Datos de puertos",
+                    "interval_ram": "Datos RAM",
+                    "interval_sysinfo": "Datos de sistema",
+                    "interval_temperature": "Datos de temperatura",
+                    "interval_vpn": "Datos VPN",
+                    "interval_wan": "Datos WAN",
+                    "interval_wlan": "Datos WLAN"
                 }
             },
             "interfaces": {
@@ -69,13 +69,13 @@
                 }
             },
             "security": {
-                "title": "[NT] Security",
+                "title": "Seguridad",
                 "data": {
-                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
+                    "hide_passwords": "Ocultar contraseñas de sensores y atributos"
                 }
             },
             "name": {
-                "title": "[NT] Device name",
+                "title": "Nombre dispositivo",
                 "data": {
                     "name": "Dejar en blanco para usar el modelo del dispositivo como nombre"
                 }
@@ -94,19 +94,19 @@
     "options": {
         "step": {
             "options": {
-                "title": "[NT] Configurations to change",
-                "description": "[NT] Please, select configurations you would like to change",
+                "title": "Opciones a cambiar",
+                "description": "Por favor, selecciona las opciones que deseas cambiar",
                 "data": {
                     "device": "Credenciales y configuración de conexión",
                     "operation_mode": "Modo de funcionamiento",
-                    "intervals": "[NT] Update intervals",
+                    "intervals": "Intervalos de actualización",
                     "interfaces": "Interfaces a monitorizar",
-                    "events": "[NT] Home Assistant events",
-                    "security": "[NT] Security options"
+                    "events": "Eventos Home Assistant",
+                    "security": "Opciones de seguridad"
                 }
             },
             "device": {
-                "title": "[NT] Device settings",
+                "title": "Opciones del dispositivo",
                 "description": "Parámetros para conectar al dispositivo",
                 "data": {
                     "username": "Usuario",
@@ -120,32 +120,32 @@
             "operation_mode": {
                 "title": "Modo de funcionamiento",
                 "data": {
-                    "track_devices": "[NT] Enable device trackers",
+                    "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
-                    "enable_control": "Hablitar control del dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals"
+                    "enable_control": "Habilitar control del dispositivo",
+                    "split_intervals": "Habilitar intervalos de actualización por sensor"
                 }
             },
             "intervals": {
-                "title": "[NT] Update intervals",
-                "description": "[NT] Values are in seconds",
+                "title": "Intervalos de actualización",
+                "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "[NT] Device trackers update",
+                    "interval_devices": "Actualizar rastreadores de dispositivo",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
-                    "interval_cpu": "[NT] CPU data",
-                    "interval_firmware": "[NT] Firmware data",
-                    "interval_light": "[NT] Light data",
-                    "interval_misc": "[NT] Misc data",
-                    "interval_network_stat": "[NT] Network stat data",
-                    "interval_ports": "[NT] Ports data",
-                    "interval_ram": "[NT] RAM data",
-                    "interval_sysinfo": "[NT] Sysinfo data",
-                    "interval_temperature": "[NT] Temperature data",
-                    "interval_vpn": "[NT] VPN data",
-                    "interval_wan": "[NT] WAN data",
-                    "interval_wlan": "[NT] WLAN data"
+                    "interval_cpu": "Datos CPU",
+                    "interval_firmware": "Datos firmware",
+                    "interval_light": "Datos luces",
+                    "interval_misc": "Datos miscelánea",
+                    "interval_network_stat": "Datos estadísticas de red",
+                    "interval_ports": "Datos de puertos",
+                    "interval_ram": "Datos RAM",
+                    "interval_sysinfo": "Datos de sistema",
+                    "interval_temperature": "Datos de temperatura",
+                    "interval_vpn": "Datos VPN",
+                    "interval_wan": "Datos WAN",
+                    "interval_wlan": "Datos WLAN"
                 }
             },
             "interfaces": {
@@ -157,22 +157,22 @@
                 }
             },
             "events": {
-                "title": "[NT] Events",
-                "description": "[NT] Which events should be raised",
+                "title": "Eventos",
+                "description": "Qué eventos deben ser disparados",
                 "data": {
-                    "device_connected": "[NT] Device connected (the device was not tracked before)",
-                    "device_disconnected": "[NT] Device disconnected",
-                    "device_reconnected": "[NT] Device reconnected (this device was already tracked before)"
+                    "device_connected": "Dispositivo conectado (el dispositivo no fue rastreado previamente)",
+                    "device_disconnected": "Dispositivo desconectado",
+                    "device_reconnected": "Dispositivo reconectado (el dispositivo ya fue rastreado previamente)"
                 }
             },
             "security": {
-                "title": "[NT] Security",
+                "title": "Seguridad",
                 "data": {
-                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
+                    "hide_passwords": "Ocultar contraseñas de sensores y atributos"
                 }
             },
             "confirmation": {
-                "title": "[NT] Reload required",
+                "title": "Se requiere recargar",
                 "description": "Por favor, recarga la integración",
                 "data": {
                     "confirm": "Entiendo que necesito recargar la integración para aplicar la nueva configuración. Para hacer esto, debo hacer click el el menú de la integración (los 3 puntos) y pulsar 'Recargar'"
