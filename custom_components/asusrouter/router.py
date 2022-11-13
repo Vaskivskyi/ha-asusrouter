@@ -527,7 +527,6 @@ class ARDevice:
                 self._connected_devices += 1
                 self._connected_devices_list.append(device.identity)
 
-
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:
             async_dispatcher_send(self.hass, self.signal_device_new)
