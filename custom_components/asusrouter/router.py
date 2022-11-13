@@ -51,6 +51,7 @@ from .const import (
     DEFAULT_TRACK_DEVICES,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
+    DEVICE_ATTRIBUTE_GUEST,
     DEVICE_ATTRIBUTE_INTERNET,
     DEVICE_ATTRIBUTE_INTERNET_MODE,
     DEVICE_ATTRIBUTE_IP_TYPE,
@@ -181,6 +182,8 @@ class ARConnectedDevice:
             "mac": self._mac,
             "ip": self._ip,
             "name": self._name,
+            DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
+            DEVICE_ATTRIBUTE_GUEST: False,
         }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
@@ -203,14 +206,6 @@ class ARConnectedDevice:
             if dev_info.online:
                 self._ip = dev_info.ip
                 self.identity["ip"] = self._ip
-                # If not connected before
-                if self._connected == False:
-                    event_call(
-                        CONF_EVENT_DEVICE_RECONNECTED,
-                        self.identity,
-                    )
-                # Set state
-                self._connected = True
                 # Connection time
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_CONNECTION_TIME
@@ -229,6 +224,17 @@ class ARConnectedDevice:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_5G
+                # Add connection type to identity
+                self.identity[
+                    DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                ] = self._extra_state_attributes[DEVICE_ATTRIBUTE_CONNECTION_TYPE]
+                # Guest network
+                self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST] = (
+                    True if dev_info.guest else False
+                )
+                self.identity[DEVICE_ATTRIBUTE_GUEST] = self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_GUEST
+                ]
                 # Internet
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_INTERNET_MODE
@@ -253,6 +259,14 @@ class ARConnectedDevice:
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_TX_SPEED
                 ] = dev_info.tx_speed
+                # If not connected before
+                if self._connected == False:
+                    event_call(
+                        CONF_EVENT_DEVICE_RECONNECTED,
+                        self.identity,
+                    )
+                # Set state
+                self._connected = True
             # Offline
             elif (
                 DEVICE_ATTRIBUTE_LAST_ACTIVITY in self._extra_state_attributes
