@@ -497,18 +497,6 @@ class ARDevice:
             self._connect_error = False
             _LOGGER.info(f"Reconnected to '{self._conf_host}'")
 
-        self._connected_devices = 0
-        self._connected_devices_list = list()
-        for device in api_devices:
-            if api_devices[device].online:
-                self._connected_devices += 1
-                self._connected_devices_list.append(
-                    {
-                        "mac": api_devices[device].mac,
-                        "ip": api_devices[device].ip,
-                        "name": api_devices[device].name,
-                    }
-                )
         consider_home = self._options.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME)
 
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
@@ -530,6 +518,15 @@ class ARDevice:
                 CONF_EVENT_DEVICE_CONNECTED,
                 device.identity,
             )
+
+        # Connected devices sensor
+        self._connected_devices = 0
+        self._connected_devices_list = list()
+        for mac, device in self._devices.items():
+            if device.is_connected:
+                self._connected_devices += 1
+                self._connected_devices_list.append(device.identity)
+
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:
