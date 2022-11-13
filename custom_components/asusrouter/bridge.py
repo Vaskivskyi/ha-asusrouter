@@ -499,8 +499,6 @@ class ARBridge:
         capabilities = entity.capabilities
 
         args_raw = raw.copy()
-        args_raw.pop("entity_id")
-        args_raw.pop("area_id")
 
         args = dict()
 
