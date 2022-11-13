@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import aiohttp
+import dataclasses
 from datetime import datetime
 import logging
 from typing import Any, Awaitable, Callable, TypeVar
@@ -52,6 +53,7 @@ from .const import (
     SENSORS_TYPE_LIGHT,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
+    SENSORS_TYPE_PARENTAL_CONTROL,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
     SENSORS_TYPE_SYSINFO,
@@ -59,6 +61,7 @@ from .const import (
     SENSORS_TYPE_VPN,
     SENSORS_TYPE_WAN,
     SENSORS_TYPE_WLAN,
+    SENSORS_PARENTAL_CONTROL,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WAN,
@@ -175,6 +178,10 @@ class ARBridge:
                 "sensors": await self._get_sensors_network_stat(),
                 "method": self._get_data_network,
             },
+            SENSORS_TYPE_PARENTAL_CONTROL: {
+                "sensors": SENSORS_PARENTAL_CONTROL,
+                "method": self._get_data_parental_control,
+            },
             SENSORS_TYPE_PORTS: {
                 "sensors": await self._get_sensors_ports(),
                 "method": self._get_data_ports,
@@ -259,6 +266,13 @@ class ARBridge:
 
         return await self._get_data(self.api.async_get_ram)
 
+    async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
+        """Get parental control data from the device."""
+
+        return await self._get_data(
+            self.api.async_get_parental_control, self._process_data_parental_control
+        )
+
     async def _get_data_ports(self) -> dict[str, dict[str, int]]:
         """Get ports data from the device."""
 
@@ -292,6 +306,20 @@ class ARBridge:
     ### <- GET DATA FROM DEVICE
 
     ### PROCESS DATA ->
+    @staticmethod
+    def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process parental control data."""
+
+        data = dict()
+        data["state"] = raw.get("parental_control")
+        devices = list()
+        for el in raw["list"]:
+            device = dataclasses.asdict(raw["list"][el])
+            device.pop("timemap")
+            devices.append(device)
+        data["list"] = devices.copy()
+        return data
+
     @staticmethod
     def _process_data_ports(raw: dict[str, Any]) -> dict[str, Any]:
         """Process ports data."""
