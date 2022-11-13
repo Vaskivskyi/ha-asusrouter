@@ -456,4 +456,9 @@ SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
     "ssid": None,
 }
 
+SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
+    "block",
+    "disable",
+]
+
 ### <-- SERVICES

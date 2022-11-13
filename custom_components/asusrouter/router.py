@@ -411,6 +411,15 @@ class ARDevice:
             DOMAIN, "adjust_wlan", async_service_adjust_wlan
         )
 
+        async def async_service_device_internet_access(service: ServiceCall):
+            """Adjust device internet access"""
+
+            await self.bridge.async_device_internet_access(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "device_internet_access", async_service_device_internet_access
+        )
+
         self._identity = self.bridge.identity
 
         if self._identity.model is not None:
