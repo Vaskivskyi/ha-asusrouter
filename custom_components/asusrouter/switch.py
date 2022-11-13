@@ -32,6 +32,8 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 SWITCHES = {
+}
+SWITCHES_PARENTAL_CONTROL = {
     (SENSORS_TYPE_PARENTAL_CONTROL, "state"): ARSwitchDescription(
         key="state",
         key_group=SENSORS_TYPE_PARENTAL_CONTROL,
@@ -73,6 +75,7 @@ async def async_setup_entry(
         SWITCHES.update(list_switches_vpn_servers(2))
         SWITCHES.update(list_switches_wlan(3, hide))
         SWITCHES.update(list_switches_gwlan(3, hide))
+        SWITCHES.update(SWITCHES_PARENTAL_CONTROL)
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
 

@@ -51,6 +51,8 @@ BINARY_SENSORS = {
             "private_subnet": "private_subnet",
         },
     ),
+}
+BINARY_SENSORS_PARENTAL_CONTROL = {
     (SENSORS_TYPE_PARENTAL_CONTROL, "state"): ARBinarySensorDescription(
         key="state",
         key_group=SENSORS_TYPE_PARENTAL_CONTROL,
@@ -82,6 +84,7 @@ async def async_setup_entry(
         BINARY_SENSORS.update(list_sensors_vpn_servers(5))
         BINARY_SENSORS.update(list_sensors_wlan(3, hide))
         BINARY_SENSORS.update(list_sensors_gwlan(3, hide))
+        BINARY_SENSORS.update(BINARY_SENSORS_PARENTAL_CONTROL)
 
     await async_setup_ar_entry(
         hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor
