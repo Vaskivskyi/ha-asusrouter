@@ -393,15 +393,6 @@ class ARDevice:
             raise ConfigEntryNotReady
 
         # Services
-        async def async_service_reboot(service: ServiceCall):
-            """Handle reboot."""
-
-            await self.bridge.async_reboot()
-
-        self.hass.services.async_register(
-            DOMAIN, "service_reboot", async_service_reboot
-        )
-
         async def async_service_adjust_wlan(service: ServiceCall):
             """Handle WLAN adjust"""
 
