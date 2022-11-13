@@ -68,6 +68,7 @@ from .const import (
     SENSORS_WLAN,
     SERVICE_ALLOWED_ADJUST_GWLAN,
     SERVICE_ALLOWED_ADJUST_WLAN,
+    SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
 )
 
 _T = TypeVar("_T")
@@ -585,6 +586,44 @@ class ARBridge:
                 arguments=service_args,
                 expect_modify=True,
             )
+        else:
+            return False
+
+    async def async_device_internet_access(self, **kwargs: Any) -> bool:
+        """Adjust device internet access"""
+
+        if not "raw" in kwargs:
+            return False
+
+        raw = kwargs["raw"]
+
+        # MAC address
+        if "mac" in raw:
+            mac = raw["mac"]
+            name = mac
+        elif "entity_id" in raw:
+            entity_reg = er.async_get(self.hass)
+            entity = entity_reg.async_get(raw["entity_id"])
+            capabilities = entity.capabilities
+            mac = capabilities["mac"]
+            name = capabilities["name"]
+        else:
+            _LOGGER.warning(
+                "You need to provide either MAC address or entity_id to change device internet access"
+            )
+            return False
+        mac = mac.upper()
+
+        # Use custom name if selected
+        if "name" in raw:
+            name = raw["name"]
+
+        # Mode
+        state = raw.get("state")
+        if state == "remove":
+            return await self.api.async_remove_parental_control_device(mac)
+        elif state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
+            return await self.api.async_set_parental_control_device(mac, name, state)
         else:
             return False
 
