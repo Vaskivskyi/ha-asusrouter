@@ -1,40 +1,31 @@
-[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](https://github.com/Vaskivskyi/ha-asusrouter/blob/main/LICENSE) [![Community forum discussion](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge&color=blue)](https://community.home-assistant.io/t/custom-component-asusrouter-integration/416111) [![Installations](https://img.shields.io/endpoint?url=https://vaskivskyi.github.io/ha-custom-analytics/badges/asusrouter/total.json&style=for-the-badge&color=yellow)](https://github.com/Vaskivskyi/ha-custom-analytics)
+[![GitHub Release](https://img.shields.io/github/release/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=blue)](https://github.com/Vaskivskyi/ha-asusrouter/releases) [![License](https://img.shields.io/github/license/Vaskivskyi/ha-asusrouter.svg?style=for-the-badge&color=yellow)](https://github.com/Vaskivskyi/ha-asusrouter/blob/main/LICENSE) [![Community forum discussion](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge&color=blue)](https://community.home-assistant.io/t/custom-component-asusrouter-integration/416111) [![Installations](https://img.shields.io/endpoint?url=https://vaskivskyi.github.io/ha-custom-analytics/badges/asusrouter/total.json&style=for-the-badge&color=yellow)](https://github.com/Vaskivskyi/ha-custom-analytics)<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://asusrouter.vaskivskyi.com/BuyMeACoffee.png" alt="Buy Me A Coffee" style="height: 28px !important;" align="right" /></a>
 
 ## Monitor and control your AsusWRT-powered router from Home Assistant
 
 The integration uses the native HTTP(S) API (the same way as WebUI) and relies on direct communication with your device. Both the stock AsusWRT as well as AsusWRT-Merlin are supported.
 
-## Monitoring
+## Full documentation
 
-#### Binary sensors and Sensors
+You can find the full documentation on the [official webpage](https://asusrouter.vaskivskyi.com/).
 
-- Boot time
-- Connected devices
-- CPU and RAM usage
-- Load average sensors (FW: **Merlin-only**)
-- Network traffic and speed
-- OpenVPN clients
-- Ports (LAN/WAN) connection
-- Temperatures
-- WAN IP and status
-- WiFi networks status
+## Features
 
-#### Device trackers
+AsusRouter supports 14+ groups of features, including monitoring of:
+- connected device, CPU, guest WLAN, LED, load average, network, OpenVPN, parental control, ports, RAM, temperature, WAN, WLAN.
 
-## Control
+and control of:
+- gues WLAN, LED, OpenVPN, parental control, WLAN.
 
-All the following entities require `Device control` to be enabled in the integration settings. Some of the entities may not be available for your device because of their firmware limitation.
+ as well as the following HA platrorms:
+- `binary_sensor`, `button`, `device_tracker`, `light`, `sensor`, `switch`, `update`
 
-#### Lights
+and HA events and services.
 
-- LED (`on`/`off`)
+[Full list of features](https://asusrouter.vaskivskyi.com/features/)
 
-#### Switches
+## Supported devices
 
-- OpenVPN clients (`on`/`off`)
-- WiFi networks (`on`/`off`)
-
-Please, refer to the GitHub [Readme](https://github.com/Vaskivskyi/ha-asusrouter/) for detailed information on the available sensors and controls.
+AsusRouter supports virtually every AsusWRT-powered device. [The full list of tested devices](https://asusrouter.vaskivskyi.com/devices/).
 
 ## Installation
 
@@ -50,10 +41,10 @@ You would need to provide the minimum information:
 - Username
 - Password
 
-Please, refer to the GitHub [Setup documentation](https://github.com/Vaskivskyi/ha-asusrouter/blob/main/docs/setup.md) if you would like to get detailed information on the configuration flow.
+Please, refer to the [Setup documentation](https://asusrouter.vaskivskyi.com/guide/getting-started/) if you would like to get detailed information on the configuration flow.
 
 ---
 
-<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;"></a>
+<a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://asusrouter.vaskivskyi.com/BuyMeACoffee.png" alt="Buy Me A Coffee" style="height: 60px !important;"></a>
 
 
