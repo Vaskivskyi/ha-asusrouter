@@ -85,6 +85,10 @@ class ARDeviceEntity(ScannerEntity):
         self._device = device
         self._attr_unique_id = device.mac
         self._attr_name = device.name or DEFAULT_DEVICE_NAME
+        self._attr_capability_attributes = {
+            "mac": self._attr_unique_id,
+            "name": self._attr_name,
+        }
 
     @property
     def source_type(self) -> str:

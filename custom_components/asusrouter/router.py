@@ -40,6 +40,9 @@ from .const import (
     CONF_TRACK_DEVICES,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
+    CONNECTION_TYPE_5G2,
+    CONNECTION_TYPE_6G,
+    CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
@@ -51,6 +54,7 @@ from .const import (
     DEFAULT_TRACK_DEVICES,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
+    DEVICE_ATTRIBUTE_GUEST,
     DEVICE_ATTRIBUTE_INTERNET,
     DEVICE_ATTRIBUTE_INTERNET_MODE,
     DEVICE_ATTRIBUTE_IP_TYPE,
@@ -181,6 +185,8 @@ class ARConnectedDevice:
             "mac": self._mac,
             "ip": self._ip,
             "name": self._name,
+            DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
+            DEVICE_ATTRIBUTE_GUEST: False,
         }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
@@ -203,14 +209,6 @@ class ARConnectedDevice:
             if dev_info.online:
                 self._ip = dev_info.ip
                 self.identity["ip"] = self._ip
-                # If not connected before
-                if self._connected == False:
-                    event_call(
-                        CONF_EVENT_DEVICE_RECONNECTED,
-                        self.identity,
-                    )
-                # Set state
-                self._connected = True
                 # Connection time
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_CONNECTION_TIME
@@ -229,6 +227,29 @@ class ARConnectedDevice:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_5G
+                elif con_type == 3:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_5G2
+                elif con_type == 4:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_6G
+                else:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_UNKNOWN
+                # Add connection type to identity
+                self.identity[
+                    DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                ] = self._extra_state_attributes[DEVICE_ATTRIBUTE_CONNECTION_TYPE]
+                # Guest network
+                self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST] = (
+                    True if dev_info.guest else False
+                )
+                self.identity[DEVICE_ATTRIBUTE_GUEST] = self._extra_state_attributes[
+                    DEVICE_ATTRIBUTE_GUEST
+                ]
                 # Internet
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_INTERNET_MODE
@@ -253,6 +274,14 @@ class ARConnectedDevice:
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_TX_SPEED
                 ] = dev_info.tx_speed
+                # If not connected before
+                if self._connected == False:
+                    event_call(
+                        CONF_EVENT_DEVICE_RECONNECTED,
+                        self.identity,
+                    )
+                # Set state
+                self._connected = True
             # Offline
             elif (
                 DEVICE_ATTRIBUTE_LAST_ACTIVITY in self._extra_state_attributes
@@ -379,15 +408,6 @@ class ARDevice:
             raise ConfigEntryNotReady
 
         # Services
-        async def async_service_reboot(service: ServiceCall):
-            """Handle reboot."""
-
-            await self.bridge.async_reboot()
-
-        self.hass.services.async_register(
-            DOMAIN, "service_reboot", async_service_reboot
-        )
-
         async def async_service_adjust_wlan(service: ServiceCall):
             """Handle WLAN adjust"""
 
@@ -395,6 +415,15 @@ class ARDevice:
 
         self.hass.services.async_register(
             DOMAIN, "adjust_wlan", async_service_adjust_wlan
+        )
+
+        async def async_service_device_internet_access(service: ServiceCall):
+            """Adjust device internet access"""
+
+            await self.bridge.async_device_internet_access(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "device_internet_access", async_service_device_internet_access
         )
 
         self._identity = self.bridge.identity
@@ -483,18 +512,6 @@ class ARDevice:
             self._connect_error = False
             _LOGGER.info(f"Reconnected to '{self._conf_host}'")
 
-        self._connected_devices = 0
-        self._connected_devices_list = list()
-        for device in api_devices:
-            if api_devices[device].online:
-                self._connected_devices += 1
-                self._connected_devices_list.append(
-                    {
-                        "mac": api_devices[device].mac,
-                        "ip": api_devices[device].ip,
-                        "name": api_devices[device].name,
-                    }
-                )
         consider_home = self._options.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME)
 
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
@@ -516,6 +533,14 @@ class ARDevice:
                 CONF_EVENT_DEVICE_CONNECTED,
                 device.identity,
             )
+
+        # Connected devices sensor
+        self._connected_devices = 0
+        self._connected_devices_list = list()
+        for mac, device in self._devices.items():
+            if device.is_connected:
+                self._connected_devices += 1
+                self._connected_devices_list.append(device.identity)
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_device:

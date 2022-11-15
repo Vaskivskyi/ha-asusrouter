@@ -25,6 +25,7 @@ from .const import (
     CONF_HIDE_PASSWORDS,
     CONF_PASSWORD,
     DEFAULT_HIDE_PASSWORDS,
+    SENSORS_TYPE_PARENTAL_CONTROL,
     SENSORS_TYPE_WAN,
 )
 from .dataclass import ARBinarySensorDescription
@@ -51,6 +52,20 @@ BINARY_SENSORS = {
         },
     ),
 }
+BINARY_SENSORS_PARENTAL_CONTROL = {
+    (SENSORS_TYPE_PARENTAL_CONTROL, "state"): ARBinarySensorDescription(
+        key="state",
+        key_group=SENSORS_TYPE_PARENTAL_CONTROL,
+        name="Parental control",
+        icon_on="mdi:magnify-expand",
+        icon_off="mdi:magnify",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            "list": "list",
+        },
+    ),
+}
 
 
 async def async_setup_entry(
@@ -69,6 +84,7 @@ async def async_setup_entry(
         BINARY_SENSORS.update(list_sensors_vpn_servers(5))
         BINARY_SENSORS.update(list_sensors_wlan(3, hide))
         BINARY_SENSORS.update(list_sensors_gwlan(3, hide))
+        BINARY_SENSORS.update(BINARY_SENSORS_PARENTAL_CONTROL)
 
     await async_setup_ar_entry(
         hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor

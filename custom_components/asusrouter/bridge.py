@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import aiohttp
+import dataclasses
 from datetime import datetime
 import logging
 from typing import Any, Awaitable, Callable, TypeVar
@@ -52,6 +53,7 @@ from .const import (
     SENSORS_TYPE_LIGHT,
     SENSORS_TYPE_MISC,
     SENSORS_TYPE_NETWORK_STAT,
+    SENSORS_TYPE_PARENTAL_CONTROL,
     SENSORS_TYPE_PORTS,
     SENSORS_TYPE_RAM,
     SENSORS_TYPE_SYSINFO,
@@ -59,12 +61,14 @@ from .const import (
     SENSORS_TYPE_VPN,
     SENSORS_TYPE_WAN,
     SENSORS_TYPE_WLAN,
+    SENSORS_PARENTAL_CONTROL,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WAN,
     SENSORS_WLAN,
     SERVICE_ALLOWED_ADJUST_GWLAN,
     SERVICE_ALLOWED_ADJUST_WLAN,
+    SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
 )
 
 _T = TypeVar("_T")
@@ -175,6 +179,10 @@ class ARBridge:
                 "sensors": await self._get_sensors_network_stat(),
                 "method": self._get_data_network,
             },
+            SENSORS_TYPE_PARENTAL_CONTROL: {
+                "sensors": SENSORS_PARENTAL_CONTROL,
+                "method": self._get_data_parental_control,
+            },
             SENSORS_TYPE_PORTS: {
                 "sensors": await self._get_sensors_ports(),
                 "method": self._get_data_ports,
@@ -259,6 +267,13 @@ class ARBridge:
 
         return await self._get_data(self.api.async_get_ram)
 
+    async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
+        """Get parental control data from the device."""
+
+        return await self._get_data(
+            self.api.async_get_parental_control, self._process_data_parental_control
+        )
+
     async def _get_data_ports(self) -> dict[str, dict[str, int]]:
         """Get ports data from the device."""
 
@@ -292,6 +307,20 @@ class ARBridge:
     ### <- GET DATA FROM DEVICE
 
     ### PROCESS DATA ->
+    @staticmethod
+    def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process parental control data."""
+
+        data = dict()
+        data["state"] = raw.get("parental_control")
+        devices = list()
+        for el in raw["list"]:
+            device = dataclasses.asdict(raw["list"][el])
+            device.pop("timemap")
+            devices.append(device)
+        data["list"] = devices.copy()
+        return data
+
     @staticmethod
     def _process_data_ports(raw: dict[str, Any]) -> dict[str, Any]:
         """Process ports data."""
@@ -499,8 +528,6 @@ class ARBridge:
         capabilities = entity.capabilities
 
         args_raw = raw.copy()
-        args_raw.pop("entity_id")
-        args_raw.pop("area_id")
 
         args = dict()
 
@@ -559,6 +586,44 @@ class ARBridge:
                 arguments=service_args,
                 expect_modify=True,
             )
+        else:
+            return False
+
+    async def async_device_internet_access(self, **kwargs: Any) -> bool:
+        """Adjust device internet access"""
+
+        if not "raw" in kwargs:
+            return False
+
+        raw = kwargs["raw"]
+
+        # MAC address
+        if "mac" in raw:
+            mac = raw["mac"]
+            name = mac
+        elif "entity_id" in raw:
+            entity_reg = er.async_get(self.hass)
+            entity = entity_reg.async_get(raw["entity_id"])
+            capabilities = entity.capabilities
+            mac = capabilities["mac"]
+            name = capabilities["name"]
+        else:
+            _LOGGER.warning(
+                "You need to provide either MAC address or entity_id to change device internet access"
+            )
+            return False
+        mac = mac.upper()
+
+        # Use custom name if selected
+        if "name" in raw:
+            name = raw["name"]
+
+        # Mode
+        state = raw.get("state")
+        if state == "remove":
+            return await self.api.async_remove_parental_control_device(mac)
+        elif state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
+            return await self.api.async_set_parental_control_device(mac, name, state)
         else:
             return False
 

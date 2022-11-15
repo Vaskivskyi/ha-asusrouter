@@ -1,9 +1,6 @@
-service_reboot:
-  name: Reboot
-  description: Reboot the device.
 adjust_wlan:
   name: Adjust WLAN
-  description: Adjust settings of WLAN network. Please, provide only parameters you would like to change. Otherwise, the previous known values will be used.
+  description: Adjust settings of WLAN network. Please, provide only parameters you would like to change. Otherwise, the previous known values will be used
   fields:
     entity_id:
       name: Entity
@@ -41,7 +38,7 @@ adjust_wlan:
         boolean:
     sync_node:
       name: AiMesh sync
-      description: (Guest only) Synchronize across all AiMesh nodes. When selected, guest network is created on all the nodes. When not selected - guest network is created only on the main router.
+      description: (Guest only) Synchronize across all AiMesh nodes. When selected, guest network is created on all the nodes. When not selected - guest network is created only on the main router
       selector:
         boolean:
     bw_enabled:
@@ -73,3 +70,38 @@ adjust_wlan:
           min: 0
           mode: box
           unit_of_measurement: s
+device_internet_access:
+  name: Device internet access control
+  description: Add / change device internet access using parental control feature of the router
+  fields:
+    entity_id:
+      name: Entity
+      description: Select device to add / change internet access setings
+      selector:
+        entity:
+          integration: asusrouter
+          domain: device_tracker
+    mac:
+      name: MAC
+      description: Manually enter MAC address of the device
+      selector:
+        text:
+    state:
+      name: State
+      description: State of parental control
+      required: true
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: Block access
+              value: block
+            - label: Disable rule
+              value: disable
+            - label: Remove rule
+              value: remove
+    name:
+      name: Device name
+      description: Device name to be saved in parental control rules. It not selected, hostname from the entity will be used. If not selected and MAC is used, MAC will also be used as name
+      selector:
+        text:
