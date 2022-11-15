@@ -40,6 +40,8 @@ from .const import (
     CONF_TRACK_DEVICES,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
+    CONNECTION_TYPE_6G,
+    CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
@@ -224,6 +226,10 @@ class ARConnectedDevice:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_5G
+                elif con_type == 4:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_6G
                 else:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
