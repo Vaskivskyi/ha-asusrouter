@@ -220,10 +220,14 @@ class ARConnectedDevice:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_2G
-                elif con_type == 2:
+                elif con_type in [2,3]:
                     self._extra_state_attributes[
                         DEVICE_ATTRIBUTE_CONNECTION_TYPE
                     ] = CONNECTION_TYPE_5G
+                else:
+                    self._extra_state_attributes[
+                        DEVICE_ATTRIBUTE_CONNECTION_TYPE
+                    ] = CONNECTION_TYPE_UNKNOWN
                 # Add connection type to identity
                 self.identity[
                     DEVICE_ATTRIBUTE_CONNECTION_TYPE
