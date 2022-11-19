@@ -420,7 +420,7 @@ class ARDevice:
         async def async_service_device_internet_access(service: ServiceCall):
             """Adjust device internet access"""
 
-            await self.bridge.async_device_internet_access(raw=service.data)
+            await self.bridge.async_parental_control(raw=service.data)
 
         self.hass.services.async_register(
             DOMAIN, "device_internet_access", async_service_device_internet_access

@@ -22,7 +22,13 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
-from asusrouter import AsusDevice, AsusRouter, AsusRouterError, ConnectedDevice
+from asusrouter import (
+    AsusDevice,
+    AsusRouter,
+    AsusRouterError,
+    ConnectedDevice,
+    FilterDevice,
+)
 from asusrouter.util import converters
 
 from . import helpers
@@ -589,41 +595,76 @@ class ARBridge:
         else:
             return False
 
-    async def async_device_internet_access(self, **kwargs: Any) -> bool:
-        """Adjust device internet access"""
+    async def async_parental_control(self, **kwargs: Any) -> bool:
+        """Adjust parental control rules"""
 
-        if not "raw" in kwargs:
+        raw = kwargs.get("raw", None)
+        if raw is None:
             return False
 
-        raw = kwargs["raw"]
+        rules_to_change = list()
 
-        # MAC address
-        if "mac" in raw:
-            mac = raw["mac"]
-            name = mac
+        state = raw.get("state")
+
+        # Devices are set
+        if "devices" in raw:
+            rules = raw["devices"]
+            for rule in rules:
+                if "mac" in rule:
+                    mac = rule["mac"].upper()
+                    name = rule.get("name", mac)
+                    rules_to_change.append(
+                        FilterDevice(
+                            mac=mac,
+                            name=name,
+                            state=state,
+                        )
+                    )
+                else:
+                    _LOGGER.warning(
+                        f"Parental control rule is missing MAC address. This rule is skipped"
+                    )
+        # Single MAC is set
+        elif "mac" in raw:
+            mac = raw["mac"].upper()
+            name = raw.get("name", mac)
+            rules_to_change.append(
+                FilterDevice(
+                    mac=mac,
+                    name=name,
+                    state=state,
+                )
+            )
+        # Entities are set
+        elif "entities" in raw:
+            entities = raw["entities"]
+            entity_reg = er.async_get(self.hass)
+            for entity in entities:
+                reg_value = entity_reg.async_get(entity)
+                rules_to_change.append(
+                    FilterDevice(
+                        mac=reg_value.capabilities["mac"].upper(),
+                        name=reg_value.capabilities["name"],
+                        state=state,
+                    )
+                )
+        # Single entity_id is provided
         elif "entity_id" in raw:
             entity_reg = er.async_get(self.hass)
-            entity = entity_reg.async_get(raw["entity_id"])
-            capabilities = entity.capabilities
-            mac = capabilities["mac"]
-            name = capabilities["name"]
-        else:
-            _LOGGER.warning(
-                "You need to provide either MAC address or entity_id to change device internet access"
+            reg_value = entity_reg.async_get(raw["entity_id"])
+            rules_to_change.append(
+                FilterDevice(
+                    mac=reg_value.capabilities["mac"].upper(),
+                    name=reg_value.capabilities["name"],
+                    state=state,
+                )
             )
-            return False
-        mac = mac.upper()
 
-        # Use custom name if selected
-        if "name" in raw:
-            name = raw["name"]
-
-        # Mode
-        state = raw.get("state")
         if state == "remove":
-            return await self.api.async_remove_parental_control_device(mac)
+            rules = await self.api.async_remove_parental_control_rules(rules_to_change)
+            return True if rules != dict() else False
         elif state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
-            return await self.api.async_set_parental_control_device(mac, name, state)
+            return await self.api.async_set_parental_control_rules(rules_to_change)
         else:
             return False
 
