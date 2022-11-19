@@ -72,20 +72,16 @@ adjust_wlan:
           unit_of_measurement: s
 device_internet_access:
   name: Device internet access control
-  description: Add / change device internet access using parental control feature of the router
+  description: Add / change device internet access using parental control feature of the router. Please, refer to the documentation for the aditional possible parameters
   fields:
-    entity_id:
-      name: Entity
+    entities:
+      name: Entities
       description: Select device to add / change internet access setings
       selector:
         entity:
           integration: asusrouter
           domain: device_tracker
-    mac:
-      name: MAC
-      description: Manually enter MAC address of the device
-      selector:
-        text:
+          multiple: true
     state:
       name: State
       description: State of parental control
@@ -100,8 +96,13 @@ device_internet_access:
               value: disable
             - label: Remove rule
               value: remove
+    mac:
+      name: MAC
+      description: Manually enter MAC address of a single device
+      selector:
+        text:
     name:
       name: Device name
-      description: Device name to be saved in parental control rules. It not selected, hostname from the entity will be used. If not selected and MAC is used, MAC will also be used as name
+      description: Device name to be saved in parental control rules. It not selected, MAC will be used as name
       selector:
         text:
