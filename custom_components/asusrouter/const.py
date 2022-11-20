@@ -409,7 +409,7 @@ NAME_GWLAN = {}
 NAME_WLAN = {}
 for i in range(len(CONNECTION_LIST)):
     # WLAN
-    NAME_WLAN = f"Wireless {CONNECTION_LIST[i]}"
+    NAME_WLAN[i] = f"Wireless {CONNECTION_LIST[i]}"
     # Guest WLAN
     for j in NUMERIC_GWLAN:
         NAME_GWLAN[f"{i}.{j}"] = f"Guest {CONNECTION_LIST[i]} {j}"
