@@ -61,8 +61,8 @@ LABEL_TX = "Upload"
 
 ### NUMERIC -->
 
-NUMERIC_CORES = range(1, 9) # maximum of 8 cores from 1 to 8
-NUMERIC_GWLAN = range(1, 5) # maximum of 4 guest WLANs from 1 to 4
+NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
+NUMERIC_GWLAN = range(1, 5)  # maximum of 4 guest WLANs from 1 to 4
 
 ### <-- NUMERIC
 

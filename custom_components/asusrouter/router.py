@@ -582,9 +582,7 @@ class ARDevice:
             return
 
         if DEVICES in self._sensor_coordinator:
-            coordinator = self._sensor_coordinator[DEVICES][
-                KEY_COORDINATOR
-            ]
+            coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
             if self._sensor_handler.update_device_count(
                 self._connected_devices, self._connected_devices_list
             ):

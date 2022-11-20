@@ -31,8 +31,7 @@ from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-SWITCHES = {
-}
+SWITCHES = {}
 SWITCHES_PARENTAL_CONTROL = {
     (PARENTAL_CONTROL, "state"): ARSwitchDescription(
         key="state",

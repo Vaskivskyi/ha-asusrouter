@@ -310,10 +310,7 @@ def list_sensors_gwlan(
                     extra_state_attributes[f"{wlan}_{key}"] = SENSORS_GWLAN[key]
             sensors.update(
                 {
-                    (
-                        GWLAN,
-                        f"{wlan}_bss_enabled",
-                    ): ARBinarySensorDescription(
+                    (GWLAN, f"{wlan}_bss_enabled",): ARBinarySensorDescription(
                         key=f"{wlan}_bss_enabled",
                         key_group=GWLAN,
                         name=f"{NAME_GWLAN[wlan_name]}",
