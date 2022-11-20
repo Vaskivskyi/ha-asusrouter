@@ -12,7 +12,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
 from .const import (
-    DATA_ASUSROUTER,
+    ASUSROUTER,
     DEVICE_ATTRIBUTE_LAST_ACTIVITY,
     DOMAIN,
     TO_REDACT,
@@ -31,7 +31,7 @@ async def async_get_config_entry_diagnostics(
 
     data = {"entry": async_redact_data(entry.as_dict(), TO_REDACT)}
 
-    router: ARDevice = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
 
     # Gather information how this AsusWrt device is represented in Home Assistant
     device_registry = dr.async_get(hass)

@@ -65,13 +65,13 @@ from .const import (
     DEFAULT_VERIFY_SSL,
     DELAULT_INTERFACES,
     DOMAIN,
+    FIRMWARE,
     RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
     RESULT_SUCCESS,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
-    SENSORS_TYPE_FIRMWARE,
     SIMPLE_SETUP_PARAMETERS,
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
@@ -343,10 +343,10 @@ def _create_form_intervals(
                     default=conf_scan_interval,
                 ): cv.positive_int,
                 vol.Optional(
-                    CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
+                    CONF_INTERVAL + FIRMWARE,
                     default=user_input.get(
-                        CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
-                        DEFAULT_INTERVALS[CONF_INTERVAL + SENSORS_TYPE_FIRMWARE],
+                        CONF_INTERVAL + FIRMWARE,
+                        DEFAULT_INTERVALS[CONF_INTERVAL + FIRMWARE],
                     ),
                 ): cv.positive_int,
             }

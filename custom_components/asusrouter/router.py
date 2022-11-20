@@ -63,11 +63,14 @@ from .const import (
     DEVICE_ATTRIBUTE_RX_SPEED,
     DEVICE_ATTRIBUTE_TX_SPEED,
     DEVICE_ATTRIBUTES,
+    DEVICES,
     DOMAIN,
+    FIRMWARE,
+    IP,
     KEY_COORDINATOR,
+    MAC,
+    NAME,
     SENSORS_CONNECTED_DEVICES,
-    SENSORS_TYPE_DEVICES,
-    SENSORS_TYPE_FIRMWARE,
 )
 
 _T = TypeVar("_T")
@@ -128,7 +131,7 @@ class ARSensorHandler:
 
         should_poll = True
 
-        if sensor_type == SENSORS_TYPE_DEVICES:
+        if sensor_type == DEVICES:
             should_poll = False
             method = self._get_connected_devices
         elif update_method is not None:
@@ -136,7 +139,7 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
-        if sensor_type == SENSORS_TYPE_FIRMWARE:
+        if sensor_type == FIRMWARE:
             interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
@@ -182,9 +185,9 @@ class ARConnectedDevice:
         self._name = name
         self._ip: str | None = None
         self.identity = {
-            "mac": self._mac,
-            "ip": self._ip,
-            "name": self._name,
+            MAC: self._mac,
+            IP: self._ip,
+            NAME: self._name,
             DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
             DEVICE_ATTRIBUTE_GUEST: False,
         }
@@ -204,11 +207,11 @@ class ARConnectedDevice:
 
         if dev_info:
             self._name = dev_info.name
-            self.identity["name"] = self._name
+            self.identity[NAME] = self._name
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
-                self.identity["ip"] = self._ip
+                self.identity[IP] = self._ip
                 # Connection time
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_CONNECTION_TIME
@@ -559,7 +562,7 @@ class ARDevice:
         )
 
         available_sensors = await self.bridge.async_get_available_sensors()
-        available_sensors[SENSORS_TYPE_DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
+        available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
 
         for sensor_type, sensor_def in available_sensors.items():
             if not (sensor_names := sensor_def.get("sensors")):
@@ -578,10 +581,8 @@ class ARDevice:
         if not self._sensor_handler:
             return
 
-        if SENSORS_TYPE_DEVICES in self._sensor_coordinator:
-            coordinator = self._sensor_coordinator[SENSORS_TYPE_DEVICES][
-                KEY_COORDINATOR
-            ]
+        if DEVICES in self._sensor_coordinator:
+            coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
             if self._sensor_handler.update_device_count(
                 self._connected_devices, self._connected_devices_list
             ):

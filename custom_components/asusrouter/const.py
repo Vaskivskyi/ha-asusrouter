@@ -9,7 +9,6 @@ from homeassistant.const import (
     ATTR_CONNECTIONS,
     ATTR_IDENTIFIERS,
     CONF_DEVICES,
-    CONF_PASSWORD,
     CONF_PORT,
     CONF_UNIQUE_ID,
     CONF_USERNAME,
@@ -37,8 +36,8 @@ from asusrouter.util import converters
 
 # INTEGRATION DATA -->
 
-DATA_ASUSROUTER = "asusrouter"
-DOMAIN = "asusrouter"
+ASUSROUTER = "asusrouter"
+DOMAIN = ASUSROUTER
 KEY_COORDINATOR = "coordinator"
 PLATFORMS = [
     Platform.BINARY_SENSOR,
@@ -52,40 +51,89 @@ PLATFORMS = [
 
 ### <-- INTEGRATION DATA
 
-### SENSORS -->
+### LABELS -->
 
-# Types
-SENSORS_TYPE_CPU = "cpu"
-SENSORS_TYPE_DEVICES = "devices"
-SENSORS_TYPE_FIRMWARE = "firmware"
-SENSORS_TYPE_GWLAN = "gwlan"
-SENSORS_TYPE_LIGHT = "light"
-SENSORS_TYPE_MISC = "misc"
-SENSORS_TYPE_NETWORK_STAT = "network_stat"
-SENSORS_TYPE_PARENTAL_CONTROL = "parental_control"
-SENSORS_TYPE_PORTS = "ports"
-SENSORS_TYPE_RAM = "ram"
-SENSORS_TYPE_SYSINFO = "sysinfo"
-SENSORS_TYPE_TEMPERATURE = "temperature"
-SENSORS_TYPE_VPN = "vpn"
-SENSORS_TYPE_WAN = "wan"
-SENSORS_TYPE_WLAN = "wlan"
+LABEL_RX = "Download"
+LABEL_SPEED = "Speed"
+LABEL_TX = "Upload"
+
+### <-- LABELS
+
+### NUMERIC -->
+
+NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
+NUMERIC_GWLAN = range(1, 5)  # maximum of 4 guest WLANs from 1 to 4
+
+### <-- NUMERIC
+
+### GENERAL DATA -->
+
+FREE = "free"
+RX = "rx"
+RX_SPEED = "rx_speed"
+TOTAL = "total"
+TX = "tx"
+TX_SPEED = "tx_speed"
+UNKNOWN = "unknown"
+USAGE = "usage"
+USED = "used"
+
+### <-- GENERAL DATA
+
+### GENERAL TYPES
+
+CONNECTION_2G = "2.4 GHz"
+CONNECTION_5G = "5 GHz"
+CONNECTION_5G2 = "5 GHz-2"
+CONNECTION_6G = "6 GHz"
+CONNECTION_LIST = [
+    CONNECTION_2G,
+    CONNECTION_5G,
+    CONNECTION_5G2,
+    CONNECTION_6G,
+]
+CONNECTION_WIRED = "Wired"
+CORE = "core"
+CPU = "cpu"
+DEVICES = "devices"
+FIRMWARE = "firmware"
+GWLAN = "gwlan"
+LIGHT = "light"
+MISC = "misc"
+NETWORK_STAT = "network_stat"
+PARENTAL_CONTROL = "parental_control"
+PORTS = "ports"
+RAM = "ram"
+SYSINFO = "sysinfo"
+TEMPERATURE = "temperature"
+VPN = "vpn"
+WAN = "wan"
+WLAN = "wlan"
+
+### <-- GENERAL TYPES
+
+### GENERAL VALUES -->
+
+BITS_PER_SECOND = "bits/s"
+BYTES = "bytes"
+IP = "ip"
+MAC = "mac"
+NAME = "name"
+PASSWORD = "password"
+SSID = "ssid"
+STATE = "state"
+
+### <-- GENERAL VALUES
+
+### SENSORS -->
 
 # Sensor lists
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = ["number", "devices"]
-SENSORS_CPU = [
-    "total",
-    "core_1",
-    "core_2",
-    "core_3",
-    "core_4",
-    "core_5",
-    "core_6",
-    "core_7",
-    "core_8",
-]
-SENSORS_FIRMWARE = ["state"]
+SENSORS_CONNECTED_DEVICES = ["number", DEVICES]
+SENSORS_CPU = [TOTAL]
+for i in NUMERIC_CORES:
+    SENSORS_CPU.append(f"{CORE}_{i}")
+SENSORS_FIRMWARE = [STATE]
 SENSORS_GWLAN = {
     "sync_node": "aimesh_sync",
     "auth_mode_x": "auth_method",
@@ -98,21 +146,21 @@ SENSORS_GWLAN = {
     "lanaccess": "lan_access",
     "maclist": "maclist",
     "macmode": "macmode",
-    "wpa_psk": "password",
-    "ssid": "ssid",
+    "wpa_psk": PASSWORD,
+    SSID: SSID,
     "crypto": "wpa_encryption",
 }
 SENSORS_LIGHT = ["led"]
 SENSORS_MISC = ["boottime"]
-SENSORS_NETWORK_STAT = ["rx", "tx", "rx_speed", "tx_speed"]
-SENSORS_PARENTAL_CONTROL = ["state"]
-SENSORS_PORTS = ["WAN", "LAN"]
-SENSORS_RAM = ["total", "free", "used", "usage"]
+SENSORS_NETWORK_STAT = [RX, RX_SPEED, TX, TX_SPEED]
+SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PORTS = ["LAN", "WAN"]
+SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
 SENSORS_SYSINFO = ["load_avg_1", "load_avg_5", "load_avg_15"]
 SENSORS_VPN = {
     "auth_read": "auth_read",
     "errno": "error_code",
-    "ip": "local_ip",
+    IP: "local_ip",
     "post_compress": "post_compress_bytes",
     "post_decompress": "post_decompress_bytes",
     "pre_compress": "pre_compress_bytes",
@@ -132,7 +180,7 @@ SENSORS_VPN_SERVER = {
     "client_list": "client_list",
     "routing_table": "routing_table",
 }
-SENSORS_WAN = ["status", "ip", "ip_type", "gateway", "mask", "dns", "private_subnet"]
+SENSORS_WAN = ["status", IP, "ip_type", "gateway", "mask", "dns", "private_subnet"]
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
     "channel": "channel",
@@ -147,17 +195,17 @@ SENSORS_WLAN = {
     "mbo_enable": "mbo_enable",
     "mfp": "mfp",
     "nmode_x": "mode",
-    "wpa_psk": "password",
+    "wpa_psk": PASSWORD,
     "radius_ipaddr": "radius_ipaddr",
     "radius_key": "radius_key",
     "radius_port": "radius_port",
-    "ssid": "ssid",
+    SSID: SSID,
     "crypto": "wpa_encryption",
     "optimizexbox_ckb": "xbox_optimized",
 }
 
 # Defaults
-DEFAULT_SENSORS: dict[str, list[str]] = {SENSORS_TYPE_CPU: ["total"]}
+DEFAULT_SENSORS: dict[str, list[str]] = {CPU: [TOTAL]}
 
 ### <-- SENSORS
 
@@ -176,22 +224,22 @@ CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
 CONF_HIDE_PASSWORDS = "hide_passwords"
 CONF_INTERFACES = "interfaces"
 CONF_INTERVAL = "interval_"
-CONF_INTERVAL_DEVICES = CONF_INTERVAL + SENSORS_TYPE_DEVICES
+CONF_INTERVAL_DEVICES = CONF_INTERVAL + DEVICES
 CONF_INTERVALS = [
-    CONF_INTERVAL + SENSORS_TYPE_CPU,
-    CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
-    CONF_INTERVAL + SENSORS_TYPE_GWLAN,
-    CONF_INTERVAL + SENSORS_TYPE_LIGHT,
-    CONF_INTERVAL + SENSORS_TYPE_MISC,
-    CONF_INTERVAL + SENSORS_TYPE_NETWORK_STAT,
-    CONF_INTERVAL + SENSORS_TYPE_PARENTAL_CONTROL,
-    CONF_INTERVAL + SENSORS_TYPE_PORTS,
-    CONF_INTERVAL + SENSORS_TYPE_RAM,
-    CONF_INTERVAL + SENSORS_TYPE_SYSINFO,
-    CONF_INTERVAL + SENSORS_TYPE_TEMPERATURE,
-    CONF_INTERVAL + SENSORS_TYPE_VPN,
-    CONF_INTERVAL + SENSORS_TYPE_WAN,
-    CONF_INTERVAL + SENSORS_TYPE_WLAN,
+    CONF_INTERVAL + CPU,
+    CONF_INTERVAL + FIRMWARE,
+    CONF_INTERVAL + GWLAN,
+    CONF_INTERVAL + LIGHT,
+    CONF_INTERVAL + MISC,
+    CONF_INTERVAL + NETWORK_STAT,
+    CONF_INTERVAL + PARENTAL_CONTROL,
+    CONF_INTERVAL + PORTS,
+    CONF_INTERVAL + RAM,
+    CONF_INTERVAL + SYSINFO,
+    CONF_INTERVAL + TEMPERATURE,
+    CONF_INTERVAL + VPN,
+    CONF_INTERVAL + WAN,
+    CONF_INTERVAL + WLAN,
 ]
 CONF_SPLIT_INTERVALS = "split_intervals"
 CONF_TRACK_DEVICES = "track_devices"
@@ -244,7 +292,7 @@ DEFAULT_EVENT: dict[str, bool] = {
 DEFAULT_HIDE_PASSWORDS = False
 DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
 DELAULT_INTERFACES = ["WAN"]
-DEFAULT_INTERVALS = {CONF_INTERVAL + SENSORS_TYPE_FIRMWARE: 21600}
+DEFAULT_INTERVALS = {CONF_INTERVAL + FIRMWARE: 21600}
 DEFAULT_PORT = 0
 DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
 DEFAULT_SCAN_INTERVAL = 30
@@ -319,12 +367,12 @@ CONNECTION_CONNECTED = "connected"
 CONNECTION_DISCONNECTED = "disconnected"
 
 # Connection type
-CONNECTION_TYPE_2G = "2.4 GHz"
-CONNECTION_TYPE_5G = "5 GHz"
-CONNECTION_TYPE_5G2 = "5 GHz-2"
-CONNECTION_TYPE_6G = "6 GHz"
-CONNECTION_TYPE_WIRED = "Wired"
-CONNECTION_TYPE_UNKNOWN = "Unknown"
+CONNECTION_TYPE_2G = CONNECTION_2G
+CONNECTION_TYPE_5G = CONNECTION_5G
+CONNECTION_TYPE_5G2 = CONNECTION_5G2
+CONNECTION_TYPE_6G = CONNECTION_6G
+CONNECTION_TYPE_WIRED = CONNECTION_WIRED
+CONNECTION_TYPE_UNKNOWN = UNKNOWN
 
 # Device attributes
 DEVICE_ATTRIBUTE_CONNECTION_TIME = "connection_time"
@@ -335,8 +383,8 @@ DEVICE_ATTRIBUTE_INTERNET_MODE = "internet_mode"
 DEVICE_ATTRIBUTE_IP_TYPE = "ip_type"
 DEVICE_ATTRIBUTE_LAST_ACTIVITY = "last_activity"
 DEVICE_ATTRIBUTE_RSSI = "rssi"
-DEVICE_ATTRIBUTE_RX_SPEED = "rx_speed"
-DEVICE_ATTRIBUTE_TX_SPEED = "tx_speed"
+DEVICE_ATTRIBUTE_RX_SPEED = RX_SPEED
+DEVICE_ATTRIBUTE_TX_SPEED = TX_SPEED
 DEVICE_ATTRIBUTES: list[str] = [
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
@@ -356,37 +404,23 @@ KEY_OVPN_SERVER = "vpn_server"
 KEY_SENSOR_ID = "{}_{}"
 KEY_WLAN = "wl"
 
-NAME_GWLAN = {
-    "0.1": "Guest 2.4 GHz 1",
-    "0.2": "Guest 2.4 GHz 2",
-    "0.3": "Guest 2.4 GHz 3",
-    "0.4": "Guest 2.4 GHz 4",
-    "1.1": "Guest 5 GHz 1",
-    "1.2": "Guest 5 GHz 2",
-    "1.3": "Guest 5 GHz 3",
-    "1.4": "Guest 5 GHz 4",
-    "2.1": "Guest 5 GHz (2) 1",
-    "2.2": "Guest 5 GHz (2) 2",
-    "2.3": "Guest 5 GHz (2) 3",
-    "2.4": "Guest 5 GHz (2) 4",
-    "3.1": "Guest 6 GHz 1",
-    "3.2": "Guest 6 GHz 2",
-    "3.3": "Guest 6 GHz 3",
-    "3.4": "Guest 6 GHz 4",
-}
+# Generate wireless networks
+NAME_GWLAN = {}
+NAME_WLAN = {}
+for i in range(len(CONNECTION_LIST)):
+    # WLAN
+    NAME_WLAN = f"Wireless {CONNECTION_LIST[i]}"
+    # Guest WLAN
+    for j in NUMERIC_GWLAN:
+        NAME_GWLAN[f"{i}.{j}"] = f"Guest {CONNECTION_LIST[i]} {j}"
+
 NAME_OVPN_CLIENT = "OpenVPN Client"
 NAME_OVPN_SERVER = "OpenVPN Server"
-NAME_WLAN = {
-    0: "Wireless 2.4 GHz",
-    1: "Wireless 5 GHz",
-    2: "Wireless 5 GHz (2)",
-    3: "Wireless 6 GHz",
-}
 
 SENSORS_PARAM: dict[str, dict[str, Any]] = {
     "key": {},
     "key_group": {},
-    "name": {},
+    NAME: {},
     "icon": {},
     "state_class": {},
     "native_unit_of_measurement": {},
@@ -396,37 +430,37 @@ SENSORS_PARAM: dict[str, dict[str, Any]] = {
 }
 
 SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
-    "rx": {
-        "name": "{} Download",
+    RX: {
+        NAME: f"{LABEL_RX}",
         "icon": "mdi:download-outline",
         "state_class": SensorStateClass.TOTAL_INCREASING,
         "factor": CONVERT_TRAFFIC,
         "entity_registry_enabled_default": True,
-        "raw_attribute": "bytes",
+        "raw_attribute": BYTES,
     },
-    "tx": {
-        "name": "{} Upload",
-        "icon": "mdi:upload-outline",
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "factor": CONVERT_TRAFFIC,
-        "entity_registry_enabled_default": True,
-        "raw_attribute": "bytes",
-    },
-    "rx_speed": {
-        "name": "{} Download Speed",
+    RX_SPEED: {
+        NAME: f"{LABEL_RX} {LABEL_SPEED}",
         "icon": "mdi:download-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
         "factor": CONVERT_SPEED,
         "entity_registry_enabled_default": True,
-        "raw_attribute": "bits/s",
+        "raw_attribute": BITS_PER_SECOND,
     },
-    "tx_speed": {
-        "name": "{} Upload Speed",
+    TX: {
+        NAME: f"{LABEL_TX}",
+        "icon": "mdi:upload-outline",
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "factor": CONVERT_TRAFFIC,
+        "entity_registry_enabled_default": True,
+        "raw_attribute": BYTES,
+    },
+    TX_SPEED: {
+        NAME: f"{LABEL_TX} {LABEL_SPEED}",
         "icon": "mdi:upload-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
         "factor": CONVERT_SPEED,
         "entity_registry_enabled_default": True,
-        "raw_attribute": "bits/s",
+        "raw_attribute": BITS_PER_SECOND,
     },
 }
 
@@ -434,10 +468,10 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
 
 ### DIAGNOSTICS -->
 
-TO_REDACT = {CONF_PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
+TO_REDACT = {PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
 TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
 TO_REDACT_STATE = {"WAN IP"}
-TO_REDACT_ATTRS = {CONF_DEVICES, CONF_PASSWORD, "ip", "ssid", "list"}
+TO_REDACT_ATTRS = {CONF_DEVICES, PASSWORD, IP, SSID, "list"}
 
 ### <-- DIAGNOSTICS
 
@@ -451,12 +485,12 @@ SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
     "expire": None,
     "closed": converters.int_from_bool,
     "lanaccess": converters.int_from_bool,
-    "ssid": None,
+    SSID: None,
 }
 
 SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
     "closed": converters.int_from_bool,
-    "ssid": None,
+    SSID: None,
 }
 
 SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
