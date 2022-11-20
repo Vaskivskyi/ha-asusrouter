@@ -10,24 +10,26 @@ from homeassistant.helpers.entity import EntityCategory
 from .const import (
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
+    GWLAN,
     KEY_GWLAN,
     KEY_OVPN_CLIENT,
     KEY_OVPN_SERVER,
     KEY_SENSOR_ID,
     KEY_WLAN,
+    LABEL_SPEED,
+    NAME,
     NAME_GWLAN,
     NAME_OVPN_CLIENT,
     NAME_OVPN_SERVER,
     NAME_WLAN,
+    NETWORK_STAT,
     SENSORS_GWLAN,
     SENSORS_PARAM_NETWORK,
-    SENSORS_TYPE_GWLAN,
-    SENSORS_TYPE_NETWORK_STAT,
-    SENSORS_TYPE_VPN,
-    SENSORS_TYPE_WLAN,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WLAN,
+    VPN,
+    WLAN,
 )
 from .dataclass import (
     ARBinarySensorDescription,
@@ -53,14 +55,14 @@ def list_sensors_network(
             data = SENSORS_PARAM_NETWORK[type]
             key = KEY_SENSOR_ID.format(interface, type)
             units = units_traffic
-            if "Speed" in data["name"]:
+            if LABEL_SPEED in data[NAME]:
                 units = units_speed
             sensors.update(
                 {
-                    (SENSORS_TYPE_NETWORK_STAT, key): ARSensorDescription(
+                    (NETWORK_STAT, key): ARSensorDescription(
                         key=key,
-                        key_group=SENSORS_TYPE_NETWORK_STAT,
-                        name=data["name"].format(interface) or None,
+                        key_group=NETWORK_STAT,
+                        name=f"{interface} {data[NAME]}" or None,
                         icon=data["icon"] or None,
                         state_class=data["state_class"] or None,
                         native_unit_of_measurement=units or None,
@@ -94,9 +96,9 @@ def list_sensors_vpn_clients(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN[key]
         sensors.update(
             {
-                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARBinarySensorDescription(
+                (VPN, f"{vpn}_state"): ARBinarySensorDescription(
                     key=f"{vpn}_state",
-                    key_group=SENSORS_TYPE_VPN,
+                    key_group=VPN,
                     name=f"{NAME_OVPN_CLIENT} {num}",
                     device_class=DEVICE_CLASS_CONNECTIVITY,
                     entity_registry_enabled_default=False,
@@ -123,9 +125,9 @@ def list_switches_vpn_clients(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN[key]
         sensors.update(
             {
-                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARSwitchDescription(
+                (VPN, f"{vpn}_state"): ARSwitchDescription(
                     key=f"{vpn}_state",
-                    key_group=SENSORS_TYPE_VPN,
+                    key_group=VPN,
                     name=f"{NAME_OVPN_CLIENT} {num}",
                     icon="mdi:network-outline",
                     icon_on="mdi:check-network-outline",
@@ -157,9 +159,9 @@ def list_sensors_vpn_servers(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
         sensors.update(
             {
-                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARBinarySensorDescription(
+                (VPN, f"{vpn}_state"): ARBinarySensorDescription(
                     key=f"{vpn}_state",
-                    key_group=SENSORS_TYPE_VPN,
+                    key_group=VPN,
                     name=f"{NAME_OVPN_SERVER} {num}",
                     device_class=DEVICE_CLASS_CONNECTIVITY,
                     entity_registry_enabled_default=False,
@@ -186,9 +188,9 @@ def list_switches_vpn_servers(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
         sensors.update(
             {
-                (SENSORS_TYPE_VPN, f"{vpn}_state"): ARSwitchDescription(
+                (VPN, f"{vpn}_state"): ARSwitchDescription(
                     key=f"{vpn}_state",
-                    key_group=SENSORS_TYPE_VPN,
+                    key_group=VPN,
                     name=f"{NAME_OVPN_SERVER} {num}",
                     icon="mdi:network-outline",
                     icon_on="mdi:check-network-outline",
@@ -223,9 +225,9 @@ def list_sensors_wlan(
                 extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
         sensors.update(
             {
-                (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARBinarySensorDescription(
+                (WLAN, f"{wlan}_radio"): ARBinarySensorDescription(
                     key=f"{wlan}_radio",
-                    key_group=SENSORS_TYPE_WLAN,
+                    key_group=WLAN,
                     name=f"{NAME_WLAN[id]}",
                     device_class=DEVICE_CLASS_CONNECTIVITY,
                     entity_registry_enabled_default=True,
@@ -255,9 +257,9 @@ def list_switches_wlan(
                 extra_state_attributes[f"{wlan}_{key}"] = SENSORS_WLAN[key]
         sensors.update(
             {
-                (SENSORS_TYPE_WLAN, f"{wlan}_radio"): ARSwitchDescription(
+                (WLAN, f"{wlan}_radio"): ARSwitchDescription(
                     key=f"{wlan}_radio",
-                    key_group=SENSORS_TYPE_WLAN,
+                    key_group=WLAN,
                     name=f"{NAME_WLAN[id]}",
                     icon="mdi:wifi",
                     icon_on="mdi:wifi",
@@ -274,7 +276,7 @@ def list_switches_wlan(
                     },
                     device_class="wlan",
                     capabilities={
-                        "api_type": SENSORS_TYPE_WLAN,
+                        "api_type": WLAN,
                         "api_id": id,
                     },
                     service_expect_modify=True,
@@ -309,11 +311,11 @@ def list_sensors_gwlan(
             sensors.update(
                 {
                     (
-                        SENSORS_TYPE_GWLAN,
+                        GWLAN,
                         f"{wlan}_bss_enabled",
                     ): ARBinarySensorDescription(
                         key=f"{wlan}_bss_enabled",
-                        key_group=SENSORS_TYPE_GWLAN,
+                        key_group=GWLAN,
                         name=f"{NAME_GWLAN[wlan_name]}",
                         device_class=DEVICE_CLASS_CONNECTIVITY,
                         entity_registry_enabled_default=True,
@@ -345,9 +347,9 @@ def list_switches_gwlan(
                     extra_state_attributes[f"{wlan}_{key}"] = SENSORS_GWLAN[key]
             sensors.update(
                 {
-                    (SENSORS_TYPE_GWLAN, f"{wlan}_bss_enabled"): ARSwitchDescription(
+                    (GWLAN, f"{wlan}_bss_enabled"): ARSwitchDescription(
                         key=f"{wlan}_bss_enabled",
-                        key_group=SENSORS_TYPE_WLAN,
+                        key_group=GWLAN,
                         name=f"{NAME_GWLAN[wlan_name]}",
                         icon="mdi:wifi",
                         icon_on="mdi:wifi",
@@ -365,7 +367,7 @@ def list_switches_gwlan(
                         },
                         device_class="wlan",
                         capabilities={
-                            "api_type": SENSORS_TYPE_GWLAN,
+                            "api_type": GWLAN,
                             "api_id": wlan_name,
                         },
                         service_expect_modify=True,

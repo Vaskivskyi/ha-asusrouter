@@ -12,7 +12,7 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_ENABLE_CONTROL, DATA_ASUSROUTER, DOMAIN, SENSORS_TYPE_LIGHT
+from .const import CONF_ENABLE_CONTROL, ASUSROUTER, DOMAIN, LIGHT
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -20,9 +20,9 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 LIGHTS = {
-    (SENSORS_TYPE_LIGHT, "led"): ARLightDescription(
+    (LIGHT, "led"): ARLightDescription(
         key="led",
-        key_group=SENSORS_TYPE_LIGHT,
+        key_group=LIGHT,
         name="LED",
         icon="mdi:led-outline",
         icon_on="mdi:led-on",
@@ -42,7 +42,7 @@ async def async_setup_entry(
 
     if (
         not entry.options[CONF_ENABLE_CONTROL]
-        or not hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER].bridge._identity.led
+        or not hass.data[DOMAIN][entry.entry_id][ASUSROUTER].bridge._identity.led
     ):
         return
 

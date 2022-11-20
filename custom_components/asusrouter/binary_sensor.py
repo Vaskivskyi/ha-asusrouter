@@ -23,10 +23,10 @@ from .compilers import (
 from .const import (
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
-    CONF_PASSWORD,
     DEFAULT_HIDE_PASSWORDS,
-    SENSORS_TYPE_PARENTAL_CONTROL,
-    SENSORS_TYPE_WAN,
+    PASSWORD,
+    PARENTAL_CONTROL,
+    WAN,
 )
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -35,9 +35,9 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 BINARY_SENSORS = {
-    (SENSORS_TYPE_WAN, "status"): ARBinarySensorDescription(
+    (WAN, "status"): ARBinarySensorDescription(
         key="status",
-        key_group=SENSORS_TYPE_WAN,
+        key_group=WAN,
         name="WAN",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
@@ -53,9 +53,9 @@ BINARY_SENSORS = {
     ),
 }
 BINARY_SENSORS_PARENTAL_CONTROL = {
-    (SENSORS_TYPE_PARENTAL_CONTROL, "state"): ARBinarySensorDescription(
+    (PARENTAL_CONTROL, "state"): ARBinarySensorDescription(
         key="state",
-        key_group=SENSORS_TYPE_PARENTAL_CONTROL,
+        key_group=PARENTAL_CONTROL,
         name="Parental control",
         icon_on="mdi:magnify-expand",
         icon_off="mdi:magnify",
@@ -77,7 +77,7 @@ async def async_setup_entry(
 
     hide = list()
     if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
-        hide.append(CONF_PASSWORD)
+        hide.append(PASSWORD)
 
     if not entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.update(list_sensors_vpn_clients(5))

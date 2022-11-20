@@ -21,9 +21,9 @@ from .compilers import (
 from .const import (
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
-    CONF_PASSWORD,
     DEFAULT_HIDE_PASSWORDS,
-    SENSORS_TYPE_PARENTAL_CONTROL,
+    PASSWORD,
+    PARENTAL_CONTROL,
 )
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -34,9 +34,9 @@ _LOGGER = logging.getLogger(__name__)
 SWITCHES = {
 }
 SWITCHES_PARENTAL_CONTROL = {
-    (SENSORS_TYPE_PARENTAL_CONTROL, "state"): ARSwitchDescription(
+    (PARENTAL_CONTROL, "state"): ARSwitchDescription(
         key="state",
-        key_group=SENSORS_TYPE_PARENTAL_CONTROL,
+        key_group=PARENTAL_CONTROL,
         name="Parental control",
         icon_on="mdi:magnify-expand",
         icon_off="mdi:magnify",
@@ -68,7 +68,7 @@ async def async_setup_entry(
 
     hide = list()
     if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
-        hide.append(CONF_PASSWORD)
+        hide.append(PASSWORD)
 
     if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(list_switches_vpn_clients(5))

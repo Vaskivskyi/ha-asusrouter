@@ -12,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
-    SENSORS_TYPE_FIRMWARE,
+    FIRMWARE,
 )
 from .dataclass import ARUpdateDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -21,9 +21,9 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 UPDATES = {
-    (SENSORS_TYPE_FIRMWARE, "state"): ARUpdateDescription(
+    (FIRMWARE, "state"): ARUpdateDescription(
         key="state",
-        key_group=SENSORS_TYPE_FIRMWARE,
+        key_group=FIRMWARE,
         name="Firmware update",
         icon="mdi:update",
         extra_state_attributes={

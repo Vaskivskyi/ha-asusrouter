@@ -9,12 +9,12 @@ from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 
 from .const import (
+    ASUSROUTER,
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
     CONF_INTERFACES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
-    DATA_ASUSROUTER,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_SCAN_INTERVAL,
@@ -51,7 +51,7 @@ async def async_setup_entry(
     )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
-        DATA_ASUSROUTER: router,
+        ASUSROUTER: router,
         "stop_listener": stop_listener,
     }
 
@@ -70,7 +70,7 @@ async def async_unload_entry(
 
     if unload:
         hass.data[DOMAIN][entry.entry_id]["stop_listener"]()
-        router = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+        router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
         await router.close()
 
         hass.data[DOMAIN].pop(entry.entry_id)
@@ -84,7 +84,7 @@ async def update_listener(
 ) -> None:
     """Update on config_entry update."""
 
-    router = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
 
     if router.update_options(entry.options):
         await hass.config_entries.async_reload(entry.entry_id)

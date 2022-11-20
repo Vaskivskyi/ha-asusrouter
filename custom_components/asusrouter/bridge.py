@@ -37,14 +37,26 @@ from .const import (
     CONF_CERT_PATH,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
+    CPU,
     DEFAULT_CACHE_TIME,
     DEFAULT_ENABLE_CONTROL,
     DEFAULT_ENABLE_MONITOR,
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
+    FIRMWARE,
+    GWLAN,
     KEY_OVPN_CLIENT,
     KEY_OVPN_SERVER,
+    LIGHT,
+    MAC,
+    MISC,
+    NAME,
+    NETWORK_STAT,
+    PARENTAL_CONTROL,
+    PASSWORD,
+    PORTS,
+    RAM,
     SENSORS_FIRMWARE,
     SENSORS_GWLAN,
     SENSORS_LIGHT,
@@ -53,20 +65,6 @@ from .const import (
     SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
-    SENSORS_TYPE_CPU,
-    SENSORS_TYPE_FIRMWARE,
-    SENSORS_TYPE_GWLAN,
-    SENSORS_TYPE_LIGHT,
-    SENSORS_TYPE_MISC,
-    SENSORS_TYPE_NETWORK_STAT,
-    SENSORS_TYPE_PARENTAL_CONTROL,
-    SENSORS_TYPE_PORTS,
-    SENSORS_TYPE_RAM,
-    SENSORS_TYPE_SYSINFO,
-    SENSORS_TYPE_TEMPERATURE,
-    SENSORS_TYPE_VPN,
-    SENSORS_TYPE_WAN,
-    SENSORS_TYPE_WLAN,
     SENSORS_PARENTAL_CONTROL,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
@@ -75,6 +73,11 @@ from .const import (
     SERVICE_ALLOWED_ADJUST_GWLAN,
     SERVICE_ALLOWED_ADJUST_WLAN,
     SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
+    SYSINFO,
+    TEMPERATURE,
+    VPN,
+    WAN,
+    WLAN,
 )
 
 _T = TypeVar("_T")
@@ -164,50 +167,50 @@ class ARBridge:
         """Get a dictionary of available sensors."""
 
         sensors_types = {
-            SENSORS_TYPE_CPU: {
+            CPU: {
                 "sensors": await self._get_sensors_cpu(),
                 "method": self._get_data_cpu,
             },
-            SENSORS_TYPE_FIRMWARE: {
+            FIRMWARE: {
                 "sensors": SENSORS_FIRMWARE,
                 "method": self._get_data_firmware,
             },
-            SENSORS_TYPE_GWLAN: {
+            GWLAN: {
                 "sensors": await self._get_sensors_gwlan(),
                 "method": self._get_data_gwlan,
             },
-            SENSORS_TYPE_LIGHT: {
+            LIGHT: {
                 "sensors": SENSORS_LIGHT,
                 "method": self._get_data_light,
             },
-            SENSORS_TYPE_MISC: {"sensors": SENSORS_MISC, "method": self._get_data_misc},
-            SENSORS_TYPE_NETWORK_STAT: {
+            MISC: {"sensors": SENSORS_MISC, "method": self._get_data_misc},
+            NETWORK_STAT: {
                 "sensors": await self._get_sensors_network_stat(),
                 "method": self._get_data_network,
             },
-            SENSORS_TYPE_PARENTAL_CONTROL: {
+            PARENTAL_CONTROL: {
                 "sensors": SENSORS_PARENTAL_CONTROL,
                 "method": self._get_data_parental_control,
             },
-            SENSORS_TYPE_PORTS: {
+            PORTS: {
                 "sensors": await self._get_sensors_ports(),
                 "method": self._get_data_ports,
             },
-            SENSORS_TYPE_RAM: {"sensors": SENSORS_RAM, "method": self._get_data_ram},
-            SENSORS_TYPE_SYSINFO: {
+            RAM: {"sensors": SENSORS_RAM, "method": self._get_data_ram},
+            SYSINFO: {
                 "sensors": await self._get_sensors_sysinfo(),
                 "method": self._get_data_sysinfo,
             },
-            SENSORS_TYPE_TEMPERATURE: {
+            TEMPERATURE: {
                 "sensors": await self._get_sensors_temperature(),
                 "method": self._get_data_temperature,
             },
-            SENSORS_TYPE_VPN: {
+            VPN: {
                 "sensors": await self._get_sensors_vpn(),
                 "method": self._get_data_vpn,
             },
-            SENSORS_TYPE_WAN: {"sensors": SENSORS_WAN, "method": self._get_data_wan},
-            SENSORS_TYPE_WLAN: {
+            WAN: {"sensors": SENSORS_WAN, "method": self._get_data_wan},
+            WLAN: {
                 "sensors": await self._get_sensors_wlan(),
                 "method": self._get_data_wlan,
             },
@@ -377,7 +380,7 @@ class ARBridge:
         """Get the available CPU sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_cpu_labels, type=SENSORS_TYPE_CPU, defaults=True
+            self.api.async_get_cpu_labels, type=CPU, defaults=True
         )
 
     async def _get_sensors_gwlan(self) -> list[str]:
@@ -386,7 +389,7 @@ class ARBridge:
         return await self._get_sensors(
             self.api.async_get_gwlan_ids,
             self._process_sensors_gwlan,
-            type=SENSORS_TYPE_GWLAN,
+            type=GWLAN,
         )
 
     async def _get_sensors_network_stat(self) -> list[str]:
@@ -395,7 +398,7 @@ class ARBridge:
         return await self._get_sensors(
             self.api.async_get_network_labels,
             self._process_sensors_network_stat,
-            type=SENSORS_TYPE_NETWORK_STAT,
+            type=NETWORK_STAT,
         )
 
     async def _get_sensors_ports(self) -> list[str]:
@@ -404,7 +407,7 @@ class ARBridge:
         return await self._get_sensors(
             self.api.async_get_ports,
             self._process_sensors_ports,
-            type=SENSORS_TYPE_PORTS,
+            type=PORTS,
         )
 
     async def _get_sensors_sysinfo(self) -> list[str]:
@@ -413,21 +416,21 @@ class ARBridge:
         return await self._get_sensors(
             self.api.async_get_sysinfo,
             self._process_sensors_sysinfo,
-            type=SENSORS_TYPE_SYSINFO,
+            type=SYSINFO,
         )
 
     async def _get_sensors_temperature(self) -> list[str]:
         """Get the available temperature sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_temperature_labels, type=SENSORS_TYPE_TEMPERATURE
+            self.api.async_get_temperature_labels, type=TEMPERATURE
         )
 
     async def _get_sensors_vpn(self) -> list[str]:
         """Get the available VPN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_vpn, self._process_sensors_vpn, type=SENSORS_TYPE_VPN
+            self.api.async_get_vpn, self._process_sensors_vpn, type=VPN
         )
 
     async def _get_sensors_wlan(self) -> list[str]:
@@ -436,7 +439,7 @@ class ARBridge:
         return await self._get_sensors(
             self.api.async_get_wlan_ids,
             self._process_sensors_wlan,
-            type=SENSORS_TYPE_WLAN,
+            type=WLAN,
         )
 
     ### <- GET SENSORS LIST
@@ -538,7 +541,7 @@ class ARBridge:
         args = dict()
 
         prefix = str()
-        if capabilities["api_type"] == SENSORS_TYPE_GWLAN:
+        if capabilities["api_type"] == GWLAN:
             prefix = f"wl{capabilities['api_id']}"
 
             for arg in args_raw:
@@ -549,8 +552,8 @@ class ARBridge:
                         else str(args_raw[arg])
                     )
 
-            if "password" in args_raw:
-                args["wpa_psk"] = str(args_raw["password"])
+            if PASSWORD in args_raw:
+                args["wpa_psk"] = str(args_raw[PASSWORD])
             if "state" in args_raw:
                 args["bss_enabled"] = str(converters.int_from_bool(args_raw["state"]))
             if "expire" in args_raw:
@@ -568,7 +571,7 @@ class ARBridge:
                 arguments=service_args,
                 expect_modify=True,
             )
-        elif capabilities["api_type"] == SENSORS_TYPE_WLAN:
+        elif capabilities["api_type"] == WLAN:
             prefix = f"wl{capabilities['api_id']}"
 
             for arg in args_raw:
@@ -579,8 +582,8 @@ class ARBridge:
                         else str(args_raw[arg])
                     )
 
-            if "password" in args_raw:
-                args["wpa_psk"] = str(args_raw["password"])
+            if PASSWORD in args_raw:
+                args["wpa_psk"] = str(args_raw[PASSWORD])
             if "state" in args_raw:
                 args["radio"] = str(converters.int_from_bool(args_raw["state"]))
 
@@ -610,9 +613,9 @@ class ARBridge:
         if "devices" in raw:
             rules = raw["devices"]
             for rule in rules:
-                if "mac" in rule:
-                    mac = rule["mac"].upper()
-                    name = rule.get("name", mac)
+                if MAC in rule:
+                    mac = rule[MAC].upper()
+                    name = rule.get(NAME, mac)
                     rules_to_change.append(
                         FilterDevice(
                             mac=mac,
@@ -625,9 +628,9 @@ class ARBridge:
                         f"Parental control rule is missing MAC address. This rule is skipped"
                     )
         # Single MAC is set
-        elif "mac" in raw:
-            mac = raw["mac"].upper()
-            name = raw.get("name", mac)
+        elif MAC in raw:
+            mac = raw[MAC].upper()
+            name = raw.get(NAME, mac)
             rules_to_change.append(
                 FilterDevice(
                     mac=mac,
@@ -643,8 +646,8 @@ class ARBridge:
                 reg_value = entity_reg.async_get(entity)
                 rules_to_change.append(
                     FilterDevice(
-                        mac=reg_value.capabilities["mac"].upper(),
-                        name=reg_value.capabilities["name"],
+                        mac=reg_value.capabilities[MAC].upper(),
+                        name=reg_value.capabilities[NAME],
                         state=state,
                     )
                 )
@@ -654,8 +657,8 @@ class ARBridge:
             reg_value = entity_reg.async_get(raw["entity_id"])
             rules_to_change.append(
                 FilterDevice(
-                    mac=reg_value.capabilities["mac"].upper(),
-                    name=reg_value.capabilities["name"],
+                    mac=reg_value.capabilities[MAC].upper(),
+                    name=reg_value.capabilities[NAME],
                     state=state,
                 )
             )
