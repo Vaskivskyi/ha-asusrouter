@@ -93,6 +93,8 @@ class ARSensorHandler:
         self._bridge = bridge
         self._connected_devices = 0
         self._connected_devices_list: list[str] = list()
+        self._latest_connected: datetime | None = None
+        self._latest_connected_list: list[Any] = list()
         self._options = options
         self._split_intervals = options.get(
             CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
@@ -104,22 +106,30 @@ class ARSensorHandler:
         return {
             SENSORS_CONNECTED_DEVICES[0]: self._connected_devices,
             SENSORS_CONNECTED_DEVICES[1]: self._connected_devices_list,
+            SENSORS_CONNECTED_DEVICES[2]: self._latest_connected_list,
+            SENSORS_CONNECTED_DEVICES[3]: self._latest_connected,
         }
 
     def update_device_count(
         self,
         conn_devices: int,
         list_devices: list[str],
+        latest_connected: datetime | None,
+        latest_connected_list: list[Any],
     ) -> bool:
         """Update connected devices attribute."""
 
         if (
             self._connected_devices == conn_devices
             and self._connected_devices_list == list_devices
+            and self._latest_connected == latest_connected
+            and self._latest_connected_list == latest_connected_list
         ):
             return False
         self._connected_devices = conn_devices
         self._connected_devices_list = list_devices
+        self._latest_connected = latest_connected
+        self._latest_connected_list = latest_connected_list
         return True
 
     async def get_coordinator(
@@ -200,6 +210,7 @@ class ARConnectedDevice:
         dev_info: dict[str, ConnectedDevice] | None = None,
         consider_home: int = 0,
         event_call: CALLBACK_TYPE | None = None,
+        connected_call: CALLBACK_TYPE | None = None,
     ):
         """Update AsusRouter device info."""
 
@@ -283,6 +294,8 @@ class ARConnectedDevice:
                         CONF_EVENT_DEVICE_RECONNECTED,
                         self.identity,
                     )
+                    if connected_call:
+                        connected_call(self.identity, utc_point_in_time)
                 # Set state
                 self._connected = True
             # Offline
@@ -390,6 +403,8 @@ class ARDevice:
         self._devices: dict[str, Any] = {}
         self._connected_devices: int = 0
         self._connected_devices_list: list[str] = list()
+        self._latest_connected: datetime | None = None
+        self._latest_connected_list: list[Any] = list()
         self._connect_error: bool = False
 
         self._sensor_handler: ARSensorHandler | None = None
@@ -520,14 +535,23 @@ class ARDevice:
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
         for device_mac, device in self._devices.items():
             dev_info = wrt_devices.pop(device_mac, None)
-            device.update(dev_info, consider_home, event_call=self.fire_event)
+            device.update(
+                dev_info,
+                consider_home,
+                event_call=self.fire_event,
+                connected_call=self.connected_device,
+            )
 
         new_devices = list()
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
             device = ARConnectedDevice(device_mac)
-            device.update(dev_info, event_call=self.fire_event)
+            device.update(
+                dev_info,
+                event_call=self.fire_event,
+                connected_call=self.connected_device,
+            )
             self._devices[device_mac] = device
             new_devices.append(device)
 
@@ -558,7 +582,10 @@ class ARDevice:
 
         self._sensor_handler = ARSensorHandler(self.hass, self.bridge, self._options)
         self._sensor_handler.update_device_count(
-            self._connected_devices, self._connected_devices_list
+            self._connected_devices,
+            self._connected_devices_list,
+            self._latest_connected,
+            self._latest_connected_list,
         )
 
         available_sensors = await self.bridge.async_get_available_sensors()
@@ -584,7 +611,10 @@ class ARDevice:
         if DEVICES in self._sensor_coordinator:
             coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
             if self._sensor_handler.update_device_count(
-                self._connected_devices, self._connected_devices_list
+                self._connected_devices,
+                self._connected_devices_list,
+                self._latest_connected,
+                self._latest_connected_list,
             ):
                 await coordinator.async_refresh()
 
@@ -625,6 +655,35 @@ class ARDevice:
         self._options.update(new_options)
         return req_reload
 
+    @callback
+    def connected_device(
+        self,
+        identity: dict[str, Any],
+        time: datetime | None = None,
+    ) -> None:
+        """Mark device connected."""
+
+        # Update latest connected time
+        if time:
+            self._latest_connected = time
+
+        mac = identity.get(MAC, None)
+        if not mac:
+            return
+
+        # If device already in list
+        for device in self._latest_connected_list:
+            if device.get(MAC, None) == mac:
+                self._latest_connected_list.remove(device)
+
+        # Add new identity
+        self._latest_connected_list.append(identity)
+
+        # Check the size
+        while len(self._latest_connected_list) > 5:
+            self._latest_connected_list.pop(0)
+
+    @callback
     def fire_event(
         self,
         event: str,

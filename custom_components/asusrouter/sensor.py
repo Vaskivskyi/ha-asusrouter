@@ -47,6 +47,18 @@ SENSORS = {
             "devices": "devices",
         },
     ),
+    (DEVICES, "latest_time"): ARSensorDescription(
+        key="latest_time",
+        key_group=DEVICES,
+        name="Latest Connected",
+        icon="mdi:devices",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "latest": "list",
+        },
+    ),
     (MISC, "boottime"): ARSensorDescription(
         key="boottime",
         key_group=MISC,

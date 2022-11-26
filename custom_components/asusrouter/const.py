@@ -129,7 +129,7 @@ STATE = "state"
 
 # Sensor lists
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = ["number", DEVICES]
+SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL]
 for i in NUMERIC_CORES:
     SENSORS_CPU.append(f"{CORE}_{i}")
