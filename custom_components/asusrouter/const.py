@@ -80,7 +80,13 @@ USED = "used"
 
 ### <-- GENERAL DATA
 
-### GENERAL TYPES
+### GENERAL STATES -->
+
+CONNECTED = "connected"
+
+### <-- GENERAL STATES
+
+### GENERAL TYPES -->
 
 CONNECTION_2G = "2.4 GHz"
 CONNECTION_5G = "5 GHz"
