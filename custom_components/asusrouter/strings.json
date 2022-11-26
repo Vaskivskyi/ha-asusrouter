@@ -35,7 +35,8 @@
                     "track_devices": "Enable device trackers",
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals"
+                    "split_intervals": "Enable per-sensor update intervals",
+                    "latest_connected": "Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -125,7 +126,8 @@
                     "track_devices": "Enable device trackers",
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals"
+                    "split_intervals": "Enable per-sensor update intervals",
+                    "latest_connected": "Number of latest connected devices to store"
                 }
             },
             "intervals": {
