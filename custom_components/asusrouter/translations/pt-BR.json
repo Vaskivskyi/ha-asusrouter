@@ -35,7 +35,8 @@
                     "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
                     "enable_control": "Ativar o controle do dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals"
+                    "split_intervals": "[NT] Enable per-sensor update intervals",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -125,7 +126,8 @@
                     "track_devices": "[NT] Enable device trackers",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
                     "enable_control": "Ativar o controle do dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals"
+                    "split_intervals": "[NT] Enable per-sensor update intervals",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {

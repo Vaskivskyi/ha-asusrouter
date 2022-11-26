@@ -35,6 +35,7 @@ from .const import (
     CONF_EVENT_DEVICE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
+    CONF_LATEST_CONNECTED,
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
@@ -48,6 +49,7 @@ from .const import (
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
     DEFAULT_INTERVALS,
+    DEFAULT_LATEST_CONNECTED,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
@@ -690,7 +692,9 @@ class ARDevice:
         self._latest_connected_list.append(identity)
 
         # Check the size
-        while len(self._latest_connected_list) > 5:
+        while len(self._latest_connected_list) > self._options.get(
+            CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED
+        ):
             self._latest_connected_list.pop(0)
 
         # Update latest connected time

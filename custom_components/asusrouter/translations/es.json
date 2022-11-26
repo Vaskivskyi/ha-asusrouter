@@ -35,7 +35,8 @@
                     "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                    "split_intervals": "Habilitar intervalos de actualización por sensor",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -125,7 +126,8 @@
                     "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                    "split_intervals": "Habilitar intervalos de actualización por sensor",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {

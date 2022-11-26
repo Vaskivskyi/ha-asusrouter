@@ -41,6 +41,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LATEST_CONNECTED,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
@@ -54,6 +55,7 @@ from .const import (
     DEFAULT_EVENT,
     DEFAULT_HIDE_PASSWORDS,
     DEFAULT_INTERVALS,
+    DEFAULT_LATEST_CONNECTED,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
@@ -301,6 +303,10 @@ def _create_form_operation_mode(
             CONF_SPLIT_INTERVALS,
             default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
         ): cv.boolean,
+        vol.Required(
+            CONF_LATEST_CONNECTED,
+            default=user_input.get(CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED),
+        ): cv.positive_int,
     }
 
     return vol.Schema(schema)
