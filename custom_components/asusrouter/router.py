@@ -38,6 +38,7 @@ from .const import (
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
+    CONNECTED,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_5G2,
@@ -200,6 +201,7 @@ class ARConnectedDevice:
             NAME: self._name,
             DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
             DEVICE_ATTRIBUTE_GUEST: False,
+            CONNECTED: None,
         }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
@@ -227,6 +229,11 @@ class ARConnectedDevice:
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_CONNECTION_TIME
                 ] = dev_info.connected_since
+                self.identity[CONNECTED] = (
+                    dev_info.connected_since
+                    or self.identity[CONNECTED]
+                    or utc_point_in_time
+                )
                 # Connection type
                 con_type = dev_info.connection_type
                 if con_type == 0:
@@ -295,7 +302,7 @@ class ARConnectedDevice:
                         self.identity,
                     )
                     if connected_call:
-                        connected_call(self.identity, utc_point_in_time)
+                        connected_call(self.identity)
                 # Set state
                 self._connected = True
             # Offline
@@ -655,17 +662,17 @@ class ARDevice:
         self._options.update(new_options)
         return req_reload
 
+    def connected_device_time(self, element: dict[str, Any]) -> datetime:
+        """Get connected time for the device"""
+
+        return element.get(CONNECTED)
+
     @callback
     def connected_device(
         self,
         identity: dict[str, Any],
-        time: datetime | None = None,
     ) -> None:
         """Mark device connected."""
-
-        # Update latest connected time
-        if time:
-            self._latest_connected = time
 
         mac = identity.get(MAC, None)
         if not mac:
@@ -676,12 +683,18 @@ class ARDevice:
             if device.get(MAC, None) == mac:
                 self._latest_connected_list.remove(device)
 
+        # Sort the list by time
+        self._latest_connected_list.sort(key=self.connected_device_time)
+
         # Add new identity
         self._latest_connected_list.append(identity)
 
         # Check the size
         while len(self._latest_connected_list) > 5:
             self._latest_connected_list.pop(0)
+
+        # Update latest connected time
+        self._latest_connected = self._latest_connected_list[-1].get(CONNECTED)
 
     @callback
     def fire_event(
