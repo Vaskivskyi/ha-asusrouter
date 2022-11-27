@@ -664,10 +664,16 @@ class ARBridge:
             )
 
         if state == "remove":
-            rules = await self.api.async_remove_parental_control_rules(rules_to_change)
+            _LOGGER.debug("Removing parental control rules")
+            rules = await self.api.async_remove_parental_control_rules(
+                rules=rules_to_change
+            )
             return True if rules != dict() else False
         elif state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
-            return await self.api.async_set_parental_control_rules(rules_to_change)
+            _LOGGER.debug("Setting parental control rules")
+            return await self.api.async_set_parental_control_rules(
+                rules=rules_to_change
+            )
         else:
             return False
 
