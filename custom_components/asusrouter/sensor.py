@@ -21,23 +21,23 @@ from .const import (
     CONF_INTERFACES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
-    SENSORS_TYPE_CPU,
-    SENSORS_TYPE_DEVICES,
-    SENSORS_TYPE_MISC,
-    SENSORS_TYPE_PORTS,
-    SENSORS_TYPE_RAM,
-    SENSORS_TYPE_SYSINFO,
-    SENSORS_TYPE_TEMPERATURE,
-    SENSORS_TYPE_WAN,
+    CPU,
+    DEVICES,
+    MISC,
+    PORTS,
+    RAM,
+    SYSINFO,
+    TEMPERATURE,
+    WAN,
 )
 from .dataclass import ARSensorDescription
 from .entity import AREntity, async_setup_ar_entry
 from .router import ARDevice
 
 SENSORS = {
-    (SENSORS_TYPE_DEVICES, "number"): ARSensorDescription(
+    (DEVICES, "number"): ARSensorDescription(
         key="number",
-        key_group=SENSORS_TYPE_DEVICES,
+        key_group=DEVICES,
         name="Connected Devices",
         icon="mdi:router-network",
         state_class=SensorStateClass.MEASUREMENT,
@@ -47,18 +47,30 @@ SENSORS = {
             "devices": "devices",
         },
     ),
-    (SENSORS_TYPE_MISC, "boottime"): ARSensorDescription(
+    (DEVICES, "latest_time"): ARSensorDescription(
+        key="latest_time",
+        key_group=DEVICES,
+        name="Latest Connected",
+        icon="mdi:devices",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "latest": "list",
+        },
+    ),
+    (MISC, "boottime"): ARSensorDescription(
         key="boottime",
-        key_group=SENSORS_TYPE_MISC,
+        key_group=MISC,
         name="Boot Time",
         icon="mdi:restart",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_CPU, "total"): ARSensorDescription(
+    (CPU, "total"): ARSensorDescription(
         key="total",
-        key_group=SENSORS_TYPE_CPU,
+        key_group=CPU,
         name="CPU",
         icon="mdi:cpu-32-bit",
         state_class=SensorStateClass.MEASUREMENT,
@@ -76,9 +88,9 @@ SENSORS = {
             "core_8": "core_8",
         },
     ),
-    (SENSORS_TYPE_RAM, "usage"): ARSensorDescription(
+    (RAM, "usage"): ARSensorDescription(
         key="usage",
-        key_group=SENSORS_TYPE_RAM,
+        key_group=RAM,
         name="RAM",
         icon="mdi:memory",
         state_class=SensorStateClass.MEASUREMENT,
@@ -92,9 +104,9 @@ SENSORS = {
             "used": "used",
         },
     ),
-    (SENSORS_TYPE_PORTS, "WAN_total"): ARSensorDescription(
+    (PORTS, "WAN_total"): ARSensorDescription(
         key="WAN_total",
-        key_group=SENSORS_TYPE_PORTS,
+        key_group=PORTS,
         name="WAN Speed",
         icon="mdi:ethernet-cable",
         state_class=SensorStateClass.MEASUREMENT,
@@ -108,9 +120,9 @@ SENSORS = {
             "WAN_3": "wan_3",
         },
     ),
-    (SENSORS_TYPE_PORTS, "LAN_total"): ARSensorDescription(
+    (PORTS, "LAN_total"): ARSensorDescription(
         key="LAN_total",
-        key_group=SENSORS_TYPE_PORTS,
+        key_group=PORTS,
         name="LAN Speed",
         icon="mdi:ethernet-cable",
         state_class=SensorStateClass.MEASUREMENT,
@@ -128,9 +140,9 @@ SENSORS = {
             "LAN_8": "lan_8",
         },
     ),
-    (SENSORS_TYPE_WAN, "ip"): ARSensorDescription(
+    (WAN, "ip"): ARSensorDescription(
         key="ip",
-        key_group=SENSORS_TYPE_WAN,
+        key_group=WAN,
         name="WAN IP",
         icon="mdi:ip",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -143,9 +155,9 @@ SENSORS = {
             "private_subnet": "private_subnet",
         },
     ),
-    (SENSORS_TYPE_TEMPERATURE, "cpu"): ARSensorDescription(
+    (TEMPERATURE, "cpu"): ARSensorDescription(
         key="cpu",
-        key_group=SENSORS_TYPE_TEMPERATURE,
+        key_group=TEMPERATURE,
         name="Temperature CPU",
         icon="mdi:thermometer",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -154,9 +166,9 @@ SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_TEMPERATURE, "2ghz"): ARSensorDescription(
+    (TEMPERATURE, "2ghz"): ARSensorDescription(
         key="2ghz",
-        key_group=SENSORS_TYPE_TEMPERATURE,
+        key_group=TEMPERATURE,
         name="Temperature 2.4 GHz",
         icon="mdi:thermometer",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -165,9 +177,9 @@ SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_TEMPERATURE, "5ghz"): ARSensorDescription(
+    (TEMPERATURE, "5ghz"): ARSensorDescription(
         key="5ghz",
-        key_group=SENSORS_TYPE_TEMPERATURE,
+        key_group=TEMPERATURE,
         name="Temperature 5 GHz",
         icon="mdi:thermometer",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -176,27 +188,27 @@ SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_SYSINFO, "load_avg_1"): ARSensorDescription(
+    (SYSINFO, "load_avg_1"): ARSensorDescription(
         key="load_avg_1",
-        key_group=SENSORS_TYPE_SYSINFO,
+        key_group=SYSINFO,
         name="Load Average (1 min)",
         icon="mdi:cpu-32-bit",
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_SYSINFO, "load_avg_5"): ARSensorDescription(
+    (SYSINFO, "load_avg_5"): ARSensorDescription(
         key="load_avg_5",
-        key_group=SENSORS_TYPE_SYSINFO,
+        key_group=SYSINFO,
         name="Load Average (5 min)",
         icon="mdi:cpu-32-bit",
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
-    (SENSORS_TYPE_SYSINFO, "load_avg_15"): ARSensorDescription(
+    (SYSINFO, "load_avg_15"): ARSensorDescription(
         key="load_avg_15",
-        key_group=SENSORS_TYPE_SYSINFO,
+        key_group=SYSINFO,
         name="Load Average (15 min)",
         icon="mdi:cpu-32-bit",
         state_class=SensorStateClass.MEASUREMENT,

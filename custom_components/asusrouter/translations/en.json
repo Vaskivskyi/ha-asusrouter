@@ -35,7 +35,8 @@
                     "track_devices": "Enable device trackers",
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals"
+                    "split_intervals": "Enable per-sensor update intervals",
+                    "latest_connected": "Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -48,6 +49,7 @@
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",
+                    "interval_gwlan": "GWLAN interval",
                     "interval_light": "Light data",
                     "interval_misc": "Misc data",
                     "interval_network_stat": "Network stat data",
@@ -124,7 +126,8 @@
                     "track_devices": "Enable device trackers",
                     "enable_monitor": "Enable device monitoring",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals"
+                    "split_intervals": "Enable per-sensor update intervals",
+                    "latest_connected": "Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -137,6 +140,7 @@
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",
+                    "interval_gwlan": "GWLAN interval",
                     "interval_light": "Light data",
                     "interval_misc": "Misc data",
                     "interval_network_stat": "Network stat data",

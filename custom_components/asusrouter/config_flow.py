@@ -41,6 +41,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LATEST_CONNECTED,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
@@ -54,6 +55,7 @@ from .const import (
     DEFAULT_EVENT,
     DEFAULT_HIDE_PASSWORDS,
     DEFAULT_INTERVALS,
+    DEFAULT_LATEST_CONNECTED,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
@@ -65,13 +67,13 @@ from .const import (
     DEFAULT_VERIFY_SSL,
     DELAULT_INTERFACES,
     DOMAIN,
+    FIRMWARE,
     RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
     RESULT_SUCCESS,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
-    SENSORS_TYPE_FIRMWARE,
     SIMPLE_SETUP_PARAMETERS,
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
@@ -301,6 +303,10 @@ def _create_form_operation_mode(
             CONF_SPLIT_INTERVALS,
             default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
         ): cv.boolean,
+        vol.Required(
+            CONF_LATEST_CONNECTED,
+            default=user_input.get(CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED),
+        ): cv.positive_int,
     }
 
     return vol.Schema(schema)
@@ -343,10 +349,10 @@ def _create_form_intervals(
                     default=conf_scan_interval,
                 ): cv.positive_int,
                 vol.Optional(
-                    CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
+                    CONF_INTERVAL + FIRMWARE,
                     default=user_input.get(
-                        CONF_INTERVAL + SENSORS_TYPE_FIRMWARE,
-                        DEFAULT_INTERVALS[CONF_INTERVAL + SENSORS_TYPE_FIRMWARE],
+                        CONF_INTERVAL + FIRMWARE,
+                        DEFAULT_INTERVALS[CONF_INTERVAL + FIRMWARE],
                     ),
                 ): cv.positive_int,
             }

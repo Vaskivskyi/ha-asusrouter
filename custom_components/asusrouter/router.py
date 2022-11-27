@@ -35,9 +35,11 @@ from .const import (
     CONF_EVENT_DEVICE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
+    CONF_LATEST_CONNECTED,
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
+    CONNECTED,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_5G2,
@@ -47,6 +49,7 @@ from .const import (
     DEFAULT_CONSIDER_HOME,
     DEFAULT_HTTP,
     DEFAULT_INTERVALS,
+    DEFAULT_LATEST_CONNECTED,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
@@ -63,11 +66,14 @@ from .const import (
     DEVICE_ATTRIBUTE_RX_SPEED,
     DEVICE_ATTRIBUTE_TX_SPEED,
     DEVICE_ATTRIBUTES,
+    DEVICES,
     DOMAIN,
+    FIRMWARE,
+    IP,
     KEY_COORDINATOR,
+    MAC,
+    NAME,
     SENSORS_CONNECTED_DEVICES,
-    SENSORS_TYPE_DEVICES,
-    SENSORS_TYPE_FIRMWARE,
 )
 
 _T = TypeVar("_T")
@@ -90,6 +96,8 @@ class ARSensorHandler:
         self._bridge = bridge
         self._connected_devices = 0
         self._connected_devices_list: list[str] = list()
+        self._latest_connected: datetime | None = None
+        self._latest_connected_list: list[Any] = list()
         self._options = options
         self._split_intervals = options.get(
             CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
@@ -101,22 +109,30 @@ class ARSensorHandler:
         return {
             SENSORS_CONNECTED_DEVICES[0]: self._connected_devices,
             SENSORS_CONNECTED_DEVICES[1]: self._connected_devices_list,
+            SENSORS_CONNECTED_DEVICES[2]: self._latest_connected_list,
+            SENSORS_CONNECTED_DEVICES[3]: self._latest_connected,
         }
 
     def update_device_count(
         self,
         conn_devices: int,
         list_devices: list[str],
+        latest_connected: datetime | None,
+        latest_connected_list: list[Any],
     ) -> bool:
         """Update connected devices attribute."""
 
         if (
             self._connected_devices == conn_devices
             and self._connected_devices_list == list_devices
+            and self._latest_connected == latest_connected
+            and self._latest_connected_list == latest_connected_list
         ):
             return False
         self._connected_devices = conn_devices
         self._connected_devices_list = list_devices
+        self._latest_connected = latest_connected
+        self._latest_connected_list = latest_connected_list
         return True
 
     async def get_coordinator(
@@ -128,7 +144,7 @@ class ARSensorHandler:
 
         should_poll = True
 
-        if sensor_type == SENSORS_TYPE_DEVICES:
+        if sensor_type == DEVICES:
             should_poll = False
             method = self._get_connected_devices
         elif update_method is not None:
@@ -136,7 +152,7 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
-        if sensor_type == SENSORS_TYPE_FIRMWARE:
+        if sensor_type == FIRMWARE:
             interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
@@ -182,11 +198,12 @@ class ARConnectedDevice:
         self._name = name
         self._ip: str | None = None
         self.identity = {
-            "mac": self._mac,
-            "ip": self._ip,
-            "name": self._name,
+            MAC: self._mac,
+            IP: self._ip,
+            NAME: self._name,
             DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
             DEVICE_ATTRIBUTE_GUEST: False,
+            CONNECTED: None,
         }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
@@ -197,6 +214,7 @@ class ARConnectedDevice:
         dev_info: dict[str, ConnectedDevice] | None = None,
         consider_home: int = 0,
         event_call: CALLBACK_TYPE | None = None,
+        connected_call: CALLBACK_TYPE | None = None,
     ):
         """Update AsusRouter device info."""
 
@@ -204,15 +222,20 @@ class ARConnectedDevice:
 
         if dev_info:
             self._name = dev_info.name
-            self.identity["name"] = self._name
+            self.identity[NAME] = self._name
             # Online
             if dev_info.online:
                 self._ip = dev_info.ip
-                self.identity["ip"] = self._ip
+                self.identity[IP] = self._ip
                 # Connection time
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_CONNECTION_TIME
                 ] = dev_info.connected_since
+                self.identity[CONNECTED] = (
+                    dev_info.connected_since
+                    or self.identity[CONNECTED]
+                    or utc_point_in_time
+                )
                 # Connection type
                 con_type = dev_info.connection_type
                 if con_type == 0:
@@ -280,6 +303,8 @@ class ARConnectedDevice:
                         CONF_EVENT_DEVICE_RECONNECTED,
                         self.identity,
                     )
+                    if connected_call:
+                        connected_call(self.identity)
                 # Set state
                 self._connected = True
             # Offline
@@ -387,6 +412,8 @@ class ARDevice:
         self._devices: dict[str, Any] = {}
         self._connected_devices: int = 0
         self._connected_devices_list: list[str] = list()
+        self._latest_connected: datetime | None = None
+        self._latest_connected_list: list[Any] = list()
         self._connect_error: bool = False
 
         self._sensor_handler: ARSensorHandler | None = None
@@ -420,7 +447,7 @@ class ARDevice:
         async def async_service_device_internet_access(service: ServiceCall):
             """Adjust device internet access"""
 
-            await self.bridge.async_device_internet_access(raw=service.data)
+            await self.bridge.async_parental_control(raw=service.data)
 
         self.hass.services.async_register(
             DOMAIN, "device_internet_access", async_service_device_internet_access
@@ -517,14 +544,23 @@ class ARDevice:
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
         for device_mac, device in self._devices.items():
             dev_info = wrt_devices.pop(device_mac, None)
-            device.update(dev_info, consider_home, event_call=self.fire_event)
+            device.update(
+                dev_info,
+                consider_home,
+                event_call=self.fire_event,
+                connected_call=self.connected_device,
+            )
 
         new_devices = list()
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
             device = ARConnectedDevice(device_mac)
-            device.update(dev_info, event_call=self.fire_event)
+            device.update(
+                dev_info,
+                event_call=self.fire_event,
+                connected_call=self.connected_device,
+            )
             self._devices[device_mac] = device
             new_devices.append(device)
 
@@ -555,11 +591,14 @@ class ARDevice:
 
         self._sensor_handler = ARSensorHandler(self.hass, self.bridge, self._options)
         self._sensor_handler.update_device_count(
-            self._connected_devices, self._connected_devices_list
+            self._connected_devices,
+            self._connected_devices_list,
+            self._latest_connected,
+            self._latest_connected_list,
         )
 
         available_sensors = await self.bridge.async_get_available_sensors()
-        available_sensors[SENSORS_TYPE_DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
+        available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
 
         for sensor_type, sensor_def in available_sensors.items():
             if not (sensor_names := sensor_def.get("sensors")):
@@ -578,12 +617,13 @@ class ARDevice:
         if not self._sensor_handler:
             return
 
-        if SENSORS_TYPE_DEVICES in self._sensor_coordinator:
-            coordinator = self._sensor_coordinator[SENSORS_TYPE_DEVICES][
-                KEY_COORDINATOR
-            ]
+        if DEVICES in self._sensor_coordinator:
+            coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
             if self._sensor_handler.update_device_count(
-                self._connected_devices, self._connected_devices_list
+                self._connected_devices,
+                self._connected_devices_list,
+                self._latest_connected,
+                self._latest_connected_list,
             ):
                 await coordinator.async_refresh()
 
@@ -624,6 +664,43 @@ class ARDevice:
         self._options.update(new_options)
         return req_reload
 
+    def connected_device_time(self, element: dict[str, Any]) -> datetime:
+        """Get connected time for the device"""
+
+        return element.get(CONNECTED)
+
+    @callback
+    def connected_device(
+        self,
+        identity: dict[str, Any],
+    ) -> None:
+        """Mark device connected."""
+
+        mac = identity.get(MAC, None)
+        if not mac:
+            return
+
+        # If device already in list
+        for device in self._latest_connected_list:
+            if device.get(MAC, None) == mac:
+                self._latest_connected_list.remove(device)
+
+        # Sort the list by time
+        self._latest_connected_list.sort(key=self.connected_device_time)
+
+        # Add new identity
+        self._latest_connected_list.append(identity)
+
+        # Check the size
+        while len(self._latest_connected_list) > self._options.get(
+            CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED
+        ):
+            self._latest_connected_list.pop(0)
+
+        # Update latest connected time
+        self._latest_connected = self._latest_connected_list[-1].get(CONNECTED)
+
+    @callback
     def fire_event(
         self,
         event: str,

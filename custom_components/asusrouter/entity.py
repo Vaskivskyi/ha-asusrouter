@@ -13,7 +13,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import DATA_ASUSROUTER, DOMAIN, KEY_COORDINATOR
+from .const import ASUSROUTER, DOMAIN, KEY_COORDINATOR
 from .dataclass import AREntityDescription
 from .router import ARDevice
 
@@ -29,7 +29,7 @@ async def async_setup_ar_entry(
 ) -> None:
     """Setup AsusRouter entities."""
 
-    router: ARDevice = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
     entities = []
 
     for sensor_data in router._sensor_coordinator.values():

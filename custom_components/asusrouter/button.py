@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
-    DATA_ASUSROUTER,
+    ASUSROUTER,
     DOMAIN,
 )
 from .dataclass import ARButtonDescription
@@ -68,7 +68,7 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter buttons."""
 
-    router: ARDevice = hass.data[DOMAIN][entry.entry_id][DATA_ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
     entities = []
 
     for button in BUTTONS:

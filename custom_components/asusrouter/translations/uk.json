@@ -35,7 +35,8 @@
                     "track_devices": "Увімкнути трекінг пристроїв",
                     "enable_monitor": "Увімкнути моніторинг пристрою",
                     "enable_control": "Увімкнути контроль пристрою",
-                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
+                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів",
+                    "latest_connected": "Кількість останніх підключених пристроїв для зберігання"
                 }
             },
             "intervals": {
@@ -48,6 +49,7 @@
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
                     "interval_firmware": "Оновлення даних прошивки",
+                    "interval_gwlan": "Оновлення даних гостьових WLAN",
                     "interval_light": "Оновлення даних light",
                     "interval_misc": "Оновлення даних misc",
                     "interval_network_stat": "Оновлення даних network stat",
@@ -124,7 +126,8 @@
                     "track_devices": "Увімкнути трекінг пристроїв",
                     "enable_monitor": "Увімкнути моніторинг пристрою",
                     "enable_control": "Увімкнути контроль пристрою",
-                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
+                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів",
+                    "latest_connected": "Кількість останніх підключених пристроїв для зберігання"
                 }
             },
             "intervals": {
@@ -137,6 +140,7 @@
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
                     "interval_firmware": "Оновлення даних прошивки",
+                    "interval_gwlan": "Оновлення даних гостьових WLAN",
                     "interval_light": "Оновлення даних light",
                     "interval_misc": "Оновлення даних misc",
                     "interval_network_stat": "Оновлення даних network stat",

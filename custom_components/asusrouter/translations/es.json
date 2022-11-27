@@ -35,7 +35,8 @@
                     "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                    "split_intervals": "Habilitar intervalos de actualización por sensor",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -48,6 +49,7 @@
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
                     "interval_firmware": "Datos firmware",
+                    "interval_gwlan": "Datos GWLAN",
                     "interval_light": "Datos luces",
                     "interval_misc": "Datos miscelánea",
                     "interval_network_stat": "Datos estadísticas de red",
@@ -124,7 +126,8 @@
                     "track_devices": "Habilitar rastreadores de dispositivo",
                     "enable_monitor": "Habilitar monitorización de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                    "split_intervals": "Habilitar intervalos de actualización por sensor",
+                    "latest_connected": "[NT] Number of latest connected devices to store"
                 }
             },
             "intervals": {
@@ -137,6 +140,7 @@
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
                     "interval_firmware": "Datos firmware",
+                    "interval_gwlan": "Datos GWLAN",
                     "interval_light": "Datos luces",
                     "interval_misc": "Datos miscelánea",
                     "interval_network_stat": "Datos estadísticas de red",
