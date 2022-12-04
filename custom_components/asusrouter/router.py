@@ -15,6 +15,7 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_SCAN_INTERVAL,
     CONF_VERIFY_SSL,
+    Platform,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -453,6 +454,15 @@ class ARDevice:
             DOMAIN, "device_internet_access", async_service_device_internet_access
         )
 
+        async def async_service_remove_trackers(service: ServiceCall):
+            """Remove device trackers"""
+
+            await self.remove_trackers(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "remove_trackers", async_service_remove_trackers
+        )
+
         self._identity = self.bridge.identity
 
         if self._identity.model is not None:
@@ -711,6 +721,32 @@ class ARDevice:
             f"{DOMAIN}_{event}",
             args,
         )
+
+    async def remove_trackers(self, **kwargs: Any) -> None:
+        """Remove device trackers."""
+
+        _LOGGER.debug("Removing trackers")
+
+        raw = kwargs.get("raw", None)
+        if raw is None:
+            return False
+
+        if "entities" in raw:
+            entities = raw["entities"]
+            entity_reg = er.async_get(self.hass)
+            for entity in entities:
+                reg_value = entity_reg.async_get(entity)
+                mac=reg_value.capabilities[MAC]
+                _LOGGER.debug(f"Trying to remove tracker with mac: {mac}")
+                if mac in self._devices:
+                    self._devices.pop(mac)
+                    _LOGGER.debug("Found and removed")
+
+        await self.update_devices()
+
+        unload = await self.hass.config_entries.async_unload_platforms(self._entry, [Platform.DEVICE_TRACKER])
+        if unload:
+            self.hass.config_entries.async_setup_platforms(self._entry, [Platform.DEVICE_TRACKER])
 
     @property
     def device_info(self) -> DeviceInfo:

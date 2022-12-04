@@ -145,8 +145,9 @@ class ARDeviceEntity(ScannerEntity):
     def async_on_demand_update(self) -> None:
         """Update the state."""
 
-        self._device = self._router.devices[self._device.mac]
-        self.async_write_ha_state()
+        if self._device.mac in self._router.devices:
+            self._device = self._router.devices[self._device.mac]
+            self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
         """Register state update callback."""
