@@ -2,10 +2,10 @@
     "config": {
         "step": {
             "discovery": {
-                "title": "[NT] Device location",
+                "title": "Localizar dispositivo",
                 "description": "Como encontrar seu dispositivo",
                 "data": {
-                    "host": "Host / Endereço IP"
+                    "host": "Nome de rede / Endereço IP"
                 }
             },
             "credentials": {
@@ -18,12 +18,12 @@
                 }
             },
             "device": {
-                "title": "[NT] Device settings",
+                "title": "Configurar dispositivo",
                 "description": "Parâmetros para conectar ao dispositivo",
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
-                    "port": "Port (0 to use default value)",
+                    "port": "Porta (0 para usar o valor padrão)",
                     "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar certificado SSL",
                     "cert_path": "Caminho do certificado"
@@ -32,85 +32,85 @@
             "operation_mode": {
                 "title": "Modo de operação",
                 "data": {
-                    "track_devices": "[NT] Enable device trackers",
-                    "enable_monitor": "Ativar o monitoramento do dispositivo",
+                    "track_devices": "Habilitar rastreadores de dispositivos",
+                    "enable_monitor": "Ativar o monitoramento do dispositivoo",
                     "enable_control": "Ativar o controle do dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals",
-                    "latest_connected": "[NT] Number of latest connected devices to store"
+                    "split_intervals": "Habilitar intervalos de atualização por sensor",
+                    "latest_connected": "Número de dispositivos conectatos recentemente a armazenar"
                 }
             },
             "intervals": {
-                "title": "[NT] Update intervals",
-                "description": "[NT] Values are in seconds",
+                "title": "Intervalos de atualização",
+                "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "[NT] Device trackers update",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
+                    "interval_devices": "Atualizar rastreadores de dispositivos",
+                    "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "interval_cpu": "[NT] CPU data",
-                    "interval_firmware": "[NT] Firmware data",
-                    "interval_gwlan": "[NT] GWLAN data",
-                    "interval_light": "[NT] Light data",
-                    "interval_misc": "[NT] Misc data",
-                    "interval_network_stat": "[NT] Network stat data",
-                    "interval_parental_control": "[NT] Parental control data",
-                    "interval_ports": "[NT] Ports data",
-                    "interval_ram": "[NT] RAM data",
-                    "interval_sysinfo": "[NT] Sysinfo data",
-                    "interval_temperature": "[NT] Temperature data",
-                    "interval_vpn": "[NT] VPN data",
-                    "interval_wan": "[NT] WAN data",
-                    "interval_wlan": "[NT] WLAN data"
+                    "interval_cpu": "Dados de CPU",
+                    "interval_firmware": "Dados do firmware",
+                    "interval_gwlan": "Dados GWLAN",
+                    "interval_light": "Dados dos LEDs",
+                    "interval_misc": "Dados diversos",
+                    "interval_network_stat": "Dados de estatística de rede",
+                    "interval_parental_control": "Dados do controle dos pais",
+                    "interval_ports": "Dados de portas",
+                    "interval_ram": "Dados da RAM",
+                    "interval_sysinfo": "Dados do sistema",
+                    "interval_temperature": "Dados de temperatura",
+                    "interval_vpn": "Dados de VPN",
+                    "interval_wan": "Dados da WAN",
+                    "interval_wlan": "Dados da WLAN"
                 }
             },
             "interfaces": {
                 "title": "Interfaces para monitorar",
                 "data": {
                     "interfaces": "Selecione interfaces de rede para monitorar",
-                    "units_speed": "[NT] Units for speed",
-                    "units_traffic": "[NT] Units for traffic"
+                    "units_speed": "Unidades de velocidade",
+                    "units_traffic": "Unidades de tráfego"
                 }
             },
             "security": {
-                "title": "[NT] Security",
+                "title": "Segurança",
                 "data": {
-                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
+                    "hide_passwords": "Ocultar senhas de sensores e atributos"
                 }
             },
             "name": {
-                "title": "[NT] Device name",
+                "title": "Nome do dispositivo",
                 "data": {
                     "name": "Deixe em branco para usar o modelo do dispositivo como o nome"
                 }
             }
         },
         "error": {
-            "cannot_resolve_host": "Não pode resolver o nome do host. Tente com o endereço IP",
+            "cannot_resolve_host": "Não foi possível resolver o nome do host. Tente usar o endereço IP",
             "connection_refused": "Conexão recusada",
             "error": "Falhou ao conectar",
-            "login_blocked": "O login é bloqueado pelo dispositivo. Por favor, espere",
+            "login_blocked": "O login foi bloqueado pelo dispositivo. Por favor, espere",
             "password_missing": "Falta a senha",
             "unknown": "Erro desconhecido",
-            "wrong_credentials": "Credenciais erradas"
+            "wrong_credentials": "Credenciais inválidas"
         }
     },
     "options": {
         "step": {
             "options": {
-                "title": "[NT] Configurations to change",
-                "description": "[NT] Please, select configurations you would like to change",
+                "title": "Configurações a alterar",
+                "description": "Favor selecionar as configurações que deseja alterar",
                 "data": {
                     "device": "Credenciais e configurações de conexão",
                     "operation_mode": "Modo de operação",
-                    "intervals": "[NT] Update intervals",
+                    "intervals": "Intervalos de atualização",
                     "interfaces": "Interfaces para monitorar",
-                    "events": "[NT] Home Assistant events",
-                    "security": "[NT] Security options"
+                    "events": "Eventos do Home Assistant",
+                    "security": "Opções de segurança"
                 }
             },
             "device": {
-                "title": "[NT] Device settings",
-                "description": "Parâmetros para conectar ao dispositivo",
+                "title": "Configurações do dispositivo",
+                "description": "Parâmetros para conexão ao dispositivo",
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
@@ -123,62 +123,62 @@
             "operation_mode": {
                 "title": "Modo de operação",
                 "data": {
-                    "track_devices": "[NT] Enable device trackers",
+                    "track_devices": "Habilitar rastreadores de dispositivos",
                     "enable_monitor": "Ativar o monitoramento do dispositivo",
                     "enable_control": "Ativar o controle do dispositivo",
-                    "split_intervals": "[NT] Enable per-sensor update intervals",
-                    "latest_connected": "[NT] Number of latest connected devices to store"
+                    "split_intervals": "Habilitar intervalos por sensor",
+                    "latest_connected": "Número de dispositivos conectatos recentemente a armazenar"
                 }
             },
             "intervals": {
-                "title": "[NT] Update intervals",
-                "description": "[NT] Values are in seconds",
+                "title": "Intervalos de atualização",
+                "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "[NT] Device trackers update",
-                    "consider_home": "Considere o dispositivo em casa para (após o último estado 'online')",
+                    "interval_devices": "Atualizar rastreadores de dispositivos",
+                    "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
-                    "interval_cpu": "[NT] CPU data",
-                    "interval_firmware": "[NT] Firmware data",
-                    "interval_gwlan": "[NT] GWLAN data",
-                    "interval_light": "[NT] Light data",
-                    "interval_misc": "[NT] Misc data",
-                    "interval_network_stat": "[NT] Network stat data",
-                    "interval_parental_control": "[NT] Parental control data",
-                    "interval_ports": "[NT] Ports data",
-                    "interval_ram": "[NT] RAM data",
-                    "interval_sysinfo": "[NT] Sysinfo data",
-                    "interval_temperature": "[NT] Temperature data",
-                    "interval_vpn": "[NT] VPN data",
-                    "interval_wan": "[NT] WAN data",
-                    "interval_wlan": "[NT] WLAN data"
+                    "interval_cpu": "Dados de CPU",
+                    "interval_firmware": "Dados do firmware",
+                    "interval_gwlan": "Dados GWLAN",
+                    "interval_light": "Dados dos LEDs",
+                    "interval_misc": "Dados diversos",
+                    "interval_network_stat": "Dados de estatística da rede",
+                    "interval_parental_control": "Dados do controle dos pais",
+                    "interval_ports": "Dados de portas",
+                    "interval_ram": "Dados de RAM",
+                    "interval_sysinfo": "Dados do sistema",
+                    "interval_temperature": "Dados de temperatura",
+                    "interval_vpn": "Dados de VPN",
+                    "interval_wan": "Dados da WAN",
+                    "interval_wlan": "Dados da WLAN"
                 }
             },
             "interfaces": {
                 "title": "Interfaces para monitorar",
                 "data": {
                     "interfaces": "Selecione interfaces de rede para monitorar",
-                    "units_speed": "[NT] Units for speed",
-                    "units_traffic": "[NT] Units for traffic"
+                    "units_speed": "Unidades para velocidade",
+                    "units_traffic": "Unidades para tráfego"
                 }
             },
             "events": {
-                "title": "[NT] Events",
-                "description": "[NT] Which events should be raised",
+                "title": "Eventos",
+                "description": "Quais eventos devem ser disparados",
                 "data": {
-                    "device_connected": "[NT] Device connected (the device was not tracked before)",
-                    "device_disconnected": "[NT] Device disconnected",
-                    "device_reconnected": "[NT] Device reconnected (this device was already tracked before)"
+                    "device_connected": "Dispositivo conectato (o dispositivo não foi rastreado antes)",
+                    "device_disconnected": "Dispositivo desconectato",
+                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado antes)"
                 }
             },
             "security": {
-                "title": "[NT] Security",
+                "title": "Segurança",
                 "data": {
-                    "hide_passwords": "[NT] Hide passwords from sensors and attributes"
+                    "hide_passwords": "Ocultar senhas de sensores e atributos"
                 }
             },
             "confirmation": {
-                "title": "[NT] Reload required",
+                "title": "Recarregar",
                 "description": "Por favor, recarregue a integração",
                 "data": {
                     "confirm": "Entendo que preciso recarregar a integração para aplicar a nova configuração. Para fazer isso, vou clicar no menu de integração (3 pontos) e pressionar 'Recarregar'"
@@ -187,8 +187,8 @@
         },
         "error": {
             "connection_refused": "Conexão recusada",
-            "error": "Falhou ao conectar",
-            "login_blocked": "O login é bloqueado pelo dispositivo. Por favor, espere",
+            "error": "Falha ao conectar",
+            "login_blocked": "O login foi bloqueado pelo dispositivo. Por favor, espere",
             "not_confirmed": "Você tem que confirmar",
             "unknown": "Erro desconhecido",
             "wrong_credentials": "Credenciais erradas"
