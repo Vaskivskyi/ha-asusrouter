@@ -1,0 +1,197 @@
+{
+    "config": {
+        "step": {
+            "discovery": {
+                "title": "Pridať zariadenie",
+                "description": "Ako pridať svoje zariadenie",
+                "data": {
+                    "host": "Hostiteľ / IP adresa"
+                }
+            },
+            "credentials": {
+                "title": "Prihlasovacie údaje",
+                "description": "Rovnaké ako pre webový panel zariadenia",
+                "data": {
+                    "username": "Uživateľské meno",
+                    "password": "Heslo",
+                    "ssl": "Použiť pripojenie SSL"
+                }
+            },
+            "device": {
+                "title": "Nastavenie zariadenia",
+                "description": "Parametre pre pripojenie k zariadeniu",
+                "data": {
+                    "username": "Uživateľské meno",
+                    "password": "Heslo",
+                    "port": "Port (0 pre použitie východzej hodnoty)",
+                    "ssl": "Použiť pripojenie SSL",
+                    "verify_ssl": "Overiť certifikát SSL",
+                    "cert_path": "Cesta k certifikátu SSL"
+                }
+            },
+            "operation_mode": {
+                "title": "Prevádzkový režim",
+                "data": {
+                    "track_devices": "Povoliť sledovanie zariadení",
+                    "enable_monitor": "Povoliť monitorovanie zariadení",
+                    "enable_control": "Povoliť ovládanie zariadenia",
+                    "split_intervals": "Povoliť intervaly aktualizáce pre každý senzor",
+                    "latest_connected": "Počet najnovších pripojených zariadení pre uloženie"
+                }
+            },
+            "intervals": {
+                "title": "Intervaly aktualizácie",
+                "description": "Hodnoty sú v sekundách",
+                "data": {
+                    "cache_time": "Čas medzipamäti",
+                    "interval_devices": "Aktualizácia sledovačov zariadení",
+                    "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
+                    "scan_interval": "Aktualizácia entít",
+                    "interval_cpu": "Údaje CPU",
+                    "interval_firmware": "Údaje firmwaru",
+                    "interval_gwlan": "Interval GWLAN",
+                    "interval_light": "Stav LED",
+                    "interval_misc": "Rôzne údaje",
+                    "interval_network_stat": "Údaje o štatistikách siete",
+                    "interval_parental_control": "Údaje rodičovskej kontroly",
+                    "interval_ports": "Údaje portov",
+                    "interval_ram": "Údaje RAM",
+                    "interval_sysinfo": "Údaje systémové info",
+                    "interval_temperature": "Údaje o teplote",
+                    "interval_vpn": "Údaje VPN",
+                    "interval_wan": "Údaje WAN",
+                    "interval_wlan": "Údaje WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Rozhranie sledovania",
+                "data": {
+                    "interfaces": "Vyberte sieťové rozhranie sledovania",
+                    "units_speed": "Jednotky pre rýchlost",
+                    "units_traffic": "Jednotky pre sieťovú prevádzku"
+                }
+            },
+            "security": {
+                "title": "Zabezpečenie",
+                "data": {
+                    "hide_passwords": "Skryť heslá zo senzorov a atribútov"
+                }
+            },
+            "name": {
+                "title": "Názov zariadenia",
+                "data": {
+                    "name": "Ak chcete použiť ako názov model zariadenia, ponechajte toto pole prázdné"
+                }
+            }
+        },
+        "error": {
+            "cannot_resolve_host": "Nedá sa rozpoznať názov hostiteľa. Skúste použiť IP adresu",
+            "connection_refused": "Pripojenie odmietnuté",
+            "error": "Nepodarilo se pripojiť",
+            "login_blocked": "Prihlásenie je blokované zariadením. Počkajte prosím",
+            "password_missing": "Chýba heslo",
+            "unknown": "Neznáma chyba",
+            "wrong_credentials": "Chybné prihlasovacie údaje"
+        }
+    },
+    "options": {
+        "step": {
+            "options": {
+                "title": "Zmena konfigurácií",
+                "description": "Vyberte prosím konfigurácie, ktoré chcete zmeniť",
+                "data": {
+                    "device": "Prihlasovacie údaje a nastavenie pripojenia",
+                    "operation_mode": "Prevádzkový režim",
+                    "intervals": "Intervaly aktualizácie",
+                    "interfaces": "Rozhrania sledovania",
+                    "events": "Udalosti Home Assistant",
+                    "security": "Možnosti zabezpečenia"
+                }
+            },
+            "device": {
+                "title": "Nastavenie zariadenia",
+                "description": "Parametre pro pripojenie k zariadeniu",
+                "data": {
+                    "username": "Užívateľské meno",
+                    "password": "Heslo",
+                    "port": "Port (0 pre pouzitie východzej hodnoty)",
+                    "ssl": "Použíť pripojenie SSL",
+                    "verify_ssl": "Overiť certifikát SSL",
+                    "cert_path": "Cesta k certifikátu"
+                }
+            },
+            "operation_mode": {
+                "title": "Prevádzkový režim",
+                "data": {
+                    "track_devices": "Povoliť sledovanie zariadení",
+                    "enable_monitor": "Povoliť monitorovanie zariadení",
+                    "enable_control": "Povoliť ovladanie zariadenia",
+                    "split_intervals": "Povoliť intervaly aktualizácie pre každý senzor",
+                    "latest_connected": "Počet najnovších pripojených zariadení pre uloženie"
+                }
+            },
+            "intervals": {
+                "title": "Intervaly aktualizáce",
+                "description": "Hodnoty sú v sekundách",
+                "data": {
+                    "cache_time": "Čas mezipamäte",
+                    "interval_devices": "Aktualizácia sledovačov zariadení",
+                    "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
+                    "scan_interval": "Aktualizácia entít",
+                    "interval_cpu": "Údaje CPU",
+                    "interval_firmware": "Údaje firmwaru",
+                    "interval_gwlan": "Interval GWLAN",
+                    "interval_light": "Stav LED",
+                    "interval_misc": "Rôzne údaje",
+                    "interval_network_stat": "Údaje o statistikách siete",
+                    "interval_parental_control": "Údaje rodičovskej kontroly",
+                    "interval_ports": "Údaje portov",
+                    "interval_ram": "Údaje RAM",
+                    "interval_sysinfo": "Údaje systémové info",
+                    "interval_temperature": "Údaje o teplote",
+                    "interval_vpn": "Údaje VPN",
+                    "interval_wan": "Údaje WAN",
+                    "interval_wlan": "Údaje WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Rozhranie sledovania",
+                "data": {
+                    "interfaces": "Vyberte sieťové rozhranie sledovania",
+                    "units_speed": "Jednotky pre rýchlosť",
+                    "units_traffic": "Jednotky pre sieťovú prevádzku"
+                }
+            },
+            "events": {
+                "title": "Udalosti",
+                "description": "Ktoré udalosti sa majú oznamovať",
+                "data": {
+                    "device_connected": "Zariadenie pripojené (zariadenie nebolo predtým sledované)",
+                    "device_disconnected": "Zariadenie odpojené",
+                    "device_reconnected": "Zariadenie bolo znovu pripojené (toto zariadenie už bolo sledované)"
+                }
+            },
+            "security": {
+                "title": "Zabezpečenie",
+                "data": {
+                    "hide_passwords": "Skryť heslá zo senzorov a atribútov"
+                }
+            },
+            "confirmation": {
+                "title": "Znovu nahrať",
+                "description": "Nahrajte integráciu znova",
+                "data": {
+                    "confirm": "Pre použitie novej konfigurácie musíte integráciu opätovne nahrať. Kliknúť na ponuku integrácie (3 bodky) a stlačiť 'Znovu nahrať/načítať'"
+                }
+            }
+        },
+        "error": {
+            "connection_refused": "Pripojenie odmietnuté",
+            "error": "Nepodarilo se pripojiť",
+            "login_blocked": "Prihlásenie je blokované zariadením. Čakaje prosím",
+            "not_confirmed": "Nepotvrdené",
+            "unknown": "Neznámá chyba",
+            "wrong_credentials": "Chybné prihlasovacie údaje"
+        }
+    }
+}

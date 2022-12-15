@@ -1,0 +1,197 @@
+{
+    "config": {
+        "step": {
+            "discovery": {
+                "title": "Device location",
+                "description": "Comment retrouver votre appareil",
+                "data": {
+                    "host": "Nom d'hôte / Addresse IP "
+                }
+            },
+            "credentials": {
+                "title": "Identifiants",
+                "description": "Les même que sur l'interface de gestion du routeur",
+                "data": {
+                    "username": "Nom d'utilisateur",
+                    "password": "Mot de pass",
+                    "ssl": "Utiliser une connexion SSL"
+                }
+            },
+            "device": {
+                "title": "Réglages de l'appareil",
+                "description": "Parametres de connexion au routeur",
+                "data": {
+                    "username": "Nom d'utilisateur",
+                    "password": "Mot de pass",
+                    "port": "Port (0 pour utiliser la valeur par défaut)",
+                    "ssl": "Utiliser une connexion SSL",
+                    "verify_ssl": "Vérifier le certificat SSL",
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                }
+            },
+            "operation_mode": {
+                "title": "Mode de fonctionnement",
+                "data": {
+                    "track_devices": "Activer le suivis des périphériques",
+                    "enable_monitor": "Activer la surveillance des périphériques",
+                    "enable_control": "Activer le contrôle des périphériques",
+                    "split_intervals": "Activer les intervalles de mise à jour par capteur",
+                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker"
+                }
+            },
+            "intervals": {
+                "title": "Intervalles d'actualisation",
+                "description": "Les valeurs sont en secondes",
+                "data": {
+                    "cache_time": "Temps de mise en cache",
+                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
+                    "scan_interval": "Intervalles d'actualisation des entités",
+                    "interval_cpu": "Données CPU",
+                    "interval_firmware": "Données du micrologiciel",
+                    "interval_gwlan": "Intervalle GWLAN",
+                    "interval_light": "État des LED",
+                    "interval_misc": "Réglages divers",
+                    "interval_network_stat": "Données statistiques du réseau",
+                    "interval_parental_control": "Données de contrôle parental",
+                    "interval_ports": "Données des Ports",
+                    "interval_ram": "Données RAM",
+                    "interval_sysinfo": "Données Sysinfo",
+                    "interval_temperature": "Température",
+                    "interval_vpn": "Données VPN",
+                    "interval_wan": "Données WAN",
+                    "interval_wlan": "Données WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Interfaces à monitorer",
+                "data": {
+                    "interfaces": "Sélection des interfaces réseau à monitorer",
+                    "units_speed": "Unités de mesure de vitesse",
+                    "units_traffic": "Unités de mesure du trafic"
+                }
+            },
+            "security": {
+                "title": "Securitée",
+                "data": {
+                    "hide_passwords": "Masquer les mots de passe des capteurs et attributs"
+                }
+            },
+            "name": {
+                "title": "Nom du périphérique",
+                "data": {
+                    "name": "Laissez vide pour utiliser le modèle de l'appareil comme nom"
+                }
+            }
+        },
+        "error": {
+            "cannot_resolve_host": "Impossible de résoudre le nom d'hôte. Essayez avec l'adresse IP",
+            "connection_refused": "Connexion rejetée",
+            "error": "Échec de connexion",
+            "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
+            "password_missing": "Mot de passe manquant",
+            "unknown": "Erreur inconnue",
+            "wrong_credentials": "Mauvais identifiants"
+        }
+    },
+    "options": {
+        "step": {
+            "options": {
+                "title": "Paramétrages à changer",
+                "description": "Veuillez sélectionner les Paramétres à modifier",
+                "data": {
+                    "device": "Paramètres d'identification et de connexion",
+                    "operation_mode": "Mode de fonctionnement",
+                    "intervals": "Intervalles d'actualisation",
+                    "interfaces": "Interfaces à monitorer",
+                    "events": "Événements de Home Assistant",
+                    "security": "Options de sécurité"
+                }
+            },
+            "device": {
+                "title": "Réglages de l'appareil",
+                "description": "Parametres de connexion au routeur",
+                "data": {
+                    "username": "Nom d'utilisateur",
+                    "password": "Mot de pass",
+                    "port": "Port (0 pour utiliser la valeur par défaut)",
+                    "ssl": "Utiliser une connexion SSL",
+                    "verify_ssl": "Vérifier le certificat SSL",
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                }
+            },
+            "operation_mode": {
+                "title": "Mode de fonctionnement",
+                "data": {
+                    "track_devices": "Activer le suivis des périphériques",
+                    "enable_monitor": "Activer la surveillance des périphériques",
+                    "enable_control": "Activer le contrôle des périphériques",
+                    "split_intervals": "Activer les intervalles de mise à jour par capteur",
+                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker"
+                }
+            },
+            "intervals": {
+                "title": "Intervalles d'actualisation",
+                "description": "Les valeurs sont en secondes",
+                "data": {
+                    "cache_time": "Temps de mise en cache",
+                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
+                    "scan_interval": "Intervalles d'actualisation des entités",
+                    "interval_cpu": "Données CPU",
+                    "interval_firmware": "Données du micrologiciel",
+                    "interval_gwlan": "Intervalle GWLAN",
+                    "interval_light": "État des LED",
+                    "interval_misc": "Réglages divers",
+                    "interval_network_stat": "Données statistiques du réseau",
+                    "interval_parental_control": "Données de contrôle parental",
+                    "interval_ports": "Données des Ports",
+                    "interval_ram": "Données RAM",
+                    "interval_sysinfo": "Données Sysinfo",
+                    "interval_temperature": "Température",
+                    "interval_vpn": "Données VPN",
+                    "interval_wan": "Données WAN",
+                    "interval_wlan": "Données WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Interfaces à monitorer",
+                "data": {
+                    "interfaces": "Sélection des interfaces réseau à monitorer",
+                    "units_speed": "Unités de mesure de vitesse",
+                    "units_traffic": "Unités de mesure du trafic"
+                }
+            },
+            "events": {
+                "title": "Événements",
+                "description": "Quels événements doivent être déclenchés ?",
+                "data": {
+                    "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
+                    "device_disconnected": "Périphérique déconnecté",
+                    "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)"
+                }
+            },
+            "security": {
+                "title": "Securitée",
+                "data": {
+                    "hide_passwords": "Masquer les mots de passe des capteurs et des attributs"
+                }
+            },
+            "confirmation": {
+                "title": "Rechargement requis",
+                "description": "Veuillez recharger l'intégration",
+                "data": {
+                    "confirm": "Je comprends que je dois recharger l'intégration pour appliquer la nouvelle configuration. Pour ce faire, je clique sur le menu d'intégration (3 points) et j'appuie sur 'Recharger'"
+                }
+            }
+        },
+        "error": {
+            "connection_refused": "Connexion rejetée",
+            "error": "Échec de connexion",
+            "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
+            "not_confirmed": "Vous devez confirmer",
+            "unknown": "Erreur inconnue",
+            "wrong_credentials": "Mauvais identifiants"
+        }
+    }
+}
