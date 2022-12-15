@@ -1,0 +1,199 @@
+{
+    "config": {
+        "step": {
+            "discovery": {
+                "title": "Device locatie",
+                "description": "Hoe vind je jou device",
+                "data": {
+                    "host": "Hostnaam / IP adres"
+                }
+            },
+            "credentials": {
+                "title": "Login gegevens",
+                "description": "Dezelfde als die van je router web paneel",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord",
+                    "ssl": "Gebruik SSL verbinding"
+                }
+            },
+            "device": {
+                "title": "Router instellingen",
+                "description": "Parameters om verbinding te maken met device",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord",
+                    "port": "Poort (0 voor standaard waarde)",
+                    "ssl": "Gebruik SSL verbinding",
+                    "verify_ssl": "Controleer SSL certificaat",
+                    "cert_path": "certificaat pad"
+                }
+            },
+            "operation_mode": {
+                "title": "Operatie mode",
+                "data": {
+                    "track_devices": "Activeer apparaat trackers",
+                    "enable_monitor": "Activeer apparaat monitoring",
+                    "enable_control": "Activeer apparaat controle",
+                    "split_intervals": "Activeer per-sensor update interval",
+                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?"
+                }
+            },
+            "intervals": {
+                "title": "Update interval",
+                "description": "Waarde in secondes",
+                "data": {
+                    "cache_time": "Caching tijd",
+                    "interval_devices": "Apparaat trackers update",
+                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
+                    "scan_interval": "Entities update",
+                    "interval_cpu": "CPU data",
+                    "interval_firmware": "Firmware data",
+                    "interval_gwlan": "GWLAN interval",
+                    "interval_light": "Kicht data",
+                    "interval_misc": "Overige data",
+                    "interval_network_stat": "Network statestieken data",
+                    "interval_parental_control": "Ouders controlle data",
+                    "interval_ports": "Poorten data",
+                    "interval_ram": "RAM data",
+                    "interval_sysinfo": "Sysinfo data",
+                    "interval_temperature": "Temperstuur data",
+                    "interval_vpn": "VPN data",
+                    "interval_wan": "WAN data",
+                    "interval_wlan": "WLAN data"
+                }
+            },
+            "interfaces": {
+                "title": "Interface voor monitoring",
+                "data": {
+                    "interfaces": "Selecteer netwerk interfaces voor monitoring",
+                    "units_speed": "Eenheden per snelheid",
+                    "units_traffic": "Eenhenden for verkeer"
+                }
+            },
+            "security": {
+                "title": "Beveiliging",
+                "data": {
+                    "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
+                }
+            },
+            "name": {
+                "title": "Device naam",
+                "data": {
+                    "name": "Laat leeg om device model te gebruiken als naam"
+                }
+            }
+        },
+        "error": {
+            "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
+            "connection_refused": "Connectie afgewezen",
+            "error": "Problemen met connectie",
+            "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
+            "password_missing": "Wachtwoord mist",
+            "unknown": "Onbekende fout",
+            "wrong_credentials": "Verkeerde login gegevens"
+        }
+    },
+    "options": {
+        "step": {
+            "options": {
+                "title": "Verander configuratie",
+                "description": "Selecteer welkee optie van configuratie u wilt aanpassen",
+                "data": {
+                    "device": "Login gegevens en connectie instellingen",
+                    "operation_mode": "Operatie modus",
+                    "intervals": "Update interval",
+                    "interfaces": "Interfaces voor monitoring",
+                    "events": "Home Assistant events",
+                    "security": "Beveiliging opties"
+                }
+            },
+            "device": {
+                "title": "Router instellingen",
+                "description": "Parameters voor connectie met router",
+                "data": {
+                    "username": "Gebruikersnaam",
+                    "password": "Wachtwoord",
+                    "port": "Poort (0 voor standaard waarde)",
+                    "ssl": "Gebruik SSL verbinding",
+                    "verify_ssl": "Controleer SSL certificaat",
+                    "cert_path": "certificaat pad"
+                }
+            },
+            "operation_mode": {
+                "title": "Operation mode",
+                "data": {
+                    "track_devices": "Activeer apparaat trackers",
+                    "enable_monitor": "Activeer apparaat monitoring",
+                    "enable_control": "Activeer apparaat controle",
+                    "split_intervals": "Activeer per-sensor update interval",
+                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?"
+                }
+            },
+            "intervals": {
+                "title": "Update intervals",
+                "description": "Waardes zijn in secondes",
+                "data": {
+                    "cache_time": "Caching tijd",
+                    "interval_devices": "Apparaat volgen update",
+                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
+                    "scan_interval": "Entities update",
+                    "interval_cpu": "CPU data",
+                    "interval_firmware": "Firmware data",
+                    "interval_gwlan": "GWLAN interval",
+                    "interval_light": "Kicht data",
+                    "interval_misc": "Overige data",
+                    "interval_network_stat": "Network stat data",
+                    "interval_parental_control": "Ouders controlle data",
+                    "interval_ports": "Poorten data",
+                    "interval_ram": "RAM data",
+                    "interval_sysinfo": "Sysinfo data",
+                    "interval_temperature": "Temperstuur data",
+                    "interval_vpn": "VPN data",
+                    "interval_wan": "WAN data",
+                    "interval_wlan": "WLAN data"
+                }
+            },
+            "interfaces": {
+                "title": "Interfaces to monitor",
+                "data": {
+                    "interfaces": "Selecteer netwerk interfaces voor monitoring",
+                    "units_speed": "Eenheden per snelheid",
+                    "units_traffic": "Eenhenden for verkeer"
+                }
+            },
+            "events": {
+                "title": "Gebeurtenis",
+                "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
+                "data": {
+                    "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
+                    "device_disconnected": "Apparaat verbroken",
+                    "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)"
+                }
+            },
+            "security": {
+                "title": "Security",
+                "data": {
+                    "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
+                }
+            },
+            "confirmation": {
+                "title": "Herladen verplicht",
+                "description": "Herlaat de intergratie",
+                "data": {
+                    "confirm": "Ik begrijp dat het nodig is om de integratie opnieuw te laden. Dit om de nieuwe configuratie te laden. Om dit uit te voeren: Ik klik op het intergratie menu (3 puntjes) eb druk op herlaad (reload)"
+                }
+            }
+        },
+        "error": {
+            "not_confirmed": "U dient te bevestigen",
+            "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
+            "connection_refused": "Connectie afgewezen",
+            "error": "Problemen met connectie",
+            "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
+            "password_missing": "Wachtwoord mist",
+            "unknown": "Onbekende fout",
+            "wrong_credentials": "Verkeerde login gegevens"
+        }
+    }
+}
