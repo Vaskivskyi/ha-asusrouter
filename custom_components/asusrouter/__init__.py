@@ -5,26 +5,14 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_SCAN_INTERVAL, EVENT_HOMEASSISTANT_STOP
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 
 from .const import (
     ASUSROUTER,
-    CONF_CACHE_TIME,
-    CONF_CONSIDER_HOME,
-    CONF_INTERFACES,
-    CONF_UNITS_SPEED,
-    CONF_UNITS_TRAFFIC,
-    DEFAULT_CACHE_TIME,
-    DEFAULT_CONSIDER_HOME,
-    DEFAULT_SCAN_INTERVAL,
-    DEFAULT_UNITS_SPEED,
-    DEFAULT_UNITS_TRAFFIC,
-    DELAULT_INTERFACES,
     DOMAIN,
     PLATFORMS,
 )
-from .migrate import DEPRECATED, MOVE_TO_OPTIONS
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
