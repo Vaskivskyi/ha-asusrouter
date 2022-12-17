@@ -741,7 +741,7 @@ class ARDevice:
             entity_reg = er.async_get(self.hass)
             for entity in entities:
                 reg_value = entity_reg.async_get(entity)
-                mac=reg_value.capabilities[MAC]
+                mac = reg_value.capabilities[MAC]
                 _LOGGER.debug(f"Trying to remove tracker with mac: {mac}")
                 if mac in self._devices:
                     self._devices.pop(mac)
@@ -749,9 +749,13 @@ class ARDevice:
 
         await self.update_devices()
 
-        unload = await self.hass.config_entries.async_unload_platforms(self._entry, [Platform.DEVICE_TRACKER])
+        unload = await self.hass.config_entries.async_unload_platforms(
+            self._entry, [Platform.DEVICE_TRACKER]
+        )
         if unload:
-            self.hass.config_entries.async_setup_platforms(self._entry, [Platform.DEVICE_TRACKER])
+            self.hass.config_entries.async_setup_platforms(
+                self._entry, [Platform.DEVICE_TRACKER]
+            )
 
     @property
     def device_info(self) -> DeviceInfo:
