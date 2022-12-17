@@ -627,17 +627,6 @@ class ARBridge:
                     _LOGGER.warning(
                         f"Parental control rule is missing MAC address. This rule is skipped"
                     )
-        # Single MAC is set
-        elif MAC in raw:
-            mac = raw[MAC].upper()
-            name = raw.get(NAME, mac)
-            rules_to_change.append(
-                FilterDevice(
-                    mac=mac,
-                    name=name,
-                    state=state,
-                )
-            )
         # Entities are set
         elif "entities" in raw:
             entities = raw["entities"]
@@ -651,18 +640,6 @@ class ARBridge:
                         state=state,
                     )
                 )
-        # Single entity_id is provided
-        elif "entity_id" in raw:
-            entity_reg = er.async_get(self.hass)
-            reg_value = entity_reg.async_get(raw["entity_id"])
-            rules_to_change.append(
-                FilterDevice(
-                    mac=reg_value.capabilities[MAC].upper(),
-                    name=reg_value.capabilities[NAME],
-                    state=state,
-                )
-            )
-
         if state == "remove":
             _LOGGER.debug("Removing parental control rules")
             rules = await self.api.async_remove_parental_control_rules(
