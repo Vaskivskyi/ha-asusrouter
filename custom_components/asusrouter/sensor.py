@@ -10,7 +10,10 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND, PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import (
+    DATA_RATE_MEGABITS_PER_SECOND,
+    PERCENTAGE,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -26,8 +29,8 @@ from .const import (
     MISC,
     PORTS,
     RAM,
+    STATIC_SENSORS_TEMPERATURE,
     SYSINFO,
-    TEMPERATURE,
     WAN,
 )
 from .dataclass import ARSensorDescription
@@ -155,39 +158,6 @@ SENSORS = {
             "private_subnet": "private_subnet",
         },
     ),
-    (TEMPERATURE, "cpu"): ARSensorDescription(
-        key="cpu",
-        key_group=TEMPERATURE,
-        name="Temperature CPU",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=TEMP_CELSIUS,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
-    (TEMPERATURE, "2ghz"): ARSensorDescription(
-        key="2ghz",
-        key_group=TEMPERATURE,
-        name="Temperature 2.4 GHz",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=TEMP_CELSIUS,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
-    (TEMPERATURE, "5ghz"): ARSensorDescription(
-        key="5ghz",
-        key_group=TEMPERATURE,
-        name="Temperature 5 GHz",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=TEMP_CELSIUS,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
     (SYSINFO, "load_avg_1"): ARSensorDescription(
         key="load_avg_1",
         key_group=SYSINFO,
@@ -216,6 +186,8 @@ SENSORS = {
         entity_registry_enabled_default=False,
     ),
 }
+
+SENSORS.update(STATIC_SENSORS_TEMPERATURE)
 
 
 async def async_setup_entry(
