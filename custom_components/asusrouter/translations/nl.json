@@ -26,7 +26,7 @@
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
                     "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "certificaat pad"
+                    "cert_path": "Certificaat pad"
                 }
             },
             "operation_mode": {
@@ -117,7 +117,7 @@
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
                     "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "certificaat pad"
+                    "cert_path": "Certificaat pad"
                 }
             },
             "operation_mode": {
@@ -186,12 +186,10 @@
             }
         },
         "error": {
-            "not_confirmed": "U dient te bevestigen",
-            "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
             "connection_refused": "Connectie afgewezen",
             "error": "Problemen met connectie",
             "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
-            "password_missing": "Wachtwoord mist",
+            "not_confirmed": "U dient te bevestigen",
             "unknown": "Onbekende fout",
             "wrong_credentials": "Verkeerde login gegevens"
         }
