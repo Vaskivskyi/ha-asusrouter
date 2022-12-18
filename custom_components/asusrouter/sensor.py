@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from numbers import Real
 
 from homeassistant.components.sensor import (
