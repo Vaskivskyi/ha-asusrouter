@@ -45,6 +45,7 @@ from .dataclass import (
     ARLightDescription,
     ARSensorDescription,
     ARSwitchDescription,
+    ARUpdateDescription,
 )
 
 # INTEGRATION DATA -->
@@ -561,6 +562,7 @@ ICON_RAM = "mdi:memory"
 ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
 ICON_TEMPERATURE = "mdi:thermometer"
+ICON_UPDATE = "mdi:update"
 
 ### <-- ICONS
 
@@ -818,6 +820,18 @@ STATIC_SWITCHES_OPTIONAL = {
             LIST: LIST,
         },
     ),
+}
+STATIC_UPDATES = {
+    (FIRMWARE, STATE): ARUpdateDescription(
+        key=STATE,
+        key_group=FIRMWARE,
+        name="Firmware update",
+        icon=ICON_UPDATE,
+        extra_state_attributes={
+            "current": "current",
+            "available": "available",
+        },
+    )
 }
 
 ### <-- SENSORS
