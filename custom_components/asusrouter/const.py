@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_CONNECTIONS,
@@ -37,7 +38,10 @@ from homeassistant.helpers.entity import EntityCategory
 
 from asusrouter.util import converters
 
-from .dataclass import ARSensorDescription
+from .dataclass import (
+    ARBinarySensorDescription,
+    ARSensorDescription,
+)
 
 # INTEGRATION DATA -->
 
@@ -68,8 +72,11 @@ NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 ### GENERAL DATA -->
 
 FREE = "free"
+LIST = "list"
 RX = "rx"
 RX_SPEED = "rx_speed"
+STATE = "state"
+STATUS = "status"
 TOTAL = "total"
 TX = "tx"
 TX_SPEED = "tx_speed"
@@ -542,6 +549,8 @@ ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
 ICON_ETHERNET = "mdi:ethernet-cable"
 ICON_IP = "mdi:ip"
+ICON_PARENTAL_CONTROL_OFF = "mdi:magnify"
+ICON_PARENTAL_CONTROL_ON = "mdi:magnify-expand"
 ICON_RAM = "mdi:memory"
 ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
@@ -550,6 +559,40 @@ ICON_TEMPERATURE = "mdi:thermometer"
 ### <-- ICONS
 
 ### SENSORS -->
+STATIC_BINARY_SENSORS = {
+    # WAN state
+    (WAN, STATUS): ARBinarySensorDescription(
+        key=STATUS,
+        key_group=WAN,
+        name="WAN",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            "dns": "dns",
+            "gateway": "gateway",
+            IP: IP,
+            "ip_type": "ip_type",
+            "mask": "mask",
+            "private_subnet": "private_subnet",
+        },
+    ),
+}
+STATIC_BINARY_SENSORS_OPTIONAL = {
+    # Parental control state
+    (PARENTAL_CONTROL, STATE): ARBinarySensorDescription(
+        key=STATE,
+        key_group=PARENTAL_CONTROL,
+        name="Parental control",
+        icon_off=ICON_PARENTAL_CONTROL_OFF,
+        icon_on=ICON_PARENTAL_CONTROL_ON,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            LIST: LIST,
+        },
+    ),
+}
 STATIC_SENSORS = {
     # Boot time
     (MISC, BOOTTIME): ARSensorDescription(
@@ -612,7 +655,7 @@ STATIC_SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            "latest": "list",
+            "latest": LIST,
         },
     ),
     # RAM
