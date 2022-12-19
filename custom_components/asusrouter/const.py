@@ -29,6 +29,7 @@ from homeassistant.const import (
     DATA_RATE_KILOBYTES_PER_SECOND,
     DATA_RATE_MEGABITS_PER_SECOND,
     DATA_RATE_MEGABYTES_PER_SECOND,
+    PERCENTAGE,
     Platform,
     UnitOfTemperature,
 )
@@ -59,6 +60,8 @@ PLATFORMS = [
 
 NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
 NUMERIC_GWLAN = range(1, 5)  # maximum of 4 guest WLANs from 1 to 4
+NUMERIC_LAN = range(1, 9)  # maximum of 8 LAN ports from 1 to 8
+NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 
 ### <-- NUMERIC
 
@@ -95,11 +98,14 @@ CONNECTION_LIST = [
     CONNECTION_6G,
 ]
 CONNECTION_WIRED = "Wired"
+
+BOOTTIME = "boottime"
 CORE = "core"
 CPU = "cpu"
 DEVICES = "devices"
 FIRMWARE = "firmware"
 GWLAN = "gwlan"
+LAN = "lan"
 LIGHT = "light"
 LOAD_AVG = "load_avg"
 MISC = "misc"
@@ -530,33 +536,164 @@ SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
 
 ### <-- SERVICES
 
-### SENSORS -->
+### ICONS -->
 
-STATIC_SENSORS_TEMPERATURE = {
-    (TEMPERATURE, sensor): ARSensorDescription(
-        key=sensor,
-        key_group=TEMPERATURE,
-        name=LABELS_TEMPERATURE[sensor],
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+ICON_CPU = "mdi:cpu-32-bit"
+ICON_DEVICES = "mdi:devices"
+ICON_ETHERNET = "mdi:ethernet-cable"
+ICON_IP = "mdi:ip"
+ICON_RAM = "mdi:memory"
+ICON_RESTART = "mdi:restart"
+ICON_ROUTER = "mdi:router-network"
+ICON_TEMPERATURE = "mdi:thermometer"
+
+### <-- ICONS
+
+### SENSORS -->
+STATIC_SENSORS = {
+    # Boot time
+    (MISC, BOOTTIME): ARSensorDescription(
+        key=BOOTTIME,
+        key_group=MISC,
+        name="Boot Time",
+        icon=ICON_RESTART,
+        device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-    )
-    for sensor in LABELS_TEMPERATURE
-}
-STATIC_SENSORS_LOAD_AVG = {
-    (SYSINFO, f"{LOAD_AVG}_{sensor}"): ARSensorDescription(
-        key=f"{LOAD_AVG}_{sensor}",
-        key_group=SYSINFO,
-        name=LABELS_LOAD_AVG[sensor],
-        icon="mdi:cpu-32-bit",
+    ),
+    # Connected devices
+    (DEVICES, "number"): ARSensorDescription(
+        key="number",
+        key_group=DEVICES,
+        name="Connected Devices",
+        icon=ICON_ROUTER,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            DEVICES: DEVICES,
+        },
+    ),
+    # CPU
+    (CPU, TOTAL): ARSensorDescription(
+        key=TOTAL,
+        key_group=CPU,
+        name="CPU",
+        icon=ICON_CPU,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-    )
-    for sensor in LABELS_LOAD_AVG
+        extra_state_attributes={
+            f"{CORE}_{num}": f"{CORE}_{num}" for num in NUMERIC_CORES
+        },
+    ),
+    # LAN
+    (PORTS, "LAN_total"): ARSensorDescription(
+        key="LAN_total",
+        key_group=PORTS,
+        name="LAN Speed",
+        icon=ICON_ETHERNET,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            f"{LAN.upper()}_{num}": f"{LAN}_{num}" for num in NUMERIC_LAN
+        },
+    ),
+    # Latest connected
+    (DEVICES, "latest_time"): ARSensorDescription(
+        key="latest_time",
+        key_group=DEVICES,
+        name="Latest Connected",
+        icon=ICON_DEVICES,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "latest": "list",
+        },
+    ),
+    # RAM
+    (RAM, USAGE): ARSensorDescription(
+        key=USAGE,
+        key_group=RAM,
+        name="RAM",
+        icon=ICON_RAM,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        precision=2,
+        extra_state_attributes={
+            FREE: FREE,
+            TOTAL: TOTAL,
+            USED: USED,
+        },
+    ),
+    # WAN
+    (PORTS, "WAN_total"): ARSensorDescription(
+        key="WAN_total",
+        key_group=PORTS,
+        name="WAN Speed",
+        icon=ICON_ETHERNET,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            f"{WAN.upper()}_{num}": f"{WAN}_{num}" for num in NUMERIC_WAN
+        },
+    ),
+    # WAN IP
+    (WAN, IP): ARSensorDescription(
+        key=IP,
+        key_group=WAN,
+        name="WAN IP",
+        icon=ICON_IP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "dns": "dns",
+            "gateway": "gateway",
+            "ip_type": "ip_type",
+            "mask": "mask",
+            "private_subnet": "private_subnet",
+        },
+    ),
 }
+# Temperature sensors
+STATIC_SENSORS.update(
+    {
+        (TEMPERATURE, sensor): ARSensorDescription(
+            key=sensor,
+            key_group=TEMPERATURE,
+            name=LABELS_TEMPERATURE[sensor],
+            icon=ICON_TEMPERATURE,
+            device_class=SensorDeviceClass.TEMPERATURE,
+            state_class=SensorStateClass.MEASUREMENT,
+            native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=False,
+        )
+        for sensor in LABELS_TEMPERATURE
+    }
+)
+# Load avg sensors
+STATIC_SENSORS.update(
+    {
+        (SYSINFO, f"{LOAD_AVG}_{sensor}"): ARSensorDescription(
+            key=f"{LOAD_AVG}_{sensor}",
+            key_group=SYSINFO,
+            name=LABELS_LOAD_AVG[sensor],
+            icon=ICON_CPU,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=False,
+        )
+        for sensor in LABELS_LOAD_AVG
+    }
+)
 
 ### <-- SENSORS
