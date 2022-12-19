@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from homeassistant.components.update import UpdateEntity
@@ -11,27 +10,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import (
-    FIRMWARE,
-)
+from .const import STATIC_UPDATES as UPDATES
 from .dataclass import ARUpdateDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
-
-_LOGGER = logging.getLogger(__name__)
-
-UPDATES = {
-    (FIRMWARE, "state"): ARUpdateDescription(
-        key="state",
-        key_group=FIRMWARE,
-        name="Firmware update",
-        icon="mdi:update",
-        extra_state_attributes={
-            "current": "current",
-            "available": "available",
-        },
-    )
-}
 
 
 async def async_setup_entry(
