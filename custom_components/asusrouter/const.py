@@ -101,6 +101,7 @@ DEVICES = "devices"
 FIRMWARE = "firmware"
 GWLAN = "gwlan"
 LIGHT = "light"
+LOAD_AVG = "load_avg"
 MISC = "misc"
 NETWORK_STAT = "network_stat"
 PARENTAL_CONTROL = "parental_control"
@@ -120,10 +121,14 @@ WLAN_6GHZ = "6ghz"
 
 ### LABELS -->
 
+LABEL_LOAD_AVG = "Load Average"
 LABEL_RX = "Download"
 LABEL_SPEED = "Speed"
 LABEL_TX = "Upload"
 
+LABELS_LOAD_AVG = {
+    f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ["1", "5", "15"]
+}
 LABELS_TEMPERATURE = {
     CPU: f"{TEMPERATURE} {CPU.upper()}",
     WLAN_2GHZ: f"{TEMPERATURE} {CONNECTION_2G}",
@@ -540,6 +545,18 @@ STATIC_SENSORS_TEMPERATURE = {
         entity_registry_enabled_default=False,
     )
     for sensor in LABELS_TEMPERATURE
+}
+STATIC_SENSORS_LOAD_AVG = {
+    (SYSINFO, f"{LOAD_AVG}_{sensor}"): ARSensorDescription(
+        key=f"{LOAD_AVG}_{sensor}",
+        key_group=SYSINFO,
+        name=LABELS_LOAD_AVG[sensor],
+        icon="mdi:cpu-32-bit",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    )
+    for sensor in LABELS_LOAD_AVG
 }
 
 ### <-- SENSORS

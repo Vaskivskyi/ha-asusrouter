@@ -29,8 +29,8 @@ from .const import (
     MISC,
     PORTS,
     RAM,
+    STATIC_SENSORS_LOAD_AVG,
     STATIC_SENSORS_TEMPERATURE,
-    SYSINFO,
     WAN,
 )
 from .dataclass import ARSensorDescription
@@ -158,35 +158,9 @@ SENSORS = {
             "private_subnet": "private_subnet",
         },
     ),
-    (SYSINFO, "load_avg_1"): ARSensorDescription(
-        key="load_avg_1",
-        key_group=SYSINFO,
-        name="Load Average (1 min)",
-        icon="mdi:cpu-32-bit",
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
-    (SYSINFO, "load_avg_5"): ARSensorDescription(
-        key="load_avg_5",
-        key_group=SYSINFO,
-        name="Load Average (5 min)",
-        icon="mdi:cpu-32-bit",
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
-    (SYSINFO, "load_avg_15"): ARSensorDescription(
-        key="load_avg_15",
-        key_group=SYSINFO,
-        name="Load Average (15 min)",
-        icon="mdi:cpu-32-bit",
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-    ),
 }
 
+SENSORS.update(STATIC_SENSORS_LOAD_AVG)
 SENSORS.update(STATIC_SENSORS_TEMPERATURE)
 
 
