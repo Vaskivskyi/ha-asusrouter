@@ -44,6 +44,7 @@ from .dataclass import (
     ARButtonDescription,
     ARLightDescription,
     ARSensorDescription,
+    ARSwitchDescription,
 )
 
 # INTEGRATION DATA -->
@@ -793,5 +794,30 @@ STATIC_SENSORS.update(
         for sensor in LABELS_LOAD_AVG
     }
 )
+STATIC_SWITCHES = {}
+STATIC_SWITCHES_OPTIONAL = {
+    (PARENTAL_CONTROL, STATE): ARSwitchDescription(
+        key=STATE,
+        key_group=PARENTAL_CONTROL,
+        name="Parental control",
+        icon_off=ICON_PARENTAL_CONTROL_OFF,
+        icon_on=ICON_PARENTAL_CONTROL_ON,
+        service_on="restart_firewall",
+        service_on_args={
+            "action_mode": "apply",
+            "MULTIFILTER_ALL": 1,
+        },
+        service_off="restart_firewall",
+        service_off_args={
+            "action_mode": "apply",
+            "MULTIFILTER_ALL": 0,
+        },
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            LIST: LIST,
+        },
+    ),
+}
 
 ### <-- SENSORS

@@ -8,7 +8,6 @@ from typing import Any
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -23,39 +22,14 @@ from .const import (
     CONF_HIDE_PASSWORDS,
     DEFAULT_HIDE_PASSWORDS,
     PASSWORD,
-    PARENTAL_CONTROL,
+    STATIC_SWITCHES as SWITCHES,
+    STATIC_SWITCHES_OPTIONAL,
 )
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
-
-SWITCHES = {}
-SWITCHES_PARENTAL_CONTROL = {
-    (PARENTAL_CONTROL, "state"): ARSwitchDescription(
-        key="state",
-        key_group=PARENTAL_CONTROL,
-        name="Parental control",
-        icon_on="mdi:magnify-expand",
-        icon_off="mdi:magnify",
-        service_on="restart_firewall",
-        service_on_args={
-            "action_mode": "apply",
-            "MULTIFILTER_ALL": 1,
-        },
-        service_off="restart_firewall",
-        service_off_args={
-            "action_mode": "apply",
-            "MULTIFILTER_ALL": 0,
-        },
-        entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=True,
-        extra_state_attributes={
-            "list": "list",
-        },
-    ),
-}
 
 
 async def async_setup_entry(
@@ -74,7 +48,7 @@ async def async_setup_entry(
         SWITCHES.update(list_switches_vpn_servers(2))
         SWITCHES.update(list_switches_wlan(3, hide))
         SWITCHES.update(list_switches_gwlan(3, hide))
-        SWITCHES.update(SWITCHES_PARENTAL_CONTROL)
+        SWITCHES.update(STATIC_SWITCHES_OPTIONAL)
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
 
