@@ -42,6 +42,7 @@ from asusrouter.util import converters
 from .dataclass import (
     ARBinarySensorDescription,
     ARButtonDescription,
+    ARLightDescription,
     ARSensorDescription,
 )
 
@@ -551,6 +552,8 @@ ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
 ICON_ETHERNET = "mdi:ethernet-cable"
 ICON_IP = "mdi:ip"
+ICON_LIGHT_OFF = "mdi:led-off"
+ICON_LIGHT_ON = "mdi:led-on"
 ICON_PARENTAL_CONTROL_OFF = "mdi:magnify"
 ICON_PARENTAL_CONTROL_ON = "mdi:magnify-expand"
 ICON_RAM = "mdi:memory"
@@ -632,6 +635,17 @@ STATIC_BUTTONS = {
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
+    ),
+}
+STATIC_LIGHTS = {
+    (LIGHT, "led"): ARLightDescription(
+        key="led",
+        key_group=LIGHT,
+        name="LED",
+        icon_off=ICON_LIGHT_OFF,
+        icon_on=ICON_LIGHT_ON,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
     ),
 }
 STATIC_SENSORS = {
