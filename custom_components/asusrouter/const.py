@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from homeassistant.components.sensor import SensorStateClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_CONNECTIONS,
     ATTR_IDENTIFIERS,
@@ -30,9 +30,13 @@ from homeassistant.const import (
     DATA_RATE_MEGABITS_PER_SECOND,
     DATA_RATE_MEGABYTES_PER_SECOND,
     Platform,
+    UnitOfTemperature,
 )
+from homeassistant.helpers.entity import EntityCategory
 
 from asusrouter.util import converters
+
+from .dataclass import ARSensorDescription
 
 # INTEGRATION DATA -->
 
@@ -50,14 +54,6 @@ PLATFORMS = [
 ]
 
 ### <-- INTEGRATION DATA
-
-### LABELS -->
-
-LABEL_RX = "Download"
-LABEL_SPEED = "Speed"
-LABEL_TX = "Upload"
-
-### <-- LABELS
 
 ### NUMERIC -->
 
@@ -115,8 +111,28 @@ TEMPERATURE = "temperature"
 VPN = "vpn"
 WAN = "wan"
 WLAN = "wlan"
+WLAN_2GHZ = "2ghz"
+WLAN_5GHZ = "5ghz"
+WLAN_5GHZ2 = "5ghz2"
+WLAN_6GHZ = "6ghz"
 
 ### <-- GENERAL TYPES
+
+### LABELS -->
+
+LABEL_RX = "Download"
+LABEL_SPEED = "Speed"
+LABEL_TX = "Upload"
+
+LABELS_TEMPERATURE = {
+    CPU: f"{TEMPERATURE} {CPU.upper()}",
+    WLAN_2GHZ: f"{TEMPERATURE} {CONNECTION_2G}",
+    WLAN_5GHZ: f"{TEMPERATURE} {CONNECTION_5G}",
+    WLAN_5GHZ2: f"{TEMPERATURE} {CONNECTION_5G2}",
+    WLAN_6GHZ: f"{TEMPERATURE} {CONNECTION_6G}",
+}
+
+### <-- LABELS
 
 ### GENERAL VALUES -->
 
@@ -386,6 +402,7 @@ CONNECTION_TYPE_UNKNOWN = UNKNOWN
 DEVICE_ATTRIBUTE_CONNECTION_TIME = "connection_time"
 DEVICE_ATTRIBUTE_CONNECTION_TYPE = "connection_type"
 DEVICE_ATTRIBUTE_GUEST = "guest"
+DEVICE_ATTRIBUTE_GUEST_ID = "guest_id"
 DEVICE_ATTRIBUTE_INTERNET = "internet"
 DEVICE_ATTRIBUTE_INTERNET_MODE = "internet_mode"
 DEVICE_ATTRIBUTE_IP_TYPE = "ip_type"
@@ -507,3 +524,22 @@ SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
 ]
 
 ### <-- SERVICES
+
+### SENSORS -->
+
+STATIC_SENSORS_TEMPERATURE = {
+    (TEMPERATURE, sensor): ARSensorDescription(
+        key=sensor,
+        key_group=TEMPERATURE,
+        name=LABELS_TEMPERATURE[sensor],
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    )
+    for sensor in LABELS_TEMPERATURE
+}
+
+### <-- SENSORS

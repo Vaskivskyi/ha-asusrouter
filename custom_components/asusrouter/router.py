@@ -59,6 +59,7 @@ from .const import (
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_GUEST,
+    DEVICE_ATTRIBUTE_GUEST_ID,
     DEVICE_ATTRIBUTE_INTERNET,
     DEVICE_ATTRIBUTE_INTERNET_MODE,
     DEVICE_ATTRIBUTE_IP_TYPE,
@@ -204,6 +205,7 @@ class ARConnectedDevice:
             NAME: self._name,
             DEVICE_ATTRIBUTE_CONNECTION_TYPE: None,
             DEVICE_ATTRIBUTE_GUEST: False,
+            DEVICE_ATTRIBUTE_GUEST_ID: 0,
             CONNECTED: None,
         }
         self._connected: bool = False
@@ -268,12 +270,15 @@ class ARConnectedDevice:
                     DEVICE_ATTRIBUTE_CONNECTION_TYPE
                 ] = self._extra_state_attributes[DEVICE_ATTRIBUTE_CONNECTION_TYPE]
                 # Guest network
+                guest_id = dev_info.guest or 0
                 self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST] = (
-                    True if dev_info.guest else False
+                    True if guest_id else False
                 )
                 self.identity[DEVICE_ATTRIBUTE_GUEST] = self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_GUEST
                 ]
+                self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST_ID] = guest_id
+                self.identity[DEVICE_ATTRIBUTE_GUEST_ID] = guest_id
                 # Internet
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_INTERNET_MODE
@@ -736,7 +741,7 @@ class ARDevice:
             entity_reg = er.async_get(self.hass)
             for entity in entities:
                 reg_value = entity_reg.async_get(entity)
-                mac=reg_value.capabilities[MAC]
+                mac = reg_value.capabilities[MAC]
                 _LOGGER.debug(f"Trying to remove tracker with mac: {mac}")
                 if mac in self._devices:
                     self._devices.pop(mac)
@@ -744,9 +749,13 @@ class ARDevice:
 
         await self.update_devices()
 
-        unload = await self.hass.config_entries.async_unload_platforms(self._entry, [Platform.DEVICE_TRACKER])
+        unload = await self.hass.config_entries.async_unload_platforms(
+            self._entry, [Platform.DEVICE_TRACKER]
+        )
         if unload:
-            self.hass.config_entries.async_setup_platforms(self._entry, [Platform.DEVICE_TRACKER])
+            self.hass.config_entries.async_setup_platforms(
+                self._entry, [Platform.DEVICE_TRACKER]
+            )
 
     @property
     def device_info(self) -> DeviceInfo:
