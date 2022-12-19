@@ -423,7 +423,7 @@ class ARBridge:
         """Get the available temperature sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_temperature_labels, type=TEMPERATURE
+            self.api.async_get_temperature, helpers.list_from_dict, type=TEMPERATURE
         )
 
     async def _get_sensors_vpn(self) -> list[str]:

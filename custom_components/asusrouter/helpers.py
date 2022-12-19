@@ -20,3 +20,9 @@ def as_dict(pyobj):
     """Return generator object as dictionary."""
 
     return {key: value for key, value in pyobj}
+
+
+def list_from_dict(raw: dict[str, Any]) -> list[str]:
+    """Return dictionary keys as list."""
+
+    return list(raw.keys())
