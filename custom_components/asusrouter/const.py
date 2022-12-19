@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_CONNECTIONS,
@@ -40,6 +41,7 @@ from asusrouter.util import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
+    ARButtonDescription,
     ARSensorDescription,
 )
 
@@ -591,6 +593,45 @@ STATIC_BINARY_SENSORS_OPTIONAL = {
         extra_state_attributes={
             LIST: LIST,
         },
+    ),
+}
+STATIC_BUTTONS = {
+    "reboot": ARButtonDescription(
+        key="reboot",
+        name="Reboot",
+        icon=ICON_RESTART,
+        service="reboot",
+        service_args={},
+        device_class=ButtonDeviceClass.RESTART,
+        service_expect_modify=False,
+        entity_registry_enabled_default=True,
+    ),
+    "restart_firewall": ARButtonDescription(
+        key="restart_firewall",
+        name="Restart firewall",
+        icon=ICON_RESTART,
+        service="restart_firewall",
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
+    ),
+    "restart_httpd": ARButtonDescription(
+        key="restart_httpd",
+        name="Restart HTTP daemon",
+        icon=ICON_RESTART,
+        service="restart_httpd",
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
+    ),
+    "restart_wireless": ARButtonDescription(
+        key="restart_wireless",
+        name="Restart wireless",
+        icon=ICON_RESTART,
+        service="restart_wireless",
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
     ),
 }
 STATIC_SENSORS = {
