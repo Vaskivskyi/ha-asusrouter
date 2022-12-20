@@ -68,6 +68,7 @@ from .const import (
     DELAULT_INTERFACES,
     DOMAIN,
     FIRMWARE,
+    NO_SSL,
     RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
@@ -75,6 +76,7 @@ from .const import (
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     SIMPLE_SETUP_PARAMETERS,
+    SSL,
     STEP_TYPE_COMPLETE,
     STEP_TYPE_SIMPLE,
 )
@@ -152,9 +154,9 @@ async def _async_check_connection(
 
     if simple:
         configs_to_use.update(
-            SIMPLE_SETUP_PARAMETERS["ssl"]
+            SIMPLE_SETUP_PARAMETERS[SSL]
             if configs_to_use[CONF_SSL]
-            else SIMPLE_SETUP_PARAMETERS["no_ssl"]
+            else SIMPLE_SETUP_PARAMETERS[NO_SSL]
         )
         step_type = STEP_TYPE_SIMPLE
 

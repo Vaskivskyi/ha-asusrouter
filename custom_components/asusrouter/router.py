@@ -75,7 +75,9 @@ from .const import (
     KEY_COORDINATOR,
     MAC,
     NAME,
+    NO_SSL,
     SENSORS_CONNECTED_DEVICES,
+    SSL,
 )
 
 _T = TypeVar("_T")
@@ -407,9 +409,9 @@ class ARDevice:
         self._conf_port: int = self._options[CONF_PORT]
         if self._conf_port == DEFAULT_PORT:
             self._conf_port = (
-                DEFAULT_PORTS["ssl"]
+                DEFAULT_PORTS[SSL]
                 if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_PORTS["no_ssl"]
+                else DEFAULT_PORTS[NO_SSL]
             )
 
         # Device information
@@ -771,9 +773,9 @@ class ARDevice:
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
             configuration_url="{}://{}:{}".format(
-                DEFAULT_HTTP["ssl"]
+                DEFAULT_HTTP[SSL]
                 if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_HTTP["no_ssl"],
+                else DEFAULT_HTTP[NO_SSL],
                 self._conf_host,
                 self._conf_port,
             ),

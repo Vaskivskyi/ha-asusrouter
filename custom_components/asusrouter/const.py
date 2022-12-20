@@ -76,10 +76,18 @@ NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 
 ### GENERAL DATA -->
 
+ACTION_MODE = "action_mode"
+API_ID = "api_id"
+API_TYPE = "api_type"
+APPLY = "apply"
 FREE = "free"
+HTTP = "http"
+HTTPS = "https"
 LIST = "list"
+NO_SSL = "no_ssl"
 RX = "rx"
 RX_SPEED = "rx_speed"
+SSL = "ssl"
 STATE = "state"
 STATUS = "status"
 TOTAL = "total"
@@ -166,13 +174,11 @@ MAC = "mac"
 NAME = "name"
 PASSWORD = "password"
 SSID = "ssid"
-STATE = "state"
 
 ### <-- GENERAL VALUES
 
-### SENSORS -->
+### SENSORS LIST -->
 
-# Sensor lists
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL]
@@ -199,9 +205,9 @@ SENSORS_LIGHT = ["led"]
 SENSORS_MISC = ["boottime"]
 SENSORS_NETWORK_STAT = [RX, RX_SPEED, TX, TX_SPEED]
 SENSORS_PARENTAL_CONTROL = [STATE]
-SENSORS_PORTS = ["LAN", "WAN"]
+SENSORS_PORTS = [LAN.upper(), WAN.upper()]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
-SENSORS_SYSINFO = ["load_avg_1", "load_avg_5", "load_avg_15"]
+SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
 SENSORS_VPN = {
     "auth_read": "auth_read",
     "errno": "error_code",
@@ -214,7 +220,7 @@ SENSORS_VPN = {
     "remote_auth": "server_auth",
     "remote_ip": "server_ip",
     "remote_port": "server_port",
-    "status": "status",
+    STATUS: STATUS,
     "tcp_udp_read": "tcp_udp_read_bytes",
     "tcp_udp_write": "tcp_udp_write_bytes",
     "tun_tap_read": "tun_tap_read_bytes",
@@ -225,7 +231,7 @@ SENSORS_VPN_SERVER = {
     "client_list": "client_list",
     "routing_table": "routing_table",
 }
-SENSORS_WAN = ["status", IP, "ip_type", "gateway", "mask", "dns", "private_subnet"]
+SENSORS_WAN = [STATUS, IP, "ip_type", "gateway", "mask", "dns", "private_subnet"]
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
     "channel": "channel",
@@ -336,12 +342,12 @@ DEFAULT_EVENT: dict[str, bool] = {
     CONF_EVENT_DEVICE_RECONNECTED: False,
 }
 DEFAULT_HIDE_PASSWORDS = False
-DEFAULT_HTTP = {"no_ssl": "http", "ssl": "https"}
-DELAULT_INTERFACES = ["WAN"]
+DEFAULT_HTTP = {NO_SSL: HTTP, SSL: HTTPS}
+DELAULT_INTERFACES = [WAN.upper()]
 DEFAULT_INTERVALS = {CONF_INTERVAL + FIRMWARE: 21600}
 DEFAULT_LATEST_CONNECTED = 5
 DEFAULT_PORT = 0
-DEFAULT_PORTS = {"no_ssl": 80, "ssl": 8443}
+DEFAULT_PORTS = {NO_SSL: 80, SSL: 8443}
 DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SPLIT_INTERVALS = False
 DEFAULT_SSL = False
@@ -353,13 +359,13 @@ DEFAULT_VERIFY_SSL = True
 
 # Simplified setup
 SIMPLE_SETUP_PARAMETERS = {
-    "ssl": {
-        CONF_PORT: DEFAULT_PORTS["ssl"],
+    SSL: {
+        CONF_PORT: DEFAULT_PORTS[SSL],
         CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
         CONF_CERT_PATH: "",
     },
-    "no_ssl": {
-        CONF_PORT: DEFAULT_PORTS["no_ssl"],
+    NO_SSL: {
+        CONF_PORT: DEFAULT_PORTS[NO_SSL],
         CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
         CONF_CERT_PATH: "",
     },
@@ -519,11 +525,20 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
 TO_REDACT = {PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
 TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
 TO_REDACT_STATE = {"WAN IP"}
-TO_REDACT_ATTRS = {CONF_DEVICES, PASSWORD, IP, SSID, "list"}
+TO_REDACT_ATTRS = {CONF_DEVICES, PASSWORD, IP, SSID, LIST}
 
 ### <-- DIAGNOSTICS
 
 ### SERVICES -->
+
+REBOOT = "reboot"
+RESTART_FIREWALL = "restart_firewall"
+RESTART_HTTPD = "restart_httpd"
+RESTART_WIRELESS = "restart_wireless"
+START_VPNCLIENT = "start_vpnclient"
+STOP_VPNCLIENT = "stop_vpnclient"
+START_VPNSERVER = "start_vpnserver"
+STOP_VPNSERVER = "stop_vpnserver"
 
 SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
     "sync_node": converters.int_from_bool,
@@ -563,6 +578,10 @@ ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
 ICON_TEMPERATURE = "mdi:thermometer"
 ICON_UPDATE = "mdi:update"
+ICON_VPN_OFF = "mdi:close-network-outline"
+ICON_VPN_ON = "mdi:check-network-outline"
+ICON_WLAN_OFF = "mdi:wifi-off"
+ICON_WLAN_ON = "mdi:wifi"
 
 ### <-- ICONS
 
@@ -572,7 +591,7 @@ STATIC_BINARY_SENSORS = {
     (WAN, STATUS): ARBinarySensorDescription(
         key=STATUS,
         key_group=WAN,
-        name="WAN",
+        name=WAN.upper(),
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
@@ -602,39 +621,39 @@ STATIC_BINARY_SENSORS_OPTIONAL = {
     ),
 }
 STATIC_BUTTONS = {
-    "reboot": ARButtonDescription(
-        key="reboot",
+    REBOOT: ARButtonDescription(
+        key=REBOOT,
         name="Reboot",
         icon=ICON_RESTART,
-        service="reboot",
+        service=REBOOT,
         service_args={},
         device_class=ButtonDeviceClass.RESTART,
         service_expect_modify=False,
         entity_registry_enabled_default=True,
     ),
-    "restart_firewall": ARButtonDescription(
-        key="restart_firewall",
+    RESTART_FIREWALL: ARButtonDescription(
+        key=RESTART_FIREWALL,
         name="Restart firewall",
         icon=ICON_RESTART,
-        service="restart_firewall",
+        service=RESTART_FIREWALL,
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
     ),
-    "restart_httpd": ARButtonDescription(
-        key="restart_httpd",
+    RESTART_HTTPD: ARButtonDescription(
+        key=RESTART_HTTPD,
         name="Restart HTTP daemon",
         icon=ICON_RESTART,
-        service="restart_httpd",
+        service=RESTART_HTTPD,
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
     ),
-    "restart_wireless": ARButtonDescription(
-        key="restart_wireless",
+    RESTART_WIRELESS: ARButtonDescription(
+        key=RESTART_WIRELESS,
         name="Restart wireless",
         icon=ICON_RESTART,
-        service="restart_wireless",
+        service=RESTART_WIRELESS,
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,
@@ -679,7 +698,7 @@ STATIC_SENSORS = {
     (CPU, TOTAL): ARSensorDescription(
         key=TOTAL,
         key_group=CPU,
-        name="CPU",
+        name=CPU.upper(),
         icon=ICON_CPU,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
@@ -720,7 +739,7 @@ STATIC_SENSORS = {
     (RAM, USAGE): ARSensorDescription(
         key=USAGE,
         key_group=RAM,
-        name="RAM",
+        name=RAM.upper(),
         icon=ICON_RAM,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
@@ -802,17 +821,17 @@ STATIC_SWITCHES_OPTIONAL = {
         key=STATE,
         key_group=PARENTAL_CONTROL,
         name="Parental control",
-        icon_off=ICON_PARENTAL_CONTROL_OFF,
         icon_on=ICON_PARENTAL_CONTROL_ON,
-        service_on="restart_firewall",
-        service_on_args={
-            "action_mode": "apply",
-            "MULTIFILTER_ALL": 1,
-        },
-        service_off="restart_firewall",
+        icon_off=ICON_PARENTAL_CONTROL_OFF,
+        service_off=RESTART_FIREWALL,
         service_off_args={
             "action_mode": "apply",
             "MULTIFILTER_ALL": 0,
+        },
+        service_on=RESTART_FIREWALL,
+        service_on_args={
+            "action_mode": "apply",
+            "MULTIFILTER_ALL": 1,
         },
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=True,
