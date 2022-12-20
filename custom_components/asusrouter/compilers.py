@@ -8,9 +8,17 @@ from homeassistant.components.binary_sensor import DEVICE_CLASS_CONNECTIVITY
 from homeassistant.helpers.entity import EntityCategory
 
 from .const import (
+    ACTION_MODE,
+    API_ID,
+    API_TYPE,
+    APPLY,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
     GWLAN,
+    ICON_VPN_OFF,
+    ICON_VPN_ON,
+    ICON_WLAN_OFF,
+    ICON_WLAN_ON,
     KEY_GWLAN,
     KEY_OVPN_CLIENT,
     KEY_OVPN_SERVER,
@@ -23,11 +31,18 @@ from .const import (
     NAME_OVPN_SERVER,
     NAME_WLAN,
     NETWORK_STAT,
+    RESTART_FIREWALL,
+    RESTART_WIRELESS,
     SENSORS_GWLAN,
     SENSORS_PARAM_NETWORK,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WLAN,
+    START_VPNCLIENT,
+    START_VPNSERVER,
+    STATE,
+    STOP_VPNCLIENT,
+    STOP_VPNSERVER,
     VPN,
     WLAN,
 )
@@ -96,8 +111,8 @@ def list_sensors_vpn_clients(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN[key]
         sensors.update(
             {
-                (VPN, f"{vpn}_state"): ARBinarySensorDescription(
-                    key=f"{vpn}_state",
+                (VPN, f"{vpn}_{STATE}"): ARBinarySensorDescription(
+                    key=f"{vpn}_{STATE}",
                     key_group=VPN,
                     name=f"{NAME_OVPN_CLIENT} {num}",
                     device_class=DEVICE_CLASS_CONNECTIVITY,
@@ -125,15 +140,14 @@ def list_switches_vpn_clients(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN[key]
         sensors.update(
             {
-                (VPN, f"{vpn}_state"): ARSwitchDescription(
-                    key=f"{vpn}_state",
+                (VPN, f"{vpn}_{STATE}"): ARSwitchDescription(
+                    key=f"{vpn}_{STATE}",
                     key_group=VPN,
                     name=f"{NAME_OVPN_CLIENT} {num}",
-                    icon="mdi:network-outline",
-                    icon_on="mdi:check-network-outline",
-                    icon_off="mdi:close-network-outline",
-                    service_on=f"start_vpnclient{num}",
-                    service_off=f"stop_vpnclient{num}",
+                    icon_on=ICON_VPN_ON,
+                    icon_off=ICON_VPN_OFF,
+                    service_on=f"{START_VPNCLIENT}{num}",
+                    service_off=f"{STOP_VPNCLIENT}{num}",
                     entity_category=EntityCategory.CONFIG,
                     entity_registry_enabled_default=True,
                     extra_state_attributes=extra_state_attributes,
@@ -159,8 +173,8 @@ def list_sensors_vpn_servers(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
         sensors.update(
             {
-                (VPN, f"{vpn}_state"): ARBinarySensorDescription(
-                    key=f"{vpn}_state",
+                (VPN, f"{vpn}_{STATE}"): ARBinarySensorDescription(
+                    key=f"{vpn}_{STATE}",
                     key_group=VPN,
                     name=f"{NAME_OVPN_SERVER} {num}",
                     device_class=DEVICE_CLASS_CONNECTIVITY,
@@ -188,15 +202,14 @@ def list_switches_vpn_servers(number: int | None = None) -> dict[str, Any]:
             extra_state_attributes[f"{vpn}_{key}"] = SENSORS_VPN_SERVER[key]
         sensors.update(
             {
-                (VPN, f"{vpn}_state"): ARSwitchDescription(
-                    key=f"{vpn}_state",
+                (VPN, f"{vpn}_{STATE}"): ARSwitchDescription(
+                    key=f"{vpn}_{STATE}",
                     key_group=VPN,
                     name=f"{NAME_OVPN_SERVER} {num}",
-                    icon="mdi:network-outline",
-                    icon_on="mdi:check-network-outline",
-                    icon_off="mdi:close-network-outline",
-                    service_on=f"start_vpnserver{num}",
-                    service_off=f"stop_vpnserver{num}",
+                    icon_on=ICON_VPN_ON,
+                    icon_off=ICON_VPN_OFF,
+                    service_on=f"{START_VPNSERVER}{num}",
+                    service_off=f"{STOP_VPNSERVER}{num}",
                     entity_category=EntityCategory.CONFIG,
                     entity_registry_enabled_default=True,
                     extra_state_attributes=extra_state_attributes,
@@ -261,23 +274,22 @@ def list_switches_wlan(
                     key=f"{wlan}_radio",
                     key_group=WLAN,
                     name=f"{NAME_WLAN[id]}",
-                    icon="mdi:wifi",
-                    icon_on="mdi:wifi",
-                    icon_off="mdi:wifi-off",
-                    service_on="restart_wireless",
+                    icon_on=ICON_WLAN_ON,
+                    icon_off=ICON_WLAN_OFF,
+                    service_on=RESTART_WIRELESS,
                     service_on_args={
-                        "action_mode": "apply",
+                        ACTION_MODE: APPLY,
                         f"wl{id}_radio": 1,
                     },
-                    service_off="restart_wireless",
+                    service_off=RESTART_WIRELESS,
                     service_off_args={
-                        "action_mode": "apply",
+                        ACTION_MODE: APPLY,
                         f"wl{id}_radio": 0,
                     },
-                    device_class="wlan",
+                    device_class=WLAN,
                     capabilities={
-                        "api_type": WLAN,
-                        "api_id": id,
+                        API_TYPE: WLAN,
+                        API_ID: id,
                     },
                     service_expect_modify=True,
                     entity_category=EntityCategory.CONFIG,
@@ -348,24 +360,23 @@ def list_switches_gwlan(
                         key=f"{wlan}_bss_enabled",
                         key_group=GWLAN,
                         name=f"{NAME_GWLAN[wlan_name]}",
-                        icon="mdi:wifi",
-                        icon_on="mdi:wifi",
-                        icon_off="mdi:wifi-off",
-                        service_on="restart_wireless;restart_firewall",
+                        icon_on=ICON_WLAN_ON,
+                        icon_off=ICON_WLAN_OFF,
+                        service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
                         service_on_args={
-                            "action_mode": "apply",
+                            ACTION_MODE: APPLY,
                             f"wl{wlan_name}_bss_enabled": 1,
                             f"wl{wlan_name}_expire": 0,
                         },
-                        service_off="restart_wireless;restart_firewall",
+                        service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
                         service_off_args={
-                            "action_mode": "apply",
+                            ACTION_MODE: APPLY,
                             f"wl{wlan_name}_bss_enabled": 0,
                         },
-                        device_class="wlan",
+                        device_class=WLAN,
                         capabilities={
-                            "api_type": GWLAN,
-                            "api_id": wlan_name,
+                            API_TYPE: GWLAN,
+                            API_ID: wlan_name,
                         },
                         service_expect_modify=True,
                         entity_category=EntityCategory.CONFIG,
