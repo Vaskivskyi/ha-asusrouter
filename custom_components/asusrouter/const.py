@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    DEVICE_CLASS_CONNECTIVITY,
+)
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
@@ -68,9 +71,12 @@ PLATFORMS = [
 ### NUMERIC -->
 
 NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
-NUMERIC_GWLAN = range(1, 5)  # maximum of 4 guest WLANs from 1 to 4
+NUMERIC_GWLAN = range(1, 4)  # maximum of 4 guest WLANs from 1 to 3
 NUMERIC_LAN = range(1, 9)  # maximum of 8 LAN ports from 1 to 8
+NUMERIC_OVPN_CLIENT = range(1, 6)  # maximum of 5 OVPN clients from 1 to 5
+NUMERIC_OVPN_SERVER = range(1, 3)  # maximum of 2 OVPN servers from 1 to 2
 NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
+NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
 
 ### <-- NUMERIC
 
@@ -620,6 +626,73 @@ STATIC_BINARY_SENSORS_OPTIONAL = {
         },
     ),
 }
+STATIC_BINARY_SENSORS_OPTIONAL.update(
+    {
+        # OVPN clients
+        (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARBinarySensorDescription(
+            key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
+            key_group=VPN,
+            name=f"{NAME_OVPN_CLIENT} {num}",
+            device_class=DEVICE_CLASS_CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
+            },
+        )
+        for num in NUMERIC_OVPN_CLIENT
+    }
+)
+STATIC_BINARY_SENSORS_OPTIONAL.update(
+    {
+        # OVPN servers
+        (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARBinarySensorDescription(
+            key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
+            key_group=VPN,
+            name=f"{NAME_OVPN_SERVER} {num}",
+            device_class=DEVICE_CLASS_CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
+                for key in SENSORS_VPN_SERVER
+            },
+        )
+        for num in NUMERIC_OVPN_SERVER
+    }
+)
+STATIC_BINARY_SENSORS_OPTIONAL.update(
+    {
+        # WLANs
+        (WLAN, f"{KEY_WLAN}{num}_radio"): ARBinarySensorDescription(
+            key=f"{KEY_WLAN}{num}_radio",
+            key_group=WLAN,
+            name=f"{NAME_WLAN[num]}",
+            device_class=DEVICE_CLASS_CONNECTIVITY,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
+            },
+        )
+        for num in NUMERIC_WLAN
+    }
+)
+STATIC_BINARY_SENSORS_OPTIONAL.update(
+    {
+        # Guest WLANs
+        (GWLAN, f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",): ARBinarySensorDescription(
+            key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
+            key_group=GWLAN,
+            name=NAME_GWLAN[f"{num}.{gnum}"],
+            device_class=DEVICE_CLASS_CONNECTIVITY,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]
+                for key in SENSORS_GWLAN
+            },
+        )
+        for gnum in NUMERIC_GWLAN
+        for num in NUMERIC_WLAN
+    }
+)
 STATIC_BUTTONS = {
     REBOOT: ARButtonDescription(
         key=REBOOT,
@@ -840,6 +913,118 @@ STATIC_SWITCHES_OPTIONAL = {
         },
     ),
 }
+STATIC_SWITCHES_OPTIONAL.update(
+    {
+        # OVPN clients
+        (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARSwitchDescription(
+            key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
+            key_group=VPN,
+            name=f"{NAME_OVPN_CLIENT} {num}",
+            icon_on=ICON_VPN_ON,
+            icon_off=ICON_VPN_OFF,
+            service_on=f"{START_VPNCLIENT}{num}",
+            service_off=f"{STOP_VPNCLIENT}{num}",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
+            },
+        )
+        for num in NUMERIC_OVPN_CLIENT
+    }
+)
+STATIC_SWITCHES_OPTIONAL.update(
+    {
+        # OVPN servers
+        (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARSwitchDescription(
+            key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
+            key_group=VPN,
+            name=f"{NAME_OVPN_SERVER} {num}",
+            icon_on=ICON_VPN_ON,
+            icon_off=ICON_VPN_OFF,
+            service_on=f"{START_VPNSERVER}{num}",
+            service_off=f"{STOP_VPNSERVER}{num}",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
+                for key in SENSORS_VPN_SERVER
+            },
+        )
+        for num in NUMERIC_OVPN_SERVER
+    }
+)
+STATIC_SWITCHES_OPTIONAL.update(
+    {
+        # WLANs
+        (WLAN, f"{KEY_WLAN}{num}_radio"): ARSwitchDescription(
+            key=f"{KEY_WLAN}{num}_radio",
+            key_group=WLAN,
+            name=f"{NAME_WLAN[num]}",
+            icon_on=ICON_WLAN_ON,
+            icon_off=ICON_WLAN_OFF,
+            service_on=RESTART_WIRELESS,
+            service_on_args={
+                ACTION_MODE: APPLY,
+                f"wl{num}_radio": 1,
+            },
+            service_off=RESTART_WIRELESS,
+            service_off_args={
+                ACTION_MODE: APPLY,
+                f"wl{num}_radio": 0,
+            },
+            device_class=WLAN,
+            capabilities={
+                API_TYPE: WLAN,
+                API_ID: num,
+            },
+            service_expect_modify=True,
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
+            },
+        )
+        for num in NUMERIC_WLAN
+    }
+)
+STATIC_SWITCHES_OPTIONAL.update(
+    {
+        # Guest WLANs
+        (GWLAN, f"{KEY_GWLAN}{num}.{gnum}_bss_enabled"): ARSwitchDescription(
+            key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
+            key_group=GWLAN,
+            name=NAME_GWLAN[f"{num}.{gnum}"],
+            icon_on=ICON_WLAN_ON,
+            icon_off=ICON_WLAN_OFF,
+            service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
+            service_on_args={
+                ACTION_MODE: APPLY,
+                f"wl{num}.{gnum}_bss_enabled": 1,
+                f"wl{num}.{gnum}_expire": 0,
+            },
+            service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
+            service_off_args={
+                ACTION_MODE: APPLY,
+                f"wl{num}.{gnum}_bss_enabled": 0,
+            },
+            device_class=WLAN,
+            capabilities={
+                API_TYPE: GWLAN,
+                API_ID: f"{num}.{gnum}",
+            },
+            service_expect_modify=True,
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]
+                for key in SENSORS_GWLAN
+            },
+        )
+        for gnum in NUMERIC_GWLAN
+        for num in NUMERIC_WLAN
+    }
+)
 STATIC_UPDATES = {
     (FIRMWARE, STATE): ARUpdateDescription(
         key=STATE,

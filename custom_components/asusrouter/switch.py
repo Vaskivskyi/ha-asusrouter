@@ -11,12 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .compilers import (
-    list_switches_gwlan,
-    list_switches_vpn_clients,
-    list_switches_vpn_servers,
-    list_switches_wlan,
-)
 from .const import (
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
@@ -44,10 +38,6 @@ async def async_setup_entry(
         hide.append(PASSWORD)
 
     if entry.options[CONF_ENABLE_CONTROL]:
-        SWITCHES.update(list_switches_vpn_clients(5))
-        SWITCHES.update(list_switches_vpn_servers(2))
-        SWITCHES.update(list_switches_wlan(3, hide))
-        SWITCHES.update(list_switches_gwlan(3, hide))
         SWITCHES.update(STATIC_SWITCHES_OPTIONAL)
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
