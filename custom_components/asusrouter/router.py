@@ -31,6 +31,7 @@ from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 
 from .bridge import ARBridge
 from .const import (
+    CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
     CONF_EVENT_DEVICE_DISCONNECTED,
     CONF_EVENT_DEVICE_RECONNECTED,
@@ -48,6 +49,7 @@ from .const import (
     CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
+    DEFAULT_ENABLE_CONTROL,
     DEFAULT_HTTP,
     DEFAULT_INTERVALS,
     DEFAULT_LATEST_CONNECTED,
@@ -448,23 +450,24 @@ class ARDevice:
 
             await self.bridge.async_adjust_wlan(raw=service.data)
 
-        self.hass.services.async_register(
-            DOMAIN, "adjust_wlan", async_service_adjust_wlan
-        )
-
         async def async_service_device_internet_access(service: ServiceCall):
             """Adjust device internet access"""
 
             await self.bridge.async_parental_control(raw=service.data)
 
-        self.hass.services.async_register(
-            DOMAIN, "device_internet_access", async_service_device_internet_access
-        )
-
         async def async_service_remove_trackers(service: ServiceCall):
             """Remove device trackers"""
 
             await self.remove_trackers(raw=service.data)
+
+        if self._options.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL):
+            self.hass.services.async_register(
+                DOMAIN, "adjust_wlan", async_service_adjust_wlan
+            )
+
+            self.hass.services.async_register(
+                DOMAIN, "device_internet_access", async_service_device_internet_access
+            )
 
         self.hass.services.async_register(
             DOMAIN, "remove_trackers", async_service_remove_trackers
