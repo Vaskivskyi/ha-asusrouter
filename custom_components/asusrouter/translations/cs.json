@@ -176,13 +176,6 @@
                 "data": {
                     "hide_passwords": "Skrýt hesla ze senzorů a atributů"
                 }
-            },
-            "confirmation": {
-                "title": "Znovu načíst",
-                "description": "Načtěte prosím znovu integraci",
-                "data": {
-                    "confirm": "Pro použití nové konfigurace musíte znovu načíst integraci. Kliknout na nabídku integrace (3 tečky) a stisknout 'Znovu načíst'"
-                }
             }
         },
         "error": {

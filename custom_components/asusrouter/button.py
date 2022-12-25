@@ -5,60 +5,17 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.button import ButtonDeviceClass, ButtonEntity
+from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import (
-    ASUSROUTER,
-    DOMAIN,
-)
+from .const import ASUSROUTER, DOMAIN, STATIC_BUTTONS as BUTTONS
 from .dataclass import ARButtonDescription
 from .entity import ARButtonEntity
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
-
-BUTTONS = {
-    "reboot": ARButtonDescription(
-        key="reboot",
-        name="Reboot",
-        icon="mdi:restart",
-        service="reboot",
-        service_args={},
-        device_class=ButtonDeviceClass.RESTART,
-        service_expect_modify=False,
-        entity_registry_enabled_default=True,
-    ),
-    "restart_firewall": ARButtonDescription(
-        key="restart_firewall",
-        name="Restart firewall",
-        icon="mdi:restart",
-        service="restart_firewall",
-        service_args={},
-        service_expect_modify=False,
-        entity_registry_enabled_default=False,
-    ),
-    "restart_https": ARButtonDescription(
-        key="restart_httpd",
-        name="Restart HTTP daemon",
-        icon="mdi:restart",
-        service="restart_httpd",
-        service_args={},
-        service_expect_modify=False,
-        entity_registry_enabled_default=False,
-    ),
-    "restart_wireless": ARButtonDescription(
-        key="restart_wireless",
-        name="Restart wireless",
-        icon="mdi:restart",
-        service="restart_wireless",
-        service_args={},
-        service_expect_modify=False,
-        entity_registry_enabled_default=False,
-    ),
-}
 
 
 async def async_setup_entry(

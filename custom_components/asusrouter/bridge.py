@@ -118,8 +118,8 @@ class ARBridge:
             cert_check=configs.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
             cert_path=configs.get(CONF_CERT_PATH, ""),
             cache_time=configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
-            enable_monitor=configs.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR),
-            enable_control=configs.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
+            enable_monitor=True,
+            enable_control=True,
             session=session,
         )
 
@@ -423,7 +423,7 @@ class ARBridge:
         """Get the available temperature sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_temperature_labels, type=TEMPERATURE
+            self.api.async_get_temperature, helpers.list_from_dict, type=TEMPERATURE
         )
 
     async def _get_sensors_vpn(self) -> list[str]:

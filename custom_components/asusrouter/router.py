@@ -31,6 +31,7 @@ from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
 
 from .bridge import ARBridge
 from .const import (
+    CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
     CONF_EVENT_DEVICE_DISCONNECTED,
     CONF_EVENT_DEVICE_RECONNECTED,
@@ -48,6 +49,7 @@ from .const import (
     CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
     DEFAULT_CONSIDER_HOME,
+    DEFAULT_ENABLE_CONTROL,
     DEFAULT_HTTP,
     DEFAULT_INTERVALS,
     DEFAULT_LATEST_CONNECTED,
@@ -75,7 +77,9 @@ from .const import (
     KEY_COORDINATOR,
     MAC,
     NAME,
+    NO_SSL,
     SENSORS_CONNECTED_DEVICES,
+    SSL,
 )
 
 _T = TypeVar("_T")
@@ -407,9 +411,9 @@ class ARDevice:
         self._conf_port: int = self._options[CONF_PORT]
         if self._conf_port == DEFAULT_PORT:
             self._conf_port = (
-                DEFAULT_PORTS["ssl"]
+                DEFAULT_PORTS[SSL]
                 if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_PORTS["no_ssl"]
+                else DEFAULT_PORTS[NO_SSL]
             )
 
         # Device information
@@ -446,23 +450,24 @@ class ARDevice:
 
             await self.bridge.async_adjust_wlan(raw=service.data)
 
-        self.hass.services.async_register(
-            DOMAIN, "adjust_wlan", async_service_adjust_wlan
-        )
-
         async def async_service_device_internet_access(service: ServiceCall):
             """Adjust device internet access"""
 
             await self.bridge.async_parental_control(raw=service.data)
 
-        self.hass.services.async_register(
-            DOMAIN, "device_internet_access", async_service_device_internet_access
-        )
-
         async def async_service_remove_trackers(service: ServiceCall):
             """Remove device trackers"""
 
             await self.remove_trackers(raw=service.data)
+
+        if self._options.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL):
+            self.hass.services.async_register(
+                DOMAIN, "adjust_wlan", async_service_adjust_wlan
+            )
+
+            self.hass.services.async_register(
+                DOMAIN, "device_internet_access", async_service_device_internet_access
+            )
 
         self.hass.services.async_register(
             DOMAIN, "remove_trackers", async_service_remove_trackers
@@ -771,9 +776,9 @@ class ARDevice:
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
             configuration_url="{}://{}:{}".format(
-                DEFAULT_HTTP["ssl"]
+                DEFAULT_HTTP[SSL]
                 if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_HTTP["no_ssl"],
+                else DEFAULT_HTTP[NO_SSL],
                 self._conf_host,
                 self._conf_port,
             ),

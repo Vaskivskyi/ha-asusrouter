@@ -22,8 +22,6 @@ class AREntityDescription(EntityDescription):
     capabilities: dict[str, Any] | None = None
     key_group: Callable[[dict], str] | None = None
     value: Callable[[Any], Any] = lambda val: val
-    factor: int | None = None
-    precision: int = 3
     extra_state_attributes: dict[str, Any] | None = None
 
 
@@ -38,6 +36,9 @@ class ARBinaryDescription(AREntityDescription, BinarySensorEntityDescription):
 @dataclass
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """Describe AsusRouter sensor."""
+
+    factor: int | None = None
+    precision: int = 3
 
 
 @dataclass

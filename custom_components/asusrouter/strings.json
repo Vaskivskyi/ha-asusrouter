@@ -176,13 +176,6 @@
                 "data": {
                     "hide_passwords": "Hide passwords from sensors and attributes"
                 }
-            },
-            "confirmation": {
-                "title": "Reload required",
-                "description": "Please, reload the integration",
-                "data": {
-                    "confirm": "I understand, that I need to reload the integration to apply the new configuration. To do this, I will click the integration menu (3 dots) and press 'Reload'"
-                }
             }
         },
         "error": {
