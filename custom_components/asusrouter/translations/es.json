@@ -177,13 +177,6 @@
                 "data": {
                     "hide_passwords": "Ocultar contraseñas de sensores y atributos"
                 }
-            },
-            "confirmation": {
-                "title": "Se requiere recargar",
-                "description": "Por favor, recarga la integración",
-                "data": {
-                    "confirm": "Entiendo que necesito recargar la integración para aplicar la nueva configuración. Para hacer esto, debo hacer click el el menú de la integración (los 3 puntos) y pulsar 'Recargar'"
-                }
             }
         },
         "error": {

@@ -176,13 +176,6 @@
                 "data": {
                     "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
                 }
-            },
-            "confirmation": {
-                "title": "Herladen verplicht",
-                "description": "Herlaat de intergratie",
-                "data": {
-                    "confirm": "Ik begrijp dat het nodig is om de integratie opnieuw te laden. Dit om de nieuwe configuratie te laden. Om dit uit te voeren: Ik klik op het intergratie menu (3 puntjes) eb druk op herlaad (reload)"
-                }
             }
         },
         "error": {
