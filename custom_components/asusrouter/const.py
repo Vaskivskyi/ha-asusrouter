@@ -86,22 +86,54 @@ ACTION_MODE = "action_mode"
 API_ID = "api_id"
 API_TYPE = "api_type"
 APPLY = "apply"
+BITS_PER_SECOND = "bits/s"
+BOOTTIME = "boottime"
+BYTES = "bytes"
+CORE = "core"
+CPU = "cpu"
+DEVICES = "devices"
+DNS = "dns"
+FIRMWARE = "firmware"
 FREE = "free"
+GWLAN = "gwlan"
 HTTP = "http"
 HTTPS = "https"
+IP = "ip"
+LAN = "lan"
+LED = "led"
+LIGHT = "light"
 LIST = "list"
+LOAD_AVG = "load_avg"
+MAC = "mac"
+MISC = "misc"
+NAME = "name"
+NETWORK_STAT = "network_stat"
 NO_SSL = "no_ssl"
+PARENTAL_CONTROL = "parental_control"
+PASSWORD = "password"
+PORTS = "ports"
+RAM = "ram"
 RX = "rx"
 RX_SPEED = "rx_speed"
+SSID = "ssid"
 SSL = "ssl"
 STATE = "state"
 STATUS = "status"
+SYSINFO = "sysinfo"
+TEMPERATURE = "temperature"
 TOTAL = "total"
 TX = "tx"
 TX_SPEED = "tx_speed"
 UNKNOWN = "unknown"
 USAGE = "usage"
 USED = "used"
+VPN = "vpn"
+WAN = "wan"
+WLAN = "wlan"
+WLAN_2GHZ = "2ghz"
+WLAN_5GHZ = "5ghz"
+WLAN_5GHZ2 = "5ghz2"
+WLAN_6GHZ = "6ghz"
 
 ### <-- GENERAL DATA
 
@@ -111,7 +143,7 @@ CONNECTED = "connected"
 
 ### <-- GENERAL STATES
 
-### GENERAL TYPES -->
+### LABELS -->
 
 CONNECTION_2G = "2.4 GHz"
 CONNECTION_5G = "5 GHz"
@@ -125,35 +157,9 @@ CONNECTION_LIST = [
 ]
 CONNECTION_WIRED = "Wired"
 
-BOOTTIME = "boottime"
-CORE = "core"
-CPU = "cpu"
-DEVICES = "devices"
-FIRMWARE = "firmware"
-GWLAN = "gwlan"
-LAN = "lan"
-LIGHT = "light"
-LOAD_AVG = "load_avg"
-MISC = "misc"
-NETWORK_STAT = "network_stat"
-PARENTAL_CONTROL = "parental_control"
-PORTS = "ports"
-RAM = "ram"
-SYSINFO = "sysinfo"
-TEMPERATURE = "temperature"
-VPN = "vpn"
-WAN = "wan"
-WLAN = "wlan"
-WLAN_2GHZ = "2ghz"
-WLAN_5GHZ = "5ghz"
-WLAN_5GHZ2 = "5ghz2"
-WLAN_6GHZ = "6ghz"
-
-### <-- GENERAL TYPES
-
-### LABELS -->
-
 LABEL_LOAD_AVG = "Load Average"
+LABEL_OVPN_CLIENT = "OpenVPN Client"
+LABEL_OVPN_SERVER = "OpenVPN Server"
 LABEL_RX = "Download"
 LABEL_SPEED = "Speed"
 LABEL_TX = "Upload"
@@ -170,18 +176,6 @@ LABELS_TEMPERATURE = {
 }
 
 ### <-- LABELS
-
-### GENERAL VALUES -->
-
-BITS_PER_SECOND = "bits/s"
-BYTES = "bytes"
-IP = "ip"
-MAC = "mac"
-NAME = "name"
-PASSWORD = "password"
-SSID = "ssid"
-
-### <-- GENERAL VALUES
 
 ### SENSORS LIST -->
 
@@ -207,8 +201,8 @@ SENSORS_GWLAN = {
     SSID: SSID,
     "crypto": "wpa_encryption",
 }
-SENSORS_LIGHT = ["led"]
-SENSORS_MISC = ["boottime"]
+SENSORS_LIGHT = [LED]
+SENSORS_MISC = [BOOTTIME]
 SENSORS_NETWORK_STAT = [RX, RX_SPEED, TX, TX_SPEED]
 SENSORS_PARENTAL_CONTROL = [STATE]
 SENSORS_PORTS = [LAN.upper(), WAN.upper()]
@@ -474,9 +468,6 @@ for i in range(len(CONNECTION_LIST)):
     for j in NUMERIC_GWLAN:
         NAME_GWLAN[f"{i}.{j}"] = f"Guest {CONNECTION_LIST[i]} {j}"
 
-NAME_OVPN_CLIENT = "OpenVPN Client"
-NAME_OVPN_SERVER = "OpenVPN Server"
-
 SENSORS_PARAM: dict[str, dict[str, Any]] = {
     "key": {},
     "key_group": {},
@@ -602,7 +593,7 @@ STATIC_BINARY_SENSORS = {
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            "dns": "dns",
+            DNS: DNS,
             "gateway": "gateway",
             IP: IP,
             "ip_type": "ip_type",
@@ -632,7 +623,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
         (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARBinarySensorDescription(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
-            name=f"{NAME_OVPN_CLIENT} {num}",
+            name=f"{LABEL_OVPN_CLIENT} {num}",
             device_class=DEVICE_CLASS_CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
@@ -648,7 +639,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
         (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARBinarySensorDescription(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
-            name=f"{NAME_OVPN_SERVER} {num}",
+            name=f"{LABEL_OVPN_SERVER} {num}",
             device_class=DEVICE_CLASS_CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
@@ -733,8 +724,8 @@ STATIC_BUTTONS = {
     ),
 }
 STATIC_LIGHTS = {
-    (LIGHT, "led"): ARLightDescription(
-        key="led",
+    (LIGHT, LED): ARLightDescription(
+        key=LED,
         key_group=LIGHT,
         name="LED",
         icon_off=ICON_LIGHT_OFF,
@@ -848,7 +839,7 @@ STATIC_SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            "dns": "dns",
+            DNS: DNS,
             "gateway": "gateway",
             "ip_type": "ip_type",
             "mask": "mask",
@@ -898,12 +889,12 @@ STATIC_SWITCHES_OPTIONAL = {
         icon_off=ICON_PARENTAL_CONTROL_OFF,
         service_off=RESTART_FIREWALL,
         service_off_args={
-            "action_mode": "apply",
+            ACTION_MODE: APPLY,
             "MULTIFILTER_ALL": 0,
         },
         service_on=RESTART_FIREWALL,
         service_on_args={
-            "action_mode": "apply",
+            ACTION_MODE: APPLY,
             "MULTIFILTER_ALL": 1,
         },
         entity_category=EntityCategory.CONFIG,
@@ -919,7 +910,7 @@ STATIC_SWITCHES_OPTIONAL.update(
         (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARSwitchDescription(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
-            name=f"{NAME_OVPN_CLIENT} {num}",
+            name=f"{LABEL_OVPN_CLIENT} {num}",
             icon_on=ICON_VPN_ON,
             icon_off=ICON_VPN_OFF,
             service_on=f"{START_VPNCLIENT}{num}",
@@ -939,7 +930,7 @@ STATIC_SWITCHES_OPTIONAL.update(
         (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARSwitchDescription(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
-            name=f"{NAME_OVPN_SERVER} {num}",
+            name=f"{LABEL_OVPN_SERVER} {num}",
             icon_on=ICON_VPN_ON,
             icon_off=ICON_VPN_OFF,
             service_on=f"{START_VPNSERVER}{num}",
