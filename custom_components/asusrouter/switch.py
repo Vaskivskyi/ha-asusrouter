@@ -40,7 +40,9 @@ async def async_setup_entry(
     if entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.update(STATIC_SWITCHES_OPTIONAL)
 
-    await async_setup_ar_entry(hass, entry, async_add_entities, SWITCHES, ARSwitch)
+    await async_setup_ar_entry(
+        hass, entry, async_add_entities, SWITCHES, ARSwitch, hide
+    )
 
 
 class ARSwitch(ARBinaryEntity, SwitchEntity):
