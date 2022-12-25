@@ -26,6 +26,7 @@ async def async_setup_ar_entry(
     async_add_entities: AddEntitiesCallback,
     sensors: dict[Any, Any],
     sensor_class: AREntity,
+    hide: list[str] | None = None,
 ) -> None:
     """Setup AsusRouter entities."""
 
@@ -41,6 +42,15 @@ async def async_setup_ar_entry(
                         sensors[sensor_description].key
                         in sensor_data[sensor_description[0]]
                     ):
+                        # Hide protected values
+                        if hide:
+                            sensors[sensor_description].extra_state_attributes = {
+                                key: val
+                                for key, val in sensors[
+                                    sensor_description
+                                ].extra_state_attributes.items()
+                                if not val in hide
+                            }
                         entities.append(
                             sensor_class(
                                 coordinator, router, sensors[sensor_description]

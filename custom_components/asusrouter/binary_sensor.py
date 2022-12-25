@@ -36,7 +36,7 @@ async def async_setup_entry(
         BINARY_SENSORS.update(STATIC_BINARY_SENSORS_OPTIONAL)
 
     await async_setup_ar_entry(
-        hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor
+        hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor, hide
     )
 
 
