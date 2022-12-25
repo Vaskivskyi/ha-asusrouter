@@ -176,13 +176,6 @@
                 "data": {
                     "hide_passwords": "Masquer les mots de passe des capteurs et des attributs"
                 }
-            },
-            "confirmation": {
-                "title": "Rechargement requis",
-                "description": "Veuillez recharger l'intégration",
-                "data": {
-                    "confirm": "Je comprends que je dois recharger l'intégration pour appliquer la nouvelle configuration. Pour ce faire, je clique sur le menu d'intégration (3 points) et j'appuie sur 'Recharger'"
-                }
             }
         },
         "error": {

@@ -442,20 +442,6 @@ def _create_form_name(
     return vol.Schema(schema)
 
 
-def _create_form_confirmation(
-    user_input: dict[str, Any] = dict(),
-) -> vol.Schema:
-    """Create a form for the 'confirmation' step."""
-
-    schema = {
-        vol.Optional(
-            CONF_CONFIRM, default=user_input.get(CONF_CONFIRM, False)
-        ): cv.boolean,
-    }
-
-    return vol.Schema(schema)
-
-
 ### <- FORMS
 
 
@@ -763,8 +749,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_events,
             "events": self.async_step_security,
-            "security": self.async_step_confirmation,
-            "confirmation": self.async_step_finish,
+            "security": self.async_step_finish,
         }
 
     async def async_select_step(
@@ -810,7 +795,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         schema_dict = dict()
         for el in self._steps:
-            if el != step_id and el != "confirmation":
+            if el != step_id:
                 schema_dict.update({vol.Optional(el, default=False): bool})
 
         return self.async_show_form(
@@ -969,31 +954,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._options.update(user_input)
 
         return await self.async_select_step(step_id)
-
-    async def async_step_confirmation(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
-        """Step to confirm changes."""
-
-        step_id = "confirmation"
-
-        errors = dict()
-
-        if user_input:
-            if CONF_CONFIRM in user_input and user_input[CONF_CONFIRM] == True:
-                return await self.async_select_step(step_id)
-            else:
-                errors["base"] = "not_confirmed"
-
-        if not user_input:
-            user_input = self._options.copy()
-
-        return self.async_show_form(
-            step_id=step_id,
-            data_schema=_create_form_confirmation(user_input),
-            errors=errors,
-        )
 
     # Step Finish
     async def async_step_finish(

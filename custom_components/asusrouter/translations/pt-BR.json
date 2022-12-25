@@ -176,13 +176,6 @@
                 "data": {
                     "hide_passwords": "Ocultar senhas de sensores e atributos"
                 }
-            },
-            "confirmation": {
-                "title": "Recarregar",
-                "description": "Por favor, recarregue a integração",
-                "data": {
-                    "confirm": "Entendo que preciso recarregar a integração para aplicar a nova configuração. Para fazer isso, vou clicar no menu de integração (3 pontos) e pressionar 'Recarregar'"
-                }
             }
         },
         "error": {
