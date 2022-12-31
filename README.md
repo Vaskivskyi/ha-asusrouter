@@ -185,6 +185,4 @@ This integration is a free-time project. If you like it, you can support me by b
 
 The initial codebase for this integration is highly based on Home Assistant core integration [AsusWRT](https://www.home-assistant.io/integrations/asuswrt/) and [ollo69/ha_asuswrt_custom](https://github.com/ollo69/ha_asuswrt_custom).
 
----
-
 [^amazon]: As an Amazon Associate I earn from qualifying purchases. Not like I ever got anything yet (:
