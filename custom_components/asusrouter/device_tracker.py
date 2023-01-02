@@ -130,16 +130,7 @@ class ARDeviceEntity(ScannerEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return extra state attributes."""
 
-        _attributes = self._device.extra_state_attributes
-        if not _attributes:
-            return {}
-
-        attributes = {}
-
-        for attr in _attributes:
-            attributes[attr] = _attributes[attr]
-
-        return attributes
+        return dict(sorted(self._device.extra_state_attributes.items())) or {}
 
     @callback
     def async_on_demand_update(self) -> None:
