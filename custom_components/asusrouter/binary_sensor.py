@@ -146,7 +146,9 @@ class AMBinarySensor(BinarySensorEntity):
             model=self._node.native.model,
             manufacturer=MANUFACTURER,
             sw_version=self._node.native.fw,
-            via_device=(DOMAIN, self._router._identity.mac),
+            via_device=(DOMAIN, self._router._identity.mac)
+            if self._router._identity.mac != self._node.mac
+            else None,
         )
 
     @callback
