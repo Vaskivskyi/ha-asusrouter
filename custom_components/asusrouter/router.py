@@ -52,6 +52,7 @@ from .const import (
     CONF_TRACK_DEVICES,
     CONFIG,
     CONNECTED,
+    CONNECTION,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
     CONNECTION_TYPE_5G2,
@@ -95,6 +96,7 @@ from .const import (
     SENSORS_CONNECTED_DEVICES,
     SSL,
     TYPE,
+    WIRED,
 )
 
 _T = TypeVar("_T")
@@ -262,7 +264,12 @@ class AiMeshNode:
                 # Node level
                 self._extra_state_attributes[LEVEL] = node_info.level
                 # Node parent
-                self._extra_state_attributes[PARENT] = node_info.parent
+                if node_info.parent == dict():
+                    self._extra_state_attributes[PARENT] = {
+                        CONNECTION: WIRED,
+                    }
+                else:
+                    self._extra_state_attributes[PARENT] = node_info.parent
                 # Node config
                 # self._extra_state_attributes[CONFIG] = node_info.config
                 # Access point
