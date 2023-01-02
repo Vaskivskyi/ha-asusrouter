@@ -942,7 +942,7 @@ class ARDevice:
 
         return DeviceInfo(
             identifiers={
-                (DOMAIN, format_mac(self._identity.mac)),
+                (DOMAIN, self.mac),
                 (DOMAIN, self._identity.serial),
             },
             name=self._conf_name,
@@ -999,6 +999,12 @@ class ARDevice:
         """Router hostname."""
 
         return self._host
+
+    @property
+    def mac(self) -> str:
+        """Router MAC address."""
+
+        return format_mac(self._identity.mac)
 
     @property
     def bridge(self) -> ARBridge:
