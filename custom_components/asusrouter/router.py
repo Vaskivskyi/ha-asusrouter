@@ -44,6 +44,8 @@ from .const import (
     CONF_EVENT_DEVICE_DISCONNECTED,
     CONF_EVENT_DEVICE_RECONNECTED,
     CONF_EVENT_NODE_CONNECTED,
+    CONF_EVENT_NODE_DISCONNECTED,
+    CONF_EVENT_NODE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
@@ -243,8 +245,6 @@ class AiMeshNode:
             ] = format_mac(node_info.mac)
             # Online
             if node_info.status:
-                # Connection status
-                self.identity[CONNECTED] = True
                 # State: router / node
                 self._extra_state_attributes[TYPE] = self.identity[
                     TYPE
@@ -274,9 +274,29 @@ class AiMeshNode:
                 # self._extra_state_attributes[CONFIG] = node_info.config
                 # Access point
                 # self._extra_state_attributes[ACCESS_POINT] = node_info.ap
+                # Notify reconnect
+                if self.identity[CONNECTED] == False:
+                    event_call(
+                        CONF_EVENT_NODE_RECONNECTED,
+                        self.identity,
+                    )
+                # Connection status
+                self.identity[CONNECTED] = True
             else:
+                # Notify disconnect
+                if self.identity[CONNECTED] == True:
+                    event_call(
+                        CONF_EVENT_NODE_DISCONNECTED,
+                        self.identity,
+                    )
                 # Connection status
                 self.identity[CONNECTED] = False
+        else:
+            # Notify disconnect
+            event_call(
+                CONF_EVENT_NODE_DISCONNECTED,
+                self.identity,
+            )
 
     @property
     def mac(self):
