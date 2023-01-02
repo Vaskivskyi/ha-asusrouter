@@ -23,6 +23,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from asusrouter import (
+    AiMeshDevice,
     AsusDevice,
     AsusRouter,
     AsusRouterError,
@@ -35,12 +36,8 @@ from . import helpers
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
-    CONF_ENABLE_CONTROL,
-    CONF_ENABLE_MONITOR,
     CPU,
     DEFAULT_CACHE_TIME,
-    DEFAULT_ENABLE_CONTROL,
-    DEFAULT_ENABLE_MONITOR,
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
@@ -233,6 +230,12 @@ class ARBridge:
             return raw
         except AsusRouterError as ex:
             raise UpdateFailed(ex) from ex
+
+    # AiMesh nodes
+    async def async_get_aimesh_nodes(self) -> dict[str, AiMeshDevice]:
+        """Get dict of AiMesh nodes."""
+
+        return await self._get_data(self.api.async_get_aimesh)
 
     # Connected devices
     async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
