@@ -27,20 +27,30 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
-from asusrouter import AsusDevice, AsusRouterConnectionError, ConnectedDevice
+from asusrouter import (
+    AiMeshDevice,
+    AsusDevice,
+    AsusRouterConnectionError,
+    ConnectedDevice,
+)
 
 from .bridge import ARBridge
 from .const import (
+    ACCESS_POINT,
+    AIMESH,
+    ALIAS,
     CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
     CONF_EVENT_DEVICE_DISCONNECTED,
     CONF_EVENT_DEVICE_RECONNECTED,
+    CONF_EVENT_NODE_CONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
+    CONFIG,
     CONNECTED,
     CONNECTION_TYPE_2G,
     CONNECTION_TYPE_5G,
@@ -75,11 +85,16 @@ from .const import (
     FIRMWARE,
     IP,
     KEY_COORDINATOR,
+    LEVEL,
     MAC,
+    MODEL,
     NAME,
     NO_SSL,
+    PARENT,
+    PRODUCT_ID,
     SENSORS_CONNECTED_DEVICES,
     SSL,
+    TYPE,
 )
 
 _T = TypeVar("_T")
@@ -109,8 +124,8 @@ class ARSensorHandler:
             CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
         )
 
-    async def _get_connected_devices(self) -> dict[str, int]:
-        """Return number of connected devices."""
+    async def _get_connected_devices(self) -> dict[str, Any]:
+        """Return connected devices sensors."""
 
         return {
             SENSORS_CONNECTED_DEVICES[0]: self._connected_devices,
@@ -188,6 +203,85 @@ class ARSensorHandler:
         await coordinator.async_refresh()
 
         return coordinator
+
+
+class AiMeshNode:
+    """Representation of an AiMesh node."""
+
+    def __init__(
+        self,
+        mac: str,
+    ) -> None:
+        """Initialize an AiMesh node."""
+
+        self._mac = mac
+        self.native = AiMeshDevice()
+        self.identity = {
+            MAC: None,
+            IP: None,
+            ALIAS: None,
+            MODEL: None,
+            TYPE: None,
+            CONNECTED: None,
+        }
+        self._extra_state_attributes: dict[str, Any] = dict()
+
+    @callback
+    def update(
+        self,
+        node_info: AiMeshDevice | None = None,
+        event_call: CALLBACK_TYPE | None = None,
+    ) -> None:
+        """Update AiMesh device."""
+
+        if node_info:
+            self.native = node_info
+            self._mac = self._extra_state_attributes[MAC] = self.identity[
+                MAC
+            ] = node_info.mac
+            # Online
+            if node_info.status:
+                # Connection status
+                self.identity[CONNECTED] = True
+                # State: router / node
+                self._extra_state_attributes[TYPE] = self.identity[
+                    TYPE
+                ] = node_info.state
+                # IP
+                self._extra_state_attributes[IP] = self.identity[IP] = node_info.ip
+                # Alias
+                self._extra_state_attributes[ALIAS] = self.identity[
+                    ALIAS
+                ] = node_info.alias
+                # Model
+                self._extra_state_attributes[MODEL] = self.identity[
+                    MODEL
+                ] = node_info.model
+                # Product ID
+                self._extra_state_attributes[PRODUCT_ID] = node_info.product_id
+                # Node level
+                self._extra_state_attributes[LEVEL] = node_info.level
+                # Node parent
+                self._extra_state_attributes[PARENT] = node_info.parent
+                # Node config
+                # self._extra_state_attributes[CONFIG] = node_info.config
+                # Access point
+                # self._extra_state_attributes[ACCESS_POINT] = node_info.ap
+            else:
+                # Connection status
+                self.identity[CONNECTED] = False
+
+    @property
+    def mac(self):
+        """Return node mac address."""
+
+        return self._mac
+
+    @property
+    def extra_state_attributes(self):
+        """Return extra state attributes."""
+
+        return self._extra_state_attributes
 
 
 class ARConnectedDevice:
@@ -419,6 +513,7 @@ class ARDevice:
         # Device information
         self._identity: AsusDevice | None = None
 
+        self._aimesh: dict[str, Any] = {}
         self._devices: dict[str, Any] = {}
         self._connected_devices: int = 0
         self._connected_devices_list: list[str] = list()
@@ -509,6 +604,9 @@ class ARDevice:
                 device_mac, entry.original_name
             )
 
+        # Update AiMesh
+        await self.update_nodes()
+
         # Update devices
         await self.update_devices()
 
@@ -534,6 +632,7 @@ class ARDevice:
         """Update all AsusRouter platforms."""
 
         await self.update_devices()
+        await self.update_nodes()
 
     async def update_devices(self) -> None:
         """Update AsusRouter devices tracker."""
@@ -602,6 +701,54 @@ class ARDevice:
         if new_device:
             async_dispatcher_send(self.hass, self.signal_device_new)
         await self._update_unpolled_sensors()
+
+    async def update_nodes(self) -> None:
+        """Update AsusRouter AiMesh nodes."""
+
+        _LOGGER.debug(f"Updating AiMesh nodes for '{self._conf_host}'")
+        try:
+            aimesh = await self.bridge.async_get_aimesh_nodes()
+        except UpdateFailed as ex:
+            if not self._connect_error:
+                self._connect_error = True
+                _LOGGER.error(
+                    f"Error connecting to '{self._conf_host}' for device update: {ex}"
+                )
+            return
+
+        new_node = False
+
+        # Update existing nodes
+        nodes = {mac: description for mac, description in aimesh.items()}
+        for node_mac, node in self._aimesh.items():
+            node_info = nodes.pop(node_mac, None)
+            node.update(
+                node_info,
+                event_call=self.fire_event,
+            )
+
+        # Add new nodes
+        new_nodes = list()
+        for node_mac, node_info in nodes.items():
+            new_node = True
+            node = AiMeshNode(node_mac)
+            node.update(
+                node_info,
+                event_call=self.fire_event,
+            )
+            self._aimesh[node_mac] = node
+            new_nodes.append(node)
+
+        # Notify new nodes
+        for node in new_nodes:
+            self.fire_event(
+                CONF_EVENT_NODE_CONNECTED,
+                node.identity,
+            )
+
+        async_dispatcher_send(self.hass, self.signal_aimesh_update)
+        if new_node:
+            async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
     async def init_sensors_coordinator(self) -> None:
         """Initialize AsusRouter sensors coordinators."""
@@ -785,16 +932,34 @@ class ARDevice:
         )
 
     @property
+    def signal_aimesh_new(self) -> str:
+        """New AiMesh nodes."""
+
+        return f"{DOMAIN}-aimesh-new"
+
+    @property
+    def signal_aimesh_update(self) -> str:
+        """Updated AiMesh nodes."""
+
+        return f"{DOMAIN}-aimesh-update"
+
+    @property
     def signal_device_new(self) -> str:
-        """Event specific per AsusRouter entry to signal new device."""
+        """New device."""
 
         return f"{DOMAIN}-device-new"
 
     @property
     def signal_device_update(self) -> str:
-        """Event specific per AsusRouter entry to signal updates in devices."""
+        """Updated device."""
 
         return f"{DOMAIN}-device-update"
+
+    @property
+    def aimesh(self) -> dict[str, Any]:
+        """Return AiMesh nodes."""
+
+        return self._aimesh
 
     @property
     def devices(self) -> dict[str, Any]:
