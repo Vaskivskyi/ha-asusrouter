@@ -99,7 +99,7 @@ class AREntity(CoordinatorEntity):
             if attr in self.coordinator.data:
                 attributes[_attributes[attr]] = self.coordinator.data[attr]
 
-        return attributes
+        return dict(sorted(attributes.items())) or {}
 
 
 class ARBinaryEntity(AREntity):
