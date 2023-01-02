@@ -240,7 +240,7 @@ class AiMeshNode:
             self.native = node_info
             self._mac = self._extra_state_attributes[MAC] = self.identity[
                 MAC
-            ] = node_info.mac
+            ] = format_mac(node_info.mac)
             # Online
             if node_info.status:
                 # Connection status
@@ -726,7 +726,7 @@ class ARDevice:
         new_node = False
 
         # Update existing nodes
-        nodes = {mac: description for mac, description in aimesh.items()}
+        nodes = {format_mac(mac): description for mac, description in aimesh.items()}
         for node_mac, node in self._aimesh.items():
             node_info = nodes.pop(node_mac, None)
             node.update(
@@ -922,7 +922,7 @@ class ARDevice:
 
         return DeviceInfo(
             identifiers={
-                (DOMAIN, self._identity.mac),
+                (DOMAIN, format_mac(self._identity.mac)),
                 (DOMAIN, self._identity.serial),
             },
             name=self._conf_name,
