@@ -93,6 +93,7 @@ from .const import (
     MODEL,
     NAME,
     NO_SSL,
+    NODE,
     PARENT,
     PRODUCT_ID,
     SENSORS_CONNECTED_DEVICES,
@@ -332,6 +333,7 @@ class ARConnectedDevice:
             DEVICE_ATTRIBUTE_GUEST: False,
             DEVICE_ATTRIBUTE_GUEST_ID: 0,
             CONNECTED: None,
+            NODE: None,
         }
         self._connected: bool = False
         self._extra_state_attributes: dict[str, Any] = dict()
@@ -428,6 +430,10 @@ class ARConnectedDevice:
                 self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_TX_SPEED
                 ] = dev_info.tx_speed
+                # Node
+                self.identity[NODE] = self._extra_state_attributes[NODE] = format_mac(
+                    dev_info.node
+                )
                 # If not connected before
                 if self._connected == False:
                     event_call(
