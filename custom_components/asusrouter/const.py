@@ -330,6 +330,10 @@ CONF_INTERVALS = [
     CONF_INTERVAL + WAN,
     CONF_INTERVAL + WLAN,
 ]
+CONF_LABELS_MODE = {
+    ROUTER: "Router",
+    NODE: "AiMesh node",
+}
 CONF_LATEST_CONNECTED = "latest_connected"
 CONF_MODE = "mode"
 CONF_SPLIT_INTERVALS = "split_intervals"

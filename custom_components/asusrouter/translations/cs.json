@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Uživatelské jméno",
                     "password": "Heslo",
-                    "ssl": "Použít připojení SSL"
+                    "ssl": "Použít připojení SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
                     "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu"
+                    "cert_path": "Cesta k certifikátu",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -117,7 +119,8 @@
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
                     "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu"
+                    "cert_path": "Cesta k certifikátu",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {

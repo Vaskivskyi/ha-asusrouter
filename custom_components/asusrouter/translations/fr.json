@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
-                    "ssl": "Utiliser une connexion SSL"
+                    "ssl": "Utiliser une connexion SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
                     "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -117,7 +119,8 @@
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
                     "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {

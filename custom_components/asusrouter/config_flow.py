@@ -40,6 +40,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LABELS_MODE,
     CONF_LATEST_CONNECTED,
     CONF_MODE,
     CONF_SPLIT_INTERVALS,
@@ -257,7 +258,9 @@ def _create_form_credentials(
         ): cv.boolean,
         vol.Required(
             CONF_MODE, default=user_input.get(CONF_MODE, DEFAULT_MODE)
-        ): vol.In({mode: mode for mode in CONF_VALUES_MODE}),
+        ): vol.In(
+            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
+        ),
     }
 
     return vol.Schema(schema)
@@ -290,7 +293,7 @@ def _create_form_device(
             default=user_input.get(CONF_CERT_PATH, ""),
         ): cv.string,
         vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
-            {mode: mode for mode in CONF_VALUES_MODE}
+            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
         ),
     }
 

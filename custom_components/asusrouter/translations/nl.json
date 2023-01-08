@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
-                    "ssl": "Gebruik SSL verbinding"
+                    "ssl": "Gebruik SSL verbinding",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
                     "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "Certificaat pad"
+                    "cert_path": "Certificaat pad",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -117,7 +119,8 @@
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
                     "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "Certificaat pad"
+                    "cert_path": "Certificaat pad",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
