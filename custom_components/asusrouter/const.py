@@ -103,6 +103,7 @@ NAME = "name"
 NETWORK_STAT = "network_stat"
 NODE = "node"
 NO_SSL = "no_ssl"
+NUMBER = "number"
 PARENT = "parent"
 PARENTAL_CONTROL = "parental_control"
 PASSWORD = "password"
@@ -177,6 +178,7 @@ LABELS_TEMPERATURE = {
 
 ### SENSORS LIST -->
 
+SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL]
@@ -734,6 +736,19 @@ STATIC_LIGHTS = {
     ),
 }
 STATIC_SENSORS = {
+    # AiMesh
+    (AIMESH, NUMBER): ARSensorDescription(
+        key=NUMBER,
+        key_group=AIMESH,
+        name="AiMesh",
+        icon=ICON_DEVICES,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            LIST: LIST,
+        },
+    ),
     # Boot time
     (MISC, BOOTTIME): ARSensorDescription(
         key=BOOTTIME,
