@@ -144,7 +144,7 @@
                     "interval_cpu": "Dados de CPU",
                     "interval_firmware": "Dados do firmware",
                     "interval_gwlan": "Dados GWLAN",
-                    "interval_light": "Dados dos LEDs"
+                    "interval_light": "Dados dos LEDs",
                     "interval_misc": "Dados diversos",
                     "interval_network_stat": "Dados de estatística da rede",
                     "interval_parental_control": "Dados do controle dos pais",
