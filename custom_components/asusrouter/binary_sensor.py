@@ -29,6 +29,7 @@ from .const import (
 )
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
+from .helpers import to_unique_id
 from .router import AiMeshNode, ARDevice
 
 
@@ -113,8 +114,10 @@ class AMBinarySensor(BinarySensorEntity):
 
         self._router = router
         self._node = node
-        self._attr_unique_id = f"{DOMAIN} {AIMESH} {node.mac}"
-        self._attr_name = f"AiMesh {node.native.model} ({node.native.alias})"
+        self._attr_unique_id = to_unique_id(
+            f"{DOMAIN}_{router.mac}_{AIMESH}_{node.mac}"
+        )
+        self._attr_name = f"AiMesh {node.native.model} ({node.native.mac})"
 
     @property
     def is_on(self) -> bool:
