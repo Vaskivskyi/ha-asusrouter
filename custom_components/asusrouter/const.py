@@ -110,6 +110,7 @@ PASSWORD = "password"
 PORTS = "ports"
 PRODUCT_ID = "product_id"
 RAM = "ram"
+ROUTER = "router"
 RX = "rx"
 RX_SPEED = "rx_speed"
 SSID = "ssid"
@@ -175,6 +176,40 @@ LABELS_TEMPERATURE = {
 }
 
 ### <-- LABELS
+
+### MODES -->
+
+MODE_SENSORS = {
+    ROUTER: [
+        CPU,
+        FIRMWARE,
+        GWLAN,
+        LIGHT,
+        MISC,
+        NETWORK_STAT,
+        PARENTAL_CONTROL,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+        VPN,
+        WAN,
+        WLAN,
+    ],
+    NODE: [
+        CPU,
+        FIRMWARE,
+        LIGHT,
+        MISC,
+        NETWORK_STAT,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+    ],
+}
+
+### <-- MODES
 
 ### SENSORS LIST -->
 
@@ -296,6 +331,7 @@ CONF_INTERVALS = [
     CONF_INTERVAL + WLAN,
 ]
 CONF_LATEST_CONNECTED = "latest_connected"
+CONF_MODE = "mode"
 CONF_SPLIT_INTERVALS = "split_intervals"
 CONF_TRACK_DEVICES = "track_devices"
 CONF_UNITS = "units"
@@ -320,6 +356,10 @@ CONF_VALUES_DATARATE = [
     UnitOfDataRate.KILOBYTES_PER_SECOND,
     UnitOfDataRate.MEGABYTES_PER_SECOND,
     UnitOfDataRate.GIGABYTES_PER_SECOND,
+]
+CONF_VALUES_MODE = [
+    ROUTER,
+    NODE,
 ]
 
 # Keys that require reload of integration
@@ -355,6 +395,7 @@ DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SPLIT_INTERVALS = False
 DEFAULT_SSL = False
 DEFAULT_TRACK_DEVICES = True
+DEFAULT_MODE = ROUTER
 DEFAULT_UNITS_SPEED = UnitOfDataRate.MEGABITS_PER_SECOND
 DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
 DEFAULT_USERNAME = "admin"

@@ -36,8 +36,10 @@ from . import helpers
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
+    CONF_MODE,
     CPU,
     DEFAULT_CACHE_TIME,
+    DEFAULT_MODE,
     DEFAULT_PORT,
     DEFAULT_SENSORS,
     DEFAULT_VERIFY_SSL,
@@ -48,6 +50,7 @@ from .const import (
     LIGHT,
     MAC,
     MISC,
+    MODE_SENSORS,
     NAME,
     NETWORK_STAT,
     PARENTAL_CONTROL,
@@ -160,10 +163,22 @@ class ARBridge:
 
     ### <- CONNECTION
 
+    async def async_cleanup_sensors(self, sensors: dict[str, Any]) -> dict[str, Any]:
+        """Cleanup sensors depending on the device mode."""
+
+        mode = self._configs.get(CONF_MODE, DEFAULT_MODE)
+        available = MODE_SENSORS[mode]
+        _LOGGER.debug(f"Available sensors for mode=`{mode}`: {available}")
+        sensors = {
+            group: details for group, details in sensors.items() if group in available
+        }
+
+        return sensors
+
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
         """Get a dictionary of available sensors."""
 
-        sensors_types = {
+        sensors = {
             CPU: {
                 "sensors": await self._get_sensors_cpu(),
                 "method": self._get_data_cpu,
@@ -212,7 +227,11 @@ class ARBridge:
                 "method": self._get_data_wlan,
             },
         }
-        return sensors_types
+
+        # Cleanup
+        sensors = await self.async_cleanup_sensors(sensors)
+
+        return sensors
 
     ### GET DATA FROM DEVICE ->
     # General method
