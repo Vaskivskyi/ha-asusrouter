@@ -15,7 +15,7 @@
                     "username": "Usuario",
                     "password": "Contraseña",
                     "ssl": "Usar conexión SSL",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo de dispositivo"
                 }
             },
             "device": {
@@ -28,7 +28,7 @@
                     "ssl": "Usar conexión SSL",
                     "verify_ssl": "Validar certificado SSL",
                     "cert_path": "Ruta del certificado",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo de dispositivo"
                 }
             },
             "operation_mode": {
@@ -47,7 +47,7 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "interval_devices": "Actualización del dispositivo / AiMesh",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
@@ -121,7 +121,7 @@
                     "ssl": "Usar conexión SSL",
                     "verify_ssl": "Validar certificado SSL",
                     "cert_path": "Ruta del certificado",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo de dispositivo"
                 }
             },
             "operation_mode": {
@@ -139,7 +139,7 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "interval_devices": "Actualización del dispositivo / AiMesh",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
