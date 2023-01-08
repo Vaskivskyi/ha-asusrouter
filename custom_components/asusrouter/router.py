@@ -645,37 +645,37 @@ class ARDevice:
             if self._conf_name is None or self._conf_name == "":
                 self._conf_name = self._identity.model
 
-        # Load tracked entities from registry
-        entity_reg = er.async_get(self.hass)
-        track_entries = er.async_entries_for_config_entry(
-            entity_reg, self._entry.entry_id
-        )
-        for entry in track_entries:
-
-            if entry.domain != TRACKER_DOMAIN:
-                continue
-            device_mac = format_mac(entry.unique_id)
-
-            # migrate entity unique ID if wrong formatted
-            if device_mac != entry.unique_id:
-                existing_entity_id = entity_reg.async_get_entity_id(
-                    DOMAIN, TRACKER_DOMAIN, device_mac
-                )
-                if existing_entity_id:
-                    # entity with uniqueid properly formatted already
-                    # exists in the registry, we delete this duplicate
-                    entity_reg.async_remove(entry.entity_id)
-                    continue
-
-                entity_reg.async_update_entity(
-                    entry.entity_id, new_unique_id=device_mac
-                )
-
-            self._devices[device_mac] = ARConnectedDevice(
-                device_mac, entry.original_name
-            )
-
         if self._mode == ROUTER:
+            # Load tracked entities from registry
+            entity_reg = er.async_get(self.hass)
+            track_entries = er.async_entries_for_config_entry(
+                entity_reg, self._entry.entry_id
+            )
+            for entry in track_entries:
+
+                if entry.domain != TRACKER_DOMAIN:
+                    continue
+                device_mac = format_mac(entry.unique_id)
+
+                # migrate entity unique ID if wrong formatted
+                if device_mac != entry.unique_id:
+                    existing_entity_id = entity_reg.async_get_entity_id(
+                        DOMAIN, TRACKER_DOMAIN, device_mac
+                    )
+                    if existing_entity_id:
+                        # entity with uniqueid properly formatted already
+                        # exists in the registry, we delete this duplicate
+                        entity_reg.async_remove(entry.entity_id)
+                        continue
+
+                    entity_reg.async_update_entity(
+                        entry.entity_id, new_unique_id=device_mac
+                    )
+
+                self._devices[device_mac] = ARConnectedDevice(
+                    device_mac, entry.original_name
+                )
+
             # Update AiMesh
             await self.update_nodes()
 

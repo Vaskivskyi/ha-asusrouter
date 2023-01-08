@@ -777,6 +777,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._configs: dict[str, Any] = self.config_entry.data.copy()
         self._host: str = self._configs[CONF_HOST]
         self._options: dict[str, Any] = self.config_entry.options.copy()
+        self._mode = self._options.get(CONF_MODE, DEFAULT_MODE)
 
         # Dictionary last_step: next_step
         self._steps = {
@@ -855,6 +856,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input:
             self._options.update(user_input)
+            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options
             )
@@ -869,7 +871,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_device(user_input),
+            data_schema=_create_form_device(user_input, self._mode),
             errors=errors,
         )
 
@@ -888,7 +890,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_operation_mode(user_input),
+                data_schema=_create_form_operation_mode(user_input, self._mode),
             )
 
         self._options.update(user_input)
@@ -910,7 +912,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_intervals(user_input),
+                data_schema=_create_form_intervals(user_input, self._mode),
             )
 
         self._options.update(user_input)
