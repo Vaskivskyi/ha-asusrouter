@@ -46,7 +46,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
@@ -138,7 +138,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",

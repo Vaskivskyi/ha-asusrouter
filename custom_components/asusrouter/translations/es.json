@@ -47,7 +47,7 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "Actualizar rastreadores de dispositivo",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
@@ -139,7 +139,7 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "Actualizar rastreadores de dispositivo",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
