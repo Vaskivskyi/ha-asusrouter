@@ -47,6 +47,7 @@ from .const import (
     CONF_EVENT_NODE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
+    CONF_LABELS_INTERFACES,
     CONF_LATEST_CONNECTED,
     CONF_MODE,
     CONF_REQ_RELOAD,
@@ -679,6 +680,21 @@ class ARDevice:
                             entity_reg.async_update_entity(
                                 entry.entity_id, new_unique_id=new_uid
                             )
+                        uid = new_uid
+
+                    # Rename network interfaces
+                    for interface in CONF_LABELS_INTERFACES:
+                        lookup = to_unique_id(interface)
+                        if lookup in uid:
+                            new_uid = uid.replace(
+                                lookup, CONF_LABELS_INTERFACES[interface]
+                            )
+                            new_uid = to_unique_id(new_uid)
+
+                            if new_uid != uid:
+                                entity_reg.async_update_entity(
+                                    entry.entity_id, new_unique_id=new_uid
+                                )
 
             # Update AiMesh
             await self.update_nodes()

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from .const import (
+    CONF_LABELS_INTERFACES,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
     KEY_SENSOR_ID,
@@ -42,7 +43,8 @@ def list_sensors_network(
                     (NETWORK_STAT, key): ARSensorDescription(
                         key=key,
                         key_group=NETWORK_STAT,
-                        name=f"{interface} {data[NAME]}" or None,
+                        name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} {data[NAME]}"
+                        or None,
                         icon=data["icon"] or None,
                         state_class=data["state_class"] or None,
                         native_unit_of_measurement=units or None,
