@@ -32,7 +32,6 @@ from .bridge import ARBridge
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
-    CONF_CONFIRM,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,

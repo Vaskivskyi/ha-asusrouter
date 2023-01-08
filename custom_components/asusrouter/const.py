@@ -6,7 +6,6 @@ from typing import Any, Callable
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
-    DEVICE_CLASS_CONNECTIVITY,
 )
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -399,8 +398,6 @@ CONVERT_SPEED = {
     UnitOfDataRate.MEGABYTES_PER_SECOND: 8388608,
     UnitOfDataRate.GIGABYTES_PER_SECOND: 8589934592,
 }
-CONVERT_TO_MEGA = 1048576
-CONVERT_TO_GIGA = 1073741824
 CONVERT_TRAFFIC = {
     UnitOfInformation.BITS: 0.125,
     UnitOfInformation.KILOBITS: 128,
@@ -626,7 +623,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_CLIENT} {num}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
                 f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
@@ -642,7 +639,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_SERVER} {num}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
                 f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
@@ -659,7 +656,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_WLAN}{num}_radio",
             key_group=WLAN,
             name=f"{NAME_WLAN[num]}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
                 f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
@@ -675,7 +672,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
             key_group=GWLAN,
             name=NAME_GWLAN[f"{num}.{gnum}"],
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
                 f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]

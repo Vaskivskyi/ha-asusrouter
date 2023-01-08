@@ -36,8 +36,6 @@ from asusrouter import (
 
 from .bridge import ARBridge
 from .const import (
-    ACCESS_POINT,
-    AIMESH,
     ALIAS,
     CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
@@ -52,7 +50,6 @@ from .const import (
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
-    CONFIG,
     CONNECTED,
     CONNECTION,
     CONNECTION_TYPE_2G,
