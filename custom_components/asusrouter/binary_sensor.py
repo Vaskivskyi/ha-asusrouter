@@ -145,7 +145,7 @@ class AMBinarySensor(BinarySensorEntity):
             identifiers={
                 (DOMAIN, self._node.mac),
             },
-            name=f"{self._node.native.model}",
+            name=self._node.native.model,
             model=self._node.native.model,
             manufacturer=MANUFACTURER,
             sw_version=self._node.native.fw,
