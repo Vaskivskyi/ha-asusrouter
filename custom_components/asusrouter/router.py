@@ -36,6 +36,7 @@ from asusrouter import (
 
 from .bridge import ARBridge
 from .const import (
+    AIMESH,
     ALIAS,
     CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
@@ -86,13 +87,16 @@ from .const import (
     IP,
     KEY_COORDINATOR,
     LEVEL,
+    LIST,
     MAC,
     MODEL,
     NAME,
     NO_SSL,
     NODE,
+    NUMBER,
     PARENT,
     PRODUCT_ID,
+    SENSORS_AIMESH,
     SENSORS_CONNECTED_DEVICES,
     SSL,
     TYPE,
@@ -117,10 +121,12 @@ class ARSensorHandler:
 
         self._hass = hass
         self._bridge = bridge
-        self._connected_devices = 0
-        self._connected_devices_list: list[str] = list()
+        self._connected_devices: int = 0
+        self._connected_devices_list: list[dict[str, Any]] = list()
         self._latest_connected: datetime | None = None
-        self._latest_connected_list: list[Any] = list()
+        self._latest_connected_list: list[dict[str, Any]] = list()
+        self._aimesh_devices: int = 0
+        self._aimesh_list: list[dict[str, Any]] = list()
         self._options = options
         self._split_intervals = options.get(
             CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
@@ -134,6 +140,14 @@ class ARSensorHandler:
             SENSORS_CONNECTED_DEVICES[1]: self._connected_devices_list,
             SENSORS_CONNECTED_DEVICES[2]: self._latest_connected_list,
             SENSORS_CONNECTED_DEVICES[3]: self._latest_connected,
+        }
+
+    async def _get_aimesh_devices(self) -> dict[str, Any]:
+        """Return aimesh devices sensors."""
+
+        return {
+            NUMBER: self._aimesh_devices,
+            LIST: self._aimesh_list,
         }
 
     def update_device_count(
@@ -158,6 +172,20 @@ class ARSensorHandler:
         self._latest_connected_list = latest_connected_list
         return True
 
+    def update_aimesh(
+        self,
+        nodes_number: int,
+        nodes_list: list[dict[str, Any]],
+    ) -> bool:
+        """Update aimesh sensors."""
+
+        if self._aimesh_devices == nodes_number and self._aimesh_list == nodes_list:
+            return False
+
+        self._aimesh_devices = nodes_number
+        self._aimesh_list = nodes_list
+        return True
+
     async def get_coordinator(
         self,
         sensor_type: str,
@@ -170,6 +198,9 @@ class ARSensorHandler:
         if sensor_type == DEVICES:
             should_poll = False
             method = self._get_connected_devices
+        elif sensor_type == AIMESH:
+            should_poll = False
+            method = self._get_aimesh_devices
         elif update_method is not None:
             method = update_method
         else:
@@ -545,10 +576,12 @@ class ARDevice:
 
         self._aimesh: dict[str, Any] = {}
         self._devices: dict[str, Any] = {}
+        self._aimesh_devices: int = 0
+        self._aimesh_list: list[dict[str, Any]] = list()
         self._connected_devices: int = 0
-        self._connected_devices_list: list[str] = list()
+        self._connected_devices_list: list[dict[str, Any]] = list()
         self._latest_connected: datetime | None = None
-        self._latest_connected_list: list[Any] = list()
+        self._latest_connected_list: list[dict[str, Any]] = list()
         self._connect_error: bool = False
 
         self._sensor_handler: ARSensorHandler | None = None
@@ -776,6 +809,14 @@ class ARDevice:
                 node.identity,
             )
 
+        # AiMesh sensors
+        self._aimesh_devices = 0
+        self._aimesh_list = list()
+        for mac, node in self._aimesh.items():
+            if node.identity[CONNECTED]:
+                self._aimesh_devices += 1
+            self._aimesh_list.append(node.identity)
+
         async_dispatcher_send(self.hass, self.signal_aimesh_update)
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
@@ -796,6 +837,7 @@ class ARDevice:
 
         available_sensors = await self.bridge.async_get_available_sensors()
         available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
+        available_sensors[AIMESH] = {"sensors": SENSORS_AIMESH}
 
         for sensor_type, sensor_def in available_sensors.items():
             if not (sensor_names := sensor_def.get("sensors")):
@@ -813,6 +855,14 @@ class ARDevice:
 
         if not self._sensor_handler:
             return
+
+        if AIMESH in self._sensor_coordinator:
+            coordinator = self._sensor_coordinator[AIMESH][KEY_COORDINATOR]
+            if self._sensor_handler.update_aimesh(
+                self._aimesh_devices,
+                self._aimesh_list,
+            ):
+                await coordinator.async_refresh()
 
         if DEVICES in self._sensor_coordinator:
             coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
