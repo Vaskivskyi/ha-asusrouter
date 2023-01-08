@@ -40,6 +40,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LABELS_INTERFACES,
     CONF_LABELS_MODE,
     CONF_LATEST_CONNECTED,
     CONF_MODE,
@@ -416,10 +417,12 @@ def _create_form_interfaces(
     """Create a form for the 'interfaces' step."""
 
     schema = {
-        vol.Required(
-            CONF_INTERFACES,
-            default=default,
-        ): cv.multi_select({k: k for k in user_input["interfaces"]}),
+        vol.Required(CONF_INTERFACES, default=default,): cv.multi_select(
+            {
+                interface: CONF_LABELS_INTERFACES.get(interface, interface)
+                for interface in user_input["interfaces"]
+            }
+        ),
         vol.Required(
             CONF_UNITS_SPEED,
             default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
