@@ -46,7 +46,7 @@
                 "description": "Hodnoty sú v sekundách",
                 "data": {
                     "cache_time": "Čas medzipamäti",
-                    "interval_devices": "Aktualizácia sledovačov zariadení",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
                     "scan_interval": "Aktualizácia entít",
                     "interval_cpu": "Údaje CPU",
@@ -138,7 +138,7 @@
                 "description": "Hodnoty sú v sekundách",
                 "data": {
                     "cache_time": "Čas mezipamäte",
-                    "interval_devices": "Aktualizácia sledovačov zariadení",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
                     "scan_interval": "Aktualizácia entít",
                     "interval_cpu": "Údaje CPU",

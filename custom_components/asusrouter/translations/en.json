@@ -46,7 +46,7 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Device trackers update",
+                    "interval_devices": "Devices / AiMesh update",
                     "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
@@ -138,7 +138,7 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Device trackers update",
+                    "interval_devices": "Devices / AiMesh update",
                     "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",

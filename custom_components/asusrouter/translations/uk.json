@@ -46,7 +46,7 @@
                 "description": "Значення в секундах",
                 "data": {
                     "cache_time": "Час кешування",
-                    "interval_devices": "Оновлення device trackers",
+                    "interval_devices": "Оновлення пристроїв / AiMesh",
                     "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
@@ -138,7 +138,7 @@
                 "description": "Значення в секундах",
                 "data": {
                     "cache_time": "Час кешування",
-                    "interval_devices": "Оновлення device trackers",
+                    "interval_devices": "Оновлення пристроїв / AiMesh",
                     "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')",
                     "scan_interval": "Інтервал оновлення",
                     "interval_cpu": "Оновлення даних CPU",
