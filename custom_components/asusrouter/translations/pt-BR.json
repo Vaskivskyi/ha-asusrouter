@@ -169,12 +169,12 @@
                 "title": "Eventos",
                 "description": "Quais eventos devem ser disparados",
                 "data": {
-                    "device_connected": "Dispositivo conectato (o dispositivo não foi rastreado antes)",
+                    "device_connected": "Dispositivo conectato (o dispositivo não foi rastreado anteriormente)",
                     "device_disconnected": "Dispositivo desconectato",
-                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado antes)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
+                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado anteriormente)",
+                    "node_connected": "Nó AiMesh conectado (o dispositivo não foi rastreado anteriormente)",
+                    "node_disconnected": "Nó AiMesh desconectado",
+                    "node_reconnected": "Nó AiMesh reconectado"
                 }
             },
             "security": {
