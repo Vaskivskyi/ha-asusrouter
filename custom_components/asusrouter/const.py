@@ -18,24 +18,10 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
-    DATA_BITS,
-    DATA_BYTES,
-    DATA_GIGABITS,
-    DATA_GIGABYTES,
-    DATA_KILOBITS,
-    DATA_KILOBYTES,
-    DATA_MEGABITS,
-    DATA_MEGABYTES,
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
     PERCENTAGE,
     Platform,
+    UnitOfDataRate,
+    UnitOfInformation,
     UnitOfTemperature,
 )
 from homeassistant.helpers.entity import EntityCategory
@@ -315,24 +301,24 @@ CONF_UNITS = "units"
 CONF_UNITS_SPEED = "units_speed"
 CONF_UNITS_TRAFFIC = "units_traffic"
 CONF_VALUES_DATA = [
-    DATA_BITS,
-    DATA_KILOBITS,
-    DATA_MEGABITS,
-    DATA_GIGABITS,
-    DATA_BYTES,
-    DATA_KILOBYTES,
-    DATA_MEGABYTES,
-    DATA_GIGABYTES,
+    UnitOfInformation.BITS,
+    UnitOfInformation.KILOBITS,
+    UnitOfInformation.MEGABITS,
+    UnitOfInformation.GIGABITS,
+    UnitOfInformation.BYTES,
+    UnitOfInformation.KILOBYTES,
+    UnitOfInformation.MEGABYTES,
+    UnitOfInformation.GIGABYTES,
 ]
 CONF_VALUES_DATARATE = [
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
+    UnitOfDataRate.BITS_PER_SECOND,
+    UnitOfDataRate.KILOBITS_PER_SECOND,
+    UnitOfDataRate.MEGABITS_PER_SECOND,
+    UnitOfDataRate.GIGABITS_PER_SECOND,
+    UnitOfDataRate.BYTES_PER_SECOND,
+    UnitOfDataRate.KILOBYTES_PER_SECOND,
+    UnitOfDataRate.MEGABYTES_PER_SECOND,
+    UnitOfDataRate.GIGABYTES_PER_SECOND,
 ]
 
 # Keys that require reload of integration
@@ -368,8 +354,8 @@ DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SPLIT_INTERVALS = False
 DEFAULT_SSL = False
 DEFAULT_TRACK_DEVICES = True
-DEFAULT_UNITS_SPEED = DATA_RATE_MEGABITS_PER_SECOND
-DEFAULT_UNITS_TRAFFIC = DATA_GIGABYTES
+DEFAULT_UNITS_SPEED = UnitOfDataRate.MEGABITS_PER_SECOND
+DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
 DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
 
@@ -404,26 +390,26 @@ RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 ### CONSTANTS & CONVERTERS -->
 
 CONVERT_SPEED = {
-    DATA_RATE_BITS_PER_SECOND: 1,
-    DATA_RATE_KILOBITS_PER_SECOND: 1024,
-    DATA_RATE_MEGABITS_PER_SECOND: 1048576,
-    DATA_RATE_GIGABITS_PER_SECOND: 1073741824,
-    DATA_RATE_BYTES_PER_SECOND: 8,
-    DATA_RATE_KILOBYTES_PER_SECOND: 8192,
-    DATA_RATE_MEGABYTES_PER_SECOND: 8388608,
-    DATA_RATE_GIGABYTES_PER_SECOND: 8589934592,
+    UnitOfDataRate.BITS_PER_SECOND: 1,
+    UnitOfDataRate.KILOBITS_PER_SECOND: 1024,
+    UnitOfDataRate.MEGABITS_PER_SECOND: 1048576,
+    UnitOfDataRate.GIGABITS_PER_SECOND: 1073741824,
+    UnitOfDataRate.BYTES_PER_SECOND: 8,
+    UnitOfDataRate.KILOBYTES_PER_SECOND: 8192,
+    UnitOfDataRate.MEGABYTES_PER_SECOND: 8388608,
+    UnitOfDataRate.GIGABYTES_PER_SECOND: 8589934592,
 }
 CONVERT_TO_MEGA = 1048576
 CONVERT_TO_GIGA = 1073741824
 CONVERT_TRAFFIC = {
-    DATA_BITS: 0.125,
-    DATA_KILOBITS: 128,
-    DATA_MEGABITS: 131072,
-    DATA_GIGABITS: 134217728,
-    DATA_BYTES: 1,
-    DATA_KILOBYTES: 1024,
-    DATA_MEGABYTES: 1048576,
-    DATA_GIGABYTES: 1073741824,
+    UnitOfInformation.BITS: 0.125,
+    UnitOfInformation.KILOBITS: 128,
+    UnitOfInformation.MEGABITS: 131072,
+    UnitOfInformation.GIGABITS: 134217728,
+    UnitOfInformation.BYTES: 1,
+    UnitOfInformation.KILOBYTES: 1024,
+    UnitOfInformation.MEGABYTES: 1048576,
+    UnitOfInformation.GIGABYTES: 1073741824,
 }
 
 ### <-- CONSTANTS & CONVERTERS
@@ -795,7 +781,7 @@ STATIC_SENSORS = {
         name="LAN Speed",
         icon=ICON_ETHERNET,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
@@ -839,7 +825,7 @@ STATIC_SENSORS = {
         name="WAN Speed",
         icon=ICON_ETHERNET,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
