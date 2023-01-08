@@ -171,7 +171,10 @@
                 "data": {
                     "device_connected": "Device connected (the device was not tracked before)",
                     "device_disconnected": "Device disconnected",
-                    "device_reconnected": "Device reconnected (this device was already tracked before)"
+                    "device_reconnected": "Device reconnected (this device was already tracked before)",
+                    "node_connected": "AiMesh node connected (not seen before)",
+                    "node_disconnected": "AiMesh node disconnected",
+                    "node_reconnected": "AiMesh node reconnected"
                 }
             },
             "security": {

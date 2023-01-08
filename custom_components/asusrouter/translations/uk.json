@@ -171,7 +171,10 @@
                 "data": {
                     "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
                     "device_disconnected": "Пристрій відключено",
-                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)"
+                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
+                    "node_connected": "AiMesh нода підключена (підключено вперше)",
+                    "node_disconnected": "AiMesh нода відключена",
+                    "node_reconnected": "AiMesh нода знов підключена"
                 }
             },
             "security": {
