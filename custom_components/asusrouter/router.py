@@ -989,10 +989,12 @@ class ARDevice:
         args: dict[str | Any] | None = None,
     ):
         """Fire HA event."""
-        self.hass.bus.fire(
-            f"{DOMAIN}_{event}",
-            args,
-        )
+
+        if self._options.get(event) == True:
+            self.hass.bus.fire(
+                f"{DOMAIN}_{event}",
+                args,
+            )
 
     async def remove_trackers(self, **kwargs: Any) -> None:
         """Remove device trackers."""
