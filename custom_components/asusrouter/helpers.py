@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 
@@ -26,3 +27,18 @@ def list_from_dict(raw: dict[str, Any]) -> list[str]:
     """Return dictionary keys as list."""
 
     return list(raw.keys())
+
+
+def to_unique_id(raw: str):
+    """Convert string to unique_id."""
+
+    string = (
+        re.sub(r"(?<=[a-z0-9:_])(?=[A-Z])|[^a-zA-Z0-9:_]", " ", raw)
+        .strip()
+        .replace(" ", "_")
+    )
+    result = "".join(string.lower())
+    while "__" in result:
+        result = result.replace("__", "_")
+
+    return result

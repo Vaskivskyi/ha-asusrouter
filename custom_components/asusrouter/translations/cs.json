@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Uživatelské jméno",
                     "password": "Heslo",
-                    "ssl": "Použít připojení SSL"
+                    "ssl": "Použít připojení SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
                     "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu"
+                    "cert_path": "Cesta k certifikátu",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -44,7 +46,7 @@
                 "description": "Hodnoty jsou v sekundách",
                 "data": {
                     "cache_time": "Čas mezipaměti",
-                    "interval_devices": "Aktualizace sledovačů zařízení",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)",
                     "scan_interval": "Aktualizace entit",
                     "interval_cpu": "Data CPU",
@@ -117,7 +119,8 @@
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
                     "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu"
+                    "cert_path": "Cesta k certifikátu",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -135,7 +138,7 @@
                 "description": "Hodnoty jsou v sekundách",
                 "data": {
                     "cache_time": "Čas mezipaměti",
-                    "interval_devices": "Aktualizace sledovačů zařízení",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)",
                     "scan_interval": "Aktualizace entit",
                     "interval_cpu": "Data CPU",
@@ -168,7 +171,10 @@
                 "data": {
                     "device_connected": "Zařízení připojeno (zařízení nebylo dříve sledováno)",
                     "device_disconnected": "Zařízení odpojeno",
-                    "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)"
+                    "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)",
+                    "node_connected": "[NT] AiMesh node connected (not seen before)",
+                    "node_disconnected": "[NT] AiMesh node disconnected",
+                    "node_reconnected": "[NT] AiMesh node reconnected"
                 }
             },
             "security": {

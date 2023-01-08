@@ -14,7 +14,8 @@
                 "data": {
                     "username": "[%key:common::config_flow::data::username%]",
                     "password": "[%key:common::config_flow::data::password%]",
-                    "ssl": "Use SSL connection"
+                    "ssl": "Use SSL connection",
+                    "mode": "Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
                     "verify_ssl": "[%key:common::config_flow::data::verify_ssl%]",
-                    "cert_path": "Certificate path"
+                    "cert_path": "Certificate path",
+                    "mode": "Device mode"
                 }
             },
             "operation_mode": {
@@ -44,7 +46,7 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Device trackers update",
+                    "interval_devices": "Devices / AiMesh update",
                     "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
@@ -117,7 +119,8 @@
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
                     "verify_ssl": "[%key:common::config_flow::data::verify_ssl%]",
-                    "cert_path": "Certificate path"
+                    "cert_path": "Certificate path",
+                    "mode": "Device mode"
                 }
             },
             "operation_mode": {
@@ -135,7 +138,7 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Device trackers update",
+                    "interval_devices": "Devices / AiMesh update",
                     "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
@@ -168,7 +171,10 @@
                 "data": {
                     "device_connected": "Device connected (the device was not tracked before)",
                     "device_disconnected": "Device disconnected",
-                    "device_reconnected": "Device reconnected (this device was already tracked before)"
+                    "device_reconnected": "Device reconnected (this device was already tracked before)",
+                    "node_connected": "AiMesh node connected (not seen before)",
+                    "node_disconnected": "AiMesh node disconnected",
+                    "node_reconnected": "AiMesh node reconnected"
                 }
             },
             "security": {

@@ -6,7 +6,6 @@ from typing import Any, Callable
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
-    DEVICE_CLASS_CONNECTIVITY,
 )
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -18,24 +17,10 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
-    DATA_BITS,
-    DATA_BYTES,
-    DATA_GIGABITS,
-    DATA_GIGABYTES,
-    DATA_KILOBITS,
-    DATA_KILOBYTES,
-    DATA_MEGABITS,
-    DATA_MEGABYTES,
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
     PERCENTAGE,
     Platform,
+    UnitOfDataRate,
+    UnitOfInformation,
     UnitOfTemperature,
 )
 from homeassistant.helpers.entity import EntityCategory
@@ -56,6 +41,7 @@ from .dataclass import (
 ASUSROUTER = "asusrouter"
 DOMAIN = ASUSROUTER
 KEY_COORDINATOR = "coordinator"
+MANUFACTURER = "ASUSTek"
 PLATFORMS = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
@@ -82,13 +68,18 @@ NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
 
 ### GENERAL DATA -->
 
+ACCESS_POINT = "access_point"
 ACTION_MODE = "action_mode"
+ALIAS = "alias"
+AIMESH = "aimesh"
 API_ID = "api_id"
 API_TYPE = "api_type"
 APPLY = "apply"
 BITS_PER_SECOND = "bits/s"
 BOOTTIME = "boottime"
 BYTES = "bytes"
+CONFIG = "config"
+CONNECTION = "connection"
 CORE = "core"
 CPU = "cpu"
 DEVICES = "devices"
@@ -101,18 +92,25 @@ HTTPS = "https"
 IP = "ip"
 LAN = "lan"
 LED = "led"
+LEVEL = "level"
 LIGHT = "light"
 LIST = "list"
 LOAD_AVG = "load_avg"
 MAC = "mac"
 MISC = "misc"
+MODEL = "model"
 NAME = "name"
 NETWORK_STAT = "network_stat"
+NODE = "node"
 NO_SSL = "no_ssl"
+NUMBER = "number"
+PARENT = "parent"
 PARENTAL_CONTROL = "parental_control"
 PASSWORD = "password"
 PORTS = "ports"
+PRODUCT_ID = "product_id"
 RAM = "ram"
+ROUTER = "router"
 RX = "rx"
 RX_SPEED = "rx_speed"
 SSID = "ssid"
@@ -124,11 +122,13 @@ TEMPERATURE = "temperature"
 TOTAL = "total"
 TX = "tx"
 TX_SPEED = "tx_speed"
+TYPE = "type"
 UNKNOWN = "unknown"
 USAGE = "usage"
 USED = "used"
 VPN = "vpn"
 WAN = "wan"
+WIRED = "wired"
 WLAN = "wlan"
 WLAN_2GHZ = "2ghz"
 WLAN_5GHZ = "5ghz"
@@ -162,23 +162,59 @@ LABEL_OVPN_CLIENT = "OpenVPN Client"
 LABEL_OVPN_SERVER = "OpenVPN Server"
 LABEL_RX = "Download"
 LABEL_SPEED = "Speed"
+LABEL_TEMPERATURE = "Temperature"
 LABEL_TX = "Upload"
 
 LABELS_LOAD_AVG = {
     f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ["1", "5", "15"]
 }
 LABELS_TEMPERATURE = {
-    CPU: f"{TEMPERATURE} {CPU.upper()}",
-    WLAN_2GHZ: f"{TEMPERATURE} {CONNECTION_2G}",
-    WLAN_5GHZ: f"{TEMPERATURE} {CONNECTION_5G}",
-    WLAN_5GHZ2: f"{TEMPERATURE} {CONNECTION_5G2}",
-    WLAN_6GHZ: f"{TEMPERATURE} {CONNECTION_6G}",
+    CPU: f"{LABEL_TEMPERATURE} {CPU.upper()}",
+    WLAN_2GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_2G}",
+    WLAN_5GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_5G}",
+    WLAN_5GHZ2: f"{LABEL_TEMPERATURE} {CONNECTION_5G2}",
+    WLAN_6GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_6G}",
 }
 
 ### <-- LABELS
 
+### MODES -->
+
+MODE_SENSORS = {
+    ROUTER: [
+        CPU,
+        FIRMWARE,
+        GWLAN,
+        LIGHT,
+        MISC,
+        NETWORK_STAT,
+        PARENTAL_CONTROL,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+        VPN,
+        WAN,
+        WLAN,
+    ],
+    NODE: [
+        CPU,
+        FIRMWARE,
+        LIGHT,
+        MISC,
+        NETWORK_STAT,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+    ],
+}
+
+### <-- MODES
+
 ### SENSORS LIST -->
 
+SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL]
@@ -272,6 +308,9 @@ CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_EVENT_DEVICE_CONNECTED = "device_connected"
 CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
 CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
+CONF_EVENT_NODE_CONNECTED = "node_connected"
+CONF_EVENT_NODE_DISCONNECTED = "node_disconnected"
+CONF_EVENT_NODE_RECONNECTED = "node_reconnected"
 CONF_HIDE_PASSWORDS = "hide_passwords"
 CONF_INTERFACES = "interfaces"
 CONF_INTERVAL = "interval_"
@@ -292,31 +331,50 @@ CONF_INTERVALS = [
     CONF_INTERVAL + WAN,
     CONF_INTERVAL + WLAN,
 ]
+CONF_LABELS_INTERFACES = {
+    "BRIDGE": "Bridge",
+    "USB": "USB",
+    "WAN": "WAN",
+    "WIRED": CONNECTION_WIRED,
+    "WLAN0": CONNECTION_2G,
+    "WLAN1": CONNECTION_5G,
+    "WLAN2": CONNECTION_5G2,
+    "WLAN3": CONNECTION_6G,
+}
+CONF_LABELS_MODE = {
+    ROUTER: "Router",
+    NODE: "AiMesh node",
+}
 CONF_LATEST_CONNECTED = "latest_connected"
+CONF_MODE = "mode"
 CONF_SPLIT_INTERVALS = "split_intervals"
 CONF_TRACK_DEVICES = "track_devices"
 CONF_UNITS = "units"
 CONF_UNITS_SPEED = "units_speed"
 CONF_UNITS_TRAFFIC = "units_traffic"
 CONF_VALUES_DATA = [
-    DATA_BITS,
-    DATA_KILOBITS,
-    DATA_MEGABITS,
-    DATA_GIGABITS,
-    DATA_BYTES,
-    DATA_KILOBYTES,
-    DATA_MEGABYTES,
-    DATA_GIGABYTES,
+    UnitOfInformation.BITS,
+    UnitOfInformation.KILOBITS,
+    UnitOfInformation.MEGABITS,
+    UnitOfInformation.GIGABITS,
+    UnitOfInformation.BYTES,
+    UnitOfInformation.KILOBYTES,
+    UnitOfInformation.MEGABYTES,
+    UnitOfInformation.GIGABYTES,
 ]
 CONF_VALUES_DATARATE = [
-    DATA_RATE_BITS_PER_SECOND,
-    DATA_RATE_KILOBITS_PER_SECOND,
-    DATA_RATE_MEGABITS_PER_SECOND,
-    DATA_RATE_GIGABITS_PER_SECOND,
-    DATA_RATE_BYTES_PER_SECOND,
-    DATA_RATE_KILOBYTES_PER_SECOND,
-    DATA_RATE_MEGABYTES_PER_SECOND,
-    DATA_RATE_GIGABYTES_PER_SECOND,
+    UnitOfDataRate.BITS_PER_SECOND,
+    UnitOfDataRate.KILOBITS_PER_SECOND,
+    UnitOfDataRate.MEGABITS_PER_SECOND,
+    UnitOfDataRate.GIGABITS_PER_SECOND,
+    UnitOfDataRate.BYTES_PER_SECOND,
+    UnitOfDataRate.KILOBYTES_PER_SECOND,
+    UnitOfDataRate.MEGABYTES_PER_SECOND,
+    UnitOfDataRate.GIGABYTES_PER_SECOND,
+]
+CONF_VALUES_MODE = [
+    ROUTER,
+    NODE,
 ]
 
 # Keys that require reload of integration
@@ -340,6 +398,9 @@ DEFAULT_EVENT: dict[str, bool] = {
     CONF_EVENT_DEVICE_CONNECTED: True,
     CONF_EVENT_DEVICE_DISCONNECTED: False,
     CONF_EVENT_DEVICE_RECONNECTED: False,
+    CONF_EVENT_NODE_CONNECTED: True,
+    CONF_EVENT_NODE_DISCONNECTED: True,
+    CONF_EVENT_NODE_RECONNECTED: True,
 }
 DEFAULT_HIDE_PASSWORDS = False
 DEFAULT_HTTP = {NO_SSL: HTTP, SSL: HTTPS}
@@ -352,8 +413,9 @@ DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_SPLIT_INTERVALS = False
 DEFAULT_SSL = False
 DEFAULT_TRACK_DEVICES = True
-DEFAULT_UNITS_SPEED = DATA_RATE_MEGABITS_PER_SECOND
-DEFAULT_UNITS_TRAFFIC = DATA_GIGABYTES
+DEFAULT_MODE = ROUTER
+DEFAULT_UNITS_SPEED = UnitOfDataRate.MEGABITS_PER_SECOND
+DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
 DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
 
@@ -388,26 +450,24 @@ RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 ### CONSTANTS & CONVERTERS -->
 
 CONVERT_SPEED = {
-    DATA_RATE_BITS_PER_SECOND: 1,
-    DATA_RATE_KILOBITS_PER_SECOND: 1024,
-    DATA_RATE_MEGABITS_PER_SECOND: 1048576,
-    DATA_RATE_GIGABITS_PER_SECOND: 1073741824,
-    DATA_RATE_BYTES_PER_SECOND: 8,
-    DATA_RATE_KILOBYTES_PER_SECOND: 8192,
-    DATA_RATE_MEGABYTES_PER_SECOND: 8388608,
-    DATA_RATE_GIGABYTES_PER_SECOND: 8589934592,
+    UnitOfDataRate.BITS_PER_SECOND: 1,
+    UnitOfDataRate.KILOBITS_PER_SECOND: 1024,
+    UnitOfDataRate.MEGABITS_PER_SECOND: 1048576,
+    UnitOfDataRate.GIGABITS_PER_SECOND: 1073741824,
+    UnitOfDataRate.BYTES_PER_SECOND: 8,
+    UnitOfDataRate.KILOBYTES_PER_SECOND: 8192,
+    UnitOfDataRate.MEGABYTES_PER_SECOND: 8388608,
+    UnitOfDataRate.GIGABYTES_PER_SECOND: 8589934592,
 }
-CONVERT_TO_MEGA = 1048576
-CONVERT_TO_GIGA = 1073741824
 CONVERT_TRAFFIC = {
-    DATA_BITS: 0.125,
-    DATA_KILOBITS: 128,
-    DATA_MEGABITS: 131072,
-    DATA_GIGABITS: 134217728,
-    DATA_BYTES: 1,
-    DATA_KILOBYTES: 1024,
-    DATA_MEGABYTES: 1048576,
-    DATA_GIGABYTES: 1073741824,
+    UnitOfInformation.BITS: 0.125,
+    UnitOfInformation.KILOBITS: 128,
+    UnitOfInformation.MEGABITS: 131072,
+    UnitOfInformation.GIGABITS: 134217728,
+    UnitOfInformation.BYTES: 1,
+    UnitOfInformation.KILOBYTES: 1024,
+    UnitOfInformation.MEGABYTES: 1048576,
+    UnitOfInformation.GIGABYTES: 1073741824,
 }
 
 ### <-- CONSTANTS & CONVERTERS
@@ -624,7 +684,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_CLIENT} {num}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
                 f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
@@ -640,7 +700,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_SERVER} {num}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
                 f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
@@ -657,7 +717,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_WLAN}{num}_radio",
             key_group=WLAN,
             name=f"{NAME_WLAN[num]}",
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
                 f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
@@ -673,7 +733,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
             key_group=GWLAN,
             name=NAME_GWLAN[f"{num}.{gnum}"],
-            device_class=DEVICE_CLASS_CONNECTIVITY,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
                 f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]
@@ -735,6 +795,19 @@ STATIC_LIGHTS = {
     ),
 }
 STATIC_SENSORS = {
+    # AiMesh
+    (AIMESH, NUMBER): ARSensorDescription(
+        key=NUMBER,
+        key_group=AIMESH,
+        name="AiMesh",
+        icon=ICON_DEVICES,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            LIST: LIST,
+        },
+    ),
     # Boot time
     (MISC, BOOTTIME): ARSensorDescription(
         key=BOOTTIME,
@@ -779,7 +852,7 @@ STATIC_SENSORS = {
         name="LAN Speed",
         icon=ICON_ETHERNET,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
@@ -823,7 +896,7 @@ STATIC_SENSORS = {
         name="WAN Speed",
         icon=ICON_ETHERNET,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={

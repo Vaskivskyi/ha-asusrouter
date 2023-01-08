@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
-                    "ssl": "Usar conexão SSL"
+                    "ssl": "Usar conexão SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Porta (0 para usar o valor padrão)",
                     "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar certificado SSL",
-                    "cert_path": "Caminho do certificado"
+                    "cert_path": "Caminho do certificado",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -44,7 +46,7 @@
                 "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "Atualizar rastreadores de dispositivos",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
                     "interval_cpu": "Dados de CPU",
@@ -117,7 +119,8 @@
                     "port": "Porta (0 para usar o valor padrão)",
                     "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar certificado SSL",
-                    "cert_path": "Caminho do certificadoh"
+                    "cert_path": "Caminho do certificadoh",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -135,7 +138,7 @@
                 "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "Atualizar rastreadores de dispositivos",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
                     "interval_cpu": "Dados de CPU",
@@ -168,7 +171,10 @@
                 "data": {
                     "device_connected": "Dispositivo conectato (o dispositivo não foi rastreado antes)",
                     "device_disconnected": "Dispositivo desconectato",
-                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado antes)"
+                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado antes)",
+                    "node_connected": "[NT] AiMesh node connected (not seen before)",
+                    "node_disconnected": "[NT] AiMesh node disconnected",
+                    "node_reconnected": "[NT] AiMesh node reconnected"
                 }
             },
             "security": {

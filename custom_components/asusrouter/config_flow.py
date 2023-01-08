@@ -32,7 +32,6 @@ from .bridge import ARBridge
 from .const import (
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
-    CONF_CONFIRM,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
@@ -41,13 +40,17 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LABELS_INTERFACES,
+    CONF_LABELS_MODE,
     CONF_LATEST_CONNECTED,
+    CONF_MODE,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
     CONF_UNITS_SPEED,
     CONF_UNITS_TRAFFIC,
     CONF_VALUES_DATA,
     CONF_VALUES_DATARATE,
+    CONF_VALUES_MODE,
     DEFAULT_CACHE_TIME,
     DEFAULT_CONSIDER_HOME,
     DEFAULT_ENABLE_CONTROL,
@@ -56,6 +59,7 @@ from .const import (
     DEFAULT_HIDE_PASSWORDS,
     DEFAULT_INTERVALS,
     DEFAULT_LATEST_CONNECTED,
+    DEFAULT_MODE,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SPLIT_INTERVALS,
@@ -75,6 +79,7 @@ from .const import (
     RESULT_SUCCESS,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
+    ROUTER,
     SIMPLE_SETUP_PARAMETERS,
     SSL,
     STEP_TYPE_COMPLETE,
@@ -252,6 +257,11 @@ def _create_form_credentials(
         vol.Optional(
             CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
         ): cv.boolean,
+        vol.Required(
+            CONF_MODE, default=user_input.get(CONF_MODE, DEFAULT_MODE)
+        ): vol.In(
+            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
+        ),
     }
 
     return vol.Schema(schema)
@@ -259,6 +269,7 @@ def _create_form_credentials(
 
 def _create_form_device(
     user_input: dict[str, Any] = dict(),
+    mode: str = ROUTER,
 ) -> vol.Schema:
     """Create a form for the 'device' step."""
 
@@ -282,6 +293,9 @@ def _create_form_device(
             CONF_CERT_PATH,
             default=user_input.get(CONF_CERT_PATH, ""),
         ): cv.string,
+        vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
+            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
+        ),
     }
 
     return vol.Schema(schema)
@@ -289,14 +303,11 @@ def _create_form_device(
 
 def _create_form_operation_mode(
     user_input: dict[str, Any] = dict(),
+    mode: str = ROUTER,
 ) -> vol.Schema:
     """Create a form for the 'operation_mode' step."""
 
     schema = {
-        vol.Required(
-            CONF_TRACK_DEVICES,
-            default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
-        ): cv.boolean,
         vol.Required(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
@@ -305,17 +316,31 @@ def _create_form_operation_mode(
             CONF_SPLIT_INTERVALS,
             default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
         ): cv.boolean,
-        vol.Required(
-            CONF_LATEST_CONNECTED,
-            default=user_input.get(CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED),
-        ): cv.positive_int,
     }
+
+    # Only in router mode
+    if mode == ROUTER:
+        schema.update(
+            {
+                vol.Required(
+                    CONF_TRACK_DEVICES,
+                    default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
+                ): cv.boolean,
+                vol.Required(
+                    CONF_LATEST_CONNECTED,
+                    default=user_input.get(
+                        CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED
+                    ),
+                ): cv.positive_int,
+            }
+        )
 
     return vol.Schema(schema)
 
 
 def _create_form_intervals(
     user_input: dict[str, Any] = dict(),
+    mode: str = ROUTER,
 ) -> vol.Schema:
     """Create a form for the 'intervals' step."""
 
@@ -324,21 +349,31 @@ def _create_form_intervals(
             CONF_CACHE_TIME,
             default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
         ): cv.positive_int,
-        vol.Required(
-            CONF_INTERVAL_DEVICES,
-            default=user_input.get(CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL),
-        ): cv.positive_int,
     }
 
-    if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
+    # Only in router mode
+    if mode == ROUTER:
         schema.update(
             {
                 vol.Required(
-                    CONF_CONSIDER_HOME,
-                    default=user_input.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME),
+                    CONF_INTERVAL_DEVICES,
+                    default=user_input.get(
+                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                    ),
                 ): cv.positive_int,
             }
         )
+        if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
+            schema.update(
+                {
+                    vol.Required(
+                        CONF_CONSIDER_HOME,
+                        default=user_input.get(
+                            CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME
+                        ),
+                    ): cv.positive_int,
+                }
+            )
 
     split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
     conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
@@ -382,10 +417,12 @@ def _create_form_interfaces(
     """Create a form for the 'interfaces' step."""
 
     schema = {
-        vol.Required(
-            CONF_INTERFACES,
-            default=default,
-        ): cv.multi_select({k: k for k in user_input["interfaces"]}),
+        vol.Required(CONF_INTERFACES, default=default,): cv.multi_select(
+            {
+                interface: CONF_LABELS_INTERFACES.get(interface, interface)
+                for interface in user_input["interfaces"]
+            }
+        ),
         vol.Required(
             CONF_UNITS_SPEED,
             default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
@@ -457,6 +494,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self._options = dict()
         self._unique_id: str | None = None
         self._simple = False
+        self._mode = DEFAULT_MODE
 
         # Dictionary last_step: next_step
         self._steps = {
@@ -545,6 +583,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input:
             self._options.update(user_input)
+            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options, simple=True
             )
@@ -581,6 +620,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input:
             self._options.update(user_input)
+            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options
             )
@@ -596,7 +636,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_device(user_input),
+            data_schema=_create_form_device(user_input, self._mode),
             errors=errors,
         )
 
@@ -613,7 +653,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_operation_mode(user_input),
+                data_schema=_create_form_operation_mode(user_input, self._mode),
             )
 
         self._options.update(user_input)
@@ -633,7 +673,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_intervals(user_input),
+                data_schema=_create_form_intervals(user_input, self._mode),
             )
 
         self._options.update(user_input)
@@ -740,6 +780,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._configs: dict[str, Any] = self.config_entry.data.copy()
         self._host: str = self._configs[CONF_HOST]
         self._options: dict[str, Any] = self.config_entry.options.copy()
+        self._mode = self._options.get(CONF_MODE, DEFAULT_MODE)
 
         # Dictionary last_step: next_step
         self._steps = {
@@ -818,6 +859,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input:
             self._options.update(user_input)
+            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options
             )
@@ -832,7 +874,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_device(user_input),
+            data_schema=_create_form_device(user_input, self._mode),
             errors=errors,
         )
 
@@ -851,7 +893,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_operation_mode(user_input),
+                data_schema=_create_form_operation_mode(user_input, self._mode),
             )
 
         self._options.update(user_input)
@@ -873,7 +915,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_intervals(user_input),
+                data_schema=_create_form_intervals(user_input, self._mode),
             )
 
         self._options.update(user_input)

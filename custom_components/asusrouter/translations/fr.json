@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
-                    "ssl": "Utiliser une connexion SSL"
+                    "ssl": "Utiliser une connexion SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
                     "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -44,7 +46,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
@@ -117,7 +119,8 @@
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
                     "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL"
+                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
+                    "mode": "[NT] Device mode"
                 }
             },
             "operation_mode": {
@@ -135,7 +138,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "Mise à jour des trackers des périphériques",
+                    "interval_devices": "[NT] Devices / AiMesh update",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
@@ -168,7 +171,10 @@
                 "data": {
                     "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
                     "device_disconnected": "Périphérique déconnecté",
-                    "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)"
+                    "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)",
+                    "node_connected": "[NT] AiMesh node connected (not seen before)",
+                    "node_disconnected": "[NT] AiMesh node disconnected",
+                    "node_reconnected": "[NT] AiMesh node reconnected"
                 }
             },
             "security": {

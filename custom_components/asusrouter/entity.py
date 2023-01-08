@@ -15,6 +15,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .const import ASUSROUTER, DOMAIN, KEY_COORDINATOR
 from .dataclass import AREntityDescription
+from .helpers import to_unique_id
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ class AREntity(CoordinatorEntity):
         self.coordinator = coordinator
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = f"{DOMAIN} {self.name}"
+        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities
 
@@ -99,7 +100,7 @@ class AREntity(CoordinatorEntity):
             if attr in self.coordinator.data:
                 attributes[_attributes[attr]] = self.coordinator.data[attr]
 
-        return attributes
+        return dict(sorted(attributes.items())) or {}
 
 
 class ARBinaryEntity(AREntity):
@@ -152,6 +153,6 @@ class ARButtonEntity:
         self.api = router.bridge.api
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = f"{DOMAIN} {self.name}"
+        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities
