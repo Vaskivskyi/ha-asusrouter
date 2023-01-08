@@ -83,10 +83,10 @@ class ARDeviceEntity(ScannerEntity):
 
         self._router = router
         self._device = device
-        self._attr_unique_id = device.mac
+        self._attr_unique_id = f"{router.mac}_{device.mac}"
         self._attr_name = device.name or DEFAULT_DEVICE_NAME
         self._attr_capability_attributes = {
-            "mac": self._attr_unique_id,
+            "mac": device.mac,
             "name": self._attr_name,
         }
 
@@ -125,6 +125,12 @@ class ARDeviceEntity(ScannerEntity):
         """Device icon."""
 
         return "mdi:lan-connect" if self._device.is_connected else "mdi:lan-disconnect"
+
+    @property
+    def unique_id(self) -> str:
+        """Unique ID of the entity."""
+
+        return self._attr_unique_id
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
