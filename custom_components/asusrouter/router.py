@@ -48,6 +48,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
+    CONF_MODE,
     CONF_REQ_RELOAD,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
@@ -64,6 +65,7 @@ from .const import (
     DEFAULT_HTTP,
     DEFAULT_INTERVALS,
     DEFAULT_LATEST_CONNECTED,
+    DEFAULT_MODE,
     DEFAULT_PORT,
     DEFAULT_PORTS,
     DEFAULT_SCAN_INTERVAL,
@@ -96,6 +98,7 @@ from .const import (
     NUMBER,
     PARENT,
     PRODUCT_ID,
+    ROUTER,
     SENSORS_AIMESH,
     SENSORS_CONNECTED_DEVICES,
     SSL,
@@ -127,6 +130,7 @@ class ARSensorHandler:
         self._latest_connected_list: list[dict[str, Any]] = list()
         self._aimesh_devices: int = 0
         self._aimesh_list: list[dict[str, Any]] = list()
+        self._mode = options.get(CONF_MODE, DEFAULT_MODE)
         self._options = options
         self._split_intervals = options.get(
             CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
@@ -145,10 +149,13 @@ class ARSensorHandler:
     async def _get_aimesh_devices(self) -> dict[str, Any]:
         """Return aimesh devices sensors."""
 
-        return {
-            NUMBER: self._aimesh_devices,
-            LIST: self._aimesh_list,
-        }
+        # Only in router mode
+        if self._mode == ROUTER:
+            return {
+                NUMBER: self._aimesh_devices,
+                LIST: self._aimesh_list,
+            }
+        return {}
 
     def update_device_count(
         self,
@@ -559,6 +566,7 @@ class ARDevice:
 
         self._bridge: ARBridge | None = None
         self._options = entry.options.copy()
+        self._mode = self._options.get(CONF_MODE, DEFAULT_MODE)
 
         # Device configs
         self._conf_host: str = entry.data[CONF_HOST]
@@ -667,11 +675,16 @@ class ARDevice:
                 device_mac, entry.original_name
             )
 
-        # Update AiMesh
-        await self.update_nodes()
+        if self._mode == ROUTER:
+            # Update AiMesh
+            await self.update_nodes()
 
-        # Update devices
-        await self.update_devices()
+            # Update devices
+            await self.update_devices()
+        else:
+            _LOGGER.debug(
+                f"Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
+            )
 
         # Initialise sensors
         await self.init_sensors_coordinator()
@@ -694,8 +707,9 @@ class ARDevice:
     ) -> None:
         """Update all AsusRouter platforms."""
 
-        await self.update_devices()
-        await self.update_nodes()
+        if self._mode == ROUTER:
+            await self.update_devices()
+            await self.update_nodes()
 
     async def update_devices(self) -> None:
         """Update AsusRouter devices tracker."""
@@ -768,7 +782,7 @@ class ARDevice:
     async def update_nodes(self) -> None:
         """Update AsusRouter AiMesh nodes."""
 
-        _LOGGER.debug(f"Updating AiMesh nodes for '{self._conf_host}'")
+        _LOGGER.debug(f"Updating AiMesh status for '{self._conf_host}'")
         try:
             aimesh = await self.bridge.async_get_aimesh_nodes()
         except UpdateFailed as ex:
@@ -836,8 +850,9 @@ class ARDevice:
         )
 
         available_sensors = await self.bridge.async_get_available_sensors()
-        available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
-        available_sensors[AIMESH] = {"sensors": SENSORS_AIMESH}
+        if self._mode == ROUTER:
+            available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
+            available_sensors[AIMESH] = {"sensors": SENSORS_AIMESH}
 
         for sensor_type, sensor_def in available_sensors.items():
             if not (sensor_names := sensor_def.get("sensors")):

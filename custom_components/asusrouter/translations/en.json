@@ -14,7 +14,8 @@
                 "data": {
                     "username": "Username",
                     "password": "Password",
-                    "ssl": "Use SSL connection"
+                    "ssl": "Use SSL connection",
+                    "mode": "Device mode"
                 }
             },
             "device": {
@@ -26,7 +27,8 @@
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
                     "verify_ssl": "Verify SSL certificate",
-                    "cert_path": "Certificate path"
+                    "cert_path": "Certificate path",
+                    "mode": "Device mode"
                 }
             },
             "operation_mode": {
@@ -117,7 +119,8 @@
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
                     "verify_ssl": "Verify SSL certificate",
-                    "cert_path": "Certificate path"
+                    "cert_path": "Certificate path",
+                    "mode": "Device mode"
                 }
             },
             "operation_mode": {
