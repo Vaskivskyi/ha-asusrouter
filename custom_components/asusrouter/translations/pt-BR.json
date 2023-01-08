@@ -15,7 +15,7 @@
                     "username": "Nome de usuário",
                     "password": "Senha",
                     "ssl": "Usar conexão SSL",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo do dispositivo"
                 }
             },
             "device": {
@@ -28,7 +28,7 @@
                     "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar certificado SSL",
                     "cert_path": "Caminho do certificado",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo do dispositivo"
                 }
             },
             "operation_mode": {
@@ -46,7 +46,7 @@
                 "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "interval_devices": "Atualização de dispositivos / AiMesh",
                     "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
                     "interval_cpu": "Dados de CPU",
@@ -120,7 +120,7 @@
                     "ssl": "Usar conexão SSL",
                     "verify_ssl": "Verificar certificado SSL",
                     "cert_path": "Caminho do certificadoh",
-                    "mode": "[NT] Device mode"
+                    "mode": "Modo do dispositivo"
                 }
             },
             "operation_mode": {
@@ -138,13 +138,13 @@
                 "description": "Valores indicados em segundos",
                 "data": {
                     "cache_time": "Tempo de cache para os dados do dispositivo",
-                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "interval_devices": "Atualização de dispositivos / AiMesh",
                     "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
                     "scan_interval": "Intervalo para atualizar entidades",
                     "interval_cpu": "Dados de CPU",
                     "interval_firmware": "Dados do firmware",
                     "interval_gwlan": "Dados GWLAN",
-                    "interval_light": "Dados dos LEDs",
+                    "interval_light": "Dados dos LEDs"
                     "interval_misc": "Dados diversos",
                     "interval_network_stat": "Dados de estatística da rede",
                     "interval_parental_control": "Dados do controle dos pais",
