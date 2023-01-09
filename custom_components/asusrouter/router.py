@@ -685,7 +685,7 @@ class ARDevice:
                     new_uid = uid.replace(self._conf_name, self.mac)
                     new_uid = to_unique_id(new_uid)
                     _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
-                    
+
                     # If this uid was already used - remove as duplicate
                     conflict_entity_id = entity_reg.async_get_entity_id(
                         entry.domain, DOMAIN, new_uid
@@ -706,12 +706,10 @@ class ARDevice:
                     if lookup == to_unique_id(CONF_LABELS_INTERFACES[interface]):
                         continue
                     if lookup in uid:
-                        new_uid = uid.replace(
-                            lookup, CONF_LABELS_INTERFACES[interface]
-                        )
+                        new_uid = uid.replace(lookup, CONF_LABELS_INTERFACES[interface])
                         new_uid = to_unique_id(new_uid)
                         _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
-                    
+
                         # If this uid was already used - remove as duplicate
                         conflict_entity_id = entity_reg.async_get_entity_id(
                             entry.domain, DOMAIN, new_uid
