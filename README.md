@@ -12,6 +12,12 @@ The integration uses the native HTTP(S) API (the same way as WebUI) and relies o
 
 You can find the full documentation on the [official webpage](https://asusrouter.vaskivskyi.com/).
 
+## :loudspeaker: Do you want to add AsusRouter to the default HA Core integrations?
+
+:+1: Vote for the feature request!
+
+[Add AsusRouter integration to HA Core - Feature Requests - Home Assistant Community (home-assistant.io)](https://community.home-assistant.io/t/add-asusrouter-integration-to-ha-core/515756?u=vaskivskyi)
+
 ## Firmware limitations
 
 Firmware versions `3.0.0.4.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` for the stock or `386.7` for Merlin FW.

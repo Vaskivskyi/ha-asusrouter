@@ -2,12 +2,12 @@
   "domain": "asusrouter",
   "name": "AsusRouter",
   "integration_type": "hub",
-  "version": "0.17.0",
+  "version": "0.17.2",
   "documentation": "https://asusrouter.vaskivskyi.com",
   "issue_tracker": "https://github.com/Vaskivskyi/ha-asusrouter/issues",
   "config_flow": true,
   "codeowners": ["@vaskivskyi"],
   "iot_class": "local_polling",
-  "requirements": ["asusrouter==0.16.0"],
+  "requirements": ["asusrouter==0.16.1"],
   "loggers": ["asusrouter"]
 }
