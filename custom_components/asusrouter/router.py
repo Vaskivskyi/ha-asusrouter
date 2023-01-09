@@ -660,6 +660,16 @@ class ARDevice:
                     # Only MAC as unique_id -> migrate to the new schema
                     if len(uid) == 17:
                         device_mac = uid
+                        new_uid = f"{self.mac}_{device_mac}"
+                        _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+
+                        # If this uid was already used - remove as duplicate
+                        conflict_entity_id = entity_reg.async_get_entity_id(
+                            entry.domain, DOMAIN, new_uid
+                        )
+                        if conflict_entity_id:
+                            entity_reg.async_remove(entry.entity_id)
+                            continue
 
                         entity_reg.async_update_entity(
                             entry.entity_id, new_unique_id=f"{self.mac}_{uid}"
@@ -675,6 +685,15 @@ class ARDevice:
                     if self._conf_name in uid:
                         new_uid = uid.replace(self._conf_name, self.mac)
                         new_uid = to_unique_id(new_uid)
+                        _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+                        
+                        # If this uid was already used - remove as duplicate
+                        conflict_entity_id = entity_reg.async_get_entity_id(
+                            entry.domain, DOMAIN, new_uid
+                        )
+                        if conflict_entity_id:
+                            entity_reg.async_remove(entry.entity_id)
+                            continue
 
                         if new_uid != uid:
                             entity_reg.async_update_entity(
@@ -685,11 +704,22 @@ class ARDevice:
                     # Rename network interfaces
                     for interface in CONF_LABELS_INTERFACES:
                         lookup = to_unique_id(interface)
+                        if lookup == to_unique_id(CONF_LABELS_INTERFACES[interface]):
+                            continue
                         if lookup in uid:
                             new_uid = uid.replace(
                                 lookup, CONF_LABELS_INTERFACES[interface]
                             )
                             new_uid = to_unique_id(new_uid)
+                            _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+                        
+                            # If this uid was already used - remove as duplicate
+                            conflict_entity_id = entity_reg.async_get_entity_id(
+                                entry.domain, DOMAIN, new_uid
+                            )
+                            if conflict_entity_id:
+                                entity_reg.async_remove(entry.entity_id)
+                                continue
 
                             if new_uid != uid:
                                 entity_reg.async_update_entity(
