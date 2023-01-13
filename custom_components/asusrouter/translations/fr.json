@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "discovery": {
-                "title": "Device location",
+                "title": "Emplacement de l'appareil",
                 "description": "Comment retrouver votre appareil",
                 "data": {
                     "host": "Nom d'hôte / Addresse IP "
@@ -93,7 +93,7 @@
             "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
             "password_missing": "Mot de passe manquant",
             "unknown": "Erreur inconnue",
-            "wrong_credentials": "Mauvais identifiants"
+            "wrong_credentials": "Identifiants erronés"
         }
     },
     "options": {
@@ -120,7 +120,7 @@
                     "ssl": "Utiliser une connexion SSL",
                     "verify_ssl": "Vérifier le certificat SSL",
                     "cert_path": "Répertoire ou se trouve votre certificat SSL",
-                    "mode": "[NT] Device mode"
+                    "mode": "[NT] Mode de l'appareil"
                 }
             },
             "operation_mode": {
@@ -138,7 +138,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "interval_devices": "[NT] Appareils / Mise à jour AiMesh",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
@@ -172,9 +172,9 @@
                     "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
                     "device_disconnected": "Périphérique déconnecté",
                     "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
+                    "node_connected": "[NT] Node AiMesh connecté (l'appareil n'a pas été suivi auparavant)",
+                    "node_disconnected": "[NT] Node AiMesh déconnecté",
+                    "node_reconnected": "[NT] Node AiMesh reconnecté"
                 }
             },
             "security": {
@@ -187,10 +187,10 @@
         "error": {
             "connection_refused": "Connexion rejetée",
             "error": "Échec de connexion",
-            "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
+            "login_blocked": "La connexion est bloquée par le routeur, merci de patienter",
             "not_confirmed": "Vous devez confirmer",
             "unknown": "Erreur inconnue",
-            "wrong_credentials": "Mauvais identifiants"
+            "wrong_credentials": "Identifiants erronés"
         }
     }
 }
