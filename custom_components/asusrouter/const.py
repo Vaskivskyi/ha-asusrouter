@@ -77,6 +77,7 @@ API_TYPE = "api_type"
 APPLY = "apply"
 BITS_PER_SECOND = "bits/s"
 BOOTTIME = "boottime"
+BRIDGE = "bridge"
 BYTES = "bytes"
 CONFIG = "config"
 CONNECTION = "connection"
@@ -90,6 +91,8 @@ GWLAN = "gwlan"
 HTTP = "http"
 HTTPS = "https"
 IP = "ip"
+ISO = "iso"
+LACP = "lacp"
 LAN = "lan"
 LED = "led"
 LEVEL = "level"
@@ -100,6 +103,7 @@ MAC = "mac"
 MISC = "misc"
 MODEL = "model"
 NAME = "name"
+NETWORK = "network"
 NETWORK_STAT = "network_stat"
 NODE = "node"
 NO_SSL = "no_ssl"
@@ -119,12 +123,14 @@ STATE = "state"
 STATUS = "status"
 SYSINFO = "sysinfo"
 TEMPERATURE = "temperature"
+TIMESTAMP = "timestamp"
 TOTAL = "total"
 TX = "tx"
 TX_SPEED = "tx_speed"
 TYPE = "type"
 UNKNOWN = "unknown"
 USAGE = "usage"
+USB = "usb"
 USED = "used"
 VPN = "vpn"
 WAN = "wan"
@@ -136,6 +142,28 @@ WLAN_5GHZ2 = "5ghz2"
 WLAN_6GHZ = "6ghz"
 
 ### <-- GENERAL DATA
+
+MAP_WLAN = {
+    WLAN_2GHZ: 0,
+    WLAN_5GHZ: 1,
+    WLAN_5GHZ2: 2,
+    WLAN_6GHZ: 3,
+}
+
+### MIGRATION TEMP -->
+
+MAP_NETWORK_TEMP = {
+    BRIDGE.upper(): BRIDGE,
+    USB.upper(): USB,
+    WAN.upper(): WAN,
+    WIRED.upper(): WIRED,
+    "WLAN0": WLAN_2GHZ,
+    "WLAN1": WLAN_5GHZ,
+    "WLAN2": WLAN_5GHZ2,
+    "WLAN3": WLAN_6GHZ,
+}
+
+### <-- MIGRATION TEMP
 
 ### GENERAL STATES -->
 
@@ -157,6 +185,7 @@ CONNECTION_LIST = [
 ]
 CONNECTION_WIRED = "Wired"
 
+LABEL_GUEST = "Guest"
 LABEL_LOAD_AVG = "Load Average"
 LABEL_OVPN_CLIENT = "OpenVPN Client"
 LABEL_OVPN_SERVER = "OpenVPN Server"
@@ -164,7 +193,11 @@ LABEL_RX = "Download"
 LABEL_SPEED = "Speed"
 LABEL_TEMPERATURE = "Temperature"
 LABEL_TX = "Upload"
-
+LABEL_WLAN = "Wireless"
+LABEL_WLAN_2GHZ = "2.4 GHz"
+LABEL_WLAN_5GHZ = "5 GHz"
+LABEL_WLAN_5GHZ2 = "5 GHz-2"
+LABEL_WLAN_6GHZ = "6 GHz"
 LABELS_LOAD_AVG = {
     f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ["1", "5", "15"]
 }
@@ -175,6 +208,12 @@ LABELS_TEMPERATURE = {
     WLAN_5GHZ2: f"{LABEL_TEMPERATURE} {CONNECTION_5G2}",
     WLAN_6GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_6G}",
 }
+LABELS_WLAN = {
+    WLAN_2GHZ: LABEL_WLAN_2GHZ,
+    WLAN_5GHZ: LABEL_WLAN_5GHZ,
+    WLAN_5GHZ2: LABEL_WLAN_5GHZ2,
+    WLAN_6GHZ: LABEL_WLAN_6GHZ,
+}
 
 ### <-- LABELS
 
@@ -182,12 +221,12 @@ LABELS_TEMPERATURE = {
 
 MODE_SENSORS = {
     ROUTER: [
+        BOOTTIME,
         CPU,
         FIRMWARE,
         GWLAN,
-        LIGHT,
-        MISC,
-        NETWORK_STAT,
+        LED,
+        NETWORK,
         PARENTAL_CONTROL,
         PORTS,
         RAM,
@@ -198,11 +237,11 @@ MODE_SENSORS = {
         WLAN,
     ],
     NODE: [
+        BOOTTIME,
         CPU,
         FIRMWARE,
-        LIGHT,
-        MISC,
-        NETWORK_STAT,
+        LED,
+        NETWORK,
         PORTS,
         RAM,
         SYSINFO,
@@ -215,11 +254,10 @@ MODE_SENSORS = {
 ### SENSORS LIST -->
 
 SENSORS_AIMESH = [NUMBER, LIST]
+SENSORS_BOOTTIME = [TIMESTAMP, ISO]
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
-SENSORS_CPU = [TOTAL]
-for i in NUMERIC_CORES:
-    SENSORS_CPU.append(f"{CORE}_{i}")
+SENSORS_CPU = [TOTAL, USED, USAGE]
 SENSORS_FIRMWARE = [STATE]
 SENSORS_GWLAN = {
     "sync_node": "aimesh_sync",
@@ -237,11 +275,11 @@ SENSORS_GWLAN = {
     SSID: SSID,
     "crypto": "wpa_encryption",
 }
-SENSORS_LIGHT = [LED]
+SENSORS_LED = [LED]
 SENSORS_MISC = [BOOTTIME]
-SENSORS_NETWORK_STAT = [RX, RX_SPEED, TX, TX_SPEED]
+SENSORS_NETWORK = [RX, RX_SPEED, TX, TX_SPEED]
 SENSORS_PARENTAL_CONTROL = [STATE]
-SENSORS_PORTS = [LAN.upper(), WAN.upper()]
+SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
 SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
 SENSORS_VPN = {
@@ -332,14 +370,16 @@ CONF_INTERVALS = [
     CONF_INTERVAL + WLAN,
 ]
 CONF_LABELS_INTERFACES = {
-    "BRIDGE": "Bridge",
-    "USB": "USB",
-    "WAN": "WAN",
-    "WIRED": CONNECTION_WIRED,
-    "WLAN0": CONNECTION_2G,
-    "WLAN1": CONNECTION_5G,
-    "WLAN2": CONNECTION_5G2,
-    "WLAN3": CONNECTION_6G,
+    BRIDGE: "Bridge",
+    f"{LACP}1": "LACP1",
+    f"{LACP}2": "LACP2",
+    USB: USB.upper(),
+    WAN: WAN.upper(),
+    WIRED: CONNECTION_WIRED,
+    WLAN_2GHZ: CONNECTION_2G,
+    WLAN_5GHZ: CONNECTION_5G,
+    WLAN_5GHZ2: CONNECTION_5G2,
+    WLAN_6GHZ: CONNECTION_6G,
 }
 CONF_LABELS_MODE = {
     ROUTER: "Router",
@@ -784,9 +824,9 @@ STATIC_BUTTONS = {
     ),
 }
 STATIC_LIGHTS = {
-    (LIGHT, LED): ARLightDescription(
+    (LED, LED): ARLightDescription(
         key=LED,
-        key_group=LIGHT,
+        key_group=LED,
         name="LED",
         icon_off=ICON_LIGHT_OFF,
         icon_on=ICON_LIGHT_ON,
@@ -808,10 +848,10 @@ STATIC_SENSORS = {
             LIST: LIST,
         },
     ),
-    # Boot time
-    (MISC, BOOTTIME): ARSensorDescription(
-        key=BOOTTIME,
-        key_group=MISC,
+    # Boottime
+    (BOOTTIME, TIMESTAMP): ARSensorDescription(
+        key=TIMESTAMP,
+        key_group=BOOTTIME,
         name="Boot Time",
         icon=ICON_RESTART,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -832,8 +872,8 @@ STATIC_SENSORS = {
         },
     ),
     # CPU
-    (CPU, TOTAL): ARSensorDescription(
-        key=TOTAL,
+    (CPU, f"{TOTAL}_{USAGE}"): ARSensorDescription(
+        key=f"{TOTAL}_{USAGE}",
         key_group=CPU,
         name=CPU.upper(),
         icon=ICON_CPU,
@@ -842,12 +882,12 @@ STATIC_SENSORS = {
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            f"{CORE}_{num}": f"{CORE}_{num}" for num in NUMERIC_CORES
+            f"{num}_{USAGE}": f"{CORE}_{num}" for num in NUMERIC_CORES
         },
     ),
     # LAN
-    (PORTS, "LAN_total"): ARSensorDescription(
-        key="LAN_total",
+    (PORTS, f"{LAN}_{TOTAL}"): ARSensorDescription(
+        key=f"{LAN}_{TOTAL}",
         key_group=PORTS,
         name="LAN Speed",
         icon=ICON_ETHERNET,
@@ -855,9 +895,7 @@ STATIC_SENSORS = {
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        extra_state_attributes={
-            f"{LAN.upper()}_{num}": f"{LAN}_{num}" for num in NUMERIC_LAN
-        },
+        extra_state_attributes={f"{LAN}_{num}": f"{LAN}_{num}" for num in NUMERIC_LAN},
     ),
     # Latest connected
     (DEVICES, "latest_time"): ARSensorDescription(
@@ -890,8 +928,8 @@ STATIC_SENSORS = {
         },
     ),
     # WAN
-    (PORTS, "WAN_total"): ARSensorDescription(
-        key="WAN_total",
+    (PORTS, f"{WAN}_{TOTAL}"): ARSensorDescription(
+        key=f"{WAN}_{TOTAL}",
         key_group=PORTS,
         name="WAN Speed",
         icon=ICON_ETHERNET,
@@ -899,9 +937,7 @@ STATIC_SENSORS = {
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        extra_state_attributes={
-            f"{WAN.upper()}_{num}": f"{WAN}_{num}" for num in NUMERIC_WAN
-        },
+        extra_state_attributes={f"{WAN}_{num}": f"{WAN}_{num}" for num in NUMERIC_WAN},
     ),
     # WAN IP
     (WAN, IP): ARSensorDescription(
@@ -1021,72 +1057,71 @@ STATIC_SWITCHES_OPTIONAL.update(
 STATIC_SWITCHES_OPTIONAL.update(
     {
         # WLANs
-        (WLAN, f"{KEY_WLAN}{num}_radio"): ARSwitchDescription(
-            key=f"{KEY_WLAN}{num}_radio",
+        (WLAN, f"{wlan}_radio"): ARSwitchDescription(
+            key=f"{wlan}_radio",
             key_group=WLAN,
-            name=f"{NAME_WLAN[num]}",
+            name=f"{LABEL_WLAN} {LABELS_WLAN[wlan]}",
             icon_on=ICON_WLAN_ON,
             icon_off=ICON_WLAN_OFF,
             service_on=RESTART_WIRELESS,
             service_on_args={
                 ACTION_MODE: APPLY,
-                f"wl{num}_radio": 1,
+                f"wl{MAP_WLAN[wlan]}_radio": 1,
             },
             service_off=RESTART_WIRELESS,
             service_off_args={
                 ACTION_MODE: APPLY,
-                f"wl{num}_radio": 0,
+                f"wl{MAP_WLAN[wlan]}_radio": 0,
             },
             device_class=WLAN,
             capabilities={
                 API_TYPE: WLAN,
-                API_ID: num,
+                API_ID: MAP_WLAN[wlan],
             },
             service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
+                f"{wlan}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
             },
         )
-        for num in NUMERIC_WLAN
+        for wlan in MAP_WLAN
     }
 )
 STATIC_SWITCHES_OPTIONAL.update(
     {
         # Guest WLANs
-        (GWLAN, f"{KEY_GWLAN}{num}.{gnum}_bss_enabled"): ARSwitchDescription(
-            key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
+        (GWLAN, f"{wlan}_{gwlan}_bss_enabled"): ARSwitchDescription(
+            key=f"{wlan}_{gwlan}_bss_enabled",
             key_group=GWLAN,
-            name=NAME_GWLAN[f"{num}.{gnum}"],
+            name=f"{LABEL_GUEST} {LABELS_WLAN[wlan]} {gwlan}",
             icon_on=ICON_WLAN_ON,
             icon_off=ICON_WLAN_OFF,
             service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_on_args={
                 ACTION_MODE: APPLY,
-                f"wl{num}.{gnum}_bss_enabled": 1,
-                f"wl{num}.{gnum}_expire": 0,
+                f"wl{MAP_WLAN[wlan]}.{gwlan}_bss_enabled": 1,
+                f"wl{MAP_WLAN[wlan]}.{gwlan}_expire": 0,
             },
             service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_off_args={
                 ACTION_MODE: APPLY,
-                f"wl{num}.{gnum}_bss_enabled": 0,
+                f"wl{MAP_WLAN[wlan]}.{gwlan}_bss_enabled": 0,
             },
             device_class=WLAN,
             capabilities={
                 API_TYPE: GWLAN,
-                API_ID: f"{num}.{gnum}",
+                API_ID: f"{MAP_WLAN[wlan]}.{gwlan}",
             },
             service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]
-                for key in SENSORS_GWLAN
+                f"{wlan}_{gwlan}_{key}": SENSORS_GWLAN[key] for key in SENSORS_GWLAN
             },
         )
-        for gnum in NUMERIC_GWLAN
-        for num in NUMERIC_WLAN
+        for gwlan in NUMERIC_GWLAN
+        for wlan in MAP_WLAN
     }
 )
 STATIC_UPDATES = {

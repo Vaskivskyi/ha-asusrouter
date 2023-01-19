@@ -468,8 +468,8 @@ class ARConnectedDevice:
                     DEVICE_ATTRIBUTE_TX_SPEED
                 ] = dev_info.tx_speed
                 # Node
-                self.identity[NODE] = self._extra_state_attributes[NODE] = format_mac(
-                    dev_info.node
+                self.identity[NODE] = self._extra_state_attributes[NODE] = (
+                    format_mac(dev_info.node) if dev_info.node is not None else None
                 )
                 # If not connected before
                 if self._connected == False:

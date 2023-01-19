@@ -28,6 +28,7 @@ from asusrouter import (
     AsusRouterLoginError,
 )
 
+from . import helpers
 from .bridge import ARBridge
 from .const import (
     CONF_CACHE_TIME,
@@ -127,8 +128,9 @@ async def _async_get_network_interfaces(
     try:
         if not bridge.is_connected:
             await bridge.async_connect()
-        labels = await bridge.api.async_get_network_labels()
+        labels = helpers.list_from_dict(await bridge.api.async_get_network())
         await bridge.async_disconnect()
+        _LOGGER.debug(labels)
         return labels
     except Exception as ex:
         _LOGGER.warning(
@@ -286,13 +288,6 @@ def _create_form_device(
         vol.Optional(
             CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
         ): cv.boolean,
-        vol.Optional(
-            CONF_VERIFY_SSL, default=user_input.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL)
-        ): cv.boolean,
-        vol.Optional(
-            CONF_CERT_PATH,
-            default=user_input.get(CONF_CERT_PATH, ""),
-        ): cv.string,
         vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
             {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
         ),

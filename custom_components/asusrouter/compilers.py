@@ -8,10 +8,10 @@ from .const import (
     CONF_LABELS_INTERFACES,
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
-    KEY_SENSOR_ID,
     LABEL_SPEED,
+    MAP_NETWORK_TEMP,
     NAME,
-    NETWORK_STAT,
+    NETWORK,
     SENSORS_PARAM_NETWORK,
 )
 from .dataclass import (
@@ -31,18 +31,19 @@ def list_sensors_network(
     if not interfaces:
         return sensors
 
-    for interface in interfaces:
+    for intf in interfaces:
+        interface = MAP_NETWORK_TEMP.get(intf, intf)
         for type in SENSORS_PARAM_NETWORK:
             data = SENSORS_PARAM_NETWORK[type]
-            key = KEY_SENSOR_ID.format(interface, type)
+            key = f"{interface}_{type}"
             units = units_traffic
             if LABEL_SPEED in data[NAME]:
                 units = units_speed
             sensors.update(
                 {
-                    (NETWORK_STAT, key): ARSensorDescription(
+                    (NETWORK, key): ARSensorDescription(
                         key=key,
-                        key_group=NETWORK_STAT,
+                        key_group=NETWORK,
                         name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} {data[NAME]}"
                         or None,
                         icon=data["icon"] or None,
