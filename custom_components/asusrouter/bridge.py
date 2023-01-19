@@ -34,6 +34,7 @@ from asusrouter.util import converters
 
 from . import helpers
 from .const import (
+    BOOTTIME,
     CONF_CACHE_TIME,
     CONF_CERT_PATH,
     CONF_MODE,
@@ -45,23 +46,24 @@ from .const import (
     DEFAULT_VERIFY_SSL,
     FIRMWARE,
     GWLAN,
+    ISO,
     KEY_OVPN_CLIENT,
     KEY_OVPN_SERVER,
-    LIGHT,
+    LED,
     MAC,
-    MISC,
     MODE_SENSORS,
     NAME,
+    NETWORK,
     NETWORK_STAT,
     PARENTAL_CONTROL,
     PASSWORD,
     PORTS,
     RAM,
+    SENSORS_BOOTTIME,
+    SENSORS_CPU,
     SENSORS_FIRMWARE,
-    SENSORS_GWLAN,
-    SENSORS_LIGHT,
-    SENSORS_MISC,
-    SENSORS_NETWORK_STAT,
+    SENSORS_LED,
+    SENSORS_NETWORK,
     SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
@@ -69,12 +71,13 @@ from .const import (
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WAN,
-    SENSORS_WLAN,
     SERVICE_ALLOWED_ADJUST_GWLAN,
     SERVICE_ALLOWED_ADJUST_WLAN,
     SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
     SYSINFO,
     TEMPERATURE,
+    TIMESTAMP,
+    TOTAL,
     VPN,
     WAN,
     WLAN,
@@ -115,11 +118,7 @@ class ARBridge:
             password=configs[CONF_PASSWORD],
             port=configs.get(CONF_PORT, DEFAULT_PORT),
             use_ssl=configs[CONF_SSL],
-            cert_check=configs.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
-            cert_path=configs.get(CONF_CERT_PATH, ""),
             cache_time=configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
-            enable_monitor=True,
-            enable_control=True,
             session=session,
         )
 
@@ -179,6 +178,7 @@ class ARBridge:
         """Get a dictionary of available sensors."""
 
         sensors = {
+            BOOTTIME: {"sensors": SENSORS_BOOTTIME, "method": self._get_data_boottime},
             CPU: {
                 "sensors": await self._get_sensors_cpu(),
                 "method": self._get_data_cpu,
@@ -191,13 +191,12 @@ class ARBridge:
                 "sensors": await self._get_sensors_gwlan(),
                 "method": self._get_data_gwlan,
             },
-            LIGHT: {
-                "sensors": SENSORS_LIGHT,
-                "method": self._get_data_light,
+            LED: {
+                "sensors": SENSORS_LED,
+                "method": self._get_data_led,
             },
-            MISC: {"sensors": SENSORS_MISC, "method": self._get_data_misc},
-            NETWORK_STAT: {
-                "sensors": await self._get_sensors_network_stat(),
+            NETWORK: {
+                "sensors": await self._get_sensors_network(),
                 "method": self._get_data_network,
             },
             PARENTAL_CONTROL: {
@@ -246,7 +245,7 @@ class ARBridge:
             raw = await method()
             if process is not None:
                 return process(raw)
-            return raw
+            return self._process_data_generic(raw)
         except AsusRouterError as ex:
             raise UpdateFailed(ex) from ex
 
@@ -260,9 +259,16 @@ class ARBridge:
     async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
         """Get dict of connected devices."""
 
-        return await self._get_data(self.api.async_get_devices)
+        return await self._get_data(self.api.async_get_connected_devices)
 
     # Sensor-specific methods
+    async def _get_data_boottime(self) -> dict[str, Any]:
+        """Get `boottime` data from the device."""
+
+        return await self._get_data(
+            self.api.async_get_boottime, self._process_data_boottime
+        )
+
     async def _get_data_cpu(self) -> dict[str, Any]:
         """Get CPU data from the device."""
 
@@ -271,22 +277,17 @@ class ARBridge:
     async def _get_data_firmware(self) -> dict[str, Any]:
         """Get firmware data from the device."""
 
-        return await self._get_data(self.api.async_get_firmware_update)
+        return await self._get_data(self.api.async_get_firmware)
 
     async def _get_data_gwlan(self) -> dict[str, Any]:
         """Get GWLAN data from the device."""
 
         return await self._get_data(self.api.async_get_gwlan)
 
-    async def _get_data_light(self) -> dict[str, Any]:
+    async def _get_data_led(self) -> dict[str, Any]:
         """Get light data from the device."""
 
         return {"led": self.api.led}
-
-    async def _get_data_misc(self) -> dict[str, Any]:
-        """Get MISC sensors from the device."""
-
-        return {"boottime": datetime.fromisoformat(self.api.boottime)}
 
     async def _get_data_network(self) -> dict[str, Any]:
         """Get network data from device."""
@@ -339,6 +340,19 @@ class ARBridge:
 
     ### PROCESS DATA ->
     @staticmethod
+    def _process_data_generic(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process generic data."""
+
+        return helpers.as_dict(helpers.flatten_dict(raw))
+
+    @staticmethod
+    def _process_data_boottime(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process `boottime` data"""
+
+        raw[TIMESTAMP] = datetime.fromisoformat(raw[ISO])
+        return raw
+
+    @staticmethod
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
         """Process parental control data."""
 
@@ -356,16 +370,17 @@ class ARBridge:
     def _process_data_ports(raw: dict[str, Any]) -> dict[str, Any]:
         """Process ports data."""
 
-        data = dict()
-        for type in SENSORS_PORTS:
-            if type in raw:
-                _total = f"{type}_total"
-                data[_total] = 0
-                for port in raw[type]:
-                    data[f"{type}_{port}"] = raw[type][port]
-                    data[_total] += raw[type][port]
-                if data[_total] > 0:
-                    data[type] = True
+        data = helpers.as_dict(helpers.flatten_dict(raw))
+
+        # This conversion is a legacy
+        # Keep untill switching to the new ports sensors
+        for port_type in SENSORS_PORTS:
+            if port_type in raw:
+                data[f"{port_type}_{TOTAL}"] = 0
+                for id in raw[port_type]:
+                    data[f"{port_type}_{id}"] = raw[port_type][id].get("link_rate")
+                    data[f"{port_type}_{TOTAL}"] += data[f"{port_type}_{id}"]
+
         return data
 
     @staticmethod
@@ -388,8 +403,9 @@ class ARBridge:
 
         try:
             sensors = await method()
-            if process is not None:
-                sensors = process(sensors)
+            if process is None:
+                process = self._process_data_generic
+            sensors = process(sensors)
             _LOGGER.debug(f"Available `{type}` sensors: {sensors}")
         except Exception as ex:
             sensors = DEFAULT_SENSORS[type] if defaults else list()
@@ -402,24 +418,26 @@ class ARBridge:
         """Get the available CPU sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_cpu_labels, type=CPU, defaults=True
+            self.api.async_get_cpu,
+            self._process_sensors_cpu,
+            type=CPU,
+            defaults=True,
         )
 
     async def _get_sensors_gwlan(self) -> list[str]:
         """Get the available GWLAN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_gwlan_ids,
-            self._process_sensors_gwlan,
+            self.api.async_get_gwlan,
             type=GWLAN,
         )
 
-    async def _get_sensors_network_stat(self) -> list[str]:
+    async def _get_sensors_network(self) -> list[str]:
         """Get the available network stat sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_network_labels,
-            self._process_sensors_network_stat,
+            self.api.async_get_network,
+            self._process_sensors_network,
             type=NETWORK_STAT,
         )
 
@@ -445,7 +463,7 @@ class ARBridge:
         """Get the available temperature sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_temperature, helpers.list_from_dict, type=TEMPERATURE
+            self.api.async_get_temperature, type=TEMPERATURE
         )
 
     async def _get_sensors_vpn(self) -> list[str]:
@@ -459,8 +477,7 @@ class ARBridge:
         """Get the available WLAN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_wlan_ids,
-            self._process_sensors_wlan,
+            self.api.async_get_wlan,
             type=WLAN,
         )
 
@@ -468,23 +485,33 @@ class ARBridge:
 
     ### PROCESS SENSORS LIST->
     @staticmethod
-    def _process_sensors_gwlan(raw: list[str]) -> list[str]:
-        """Process GWLAN sensors."""
+    def _process_sensors_generic(raw: dict[str, Any]) -> list[str]:
+        """Process generic sensors from the backend library.
+        For the most of sensors, which are returned and nested dicts
+        and only the top level keys are the one we are looking for.
+        """
 
-        sensors = list()
-        for id in raw:
-            for sensor in SENSORS_GWLAN:
-                sensors.append(f"wl{id}_{sensor}")
-            sensors.append(f"wl{id}_bss_enabled")
-        return sensors
+        flat = helpers.as_dict(helpers.flatten_dict(raw))
+        return helpers.list_from_dict(flat)
 
     @staticmethod
-    def _process_sensors_network_stat(raw: list[str]) -> list[str]:
-        """Process network stat sensors."""
+    def _process_sensors_cpu(raw: dict[str, Any]) -> list[str]:
+        """Process CPU sensors."""
 
         sensors = list()
         for label in raw:
-            for el in SENSORS_NETWORK_STAT:
+            for sensor in SENSORS_CPU:
+                sensors.append(f"{label}_{sensor}")
+
+        return sensors
+
+    @staticmethod
+    def _process_sensors_network(raw: list[str]) -> list[str]:
+        """Process network sensors."""
+
+        sensors = list()
+        for label in raw:
+            for el in SENSORS_NETWORK:
                 sensors.append(f"{label}_{el}")
         return sensors
 
@@ -492,13 +519,14 @@ class ARBridge:
     def _process_sensors_ports(raw: list[str]) -> list[str]:
         """Process ports sensors."""
 
+        # This conversion is a legacy
+        # Keep untill switching to the new ports sensors
         sensors = list()
-        for type in SENSORS_PORTS:
-            if type in raw:
-                sensors.append(type)
-                sensors.append(f"{type}_total")
-                for port in raw[type]:
-                    sensors.append(f"{type}_{port}")
+        for port_type in SENSORS_PORTS:
+            if port_type in raw:
+                sensors.append(f"{port_type}_{TOTAL}")
+                for id in raw[port_type]:
+                    sensors.append(f"{port_type}_{id}")
         return sensors
 
     @staticmethod
@@ -524,17 +552,6 @@ class ARBridge:
                 for sensor in SENSORS_VPN_SERVER:
                     sensors.append(f"{vpn}_{sensor}")
             sensors.append(f"{vpn}_state")
-        return sensors
-
-    @staticmethod
-    def _process_sensors_wlan(raw: list[str]) -> list[str]:
-        """Process WLAN sensors."""
-
-        sensors = list()
-        for id in raw:
-            for sensor in SENSORS_WLAN:
-                sensors.append(f"wl{id}_{sensor}")
-            sensors.append(f"wl{id}_radio")
         return sensors
 
     ### <- PROCESS SENSORS LSIT
