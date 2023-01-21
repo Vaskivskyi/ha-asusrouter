@@ -36,6 +36,7 @@ from asusrouter import (
 
 from .bridge import ARBridge
 from .const import (
+    ACCESS_POINT,
     AIMESH,
     ALIAS,
     CONF_ENABLE_CONTROL,
@@ -152,7 +153,7 @@ class ARSensorHandler:
         """Return aimesh devices sensors."""
 
         # Only in router mode
-        if self._mode == ROUTER:
+        if self._mode in (ACCESS_POINT, ROUTER):
             return {
                 NUMBER: self._aimesh_devices,
                 LIST: self._aimesh_list,
@@ -725,7 +726,7 @@ class ARDevice:
                                 entry.entity_id, new_unique_id=new_uid
                             )
 
-        if self._mode == ROUTER:
+        if self._mode in (ACCESS_POINT, ROUTER):
             # Update AiMesh
             await self.update_nodes()
 
@@ -757,7 +758,7 @@ class ARDevice:
     ) -> None:
         """Update all AsusRouter platforms."""
 
-        if self._mode == ROUTER:
+        if self._mode in (ACCESS_POINT, ROUTER):
             await self.update_devices()
             await self.update_nodes()
 
@@ -900,7 +901,7 @@ class ARDevice:
         )
 
         available_sensors = await self.bridge.async_get_available_sensors()
-        if self._mode == ROUTER:
+        if self._mode in (ACCESS_POINT, ROUTER):
             available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
             available_sensors[AIMESH] = {"sensors": SENSORS_AIMESH}
 

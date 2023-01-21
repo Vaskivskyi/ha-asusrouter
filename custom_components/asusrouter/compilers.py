@@ -28,7 +28,7 @@ def list_sensors_network(
 
     sensors = dict()
 
-    if not interfaces:
+    if not interfaces or len(interfaces) < 1:
         return sensors
 
     for intf in interfaces:

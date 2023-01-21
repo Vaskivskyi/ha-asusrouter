@@ -30,6 +30,7 @@ from asusrouter import (
 from . import helpers
 from .bridge import ARBridge
 from .const import (
+    ACCESS_POINT,
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
@@ -358,7 +359,7 @@ def _create_form_interfaces(
     """Create a form for the 'interfaces' step."""
 
     schema = {
-        vol.Required(CONF_INTERFACES, default=default,): cv.multi_select(
+        vol.Optional(CONF_INTERFACES, default=default,): cv.multi_select(
             {
                 interface: CONF_LABELS_INTERFACES.get(interface, interface)
                 for interface in user_input["interfaces"]
