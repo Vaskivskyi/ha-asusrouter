@@ -36,14 +36,12 @@ from . import helpers
 from .const import (
     BOOTTIME,
     CONF_CACHE_TIME,
-    CONF_CERT_PATH,
     CONF_MODE,
     CPU,
     DEFAULT_CACHE_TIME,
     DEFAULT_MODE,
     DEFAULT_PORT,
     DEFAULT_SENSORS,
-    DEFAULT_VERIFY_SSL,
     FIRMWARE,
     GWLAN,
     ISO,
@@ -144,19 +142,22 @@ class ARBridge:
     async def async_connect(self) -> None:
         """Connect to the device."""
 
-        try:
-            await self.api.async_connect()
-            self._identity = await self.api.async_get_identity()
-        except Exception as ex:
-            raise ConfigEntryNotReady from ex
+        _LOGGER.debug("Connecting to the API")
+
+        await self.api.async_connect()
+        self._identity = await self.api.async_get_identity()
 
     async def async_disconnect(self) -> None:
         """Disconnect from the device."""
+
+        _LOGGER.debug("Disconnecting from the API")
 
         await self.api.async_disconnect()
 
     async def async_clean(self) -> None:
         """Cleanup."""
+
+        _LOGGER.debug("Cleaning up")
 
         await self.api.connection.async_cleanup()
 
@@ -287,7 +288,7 @@ class ARBridge:
     async def _get_data_led(self) -> dict[str, Any]:
         """Get light data from the device."""
 
-        return {"led": self.api.led}
+        return await self._get_data(self.api.async_get_led)
 
     async def _get_data_network(self) -> dict[str, Any]:
         """Get network data from device."""
@@ -357,10 +358,10 @@ class ARBridge:
         """Process parental control data."""
 
         data = dict()
-        data["state"] = raw.get("parental_control")
+        data["state"] = raw.get("state")
         devices = list()
-        for el in raw["list"]:
-            device = dataclasses.asdict(raw["list"][el])
+        for el in raw["rules"]:
+            device = dataclasses.asdict(raw["rules"][el])
             device.pop("timemap")
             devices.append(device)
         data["list"] = devices.copy()
@@ -605,7 +606,7 @@ class ARBridge:
             service_args["wl_unit"] = str(capabilities["api_id"][0])
             service_args["wl_subunit"] = str(capabilities["api_id"][-1])
 
-            return await self.api.async_service_run(
+            return await self.api.async_service_generic(
                 service="restart_wireless;restart_firewall",
                 arguments=service_args,
                 expect_modify=True,
@@ -629,7 +630,7 @@ class ARBridge:
             # Name arguments correctly
             service_args = {f"{prefix}_{arg}": args[arg] for arg in args}
 
-            return await self.api.async_service_run(
+            return await self.api.async_service_generic(
                 service="restart_wireless",
                 arguments=service_args,
                 expect_modify=True,
@@ -659,7 +660,7 @@ class ARBridge:
                         FilterDevice(
                             mac=mac,
                             name=name,
-                            state=state,
+                            type=state,
                         )
                     )
                 else:
@@ -676,7 +677,7 @@ class ARBridge:
                     FilterDevice(
                         mac=reg_value.capabilities[MAC].upper(),
                         name=reg_value.capabilities[NAME],
-                        state=state,
+                        type=state,
                     )
                 )
         if state == "remove":

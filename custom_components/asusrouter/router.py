@@ -602,6 +602,8 @@ class ARDevice:
     async def setup(self) -> None:
         """Setup an AsusRouter object."""
 
+        _LOGGER.debug("Setting up router")
+
         self.bridge = ARBridge(self.hass, dict(self._entry.data), self._options)
 
         try:
@@ -611,6 +613,8 @@ class ARDevice:
 
         if not self.bridge.is_connected:
             raise ConfigEntryNotReady
+
+        _LOGGER.debug("Bridge connected")
 
         # Services
         async def async_service_adjust_wlan(service: ServiceCall):

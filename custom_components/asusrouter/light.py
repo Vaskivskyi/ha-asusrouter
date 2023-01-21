@@ -57,7 +57,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
         """Turn on LED."""
 
         try:
-            result = await self.api.async_service_led_set("on")
+            result = await self.api.async_set_led(True)
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
@@ -71,7 +71,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
         """Turn off LED."""
 
         try:
-            result = await self.api.async_service_led_set("off")
+            result = await self.api.async_set_led(False)
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
@@ -82,6 +82,6 @@ class ARLightLED(ARBinaryEntity, LightEntity):
         """Update state from the device."""
 
         try:
-            self._state = await self.api.async_service_led_get()
+            self._state = await self.api.async_get_led(use_cache=False)
         except Exception as ex:
             _LOGGER.error(f"LED control has returned an exception: {ex}")
