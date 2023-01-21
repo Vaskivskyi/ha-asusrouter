@@ -275,7 +275,7 @@ SENSORS_GWLAN = {
     SSID: SSID,
     "crypto": "wpa_encryption",
 }
-SENSORS_LED = [LED]
+SENSORS_LED = [STATE]
 SENSORS_MISC = [BOOTTIME]
 SENSORS_NETWORK = [RX, RX_SPEED, TX, TX_SPEED]
 SENSORS_PARENTAL_CONTROL = [STATE]
@@ -824,8 +824,8 @@ STATIC_BUTTONS = {
     ),
 }
 STATIC_LIGHTS = {
-    (LED, LED): ARLightDescription(
-        key=LED,
+    (LED, STATE): ARLightDescription(
+        key=STATE,
         key_group=LED,
         name="LED",
         icon_off=ICON_LIGHT_OFF,

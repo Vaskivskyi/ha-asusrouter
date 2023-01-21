@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
@@ -13,12 +15,16 @@ from .const import (
 )
 from .router import ARDevice
 
+_LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
 ) -> bool:
     """Setup AsurRouter platform."""
+
+    _LOGGER.debug("Setting up entry")
 
     router = ARDevice(hass, entry)
     await router.setup()
@@ -50,6 +56,8 @@ async def async_unload_entry(
 ) -> bool:
     """Unload entry."""
 
+    _LOGGER.debug("Unloading entry")
+
     unload = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload:
@@ -67,6 +75,8 @@ async def update_listener(
     entry: ConfigEntry,
 ) -> None:
     """Update on config_entry update."""
+
+    _LOGGER.debug("Update listener activated")
 
     router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
 

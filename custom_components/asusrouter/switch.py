@@ -70,7 +70,7 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
         """Turn on switch."""
 
         try:
-            result = await self.api.async_service_run(
+            result = await self.api.async_service_generic(
                 self._service_on,
                 arguments=self._service_on_args,
                 expect_modify=self._service_expect_modify,
@@ -88,7 +88,7 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
         """Turn off switch."""
 
         try:
-            result = await self.api.async_service_run(
+            result = await self.api.async_service_generic(
                 self._service_off,
                 arguments=self._service_off_args,
                 expect_modify=self._service_expect_modify,
