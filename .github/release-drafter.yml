@@ -25,6 +25,7 @@ categories:
     labels: 
       - "dependencies"
       - "build"
+      - "backend"
 
 template: |
   ## Changes
