@@ -14,20 +14,8 @@
                 "data": {
                     "username": "Username",
                     "password": "Password",
-                    "ssl": "Use SSL connection",
-                    "mode": "Device mode"
-                }
-            },
-            "device": {
-                "title": "Device settings",
-                "description": "Parameters to connect to the device",
-                "data": {
-                    "username": "Username",
-                    "password": "Password",
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
-                    "verify_ssl": "Verify SSL certificate",
-                    "cert_path": "Certificate path",
                     "mode": "Device mode"
                 }
             },
@@ -102,7 +90,7 @@
                 "title": "Configurations to change",
                 "description": "Please, select configurations you would like to change",
                 "data": {
-                    "device": "Credentials and connection settings",
+                    "credentials": "Credentials and connection settings",
                     "operation_mode": "Operation mode",
                     "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor",
@@ -110,16 +98,14 @@
                     "security": "Security options"
                 }
             },
-            "device": {
-                "title": "Device settings",
-                "description": "Parameters to connect to the device",
+            "credentials": {
+                "title": "Credentials",
+                "description": "The same as for the device web panel",
                 "data": {
                     "username": "Username",
                     "password": "Password",
                     "port": "Port (0 to use default value)",
                     "ssl": "Use SSL connection",
-                    "verify_ssl": "Verify SSL certificate",
-                    "cert_path": "Certificate path",
                     "mode": "Device mode"
                 }
             },

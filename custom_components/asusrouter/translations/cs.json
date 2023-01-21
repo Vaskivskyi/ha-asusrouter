@@ -14,20 +14,8 @@
                 "data": {
                     "username": "Uživatelské jméno",
                     "password": "Heslo",
-                    "ssl": "Použít připojení SSL",
-                    "mode": "[NT] Device mode"
-                }
-            },
-            "device": {
-                "title": "Nastavení zařízení",
-                "description": "Parametry pro připojení k zařízení",
-                "data": {
-                    "username": "Uživatelské jméno",
-                    "password": "Heslo",
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
-                    "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu",
                     "mode": "[NT] Device mode"
                 }
             },
@@ -102,7 +90,7 @@
                 "title": "Změnit konfiguraci",
                 "description": "Vyberte prosím konfigurace, které chcete změnit",
                 "data": {
-                    "device": "Přihlašovací údaje a nastavení připojení",
+                    "credentials": "Přihlašovací údaje a nastavení připojení",
                     "operation_mode": "Provozní režim",
                     "intervals": "Intervaly aktualizace",
                     "interfaces": "Rozhraní ke sledování",
@@ -110,16 +98,14 @@
                     "security": "Možnosti zabezpečení"
                 }
             },
-            "device": {
-                "title": "Nastavení zařízení",
-                "description": "Parametry pro připojení k zařízení",
+            "credentials": {
+                "title": "Přihlašovací údaje",
+                "description": "Stejné jako pro webový panel zařízení",
                 "data": {
                     "username": "Uživatelské jméno",
                     "password": "Heslo",
                     "port": "Port (0 pro použití výchozí hodnoty)",
                     "ssl": "Použít připojení SSL",
-                    "verify_ssl": "Ověřit certifikát SSL",
-                    "cert_path": "Cesta k certifikátu",
                     "mode": "[NT] Device mode"
                 }
             },

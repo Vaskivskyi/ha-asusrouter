@@ -14,20 +14,8 @@
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
-                    "ssl": "Usar conexão SSL",
-                    "mode": "Modo do dispositivo"
-                }
-            },
-            "device": {
-                "title": "Configurar dispositivo",
-                "description": "Parâmetros para conectar ao dispositivo",
-                "data": {
-                    "username": "Nome de usuário",
-                    "password": "Senha",
                     "port": "Porta (0 para usar o valor padrão)",
                     "ssl": "Usar conexão SSL",
-                    "verify_ssl": "Verificar certificado SSL",
-                    "cert_path": "Caminho do certificado",
                     "mode": "Modo do dispositivo"
                 }
             },
@@ -102,7 +90,7 @@
                 "title": "Configurações a alterar",
                 "description": "Favor selecionar as configurações que deseja alterar",
                 "data": {
-                    "device": "Credenciais e configurações de conexão",
+                    "credentials": "Credenciais e configurações de conexão",
                     "operation_mode": "Modo de operação",
                     "intervals": "Intervalos de atualização",
                     "interfaces": "Interfaces para monitorar",
@@ -110,16 +98,14 @@
                     "security": "Opções de segurança"
                 }
             },
-            "device": {
-                "title": "Configurações do dispositivo",
-                "description": "Parâmetros para conexão ao dispositivo",
+            "credentials": {
+                "title": "Credenciais",
+                "description": "As mesmas do painel da web do dispositivo",
                 "data": {
                     "username": "Nome de usuário",
                     "password": "Senha",
                     "port": "Porta (0 para usar o valor padrão)",
                     "ssl": "Usar conexão SSL",
-                    "verify_ssl": "Verificar certificado SSL",
-                    "cert_path": "Caminho do certificadoh",
                     "mode": "Modo do dispositivo"
                 }
             },

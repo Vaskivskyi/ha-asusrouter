@@ -14,20 +14,8 @@
                 "data": {
                     "username": "Uživateľské meno",
                     "password": "Heslo",
-                    "ssl": "Použiť pripojenie SSL",
-                    "mode": "[NT] Device mode"
-                }
-            },
-            "device": {
-                "title": "Nastavenie zariadenia",
-                "description": "Parametre pre pripojenie k zariadeniu",
-                "data": {
-                    "username": "Uživateľské meno",
-                    "password": "Heslo",
                     "port": "Port (0 pre použitie východzej hodnoty)",
                     "ssl": "Použiť pripojenie SSL",
-                    "verify_ssl": "Overiť certifikát SSL",
-                    "cert_path": "Cesta k certifikátu SSL",
                     "mode": "[NT] Device mode"
                 }
             },
@@ -102,7 +90,7 @@
                 "title": "Zmena konfigurácií",
                 "description": "Vyberte prosím konfigurácie, ktoré chcete zmeniť",
                 "data": {
-                    "device": "Prihlasovacie údaje a nastavenie pripojenia",
+                    "credentials": "Prihlasovacie údaje a nastavenie pripojenia",
                     "operation_mode": "Prevádzkový režim",
                     "intervals": "Intervaly aktualizácie",
                     "interfaces": "Rozhrania sledovania",
@@ -110,16 +98,14 @@
                     "security": "Možnosti zabezpečenia"
                 }
             },
-            "device": {
-                "title": "Nastavenie zariadenia",
-                "description": "Parametre pro pripojenie k zariadeniu",
+            "credentials": {
+                "title": "Prihlasovacie údaje",
+                "description": "Rovnaké ako pre webový panel zariadenia",
                 "data": {
-                    "username": "Užívateľské meno",
+                    "username": "Uživateľské meno",
                     "password": "Heslo",
-                    "port": "Port (0 pre pouzitie východzej hodnoty)",
-                    "ssl": "Použíť pripojenie SSL",
-                    "verify_ssl": "Overiť certifikát SSL",
-                    "cert_path": "Cesta k certifikátu",
+                    "port": "Port (0 pre použitie východzej hodnoty)",
+                    "ssl": "Použiť pripojenie SSL",
                     "mode": "[NT] Device mode"
                 }
             },
