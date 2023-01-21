@@ -305,7 +305,19 @@ SENSORS_VPN_SERVER = {
     "client_list": "client_list",
     "routing_table": "routing_table",
 }
-SENSORS_WAN = [STATUS, IP, "ip_type", "gateway", "mask", "dns", "private_subnet"]
+SENSORS_WAN = [
+    STATUS,
+    IP,
+    "ip_type",
+    "gateway",
+    "mask",
+    "dns",
+    "private_subnet",
+    "xip",
+    "xtype",
+    "xgateway",
+    "xdns",
+]
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
     "channel": "channel",
@@ -699,6 +711,11 @@ STATIC_BINARY_SENSORS = {
             "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
+            "xdns": f"x{DNS}",
+            "xgateway": "xgateway",
+            "xip": f"x{IP}",
+            "xtype": "xip_type",
+            "xmask": "xmask",
         },
     ),
 }
@@ -953,6 +970,11 @@ STATIC_SENSORS = {
             "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
+            "xdns": f"x{DNS}",
+            "xgateway": "xgateway",
+            "xip": f"x{IP}",
+            "xtype": "xip_type",
+            "xmask": "xmask",
         },
     ),
 }
