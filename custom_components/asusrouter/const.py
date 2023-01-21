@@ -247,6 +247,18 @@ MODE_SENSORS = {
         SYSINFO,
         TEMPERATURE,
     ],
+    ACCESS_POINT: [
+        BOOTTIME,
+        CPU,
+        FIRMWARE,
+        LED,
+        NETWORK,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+        WLAN,
+    ],
 }
 
 ### <-- MODES
@@ -396,6 +408,7 @@ CONF_LABELS_INTERFACES = {
 CONF_LABELS_MODE = {
     ROUTER: "Router",
     NODE: "AiMesh node",
+    ACCESS_POINT: "Access Point",
 }
 CONF_LATEST_CONNECTED = "latest_connected"
 CONF_MODE = "mode"
@@ -427,6 +440,7 @@ CONF_VALUES_DATARATE = [
 CONF_VALUES_MODE = [
     ROUTER,
     NODE,
+    ACCESS_POINT,
 ]
 
 # Keys that require reload of integration
@@ -812,15 +826,6 @@ STATIC_BUTTONS = {
         service_expect_modify=False,
         entity_registry_enabled_default=True,
     ),
-    RESTART_FIREWALL: ARButtonDescription(
-        key=RESTART_FIREWALL,
-        name="Restart firewall",
-        icon=ICON_RESTART,
-        service=RESTART_FIREWALL,
-        service_args={},
-        service_expect_modify=False,
-        entity_registry_enabled_default=False,
-    ),
     RESTART_HTTPD: ARButtonDescription(
         key=RESTART_HTTPD,
         name="Restart HTTP daemon",
@@ -835,6 +840,17 @@ STATIC_BUTTONS = {
         name="Restart wireless",
         icon=ICON_RESTART,
         service=RESTART_WIRELESS,
+        service_args={},
+        service_expect_modify=False,
+        entity_registry_enabled_default=False,
+    ),
+}
+STATIC_BUTTONS_OPTIONAL = {
+    RESTART_FIREWALL: ARButtonDescription(
+        key=RESTART_FIREWALL,
+        name="Restart firewall",
+        icon=ICON_RESTART,
+        service=RESTART_FIREWALL,
         service_args={},
         service_expect_modify=False,
         entity_registry_enabled_default=False,

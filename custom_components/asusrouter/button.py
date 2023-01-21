@@ -10,7 +10,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ASUSROUTER, DOMAIN, STATIC_BUTTONS as BUTTONS
+from .const import (
+    ASUSROUTER,
+    CONF_MODE,
+    DOMAIN,
+    ROUTER,
+    STATIC_BUTTONS as BUTTONS,
+    STATIC_BUTTONS_OPTIONAL,
+)
 from .dataclass import ARButtonDescription
 from .entity import ARButtonEntity
 from .router import ARDevice
@@ -27,6 +34,9 @@ async def async_setup_entry(
 
     router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
     entities = []
+
+    if entry.options.get(CONF_MODE) == ROUTER:
+        BUTTONS.update(STATIC_BUTTONS_OPTIONAL)
 
     for button in BUTTONS:
         try:

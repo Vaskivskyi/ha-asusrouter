@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from numbers import Real
 
 from homeassistant.components.sensor import SensorEntity
@@ -21,6 +22,8 @@ from .dataclass import ARSensorDescription
 from .entity import AREntity, async_setup_ar_entry
 from .router import ARDevice
 
+_LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -29,13 +32,16 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter sensors."""
 
-    SENSORS.update(
-        list_sensors_network(
-            entry.options[CONF_INTERFACES],
-            entry.options[CONF_UNITS_SPEED],
-            entry.options[CONF_UNITS_TRAFFIC],
+    interfaces = entry.options[CONF_INTERFACES]
+    if len(interfaces) > 0:
+        _LOGGER.debug(f"Interfaces selected: {interfaces}. Initializing sensors")
+        SENSORS.update(
+            list_sensors_network(
+                entry.options[CONF_INTERFACES],
+                entry.options[CONF_UNITS_SPEED],
+                entry.options[CONF_UNITS_TRAFFIC],
+            )
         )
-    )
 
     await async_setup_ar_entry(hass, entry, async_add_entities, SENSORS, ARSensor)
 
