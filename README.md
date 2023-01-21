@@ -72,17 +72,13 @@ and HA events and services.
 
 AsusRouter supports virtually every AsusWRT-powered device.
 
-All the devices which were tested (also by the integration users) are explicitly marked as so, as well as the firmware type(s) / version(s).
-
-### Tested
-
-#### WiFi 7 | 802.11be
+### WiFi 7 | 802.11be
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[GT-BE98](https://asusrouter.vaskivskyi.com/devices/GT-BE98.html)|💛 Expected to work||<a href="https://amzn.to/3vGztgz" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-BE96U](https://asusrouter.vaskivskyi.com/devices/RT-BE96U.html)|💛 Expected to work||<a href="https://amzn.to/3vJu8oD" rel="nofollow sponsored" target="_blank">find it</a>|
 
-#### WiFi 6e | 802.11axe
+### WiFi 6e | 802.11axe
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[GT-AXE11000](https://asusrouter.vaskivskyi.com/devices/GT-AXE11000.html)|💛 Expected to work||<a href="https://amzn.to/3Gotj9R" rel="nofollow sponsored" target="_blank">find it</a>|
@@ -90,7 +86,7 @@ All the devices which were tested (also by the integration users) are explicitly
 |[RT-AXE7800](https://asusrouter.vaskivskyi.com/devices/RT-AXE7800.html)|💛 Expected to work||<a href="https://amzn.to/3jUr2LU" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi Pro ET12](https://asusrouter.vaskivskyi.com/devices/ZenWiFiProET12.html)|💛 Expected to work||<a href="https://amzn.to/3GTz68P" rel="nofollow sponsored" target="_blank">find it</a>|
 
-#### WiFi 6 | 802.11ax
+### WiFi 6 | 802.11ax
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[DSL-AX82U](https://asusrouter.vaskivskyi.com/devices/DSL-AX82U.html)|💚 Confirmed|Merlin:<li>`386.07_0-gnuton0_beta2`</li>|<a href="https://amzn.to/3G87vyR" rel="nofollow sponsored" target="_blank">find it</a>|
@@ -119,7 +115,7 @@ All the devices which were tested (also by the integration users) are explicitly
 |[ZenWiFi AX Mini (XD4)](https://asusrouter.vaskivskyi.com/devices/ZenWiFiAXMini(XD4).html)|💚 Confirmed|Stock:<li>`386_48790`</li><li>`386_49599`</li>|<a href="https://amzn.to/3hYGuGl" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi Pro XT12](https://asusrouter.vaskivskyi.com/devices/ZenWiFiProXT12.html)|💚 Confirmed||<a href="https://amzn.to/3im6UC5" rel="nofollow sponsored" target="_blank">find it</a>|
 
-#### WiFi 5 | 802.11ac
+### WiFi 5 | 802.11ac
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[4G-AC55U](https://asusrouter.vaskivskyi.com/devices/4G-AC55U.html)|💚 Confirmed||<a href="https://amzn.to/3jIWQDu" rel="nofollow sponsored" target="_blank">find it</a>|
@@ -137,7 +133,7 @@ All the devices which were tested (also by the integration users) are explicitly
 |[RT-AC88U](https://asusrouter.vaskivskyi.com/devices/RT-AC88U.html)|💚 Confirmed|Merlin:<li>`386.7_beta1`</li>|<a href="https://amzn.to/3FYRYBy" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-ACRH17](https://asusrouter.vaskivskyi.com/devices/RT-ACRH17.html)|💚 Confirmed|Stock:<li>`382.52517`</li>|<a href="https://amzn.to/3i6dWL0" rel="nofollow sponsored" target="_blank">find it</a>|
 
-#### WiFi 4 | 802.11n
+### WiFi 4 | 802.11n
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[RT-N66U](https://asusrouter.vaskivskyi.com/devices/RT-N66U.html)|💚 Confirmed||<a href="https://amzn.to/3i7eP5Z" rel="nofollow sponsored" target="_blank">find it</a>|
