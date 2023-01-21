@@ -16,7 +16,6 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_SSL,
     CONF_USERNAME,
-    CONF_VERIFY_SSL,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
@@ -32,7 +31,6 @@ from . import helpers
 from .bridge import ARBridge
 from .const import (
     CONF_CACHE_TIME,
-    CONF_CERT_PATH,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
     CONF_ENABLE_MONITOR,
@@ -69,11 +67,9 @@ from .const import (
     DEFAULT_UNITS_SPEED,
     DEFAULT_UNITS_TRAFFIC,
     DEFAULT_USERNAME,
-    DEFAULT_VERIFY_SSL,
     DELAULT_INTERFACES,
     DOMAIN,
     FIRMWARE,
-    NO_SSL,
     RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
@@ -81,10 +77,6 @@ from .const import (
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
-    SIMPLE_SETUP_PARAMETERS,
-    SSL,
-    STEP_TYPE_COMPLETE,
-    STEP_TYPE_SIMPLE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -143,11 +135,8 @@ async def _async_check_connection(
     hass: HomeAssistant,
     configs: dict[str, Any],
     options: dict[str, Any] = dict(),
-    simple: bool = False,
 ) -> dict[str, Any]:
     """Check connection to the device with provided configurations."""
-
-    step_type = STEP_TYPE_COMPLETE
 
     configs_to_use = configs.copy()
     configs_to_use.update(options)
@@ -159,15 +148,7 @@ async def _async_check_connection(
 
     result = dict()
 
-    if simple:
-        configs_to_use.update(
-            SIMPLE_SETUP_PARAMETERS[SSL]
-            if configs_to_use[CONF_SSL]
-            else SIMPLE_SETUP_PARAMETERS[NO_SSL]
-        )
-        step_type = STEP_TYPE_SIMPLE
-
-    _LOGGER.debug(f"Setup ({step_type}) initiated")
+    _LOGGER.debug(f"Setup initiated")
 
     bridge = ARBridge(hass, configs_to_use)
 
@@ -189,27 +170,17 @@ async def _async_check_connection(
         }
     # Connection refused
     except AsusRouterConnectionError as ex:
-        if simple:
-            _LOGGER.debug(
-                f"Simplified setup failed for {host}. Switching to the complete mode. Original exception of type {type(ex)}: {ex}"
-            )
-        else:
-            _LOGGER.error(
-                f"Connection refused by {host}. Check SSL and port settings. Original exception: {ex}"
-            )
+        _LOGGER.error(
+            f"Connection refused by {host}. Check SSL and port settings. Original exception: {ex}"
+        )
         return {
             "errors": RESULT_CONNECTION_REFUSED,
         }
     # Anything else
     except Exception as ex:
-        if simple:
-            _LOGGER.debug(
-                f"Simplified setup failed for {host}. Switching to the complete mode. Original exception of type {type(ex)}: {ex}"
-            )
-        else:
-            _LOGGER.error(
-                f"Unknown error of type '{type(ex)}' during connection to {host}: {ex}"
-            )
+        _LOGGER.error(
+            f"Unknown error of type '{type(ex)}' during connection to {host}: {ex}"
+        )
         return {
             "errors": RESULT_UNKNOWN,
         }
@@ -224,7 +195,7 @@ async def _async_check_connection(
 
     result["configs"] = configs_to_use
 
-    _LOGGER.debug(f"Setup ({step_type}) successful")
+    _LOGGER.debug(f"Setup successful")
 
     return result
 
@@ -246,34 +217,9 @@ def _create_form_discovery(
 
 def _create_form_credentials(
     user_input: dict[str, Any] = dict(),
-) -> vol.Schema:
-    """Create a form for the 'credentials' step."""
-
-    schema = {
-        vol.Required(
-            CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
-        ): cv.string,
-        vol.Required(
-            CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
-        ): cv.string,
-        vol.Optional(
-            CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
-        ): cv.boolean,
-        vol.Required(
-            CONF_MODE, default=user_input.get(CONF_MODE, DEFAULT_MODE)
-        ): vol.In(
-            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
-        ),
-    }
-
-    return vol.Schema(schema)
-
-
-def _create_form_device(
-    user_input: dict[str, Any] = dict(),
     mode: str = ROUTER,
 ) -> vol.Schema:
-    """Create a form for the 'device' step."""
+    """Create a form for the 'credentials' step."""
 
     schema = {
         vol.Required(
@@ -495,9 +441,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self._steps = {
             "discovery": self.async_step_credentials,
             "credentials": self.async_step_operation_mode,
-            "credentials_error": self.async_step_device,
-            "device": self.async_step_operation_mode,
-            "device_error": self.async_step_device,
+            "credentials_error": self.async_step_credentials,
             "operation_mode": self.async_step_intervals,
             "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_security,
@@ -565,53 +509,15 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Step #2 - credentials and SSL (simplified setup)
+    # Step #2 - credentials
     async def async_step_credentials(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
-        """Credentials step."""
-
-        step_id = "credentials"
-
-        errors = dict()
-
-        if user_input:
-            self._options.update(user_input)
-            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
-            result = await _async_check_connection(
-                self.hass, self._configs, self._options, simple=True
-            )
-            if "errors" in result:
-                errors["base"] = result["errors"]
-                if (
-                    errors["base"] != RESULT_WRONG_CREDENTIALS
-                    and errors["base"] != RESULT_LOGIN_BLOCKED
-                ):
-                    return await self.async_select_step(step_id, errors)
-            else:
-                self._options.update(result["configs"])
-                await self.async_set_unique_id(result["unique_id"])
-                return await self.async_select_step(step_id, errors)
-
-        if not user_input:
-            user_input = self._options.copy()
-
-        return self.async_show_form(
-            step_id=step_id,
-            data_schema=_create_form_credentials(user_input),
-            errors=errors,
-        )
-
-    # Step #2b (optional) - complete device setup
-    async def async_step_device(
         self,
         user_input: dict[str, Any] | None = None,
         errors: dict[str, str] = dict(),
     ) -> FlowResult:
-        """Step to completely setup the device."""
+        """Credentials step."""
 
-        step_id = "device"
+        step_id = "credentials"
 
         if user_input:
             self._options.update(user_input)
@@ -622,6 +528,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             if "errors" in result:
                 errors["base"] = result["errors"]
             else:
+                errors = {}
                 self._options.update(result["configs"])
                 await self.async_set_unique_id(result["unique_id"])
                 return await self.async_select_step(step_id, errors)
@@ -631,7 +538,7 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_device(user_input, self._mode),
+            data_schema=_create_form_credentials(user_input),
             errors=errors,
         )
 
@@ -779,8 +686,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         # Dictionary last_step: next_step
         self._steps = {
-            "options": self.async_step_device,
-            "device": self.async_step_operation_mode,
+            "options": self.async_step_credentials,
+            "credentials": self.async_step_operation_mode,
             "operation_mode": self.async_step_intervals,
             "intervals": self.async_step_interfaces,
             "interfaces": self.async_step_events,
@@ -839,13 +746,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(schema_dict),
         )
 
-    async def async_step_device(
+    async def async_step_credentials(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select options to change."""
+        """Step to select credentials."""
 
-        step_id = "device"
+        step_id = "credentials"
 
         errors = dict()
 
@@ -869,7 +776,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_device(user_input, self._mode),
+            data_schema=_create_form_credentials(user_input, self._mode),
             errors=errors,
         )
 
@@ -877,7 +784,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select options to change."""
+        """Step to select operation mode."""
 
         step_id = "operation_mode"
 

@@ -14,20 +14,8 @@
                 "data": {
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
-                    "ssl": "Gebruik SSL verbinding",
-                    "mode": "[NT] Device mode"
-                }
-            },
-            "device": {
-                "title": "Router instellingen",
-                "description": "Parameters om verbinding te maken met device",
-                "data": {
-                    "username": "Gebruikersnaam",
-                    "password": "Wachtwoord",
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
-                    "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "Certificaat pad",
                     "mode": "[NT] Device mode"
                 }
             },
@@ -102,7 +90,7 @@
                 "title": "Verander configuratie",
                 "description": "Selecteer welkee optie van configuratie u wilt aanpassen",
                 "data": {
-                    "device": "Login gegevens en connectie instellingen",
+                    "credentials": "Login gegevens en connectie instellingen",
                     "operation_mode": "Operatie modus",
                     "intervals": "Update interval",
                     "interfaces": "Interfaces voor monitoring",
@@ -110,16 +98,14 @@
                     "security": "Beveiliging opties"
                 }
             },
-            "device": {
-                "title": "Router instellingen",
-                "description": "Parameters voor connectie met router",
+            "credentials": {
+                "title": "Login gegevens",
+                "description": "Dezelfde als die van je router web paneel",
                 "data": {
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
                     "port": "Poort (0 voor standaard waarde)",
                     "ssl": "Gebruik SSL verbinding",
-                    "verify_ssl": "Controleer SSL certificaat",
-                    "cert_path": "Certificaat pad",
                     "mode": "[NT] Device mode"
                 }
             },

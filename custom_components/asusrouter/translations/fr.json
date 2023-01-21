@@ -14,21 +14,9 @@
                 "data": {
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
-                    "ssl": "Utiliser une connexion SSL",
-                    "mode": "[NT] Device mode"
-                }
-            },
-            "device": {
-                "title": "Réglages de l'appareil",
-                "description": "Parametres de connexion au routeur",
-                "data": {
-                    "username": "Nom d'utilisateur",
-                    "password": "Mot de pass",
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
-                    "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
-                    "mode": "[NT] Device mode"
+                    "mode": "Mode de l'appareil"
                 }
             },
             "operation_mode": {
@@ -100,7 +88,7 @@
         "step": {
             "options": {
                 "title": "Paramétrages à changer",
-                "description": "Veuillez sélectionner les Paramétres à modifier",
+                "credentials": "Veuillez sélectionner les Paramétres à modifier",
                 "data": {
                     "device": "Paramètres d'identification et de connexion",
                     "operation_mode": "Mode de fonctionnement",
@@ -110,17 +98,15 @@
                     "security": "Options de sécurité"
                 }
             },
-            "device": {
-                "title": "Réglages de l'appareil",
-                "description": "Parametres de connexion au routeur",
+            "credentials": {
+                "title": "Identifiants",
+                "description": "Les même que sur l'interface de gestion du routeur",
                 "data": {
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
                     "port": "Port (0 pour utiliser la valeur par défaut)",
                     "ssl": "Utiliser une connexion SSL",
-                    "verify_ssl": "Vérifier le certificat SSL",
-                    "cert_path": "Répertoire ou se trouve votre certificat SSL",
-                    "mode": "[NT] Mode de l'appareil"
+                    "mode": "Mode de l'appareil"
                 }
             },
             "operation_mode": {
@@ -138,7 +124,7 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "[NT] Appareils / Mise à jour AiMesh",
+                    "interval_devices": "Appareils / Mise à jour AiMesh",
                     "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
@@ -172,9 +158,9 @@
                     "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
                     "device_disconnected": "Périphérique déconnecté",
                     "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)",
-                    "node_connected": "[NT] Node AiMesh connecté (l'appareil n'a pas été suivi auparavant)",
-                    "node_disconnected": "[NT] Node AiMesh déconnecté",
-                    "node_reconnected": "[NT] Node AiMesh reconnecté"
+                    "node_connected": "Node AiMesh connecté (l'appareil n'a pas été suivi auparavant)",
+                    "node_disconnected": "Node AiMesh déconnecté",
+                    "node_reconnected": "Node AiMesh reconnecté"
                 }
             },
             "security": {

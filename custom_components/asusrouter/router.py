@@ -14,7 +14,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PORT,
     CONF_SCAN_INTERVAL,
-    CONF_VERIFY_SSL,
+    CONF_SSL,
     Platform,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
@@ -576,9 +576,7 @@ class ARDevice:
         self._conf_port: int = self._options[CONF_PORT]
         if self._conf_port == DEFAULT_PORT:
             self._conf_port = (
-                DEFAULT_PORTS[SSL]
-                if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_PORTS[NO_SSL]
+                DEFAULT_PORTS[SSL] if self._options[CONF_SSL] else DEFAULT_PORTS[NO_SSL]
             )
 
         # Device information
@@ -1072,9 +1070,7 @@ class ARDevice:
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
             configuration_url="{}://{}:{}".format(
-                DEFAULT_HTTP[SSL]
-                if self._options[CONF_VERIFY_SSL]
-                else DEFAULT_HTTP[NO_SSL],
+                DEFAULT_HTTP[SSL] if self._options[CONF_SSL] else DEFAULT_HTTP[NO_SSL],
                 self._conf_host,
                 self._conf_port,
             ),
