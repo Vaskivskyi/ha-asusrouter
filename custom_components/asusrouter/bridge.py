@@ -221,7 +221,10 @@ class ARBridge:
                 "sensors": await self._get_sensors_vpn(),
                 "method": self._get_data_vpn,
             },
-            WAN: {"sensors": SENSORS_WAN, "method": self._get_data_wan},
+            WAN: {
+                "sensors": SENSORS_WAN,
+                "method": self._get_data_wan,
+            },
             WLAN: {
                 "sensors": await self._get_sensors_wlan(),
                 "method": self._get_data_wlan,
@@ -463,9 +466,7 @@ class ARBridge:
     async def _get_sensors_temperature(self) -> list[str]:
         """Get the available temperature sensors."""
 
-        return await self._get_sensors(
-            self.api.async_get_temperature, type=TEMPERATURE
-        )
+        return await self._get_sensors(self.api.async_get_temperature, type=TEMPERATURE)
 
     async def _get_sensors_vpn(self) -> list[str]:
         """Get the available VPN sensors."""
