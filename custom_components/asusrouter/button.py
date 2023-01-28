@@ -69,7 +69,7 @@ class ARButton(ARButtonEntity, ButtonEntity):
         """Press button."""
 
         try:
-            result = await self.api.async_service_run(
+            result = await self.api.async_service_generic_apply(
                 self._service,
                 arguments=self._service_args,
                 expect_modify=self._service_expect_modify,
