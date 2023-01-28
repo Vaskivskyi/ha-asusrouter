@@ -2,6 +2,7 @@ exclude-contributors:
   - 'Vaskivskyi'
   - 'dependabot'
 exclude-labels:
+  - "build"
   - 'github'
 
 categories:
@@ -24,7 +25,6 @@ categories:
   - title: "📦 Dependencies"
     labels: 
       - "dependencies"
-      - "build"
       - "backend"
 
 template: |
