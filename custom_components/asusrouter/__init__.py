@@ -22,7 +22,7 @@ async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
 ) -> bool:
-    """Setup AsurRouter platform."""
+    """Setup AsusRouter platform."""
 
     _LOGGER.debug("Setting up entry")
 
