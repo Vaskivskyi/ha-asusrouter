@@ -8,11 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
 
-from .const import (
-    ASUSROUTER,
-    DOMAIN,
-    PLATFORMS,
-)
+from .const import ASUSROUTER, DOMAIN, PLATFORMS, STOP_LISTENER
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,19 +16,19 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
 ) -> bool:
-    """Setup AsusRouter platform."""
+    """Set up AsusRouter platform."""
 
     _LOGGER.debug("Setting up entry")
 
-    router = ARDevice(hass, entry)
+    router = ARDevice(hass, config_entry)
     await router.setup()
 
-    router.async_on_close(entry.add_update_listener(update_listener))
+    router.async_on_close(config_entry.add_update_listener(update_listener))
 
     async def async_close_connection(event):
-        """Close AsusRouter connection on HA stop."""
+        """Close router connection on HA stop."""
 
         await router.close()
 
@@ -40,47 +36,46 @@ async def async_setup_entry(
         EVENT_HOMEASSISTANT_STOP, async_close_connection
     )
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+    hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = {
         ASUSROUTER: router,
-        "stop_listener": stop_listener,
+        STOP_LISTENER: stop_listener,
     }
 
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
     return True
 
 
 async def async_unload_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
 ) -> bool:
-    """Unload entry."""
+    """Unload AsusRouter config entry."""
 
     _LOGGER.debug("Unloading entry")
 
-    unload = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unload = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
 
     if unload:
-        hass.data[DOMAIN][entry.entry_id]["stop_listener"]()
-        router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
-        await router.close()
-
-        hass.data[DOMAIN].pop(entry.entry_id)
+        # Close connection
+        hass.data[DOMAIN][config_entry.entry_id][STOP_LISTENER]()
+        await hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER].close()
+        hass.data[DOMAIN].pop(config_entry.entry_id)
 
     return unload
 
 
 async def update_listener(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
 ) -> None:
-    """Update on config_entry update."""
+    """Reload on config entry update."""
 
     _LOGGER.debug("Update listener activated")
 
-    router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
+    router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
 
-    if router.update_options(entry.options):
-        await hass.config_entries.async_reload(entry.entry_id)
+    if router.update_options(config_entry.options):
+        await hass.config_entries.async_reload(config_entry.entry_id)
 
     return
