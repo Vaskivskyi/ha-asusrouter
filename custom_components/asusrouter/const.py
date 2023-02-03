@@ -1176,3 +1176,8 @@ STATIC_UPDATES = {
 }
 
 ### <-- SENSORS
+
+# CONSTANTS BY MODULE -->
+
+# __init__ constants
+STOP_LISTENER = "stop_listener"
