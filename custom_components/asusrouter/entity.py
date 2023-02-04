@@ -13,7 +13,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .const import ASUSROUTER, DOMAIN, KEY_COORDINATOR
+from .const import ASUSROUTER, COORDINATOR, DOMAIN
 from .dataclass import AREntityDescription
 from .helpers import to_unique_id
 from .router import ARDevice
@@ -35,7 +35,7 @@ async def async_setup_ar_entry(
     entities = []
 
     for sensor_data in router._sensor_coordinator.values():
-        coordinator = sensor_data[KEY_COORDINATOR]
+        coordinator = sensor_data[COORDINATOR]
         for sensor_description in sensors:
             try:
                 if sensor_description[0] in sensor_data:

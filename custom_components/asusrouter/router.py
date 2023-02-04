@@ -1,13 +1,14 @@
-"""AsusRouter Router."""
+"""AsusRouter router module."""
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
 import logging
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any, TypeVar
 
-from homeassistant.components.device_tracker.const import CONF_CONSIDER_HOME
-from homeassistant.components.device_tracker.const import DOMAIN as TRACKER_DOMAIN
+from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
+from homeassistant.components.device_tracker import DOMAIN as TRACKER_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -72,7 +73,7 @@ from .const import (
     CONNECTION_TYPE_6G,
     CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
-    DEFAULT_HTTP,
+    COORDINATOR,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_GUEST,
@@ -88,11 +89,13 @@ from .const import (
     DEVICES,
     DOMAIN,
     FIRMWARE,
+    HTTP,
+    HTTPS,
     IP,
-    KEY_COORDINATOR,
     LEVEL,
     LIST,
     MAC,
+    METHOD,
     MODEL,
     NAME,
     NO_SSL,
@@ -101,6 +104,7 @@ from .const import (
     PARENT,
     PRODUCT_ID,
     ROUTER,
+    SENSORS,
     SENSORS_AIMESH,
     SENSORS_CONNECTED_DEVICES,
     SSL,
@@ -110,12 +114,11 @@ from .const import (
 from .helpers import to_unique_id
 
 _T = TypeVar("_T")
-
 _LOGGER = logging.getLogger(__name__)
 
 
 class ARSensorHandler:
-    """Data handler for AsusRouter sensors."""
+    """Handler for AsusRouter sensors."""
 
     def __init__(
         self,
@@ -123,21 +126,25 @@ class ARSensorHandler:
         bridge: ARBridge,
         options: dict[str, Any],
     ) -> None:
-        """Initialise data handler."""
+        """Initialise sensor handler."""
 
-        self._hass = hass
-        self._bridge = bridge
+        self.hass = hass
+        self.bridge = bridge
+
+        # Selected options
+        self._options = options
+        self._mode = options.get(CONF_MODE, CONF_DEFAULT_MODE)
+        self._split_intervals = options.get(
+            CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS
+        )
+
+        # Sensors
         self._connected_devices: int = 0
         self._connected_devices_list: list[dict[str, Any]] = []
         self._latest_connected: datetime | None = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_devices: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
-        self._mode = options.get(CONF_MODE, CONF_DEFAULT_MODE)
-        self._options = options
-        self._split_intervals = options.get(
-            CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS
-        )
 
     async def _get_connected_devices(self) -> dict[str, Any]:
         """Return connected devices sensors."""
@@ -152,7 +159,7 @@ class ARSensorHandler:
     async def _get_aimesh_devices(self) -> dict[str, Any]:
         """Return aimesh devices sensors."""
 
-        # Only in router mode
+        # Only in router or AP mode
         if self._mode in (ACCESS_POINT, ROUTER):
             return {
                 NUMBER: self._aimesh_devices,
@@ -162,22 +169,22 @@ class ARSensorHandler:
 
     def update_device_count(
         self,
-        conn_devices: int,
-        list_devices: list[str],
+        connected_devices: int,
+        connected_devices_list: list[Any],
         latest_connected: datetime | None,
         latest_connected_list: list[Any],
     ) -> bool:
         """Update connected devices attribute."""
 
         if (
-            self._connected_devices == conn_devices
-            and self._connected_devices_list == list_devices
+            self._connected_devices == connected_devices
+            and self._connected_devices_list == connected_devices_list
             and self._latest_connected == latest_connected
             and self._latest_connected_list == latest_connected_list
         ):
             return False
-        self._connected_devices = conn_devices
-        self._connected_devices_list = list_devices
+        self._connected_devices = connected_devices
+        self._connected_devices_list = connected_devices_list
         self._latest_connected = latest_connected
         self._latest_connected_list = latest_connected_list
         return True
@@ -203,8 +210,10 @@ class ARSensorHandler:
     ) -> DataUpdateCoordinator:
         """Find coordinator for the sensor type."""
 
+        # Should sensor be polled?
         should_poll = True
 
+        # Sensor-specific rules
         if sensor_type == DEVICES:
             should_poll = False
             method = self._get_connected_devices
@@ -216,15 +225,19 @@ class ARSensorHandler:
         else:
             raise RuntimeError(f"Unknown sensor type: {sensor_type}")
 
+        # Update interval
+        update_interval: timedelta
+        # Static intervals
         if sensor_type == FIRMWARE:
-            interval = timedelta(
+            update_interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
                     CONF_DEFAULT_INTERVALS[CONF_INTERVAL + sensor_type],
                 )
             )
+        # Configurable intervals
         else:
-            interval = timedelta(
+            update_interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
                     self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL),
@@ -233,16 +246,22 @@ class ARSensorHandler:
                 else self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
             )
 
+        # Coordinator
         coordinator = DataUpdateCoordinator(
-            self._hass,
+            self.hass,
             _LOGGER,
             name=sensor_type,
             update_method=method,
-            update_interval=interval if should_poll else None,
+            update_interval=update_interval if should_poll else None,
         )
+
         _LOGGER.debug(
-            f"Coordinator initialized for `{sensor_type}`. Update interval: `{interval}`"
+            "Coordinator initialized for `%s`. Update interval: `%s`",
+            sensor_type,
+            update_interval,
         )
+
+        # Update coordinator
         await coordinator.async_refresh()
 
         return coordinator
@@ -436,9 +455,7 @@ class ARConnectedDevice:
                 ] = self._extra_state_attributes[DEVICE_ATTRIBUTE_CONNECTION_TYPE]
                 # Guest network
                 guest_id = dev_info.guest or 0
-                self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST] = (
-                    True if guest_id else False
-                )
+                self._extra_state_attributes[DEVICE_ATTRIBUTE_GUEST] = guest_id != 0
                 self.identity[DEVICE_ATTRIBUTE_GUEST] = self._extra_state_attributes[
                     DEVICE_ATTRIBUTE_GUEST
                 ]
@@ -504,8 +521,8 @@ class ARConnectedDevice:
                 # Reset IP
                 self._ip = None
                 # Reset attributes
-                for el in DEVICE_ATTRIBUTES:
-                    self._extra_state_attributes[el] = None
+                for attribute in DEVICE_ATTRIBUTES:
+                    self._extra_state_attributes[attribute] = None
         elif self._connected:
             # Reset state if needed
             self._connected = (
@@ -519,9 +536,9 @@ class ARConnectedDevice:
                 )
             # Reset IP
             self._ip = None
-            ## Reset attributes
-            for el in DEVICE_ATTRIBUTES:
-                self._extra_state_attributes[el] = None
+            # Reset attributes
+            for attribute in DEVICE_ATTRIBUTES:
+                self._extra_state_attributes[attribute] = None
 
     @property
     def is_connected(self):
@@ -560,21 +577,19 @@ class ARDevice:
     def __init__(
         self,
         hass: HomeAssistant,
-        entry: ConfigEntry,
+        config_entry: ConfigEntry,
     ) -> None:
         """Initialize the object."""
 
         self.hass = hass
-        self._entry = entry
-
-        self._bridge: ARBridge | None = None
-        self._options = entry.options.copy()
-        self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
+        self._config_entry = config_entry
+        self._options = config_entry.options.copy()
 
         # Device configs
-        self._conf_host: str = entry.data[CONF_HOST]
+        self._conf_host: str = config_entry.data[CONF_HOST]
         self._conf_name: str = self._options[CONF_NAME]
         self._conf_port: int = self._options[CONF_PORT]
+
         if self._conf_port == CONF_DEFAULT_PORT:
             self._conf_port = (
                 CONF_DEFAULT_PORTS[SSL]
@@ -582,80 +597,64 @@ class ARDevice:
                 else CONF_DEFAULT_PORTS[NO_SSL]
             )
 
-        # Device information
-        self._identity: AsusDevice | None = None
+        self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
+
+        # Bridge & device information
+        self.bridge: ARBridge = ARBridge(
+            hass, dict(self._config_entry.data), self._options
+        )
+        self._identity: AsusDevice = AsusDevice()
+        self._mac: str = ""
+
+        # Device sensors
+        self._sensor_handler: ARSensorHandler | None = None
+        self._sensor_coordinator: dict[str, Any] = {}
 
         self._aimesh: dict[str, Any] = {}
         self._devices: dict[str, Any] = {}
         self._aimesh_devices: int = 0
-        self._aimesh_list: list[dict[str, Any]] = []
+        self._aimesh_devices_list: list[dict[str, Any]] = []
         self._connected_devices: int = 0
         self._connected_devices_list: list[dict[str, Any]] = []
         self._latest_connected: datetime | None = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
 
-        self._sensor_handler: ARSensorHandler | None = None
-        self._sensor_coordinator: dict[str, Any] = {}
-
+        # On-clode parameters
         self._on_close: list[Callable] = []
 
     async def setup(self) -> None:
-        """Setup an AsusRouter object."""
+        """Set up an AsusRouter."""
 
         _LOGGER.debug("Setting up router")
 
-        self.bridge = ARBridge(self.hass, dict(self._entry.data), self._options)
-
+        # Connect & check connection
         try:
             await self.bridge.async_connect()
         except (OSError, AsusRouterConnectionError) as ex:
             raise ConfigEntryNotReady from ex
-
         if not self.bridge.connected:
             raise ConfigEntryNotReady
 
         _LOGGER.debug("Bridge connected")
 
-        # Services
-        async def async_service_adjust_wlan(service: ServiceCall):
-            """Handle WLAN adjust."""
-
-            await self.bridge.async_adjust_wlan(raw=service.data)
-
-        async def async_service_device_internet_access(service: ServiceCall):
-            """Adjust device internet access."""
-
-            await self.bridge.async_parental_control(raw=service.data)
-
-        async def async_service_remove_trackers(service: ServiceCall):
-            """Remove device trackers."""
-
-            await self.remove_trackers(raw=service.data)
-
-        if self._options.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL):
-            self.hass.services.async_register(
-                DOMAIN, "adjust_wlan", async_service_adjust_wlan
-            )
-
-            self.hass.services.async_register(
-                DOMAIN, "device_internet_access", async_service_device_internet_access
-            )
-
-        self.hass.services.async_register(
-            DOMAIN, "remove_trackers", async_service_remove_trackers
-        )
-
+        # Write the identity
         self._identity = self.bridge.identity
+        self._mac = format_mac(self._identity.mac)
 
+        # Use device model as the default device name if name not set
         if self._identity.model is not None:
             if self._conf_name is None or self._conf_name == "":
                 self._conf_name = self._identity.model
 
+        # Initialize services
+        await self._init_services()
+
+        # MIGRATION FROM OLD ASUSROTUER VERSIONS -->
         # Tracked entities
         entity_reg = er.async_get(self.hass)
         tracked_entries = er.async_entries_for_config_entry(
-            entity_reg, self._entry.entry_id
+            entity_reg, self._config_entry.entry_id
         )
         for entry in tracked_entries:
             uid: str = entry.unique_id
@@ -665,7 +664,7 @@ class ARDevice:
                 if len(uid) == 17:
                     device_mac = uid
                     new_uid = f"{self.mac}_{device_mac}"
-                    _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+                    _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
 
                     # If this uid was already used - remove as duplicate
                     conflict_entity_id = entity_reg.async_get_entity_id(
@@ -689,7 +688,7 @@ class ARDevice:
                 if self._conf_name in uid:
                     new_uid = uid.replace(self._conf_name, self.mac)
                     new_uid = to_unique_id(new_uid)
-                    _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+                    _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
 
                     # If this uid was already used - remove as duplicate
                     conflict_entity_id = entity_reg.async_get_entity_id(
@@ -706,14 +705,14 @@ class ARDevice:
                     uid = new_uid
 
                 # Rename network interfaces
-                for interface in CONF_LABELS_INTERFACES:
+                for interface, label in CONF_LABELS_INTERFACES.items():
                     lookup = to_unique_id(interface)
-                    if lookup == to_unique_id(CONF_LABELS_INTERFACES[interface]):
+                    if lookup == to_unique_id(label):
                         continue
                     if lookup in uid:
-                        new_uid = uid.replace(lookup, CONF_LABELS_INTERFACES[interface])
+                        new_uid = uid.replace(lookup, label)
                         new_uid = to_unique_id(new_uid)
-                        _LOGGER.debug(f"Migrating entity `{entry.entity_id}`")
+                        _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
 
                         # If this uid was already used - remove as duplicate
                         conflict_entity_id = entity_reg.async_get_entity_id(
@@ -727,7 +726,9 @@ class ARDevice:
                             entity_reg.async_update_entity(
                                 entry.entity_id, new_unique_id=new_uid
                             )
+        # <-- MIGRATION FROM OLD ASUSROTUER VERSIONS
 
+        # Mode-specific
         if self._mode in (ACCESS_POINT, ROUTER):
             # Update AiMesh
             await self.update_nodes()
@@ -739,9 +740,10 @@ class ARDevice:
                 "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
             )
 
-        # Initialise sensors
-        await self.init_sensors_coordinator()
+        # Initialize sensor coordinators
+        await self._init_sensor_coordinators()
 
+        # On-close parameters
         self.async_on_close(
             async_track_time_interval(
                 self.hass,
@@ -773,20 +775,22 @@ class ARDevice:
             _LOGGER.debug("Device tracking is enabled")
 
         new_device = False
-        _LOGGER.debug(f"Updating AsusRouter device list for '{self._conf_host}'")
+        _LOGGER.debug("Updating AsusRouter device list for '%s'", self._conf_host)
         try:
             api_devices = await self.bridge.async_get_connected_devices()
         except UpdateFailed as ex:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    f"Error connecting to '{self._conf_host}' for device update: {ex}"
+                    "Error connecting to '%s' for device update: %s",
+                    self._conf_host,
+                    ex,
                 )
             return
 
         if self._connect_error:
             self._connect_error = False
-            _LOGGER.info(f"Reconnected to '{self._conf_host}'")
+            _LOGGER.info("Reconnected to '%s'", self._conf_host)
 
         consider_home = self._options.get(
             CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
@@ -837,14 +841,16 @@ class ARDevice:
     async def update_nodes(self) -> None:
         """Update AsusRouter AiMesh nodes."""
 
-        _LOGGER.debug(f"Updating AiMesh status for '{self._conf_host}'")
+        _LOGGER.debug("Updating AiMesh status for '%s'", self._conf_host)
         try:
             aimesh = await self.bridge.async_get_aimesh_nodes()
         except UpdateFailed as ex:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    f"Error connecting to '{self._conf_host}' for device update: {ex}"
+                    "Error connecting to '%s' for device update: %s",
+                    self._conf_host,
+                    ex,
                 )
             return
 
@@ -880,62 +886,118 @@ class ARDevice:
 
         # AiMesh sensors
         self._aimesh_devices = 0
-        self._aimesh_list = []
+        self._aimesh_devices_list = []
         for mac, node in self._aimesh.items():
             if node.identity[CONNECTED]:
                 self._aimesh_devices += 1
-            self._aimesh_list.append(node.identity)
+            self._aimesh_devices_list.append(node.identity)
 
         async_dispatcher_send(self.hass, self.signal_aimesh_update)
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
-    async def init_sensors_coordinator(self) -> None:
-        """Initialize AsusRouter sensors coordinators."""
+    async def _init_services(self) -> None:
+        """Initialize AsusRouter services."""
 
+        # Adjust WLAN service
+        async def async_service_adjust_wlan(service: ServiceCall):
+            """Handle WLAN adjust."""
+
+            await self.bridge.async_adjust_wlan(raw=service.data)
+
+        # Parental control service
+        async def async_service_device_internet_access(service: ServiceCall):
+            """Adjust device internet access."""
+
+            await self.bridge.async_parental_control(raw=service.data)
+
+        # Remove device trackers service
+        async def async_service_remove_trackers(service: ServiceCall):
+            """Remove device trackers."""
+
+            await self.remove_trackers(raw=service.data)
+
+        # Services only available in control mode
+        if self._options.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL):
+            self.hass.services.async_register(
+                DOMAIN, "adjust_wlan", async_service_adjust_wlan
+            )
+
+            self.hass.services.async_register(
+                DOMAIN, "device_internet_access", async_service_device_internet_access
+            )
+
+        # Services always available
+        self.hass.services.async_register(
+            DOMAIN, "remove_trackers", async_service_remove_trackers
+        )
+
+    async def _init_sensor_coordinators(self) -> None:
+        """Initialize sensor coordinators."""
+
+        # If already initialized
         if self._sensor_handler:
             return
 
+        # Initialize sensor handler
         self._sensor_handler = ARSensorHandler(self.hass, self.bridge, self._options)
+
+        # Update devices
         self._sensor_handler.update_device_count(
             self._connected_devices,
             self._connected_devices_list,
             self._latest_connected,
             self._latest_connected_list,
         )
+        self._sensor_handler.update_aimesh(
+            self._aimesh_devices,
+            self._aimesh_devices_list,
+        )
 
+        # Get available sensors
         available_sensors = await self.bridge.async_get_available_sensors()
-        if self._mode in (ACCESS_POINT, ROUTER):
-            available_sensors[DEVICES] = {"sensors": SENSORS_CONNECTED_DEVICES}
-            available_sensors[AIMESH] = {"sensors": SENSORS_AIMESH}
 
-        for sensor_type, sensor_def in available_sensors.items():
-            if not (sensor_names := sensor_def.get("sensors")):
+        # Add devices sensors
+        if self._mode in (ACCESS_POINT, ROUTER):
+            available_sensors[DEVICES] = {SENSORS: SENSORS_CONNECTED_DEVICES}
+            available_sensors[AIMESH] = {SENSORS: SENSORS_AIMESH}
+
+        # Process available sensors
+        for sensor_type, sensor_definition in available_sensors.items():
+            sensor_names = sensor_definition.get(SENSORS)
+            if not sensor_names:
                 continue
+
+            # Find and initialize coordinator
             coordinator = await self._sensor_handler.get_coordinator(
-                sensor_type, update_method=sensor_def.get("method")
+                sensor_type, sensor_definition.get(METHOD)
             )
+
+            # Save the coordinator
             self._sensor_coordinator[sensor_type] = {
-                KEY_COORDINATOR: coordinator,
+                COORDINATOR: coordinator,
                 sensor_type: sensor_names,
             }
 
     async def _update_unpolled_sensors(self) -> None:
         """Request refresh for AsusRouter unpolled sensors."""
 
+        # If sensor handler is not initialized
         if not self._sensor_handler:
             return
 
+        # AiMesh
         if AIMESH in self._sensor_coordinator:
-            coordinator = self._sensor_coordinator[AIMESH][KEY_COORDINATOR]
+            coordinator = self._sensor_coordinator[AIMESH][COORDINATOR]
             if self._sensor_handler.update_aimesh(
                 self._aimesh_devices,
-                self._aimesh_list,
+                self._aimesh_devices_list,
             ):
                 await coordinator.async_refresh()
 
+        # Devices
         if DEVICES in self._sensor_coordinator:
-            coordinator = self._sensor_coordinator[DEVICES][KEY_COORDINATOR]
+            coordinator = self._sensor_coordinator[DEVICES][COORDINATOR]
             if self._sensor_handler.update_device_count(
                 self._connected_devices,
                 self._connected_devices_list,
@@ -947,12 +1009,14 @@ class ARDevice:
     async def close(self) -> None:
         """Close the connection."""
 
-        if self.bridge is not None:
+        # Disconnect the bridge
+        if self.bridge.active:
             await self.bridge.async_disconnect()
-        self.bridge = None
 
+        # Run on-close methods
         for func in self._on_close:
             func()
+
         self._on_close.clear()
 
     @callback
@@ -970,16 +1034,16 @@ class ARDevice:
     ) -> bool:
         """Update router options."""
 
-        req_reload = False
-        for name, new_opt in new_options.items():
+        require_reload = False
+        for name, new_option in new_options.items():
             if name in CONF_REQ_RELOAD:
                 old_opt = self._options.get(name)
-                if not old_opt or old_opt != new_opt:
-                    req_reload = True
+                if not old_opt or old_opt != new_option:
+                    require_reload = True
                     break
 
         self._options.update(new_options)
-        return req_reload
+        return require_reload
 
     def connected_device_time(self, element: dict[str, Any]) -> datetime:
         """Get connected time for the device."""
@@ -1036,29 +1100,33 @@ class ARDevice:
 
         _LOGGER.debug("Removing trackers")
 
+        # Check that data is provided
         raw = kwargs.get("raw", None)
         if raw is None:
             return False
 
+        # Get entities to remove
         if "entities" in raw:
             entities = raw["entities"]
             entity_reg = er.async_get(self.hass)
             for entity in entities:
                 reg_value = entity_reg.async_get(entity)
                 mac = reg_value.capabilities[MAC]
-                _LOGGER.debug(f"Trying to remove tracker with mac: {mac}")
+                _LOGGER.debug("Trying to remove tracker with mac: %s", mac)
                 if mac in self._devices:
                     self._devices.pop(mac)
                     _LOGGER.debug("Found and removed")
 
+        # Update devices
         await self.update_devices()
 
+        # Reload device tracker platform
         unload = await self.hass.config_entries.async_unload_platforms(
-            self._entry, [Platform.DEVICE_TRACKER]
+            self._config_entry, [Platform.DEVICE_TRACKER]
         )
         if unload:
             self.hass.config_entries.async_setup_platforms(
-                self._entry, [Platform.DEVICE_TRACKER]
+                self._config_entry, [Platform.DEVICE_TRACKER]
             )
 
     @property
@@ -1074,34 +1142,31 @@ class ARDevice:
             model=self._identity.model,
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
-            configuration_url="{}://{}:{}".format(
-                DEFAULT_HTTP[SSL] if self._options[CONF_SSL] else DEFAULT_HTTP[NO_SSL],
-                self._conf_host,
-                self._conf_port,
-            ),
+            configuration_url=f"{HTTPS if self._options[CONF_SSL] else HTTP}://\
+                {self._conf_host}:{self._conf_port}",
         )
 
     @property
     def signal_aimesh_new(self) -> str:
-        """New AiMesh nodes."""
+        """Notify new AiMesh nodes."""
 
         return f"{DOMAIN}-aimesh-new"
 
     @property
     def signal_aimesh_update(self) -> str:
-        """Updated AiMesh nodes."""
+        """Notify updated AiMesh nodes."""
 
         return f"{DOMAIN}-aimesh-update"
 
     @property
     def signal_device_new(self) -> str:
-        """New device."""
+        """Notify new device."""
 
         return f"{DOMAIN}-device-new"
 
     @property
     def signal_device_update(self) -> str:
-        """Updated device."""
+        """Notify updated device."""
 
         return f"{DOMAIN}-device-update"
 
@@ -1118,25 +1183,13 @@ class ARDevice:
         return self._devices
 
     @property
-    def host(self) -> str:
-        """Router hostname."""
-
-        return self._host
-
-    @property
     def mac(self) -> str:
         """Router MAC address."""
 
-        return format_mac(self._identity.mac)
+        return self._mac
 
     @property
-    def bridge(self) -> ARBridge:
-        """Router bridge."""
+    def sensor_coordinator(self) -> dict[str, Any]:
+        """Return sensor coordinator."""
 
-        return self._bridge
-
-    @bridge.setter
-    def bridge(self, value: ARBridge | None) -> None:
-        """Set router bridge."""
-
-        self._bridge = value
+        return self._sensor_coordinator
