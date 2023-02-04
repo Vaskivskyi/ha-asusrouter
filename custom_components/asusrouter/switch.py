@@ -12,9 +12,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
+    CONF_DEFAULT_HIDE_PASSWORDS,
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
-    DEFAULT_HIDE_PASSWORDS,
     PASSWORD,
     STATIC_SWITCHES as SWITCHES,
     STATIC_SWITCHES_OPTIONAL,
@@ -33,8 +33,8 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter switches."""
 
-    hide = list()
-    if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
+    hide = []
+    if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
     if entry.options[CONF_ENABLE_CONTROL]:

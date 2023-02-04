@@ -7,7 +7,7 @@ import socket
 from typing import Any
 import voluptuous as vol
 
-from homeassistant import config_entries
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
@@ -30,11 +30,27 @@ from asusrouter import (
 from . import helpers
 from .bridge import ARBridge
 from .const import (
-    ACCESS_POINT,
+    BASE,
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
+    CONF_DEFAULT_CACHE_TIME,
+    CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_ENABLE_CONTROL,
+    CONF_DEFAULT_EVENT,
+    CONF_DEFAULT_HIDE_PASSWORDS,
+    CONF_DEFAULT_INTERFACES,
+    CONF_DEFAULT_INTERVALS,
+    CONF_DEFAULT_LATEST_CONNECTED,
+    CONF_DEFAULT_MODE,
+    CONF_DEFAULT_PORT,
+    CONF_DEFAULT_SCAN_INTERVAL,
+    CONF_DEFAULT_SPLIT_INTERVALS,
+    CONF_DEFAULT_SSL,
+    CONF_DEFAULT_TRACK_DEVICES,
+    CONF_DEFAULT_UNITS_SPEED,
+    CONF_DEFAULT_UNITS_TRAFFIC,
+    CONF_DEFAULT_USERNAME,
     CONF_ENABLE_CONTROL,
-    CONF_ENABLE_MONITOR,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL,
@@ -51,26 +67,14 @@ from .const import (
     CONF_VALUES_DATA,
     CONF_VALUES_DATARATE,
     CONF_VALUES_MODE,
-    DEFAULT_CACHE_TIME,
-    DEFAULT_CONSIDER_HOME,
-    DEFAULT_ENABLE_CONTROL,
-    DEFAULT_ENABLE_MONITOR,
-    DEFAULT_EVENT,
-    DEFAULT_HIDE_PASSWORDS,
-    DEFAULT_INTERVALS,
-    DEFAULT_LATEST_CONNECTED,
-    DEFAULT_MODE,
-    DEFAULT_PORT,
-    DEFAULT_SCAN_INTERVAL,
-    DEFAULT_SPLIT_INTERVALS,
-    DEFAULT_SSL,
-    DEFAULT_TRACK_DEVICES,
-    DEFAULT_UNITS_SPEED,
-    DEFAULT_UNITS_TRAFFIC,
-    DEFAULT_USERNAME,
-    DELAULT_INTERFACES,
+    CONFIGS,
     DOMAIN,
+    ERRORS,
     FIRMWARE,
+    INTERFACES,
+    METHOD,
+    NEXT,
+    RESULT_CANNOT_RESOLVE,
     RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
@@ -78,6 +82,17 @@ from .const import (
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
+    STEP_CREDENTIALS,
+    STEP_EVENTS,
+    STEP_FIND,
+    STEP_FINISH,
+    STEP_INTERFACES,
+    STEP_INTERVALS,
+    STEP_NAME,
+    STEP_OPERATION,
+    STEP_OPTIONS,
+    STEP_SECURITY,
+    UNIQUE_ID,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,15 +110,14 @@ def _check_host(
 
 
 def _check_errors(
-    errors: dict[str, Any],
+    errors: dict[str, Any] | None = None,
 ) -> bool:
     """Check for errors."""
 
-    if (
-        "base" in errors
-        and errors["base"] != RESULT_SUCCESS
-        and errors["base"] != str()
-    ):
+    if errors is None:
+        return False
+
+    if BASE in errors and errors[BASE] != RESULT_SUCCESS and errors[BASE] != "":
         return True
 
     return False
@@ -112,102 +126,146 @@ def _check_errors(
 async def _async_get_network_interfaces(
     hass: HomeAssistant,
     configs: dict[str, Any],
-    options: dict[str, Any] = dict(),
+    options: dict[str, Any],
 ) -> list[str]:
     """Return list of possible to monitor network interfaces."""
 
     bridge = ARBridge(hass, configs, options)
 
     try:
-        if not bridge.is_connected:
+        if not bridge.connected:
             await bridge.async_connect()
         labels = helpers.list_from_dict(await bridge.api.async_get_network())
         await bridge.async_disconnect()
-        _LOGGER.debug(labels)
+        _LOGGER.debug("Found network interfaces: %s", labels)
         return labels
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         _LOGGER.warning(
-            f"Cannot get available network interfaces for {configs[CONF_HOST]}: {ex}"
+            "Cannot get available network interfaces for %s: %s", configs[CONF_HOST], ex
         )
-        return DELAULT_INTERFACES
+        return CONF_DEFAULT_INTERFACES
 
 
 async def _async_check_connection(
     hass: HomeAssistant,
     configs: dict[str, Any],
-    options: dict[str, Any] = dict(),
+    options: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Check connection to the device with provided configurations."""
 
     configs_to_use = configs.copy()
-    configs_to_use.update(options)
-    if not CONF_HOST in configs_to_use:
+    if options:
+        configs_to_use.update(options)
+    if CONF_HOST not in configs_to_use:
         return {
-            "errors": RESULT_ERROR,
+            ERRORS: RESULT_ERROR,
         }
     host = configs_to_use[CONF_HOST]
 
-    result = dict()
+    result = {}
+    _LOGGER.debug("Setup initiated")
 
-    _LOGGER.debug(f"Setup initiated")
-
+    # Initialize bridge
     bridge = ARBridge(hass, configs_to_use)
 
+    # Connect
     try:
         await bridge.async_connect()
     # Credentials error
     except AsusRouterLoginError:
-        _LOGGER.error(f"Error during connection to '{host}'. Wrong credentials")
+        _LOGGER.error("Error during connection to '%s'. Wrong credentials", host)
         return {
-            "errors": RESULT_WRONG_CREDENTIALS,
+            ERRORS: RESULT_WRONG_CREDENTIALS,
         }
     # Login blocked by the device
     except AsusRouterLoginBlockError as ex:
         _LOGGER.error(
-            f"Device '{host}' has reported block for the login (to many wrong attempts were made). Please try again in {ex.timeout} seconds"
+            "Device '%s' has reported block for the login (to many wrong attempts were made). \
+                Please try again in %s seconds",
+            host,
+            ex.timeout,
         )
         return {
-            "errors": RESULT_LOGIN_BLOCKED,
+            ERRORS: RESULT_LOGIN_BLOCKED,
         }
     # Connection refused
     except AsusRouterConnectionError as ex:
         _LOGGER.error(
-            f"Connection refused by {host}. Check SSL and port settings. Original exception: {ex}"
+            "Connection refused by `%s`. Check SSL and port settings. Original exception: %s",
+            host,
+            ex,
         )
         return {
-            "errors": RESULT_CONNECTION_REFUSED,
+            ERRORS: RESULT_CONNECTION_REFUSED,
         }
     # Anything else
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         _LOGGER.error(
-            f"Unknown error of type '{type(ex)}' during connection to {host}: {ex}"
+            "Unknown error of type '%s' during connection to `%s`: %s",
+            type(ex),
+            host,
+            ex,
         )
         return {
-            "errors": RESULT_UNKNOWN,
+            ERRORS: RESULT_UNKNOWN,
         }
     # Cleanup, so no unclosed sessions will be reported
     finally:
         await bridge.async_clean()
 
-    result["unique_id"] = bridge.identity.serial
+    # Serial number of the device is the best unique_id
+    # API provides it all the time for all the devices.
+    # MAC as an alternative might not be used / found on some
+    # older devices and some Merlin-builds of FW
+    result[UNIQUE_ID] = bridge.identity.serial
     await bridge.async_disconnect()
     for item in configs:
         configs_to_use.pop(item)
 
-    result["configs"] = configs_to_use
+    result[CONFIGS] = configs_to_use
 
-    _LOGGER.debug(f"Setup successful")
+    _LOGGER.debug("Setup successful")
 
     return result
 
 
-### FORMS ->
+async def _async_process_step(
+    steps: dict[str, dict[str, Any]],
+    step: str | None = None,
+    errors: dict[str, Any] | None = None,
+    redirect: bool = False,
+) -> FlowResult:
+    """Universal step selector.
+
+    When the name of the last step is provided, the next step is initialized.
+    On errors the same step will repeat.
+    """
+
+    if step and step in steps:
+        # Method description
+        description = steps[step]
+        # On errors or redirect, run the step method
+        if _check_errors(errors) or redirect:
+            if METHOD in description:
+                return await description[METHOD]()
+            raise ValueError(f"Step `{step}` is not properly defined")
+        # If the next step is defined, move to it
+        if NEXT in description and description[NEXT]:
+            return await _async_process_step(steps, description[NEXT], redirect=True)
+        raise ValueError(f"Step `{step}` is not properly defined")
+    raise ValueError(f"Step `{step}` cannot be found")
 
 
-def _create_form_discovery(
-    user_input: dict[str, Any] = dict(),
+# FORMS ->
+
+
+def _create_form_find(
+    user_input: dict[str, Any] | None = None,
 ) -> vol.Schema:
-    """Create a form for the 'discovery' step."""
+    """Create a form for the 'find' step."""
+
+    if not user_input:
+        user_input = {}
 
     schema = {
         vol.Required(CONF_HOST, default=user_input.get(CONF_HOST, "")): cv.string,
@@ -217,23 +275,26 @@ def _create_form_discovery(
 
 
 def _create_form_credentials(
-    user_input: dict[str, Any] = dict(),
-    mode: str = ROUTER,
+    user_input: dict[str, Any] | None = None,
+    mode: str = CONF_DEFAULT_MODE,
 ) -> vol.Schema:
     """Create a form for the 'credentials' step."""
 
+    if not user_input:
+        user_input = {}
+
     schema = {
         vol.Required(
-            CONF_USERNAME, default=user_input.get(CONF_USERNAME, DEFAULT_USERNAME)
+            CONF_USERNAME, default=user_input.get(CONF_USERNAME, CONF_DEFAULT_USERNAME)
         ): cv.string,
         vol.Required(
             CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
         ): cv.string,
         vol.Optional(
-            CONF_PORT, default=user_input.get(CONF_PORT, DEFAULT_PORT)
+            CONF_PORT, default=user_input.get(CONF_PORT, CONF_DEFAULT_PORT)
         ): cv.positive_int,
         vol.Optional(
-            CONF_SSL, default=user_input.get(CONF_SSL, DEFAULT_SSL)
+            CONF_SSL, default=user_input.get(CONF_SSL, CONF_DEFAULT_SSL)
         ): cv.boolean,
         vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
             {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
@@ -243,20 +304,23 @@ def _create_form_credentials(
     return vol.Schema(schema)
 
 
-def _create_form_operation_mode(
-    user_input: dict[str, Any] = dict(),
-    mode: str = ROUTER,
+def _create_form_operation(
+    user_input: dict[str, Any] | None = None,
+    mode: str = CONF_DEFAULT_MODE,
 ) -> vol.Schema:
-    """Create a form for the 'operation_mode' step."""
+    """Create a form for the 'operation' step."""
+
+    if not user_input:
+        user_input = {}
 
     schema = {
         vol.Required(
             CONF_ENABLE_CONTROL,
-            default=user_input.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL),
+            default=user_input.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL),
         ): cv.boolean,
         vol.Required(
             CONF_SPLIT_INTERVALS,
-            default=user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS),
+            default=user_input.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS),
         ): cv.boolean,
     }
 
@@ -266,12 +330,14 @@ def _create_form_operation_mode(
             {
                 vol.Required(
                     CONF_TRACK_DEVICES,
-                    default=user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES),
+                    default=user_input.get(
+                        CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES
+                    ),
                 ): cv.boolean,
                 vol.Required(
                     CONF_LATEST_CONNECTED,
                     default=user_input.get(
-                        CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED
+                        CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
                     ),
                 ): cv.positive_int,
             }
@@ -281,15 +347,18 @@ def _create_form_operation_mode(
 
 
 def _create_form_intervals(
-    user_input: dict[str, Any] = dict(),
+    user_input: dict[str, Any] | None = None,
     mode: str = ROUTER,
 ) -> vol.Schema:
     """Create a form for the 'intervals' step."""
 
+    if not user_input:
+        user_input = {}
+
     schema = {
         vol.Required(
             CONF_CACHE_TIME,
-            default=user_input.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
+            default=user_input.get(CONF_CACHE_TIME, CONF_DEFAULT_CACHE_TIME),
         ): cv.positive_int,
     }
 
@@ -300,27 +369,27 @@ def _create_form_intervals(
                 vol.Required(
                     CONF_INTERVAL_DEVICES,
                     default=user_input.get(
-                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                        CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL
                     ),
                 ): cv.positive_int,
             }
         )
-        if user_input.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES):
+        if user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES):
             schema.update(
                 {
                     vol.Required(
                         CONF_CONSIDER_HOME,
                         default=user_input.get(
-                            CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME
+                            CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
                         ),
                     ): cv.positive_int,
                 }
             )
 
-    split = user_input.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
-    conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    split = user_input.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS)
+    conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
 
-    if split == False:
+    if split is False:
         schema.update(
             {
                 vol.Optional(
@@ -331,18 +400,18 @@ def _create_form_intervals(
                     CONF_INTERVAL + FIRMWARE,
                     default=user_input.get(
                         CONF_INTERVAL + FIRMWARE,
-                        DEFAULT_INTERVALS[CONF_INTERVAL + FIRMWARE],
+                        CONF_DEFAULT_INTERVALS[CONF_INTERVAL + FIRMWARE],
                     ),
                 ): cv.positive_int,
             }
         )
-    elif split == True:
+    elif split is True:
         schema.update(
             {
                 vol.Required(
                     conf,
                     default=user_input.get(
-                        conf, DEFAULT_INTERVALS.get(conf, conf_scan_interval)
+                        conf, CONF_DEFAULT_INTERVALS.get(conf, conf_scan_interval)
                     ),
                 ): cv.positive_int
                 for conf in CONF_INTERVALS
@@ -353,25 +422,34 @@ def _create_form_intervals(
 
 
 def _create_form_interfaces(
-    user_input: dict[str, Any] = dict(),
-    default: list[str] = list(),
+    user_input: dict[str, Any] | None = None,
+    default: list[str] | None = None,
 ) -> vol.Schema:
     """Create a form for the 'interfaces' step."""
 
+    if not user_input:
+        user_input = {}
+
+    if not default:
+        default = []
+
     schema = {
-        vol.Optional(CONF_INTERFACES, default=default,): cv.multi_select(
+        vol.Optional(
+            CONF_INTERFACES,
+            default=default,
+        ): cv.multi_select(
             {
                 interface: CONF_LABELS_INTERFACES.get(interface, interface)
-                for interface in user_input["interfaces"]
+                for interface in user_input[INTERFACES]
             }
         ),
         vol.Required(
             CONF_UNITS_SPEED,
-            default=user_input.get(CONF_UNITS_SPEED, DEFAULT_UNITS_SPEED),
+            default=user_input.get(CONF_UNITS_SPEED, CONF_DEFAULT_UNITS_SPEED),
         ): vol.In({datarate: datarate for datarate in CONF_VALUES_DATARATE}),
         vol.Required(
             CONF_UNITS_TRAFFIC,
-            default=user_input.get(CONF_UNITS_TRAFFIC, DEFAULT_UNITS_TRAFFIC),
+            default=user_input.get(CONF_UNITS_TRAFFIC, CONF_DEFAULT_UNITS_TRAFFIC),
         ): vol.In({data: data for data in CONF_VALUES_DATA}),
     }
 
@@ -379,30 +457,36 @@ def _create_form_interfaces(
 
 
 def _create_form_events(
-    user_input: dict[str, Any] = dict(),
+    user_input: dict[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the `events` step."""
 
+    if not user_input:
+        user_input = {}
+
     schema = {
         vol.Optional(
-            conf,
-            default=user_input.get(conf, DEFAULT_EVENT[conf]),
+            event,
+            default=user_input.get(event, default_state),
         ): cv.boolean
-        for conf in DEFAULT_EVENT
+        for event, default_state in CONF_DEFAULT_EVENT.items()
     }
 
     return vol.Schema(schema)
 
 
 def _create_form_security(
-    user_input: dict[str, Any] = dict(),
+    user_input: dict[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the `security` step."""
+
+    if not user_input:
+        user_input = {}
 
     schema = {
         vol.Required(
             CONF_HIDE_PASSWORDS,
-            default=user_input.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS),
+            default=user_input.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS),
         ): cv.boolean,
     }
 
@@ -410,9 +494,12 @@ def _create_form_security(
 
 
 def _create_form_name(
-    user_input: dict[str, Any] = dict(),
+    user_input: dict[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the 'name' step."""
+
+    if not user_input:
+        user_input = {}
 
     schema = {
         vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "")): cv.string,
@@ -421,10 +508,10 @@ def _create_form_name(
     return vol.Schema(schema)
 
 
-### <- FORMS
+# <- FORMS
 
 
-class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class ARFlowHandler(ConfigFlow, domain=DOMAIN):
     """Handle config flow for AsusRouter."""
 
     VERSION = 4
@@ -432,43 +519,30 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialise config flow."""
 
-        self._configs = dict()
-        self._options = dict()
+        self._configs: dict[str, Any] = {}
+        self._options: dict[str, Any] = {}
         self._unique_id: str | None = None
-        self._simple = False
-        self._mode = DEFAULT_MODE
+        self._mode = CONF_DEFAULT_MODE
 
-        # Dictionary last_step: next_step
+        # Steps description
         self._steps = {
-            "discovery": self.async_step_credentials,
-            "credentials": self.async_step_operation_mode,
-            "credentials_error": self.async_step_credentials,
-            "operation_mode": self.async_step_intervals,
-            "intervals": self.async_step_interfaces,
-            "interfaces": self.async_step_security,
-            "security": self.async_step_name,
-            "name": self.async_step_finish,
+            STEP_FIND: {METHOD: self.async_step_find, NEXT: STEP_CREDENTIALS},
+            STEP_CREDENTIALS: {
+                METHOD: self.async_step_credentials,
+                NEXT: STEP_OPERATION,
+            },
+            STEP_OPERATION: {
+                METHOD: self.async_step_operation,
+                NEXT: STEP_INTERVALS,
+            },
+            STEP_INTERVALS: {METHOD: self.async_step_intervals, NEXT: STEP_INTERFACES},
+            STEP_INTERFACES: {METHOD: self.async_step_interfaces, NEXT: STEP_SECURITY},
+            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_NAME},
+            STEP_NAME: {METHOD: self.async_step_name, NEXT: STEP_FINISH},
+            STEP_FINISH: {METHOD: self.async_step_finish},
         }
 
-    async def async_select_step(
-        self,
-        last_step: str | None = None,
-        errors: dict[str, Any] = dict(),
-    ) -> FlowResult:
-        """Step selector."""
-
-        if last_step:
-            if last_step in self._steps:
-                if _check_errors(errors):
-                    return await self._steps[f"{last_step}_error"](errors=errors)
-                else:
-                    return await self._steps[last_step]()
-            else:
-                raise ValueError(f"Unknown value of last_step: {last_step}")
-        else:
-            raise ValueError("Step name was not provided")
-
-    ### USER SETUP -->
+    # User setup
 
     async def async_step_user(
         self,
@@ -476,18 +550,18 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Flow initiated by user."""
 
-        return await self.async_step_discovery(user_input)
+        return await self.async_step_find(user_input)
 
-    # Step #1 - discover the device
-    async def async_step_discovery(
+    # Step #1 - find the device
+    async def async_step_find(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Device discovery step."""
+        """Find the device step."""
 
-        step_id = "discovery"
+        step_id = STEP_FIND
 
-        errors = dict()
+        errors = {}
 
         if user_input:
             # Check if host can be resolved
@@ -495,44 +569,49 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _check_host, user_input[CONF_HOST]
             )
             if not ip:
-                errors["base"] = "cannot_resolve_host"
+                errors[BASE] = RESULT_CANNOT_RESOLVE
 
             if not errors:
+                # Save host to configs
                 self._configs.update(user_input)
-                return await self.async_select_step(step_id, errors)
+                # Proceed to the next step
+                return await _async_process_step(self._steps, step_id, errors)
 
         if not user_input:
-            user_input = dict()
+            user_input = {}
 
         return self.async_show_form(
             step_id=step_id,
-            data_schema=_create_form_discovery(user_input),
+            data_schema=_create_form_find(user_input),
             errors=errors,
         )
 
-    # Step #2 - credentials
+    # Step #2 - credentials, SSL and operation mode
     async def async_step_credentials(
         self,
         user_input: dict[str, Any] | None = None,
-        errors: dict[str, str] = dict(),
     ) -> FlowResult:
         """Credentials step."""
 
-        step_id = "credentials"
+        step_id = STEP_CREDENTIALS
+
+        errors = {}
 
         if user_input:
-            self._options.update(user_input)
-            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
-            result = await _async_check_connection(
-                self.hass, self._configs, self._options
-            )
-            if "errors" in result:
-                errors["base"] = result["errors"]
+            # Save the operation mode
+            self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
+            # Check credentials and connection
+            result = await _async_check_connection(self.hass, self._configs, user_input)
+            # Show errors if any
+            if ERRORS in result:
+                errors[BASE] = result[ERRORS]
             else:
-                errors = {}
-                self._options.update(result["configs"])
-                await self.async_set_unique_id(result["unique_id"])
-                return await self.async_select_step(step_id, errors)
+                # Save the checked settings to the options
+                self._options.update(result[CONFIGS])
+                # Set unique ID obtained from the device during the check
+                await self.async_set_unique_id(result[UNIQUE_ID])
+                # Proceed to the next step
+                return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -543,34 +622,35 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Step #3 - operation mode
-    async def async_step_operation_mode(
+    # Step #3 - operation settings
+    async def async_step_operation(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select operation mode."""
+        """Step to select operation settings."""
 
-        step_id = "operation_mode"
+        step_id = STEP_OPERATION
 
         if not user_input:
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_operation_mode(user_input, self._mode),
+                data_schema=_create_form_operation(user_input, self._mode),
             )
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        # Proceed to the next step
+        return await _async_process_step(self._steps, step_id)
 
-    # Step #4 - intervals
+    # Step #4 - time intervals
     async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Step to select intervals."""
 
-        step_id = "intervals"
+        step_id = STEP_INTERVALS
 
         if not user_input:
             user_input = self._options.copy()
@@ -581,31 +661,32 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        # Proceed to the next step
+        return await _async_process_step(self._steps, step_id)
 
-    # Step #5 (optional if monitoring is enabled) - network interfaces to monitor
+    # Step #5 - network interfaces to monitor
     async def async_step_interfaces(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Step to select interfaces for traffic monitoring."""
 
-        step_id = "interfaces"
+        step_id = STEP_INTERFACES
 
-        if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
-            if not user_input:
-                user_input = self._options.copy()
-                user_input["interfaces"] = await _async_get_network_interfaces(
-                    self.hass, self._configs, self._options
-                )
-                return self.async_show_form(
-                    step_id=step_id,
-                    data_schema=_create_form_interfaces(user_input),
-                )
+        if not user_input:
+            user_input = self._options.copy()
+            user_input[INTERFACES] = await _async_get_network_interfaces(
+                self.hass, self._configs, self._options
+            )
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_interfaces(user_input),
+            )
 
-            self._options.update(user_input)
+        self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        # Proceed to the next step
+        return await _async_process_step(self._steps, step_id)
 
     # Step #6 - security options
     async def async_step_security(
@@ -614,10 +695,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Security step."""
 
-        step_id = "security"
+        step_id = STEP_SECURITY
 
         if not user_input:
-            user_input = dict()
+            user_input = {}
             return self.async_show_form(
                 step_id=step_id,
                 data_schema=_create_form_security(user_input),
@@ -625,7 +706,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        # Proceed to the next step
+        return await _async_process_step(self._steps, step_id)
 
     # Step #7 - select device name
     async def async_step_name(
@@ -634,10 +716,10 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Name the device step."""
 
-        step_id = "name"
+        step_id = STEP_NAME
 
         if not user_input:
-            user_input = dict()
+            user_input = {}
             return self.async_show_form(
                 step_id=step_id,
                 data_schema=_create_form_name(user_input),
@@ -645,7 +727,8 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        # Proceed to the next step
+        return await _async_process_step(self._steps, step_id)
 
     # Step Finish
     async def async_step_finish(
@@ -662,57 +745,48 @@ class ASUSRouterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(
+        config_entry: ConfigEntry,
+    ) -> OptionsFlow:
         """Get the options flow."""
 
-        return OptionsFlowHandler(config_entry)
+        return AROptionsFlowHandler(config_entry)
 
 
-class OptionsFlowHandler(config_entries.OptionsFlow):
+class AROptionsFlowHandler(OptionsFlow):
     """Options flow for AsusRouter."""
 
     def __init__(
         self,
-        config_entry: config_entries.ConfigEntry,
+        config_entry: ConfigEntry,
     ) -> None:
         """Initialize options flow."""
 
         self.config_entry = config_entry
 
-        self._selection = dict()
+        self._selection = {}
         self._configs: dict[str, Any] = self.config_entry.data.copy()
         self._host: str = self._configs[CONF_HOST]
         self._options: dict[str, Any] = self.config_entry.options.copy()
-        self._mode = self._options.get(CONF_MODE, DEFAULT_MODE)
+        self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
 
-        # Dictionary last_step: next_step
+        # Steps description
         self._steps = {
-            "options": self.async_step_credentials,
-            "credentials": self.async_step_operation_mode,
-            "operation_mode": self.async_step_intervals,
-            "intervals": self.async_step_interfaces,
-            "interfaces": self.async_step_events,
-            "events": self.async_step_security,
-            "security": self.async_step_finish,
+            STEP_OPTIONS: {METHOD: self.async_step_options, NEXT: STEP_CREDENTIALS},
+            STEP_CREDENTIALS: {
+                METHOD: self.async_step_credentials,
+                NEXT: STEP_OPERATION,
+            },
+            STEP_OPERATION: {
+                METHOD: self.async_step_operation,
+                NEXT: STEP_INTERVALS,
+            },
+            STEP_INTERVALS: {METHOD: self.async_step_intervals, NEXT: STEP_INTERFACES},
+            STEP_INTERFACES: {METHOD: self.async_step_interfaces, NEXT: STEP_EVENTS},
+            STEP_EVENTS: {METHOD: self.async_step_events, NEXT: STEP_SECURITY},
+            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_FINISH},
+            STEP_FINISH: {METHOD: self.async_step_finish},
         }
-
-    async def async_select_step(
-        self,
-        last_step: str | None = None,
-        errors: dict[str, Any] = dict(),
-    ) -> FlowResult:
-        """Step selector."""
-
-        if last_step:
-            if last_step in self._steps:
-                if _check_errors(errors):
-                    return await self._steps[f"{last_step}_error"](errors=errors)
-                else:
-                    return await self._steps[last_step]()
-            else:
-                raise ValueError(f"Unknown value of last_step: {last_step}")
-        else:
-            raise ValueError("Step name was not provided")
 
     async def async_step_init(
         self,
@@ -728,19 +802,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step to select options to change."""
 
-        step_id = "options"
+        step_id = STEP_OPTIONS
 
         if user_input:
             self._selection.update(user_input)
-            return await self.async_select_step(step_id)
+            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._selection.copy()
 
-        schema_dict = dict()
-        for el in self._steps:
-            if el != step_id:
-                schema_dict.update({vol.Optional(el, default=False): bool})
+        schema_dict = {}
+        for step in self._steps:
+            if step != step_id and step != STEP_FINISH:
+                schema_dict.update({vol.Optional(step, default=False): bool})
 
         return self.async_show_form(
             step_id=step_id,
@@ -753,24 +827,24 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step to select credentials."""
 
-        step_id = "credentials"
+        step_id = STEP_CREDENTIALS
 
-        errors = dict()
+        errors = {}
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
         if user_input:
             self._options.update(user_input)
-            self._mode = user_input.get(CONF_MODE, DEFAULT_MODE)
+            self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options
             )
-            if "errors" in result:
-                errors["base"] = result["errors"]
+            if ERRORS in result:
+                errors[BASE] = result[ERRORS]
             else:
-                self._options.update(result["configs"])
-                return await self.async_select_step(step_id, errors)
+                self._options.update(result[CONFIGS])
+                return await _async_process_step(self._steps, step_id, errors)
 
         if not user_input:
             user_input = self._options.copy()
@@ -781,27 +855,27 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             errors=errors,
         )
 
-    async def async_step_operation_mode(
+    async def async_step_operation(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Step to select operation mode."""
 
-        step_id = "operation_mode"
+        step_id = STEP_OPERATION
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_operation_mode(user_input, self._mode),
+                data_schema=_create_form_operation(user_input, self._mode),
             )
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        return await _async_process_step(self._steps, step_id)
 
     async def async_step_intervals(
         self,
@@ -809,10 +883,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step to select intervals."""
 
-        step_id = "intervals"
+        step_id = STEP_INTERVALS
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -823,38 +897,37 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        return await _async_process_step(self._steps, step_id)
 
     async def async_step_interfaces(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step to select options to change."""
+        """Step to select network interfaces."""
 
-        step_id = "interfaces"
+        step_id = STEP_INTERFACES
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
-        if self._options.get(CONF_ENABLE_MONITOR, DEFAULT_ENABLE_MONITOR):
-            if not user_input:
-                user_input = self._options.copy()
-                selected = user_input["interfaces"].copy()
-                interfaces = await _async_get_network_interfaces(
-                    self.hass, self._configs, self._options
-                )
-                # If interface was tracked, but cannot be found now, still add it
-                for interface in interfaces:
-                    if not interface in user_input["interfaces"]:
-                        user_input["interfaces"].append(interface)
-                return self.async_show_form(
-                    step_id=step_id,
-                    data_schema=_create_form_interfaces(user_input, default=selected),
-                )
+        if not user_input:
+            user_input = self._options.copy()
+            selected = user_input[INTERFACES].copy()
+            interfaces = await _async_get_network_interfaces(
+                self.hass, self._configs, self._options
+            )
+            # If interface was tracked, but cannot be found now, still add it
+            for interface in interfaces:
+                if interface not in user_input[INTERFACES]:
+                    user_input[INTERFACES].append(interface)
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_interfaces(user_input, default=selected),
+            )
 
-            self._options.update(user_input)
+        self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        return await _async_process_step(self._steps, step_id)
 
     async def async_step_events(
         self,
@@ -862,10 +935,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Events step."""
 
-        step_id = "events"
+        step_id = STEP_EVENTS
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -876,7 +949,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        return await _async_process_step(self._steps, step_id)
 
     async def async_step_security(
         self,
@@ -884,10 +957,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Security step."""
 
-        step_id = "security"
+        step_id = STEP_SECURITY
 
-        if self._selection.get(step_id, False) == False:
-            return await self.async_select_step(step_id)
+        if self._selection.get(step_id, False) is False:
+            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -898,7 +971,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         self._options.update(user_input)
 
-        return await self.async_select_step(step_id)
+        return await _async_process_step(self._steps, step_id)
 
     # Step Finish
     async def async_step_finish(

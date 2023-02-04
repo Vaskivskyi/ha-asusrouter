@@ -18,9 +18,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .const import (
     AIMESH,
     ASUSROUTER,
+    CONF_DEFAULT_HIDE_PASSWORDS,
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
-    DEFAULT_HIDE_PASSWORDS,
     DOMAIN,
     MANUFACTURER,
     PASSWORD,
@@ -40,8 +40,8 @@ async def async_setup_entry(
 ) -> None:
     """Setup AsusRouter binary sensors."""
 
-    hide = list()
-    if entry.options.get(CONF_HIDE_PASSWORDS, DEFAULT_HIDE_PASSWORDS):
+    hide = []
+    if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
     if not entry.options[CONF_ENABLE_CONTROL]:

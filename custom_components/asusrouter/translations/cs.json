@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Přidat zařízení",
                 "description": "Jak přidat své zařízení",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "[NT] Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Provozní režim",
                 "data": {
                     "track_devices": "Povolit sledování zařízení",
@@ -91,7 +91,7 @@
                 "description": "Vyberte prosím konfigurace, které chcete změnit",
                 "data": {
                     "credentials": "Přihlašovací údaje a nastavení připojení",
-                    "operation_mode": "Provozní režim",
+                    "operation": "Provozní režim",
                     "intervals": "Intervaly aktualizace",
                     "interfaces": "Rozhraní ke sledování",
                     "events": "Události Home Assistant",
@@ -109,7 +109,7 @@
                     "mode": "[NT] Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Provozní režim",
                 "data": {
                     "track_devices": "Povolit sledování zařízení",
