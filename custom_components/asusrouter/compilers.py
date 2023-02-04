@@ -1,4 +1,4 @@
-"""AsusRouter compilers."""
+"""AsusRouter compilers module."""
 
 from __future__ import annotations
 
@@ -33,9 +33,8 @@ def list_sensors_network(
 
     for intf in interfaces:
         interface = MAP_NETWORK_TEMP.get(intf, intf)
-        for type in SENSORS_PARAM_NETWORK:
-            data = SENSORS_PARAM_NETWORK[type]
-            key = f"{interface}_{type}"
+        for sensor_type, data in SENSORS_PARAM_NETWORK.items():
+            key = f"{interface}_{sensor_type}"
             units = units_traffic
             if LABEL_SPEED in data[NAME]:
                 units = units_speed
