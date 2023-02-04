@@ -79,6 +79,7 @@ class ARBinarySensor(ARBinaryEntity, BinarySensorEntity):
         """Initialize AsusRouter binary sensor."""
 
         super().__init__(coordinator, router, description)
+        self.entity_description: ARBinarySensorDescription = description
 
 
 @callback

@@ -38,7 +38,7 @@ async def async_setup_entry(
         hide.append(PASSWORD)
 
     if entry.options[CONF_ENABLE_CONTROL]:
-        SWITCHES.update(STATIC_SWITCHES_OPTIONAL)
+        SWITCHES.extend(STATIC_SWITCHES_OPTIONAL)
 
     await async_setup_ar_entry(
         hass, entry, async_add_entities, SWITCHES, ARSwitch, hide
@@ -57,6 +57,8 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
         """Initialize AsusRouter switch."""
 
         super().__init__(coordinator, router, description)
+        self.entity_description: ARSwitchDescription = description
+
         self._service_on = description.service_on
         self._service_on_args = description.service_on_args
         self._service_off = description.service_off

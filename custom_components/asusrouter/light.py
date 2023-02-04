@@ -49,6 +49,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
         """Initialize AsusRouter LED light."""
 
         super().__init__(coordinator, router, description)
+        self.entity_description: ARLightDescription = description
 
     async def async_turn_on(
         self,

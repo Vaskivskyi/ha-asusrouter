@@ -36,5 +36,7 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         """Initialize AsusRouter update."""
 
         super().__init__(coordinator, router, description)
+        self.entity_description: ARUpdateDescription = description
+
         self._attr_installed_version = self.extra_state_attributes["current"]
         self._attr_latest_version = self.extra_state_attributes["available"]
