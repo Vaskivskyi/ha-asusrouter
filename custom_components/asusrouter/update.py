@@ -1,4 +1,4 @@
-"""AsusRouter updates."""
+"""AsusRouter update module."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter updates."""
+    """Set up AsusRouter updates."""
 
     await async_setup_ar_entry(hass, entry, async_add_entities, UPDATES, ARUpdate)
 

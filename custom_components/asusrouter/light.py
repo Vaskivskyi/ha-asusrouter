@@ -1,4 +1,4 @@
-"""AsusRouter lights."""
+"""AsusRouter light module."""
 
 from __future__ import annotations
 
@@ -24,11 +24,11 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter lights."""
+    """Set up AsusRouter lights."""
 
     if (
         not entry.options[CONF_ENABLE_CONTROL]
-        or not hass.data[DOMAIN][entry.entry_id][ASUSROUTER].bridge._identity.led
+        or not hass.data[DOMAIN][entry.entry_id][ASUSROUTER].bridge.identity.led
     ):
         return
 
@@ -50,6 +50,7 @@ class ARLightLED(ARBinaryEntity, LightEntity):
 
         super().__init__(coordinator, router, description)
         self.entity_description: ARLightDescription = description
+        self._state: bool
 
     async def async_turn_on(
         self,
@@ -62,8 +63,8 @@ class ARLightLED(ARBinaryEntity, LightEntity):
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
-        except Exception as ex:
-            _LOGGER.error(f"LED control has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("LED control has returned an exception: %s", ex)
 
     async def async_turn_off(
         self,
@@ -76,13 +77,13 @@ class ARLightLED(ARBinaryEntity, LightEntity):
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("LED state was not set!")
-        except Exception as ex:
-            _LOGGER.error(f"LED control has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("LED control has returned an exception: %s", ex)
 
     async def async_update(self) -> None:
         """Update state from the device."""
 
         try:
             self._state = await self.api.async_get_led(use_cache=False)
-        except Exception as ex:
-            _LOGGER.error(f"LED control has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("LED control has returned an exception: %s", ex)

@@ -1,4 +1,4 @@
-"""AsusRouter sensors."""
+"""AsusRouter sensor module."""
 
 from __future__ import annotations
 
@@ -30,11 +30,11 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter sensors."""
+    """Set up AsusRouter sensors."""
 
     interfaces = entry.options[CONF_INTERFACES]
     if len(interfaces) > 0:
-        _LOGGER.debug(f"Interfaces selected: {interfaces}. Initializing sensors")
+        _LOGGER.debug("Interfaces selected: %s. Initializing sensors", interfaces)
         SENSORS.extend(
             list_sensors_network(
                 entry.options[CONF_INTERFACES],
