@@ -1,4 +1,4 @@
-"""AsusRouter helpers."""
+"""AsusRouter helpers module."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from typing import Any
 
 
 def flatten_dict(obj: Any, keystring: str = "", delimiter: str = "_"):
-    """Flatten dictionary"""
+    """Flatten dictionary."""
 
-    if type(obj) == dict:
+    if isinstance(obj, dict):
         keystring = keystring + delimiter if keystring else keystring
         for key in obj:
             yield from flatten_dict(obj[key], keystring + str(key))
@@ -20,7 +20,7 @@ def flatten_dict(obj: Any, keystring: str = "", delimiter: str = "_"):
 def as_dict(pyobj):
     """Return generator object as dictionary."""
 
-    return {key: value for key, value in pyobj}
+    return dict(pyobj)
 
 
 def list_from_dict(raw: dict[str, Any]) -> list[str]:
