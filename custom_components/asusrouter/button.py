@@ -36,11 +36,11 @@ async def async_setup_entry(
     entities = []
 
     if entry.options.get(CONF_MODE) == ROUTER:
-        BUTTONS.update(STATIC_BUTTONS_OPTIONAL)
+        BUTTONS.extend(STATIC_BUTTONS_OPTIONAL)
 
     for button in BUTTONS:
         try:
-            entities.append(ARButton(router, BUTTONS[button]))
+            entities.append(ARButton(router, button))
         except Exception as ex:
             _LOGGER.warning(ex)
 

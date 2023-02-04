@@ -26,7 +26,7 @@ def list_sensors_network(
 ) -> dict[str, Any]:
     """Compile a list of network sensors."""
 
-    sensors = {}
+    sensors = []
 
     if not interfaces or len(interfaces) < 1:
         return sensors
@@ -39,26 +39,24 @@ def list_sensors_network(
             units = units_traffic
             if LABEL_SPEED in data[NAME]:
                 units = units_speed
-            sensors.update(
-                {
-                    (NETWORK, key): ARSensorDescription(
-                        key=key,
-                        key_group=NETWORK,
-                        name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} {data[NAME]}"
-                        or None,
-                        icon=data["icon"] or None,
-                        state_class=data["state_class"] or None,
-                        native_unit_of_measurement=units or None,
-                        factor=data["factor"][units] or None,
-                        entity_registry_enabled_default=data[
-                            "entity_registry_enabled_default"
-                        ]
-                        or None,
-                        extra_state_attributes={
-                            key: data["raw_attribute"] or None,
-                        },
-                    )
-                }
+            sensors.append(
+                ARSensorDescription(
+                    key=key,
+                    key_group=NETWORK,
+                    name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} {data[NAME]}"
+                    or None,
+                    icon=data["icon"] or None,
+                    state_class=data["state_class"] or None,
+                    native_unit_of_measurement=units or None,
+                    factor=data["factor"][units] or None,
+                    entity_registry_enabled_default=data[
+                        "entity_registry_enabled_default"
+                    ]
+                    or None,
+                    extra_state_attributes={
+                        key: data["raw_attribute"] or None,
+                    },
+                )
             )
 
     return sensors

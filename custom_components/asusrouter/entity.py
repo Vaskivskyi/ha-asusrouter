@@ -1,4 +1,4 @@
-"""AsusRouter entities."""
+"""AsusRouter entity module."""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
+from . import helpers
 from .const import ASUSROUTER, COORDINATOR, DOMAIN
 from .dataclass import AREntityDescription
-from .helpers import to_unique_id
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,41 +23,43 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_ar_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
-    sensors: dict[Any, Any],
-    sensor_class: AREntity,
+    sensors: list[AREntityDescription],
+    sensor_class: type[AREntity],
     hide: list[str] | None = None,
 ) -> None:
-    """Setup AsusRouter entities."""
+    """Set up AsusRouter entities."""
 
-    router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     entities = []
 
-    for sensor_data in router._sensor_coordinator.values():
+    if not hide:
+        hide = []
+
+    for sensor_data in router.sensor_coordinator.values():
         coordinator = sensor_data[COORDINATOR]
         for sensor_description in sensors:
             try:
-                if sensor_description[0] in sensor_data:
-                    if (
-                        sensors[sensor_description].key
-                        in sensor_data[sensor_description[0]]
-                    ):
+                sensor_type = sensor_description.key_group
+
+                # Make sure extra state attributes are dict
+                if not sensor_description.extra_state_attributes:
+                    sensor_description.extra_state_attributes = {}
+
+                if sensor_type in sensor_data:
+                    if sensor_description.key in sensor_data[sensor_type]:
                         # Hide protected values
-                        if hide:
-                            sensors[sensor_description].extra_state_attributes = {
-                                key: val
-                                for key, val in sensors[
-                                    sensor_description
-                                ].extra_state_attributes.items()
-                                if not val in hide
-                            }
+                        sensor_description.extra_state_attributes = {
+                            key: value
+                            for key, value in sensor_description.extra_state_attributes.items()
+                            if value not in hide
+                        }
+
                         entities.append(
-                            sensor_class(
-                                coordinator, router, sensors[sensor_description]
-                            )
+                            sensor_class(coordinator, router, sensor_description)
                         )
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.warning(ex)
 
     async_add_entities(entities, True)
@@ -75,19 +77,24 @@ class AREntity(CoordinatorEntity):
         """Initialize AsusRouter entity."""
 
         super().__init__(coordinator)
-        self.entity_description: AREntityDescription = description
         self.router = router
         self.api = router.bridge.api
         self.coordinator = coordinator
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
+        self._attr_unique_id = helpers.to_unique_id(
+            f"{DOMAIN}_{router.mac}_{description.name}"
+        )
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return extra state attributes."""
+
+        # Check if description is of the needed class
+        if not isinstance(self.entity_description, AREntityDescription):
+            return {}
 
         description = self.entity_description
         _attributes = description.extra_state_attributes
@@ -115,9 +122,7 @@ class ARBinaryEntity(AREntity):
         """Initialize AsusRouter binary entity."""
 
         super().__init__(coordinator, router, description)
-        self._icon_onoff = (
-            True if description.icon_on and description.icon_off else False
-        )
+        self._icon_onoff = bool(description.icon_on and description.icon_off)
 
     @property
     def is_on(self) -> bool:
@@ -132,9 +137,8 @@ class ARBinaryEntity(AREntity):
         if self._icon_onoff:
             if self.is_on:
                 return self.entity_description.icon_on
-            else:
-                return self.entity_description.icon_off
-        elif self.entity_description.icon:
+            return self.entity_description.icon_off
+        if self.entity_description.icon:
             return self.entity_description.icon
 
 
@@ -148,11 +152,12 @@ class ARButtonEntity:
     ) -> None:
         """Initialize AsusRouter button entity."""
 
-        self.entity_description: AREntityDescription = description
         self.router = router
         self.api = router.bridge.api
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
+        self._attr_unique_id = helpers.to_unique_id(
+            f"{DOMAIN}_{router.mac}_{description.name}"
+        )
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities

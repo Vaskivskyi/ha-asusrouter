@@ -30,6 +30,7 @@ from asusrouter.util import converters
 from .dataclass import (
     ARBinarySensorDescription,
     ARButtonDescription,
+    AREntityDescription,
     ARLightDescription,
     ARSensorDescription,
     ARSwitchDescription,
@@ -716,9 +717,9 @@ ICON_WLAN_ON = "mdi:wifi"
 ### <-- ICONS
 
 ### SENSORS -->
-STATIC_BINARY_SENSORS = {
+STATIC_BINARY_SENSORS: list[AREntityDescription] = [
     # WAN state
-    (WAN, STATUS): ARBinarySensorDescription(
+    ARBinarySensorDescription(
         key=STATUS,
         key_group=WAN,
         name=WAN.upper(),
@@ -739,10 +740,10 @@ STATIC_BINARY_SENSORS = {
             "xmask": "xmask",
         },
     ),
-}
-STATIC_BINARY_SENSORS_OPTIONAL = {
+]
+STATIC_BINARY_SENSORS_OPTIONAL: list[AREntityDescription] = [
     # Parental control state
-    (PARENTAL_CONTROL, STATE): ARBinarySensorDescription(
+    ARBinarySensorDescription(
         key=STATE,
         key_group=PARENTAL_CONTROL,
         name="Parental control",
@@ -754,11 +755,11 @@ STATIC_BINARY_SENSORS_OPTIONAL = {
             LIST: LIST,
         },
     ),
-}
-STATIC_BINARY_SENSORS_OPTIONAL.update(
-    {
+]
+STATIC_BINARY_SENSORS_OPTIONAL.extend(
+    [
         # OVPN clients
-        (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARBinarySensorDescription(
+        ARBinarySensorDescription(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_CLIENT} {num}",
@@ -769,12 +770,12 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             },
         )
         for num in NUMERIC_OVPN_CLIENT
-    }
+    ]
 )
-STATIC_BINARY_SENSORS_OPTIONAL.update(
-    {
+STATIC_BINARY_SENSORS_OPTIONAL.extend(
+    [
         # OVPN servers
-        (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARBinarySensorDescription(
+        ARBinarySensorDescription(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_SERVER} {num}",
@@ -786,12 +787,12 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             },
         )
         for num in NUMERIC_OVPN_SERVER
-    }
+    ]
 )
-STATIC_BINARY_SENSORS_OPTIONAL.update(
-    {
+STATIC_BINARY_SENSORS_OPTIONAL.extend(
+    [
         # WLANs
-        (WLAN, f"{KEY_WLAN}{num}_radio"): ARBinarySensorDescription(
+        ARBinarySensorDescription(
             key=f"{KEY_WLAN}{num}_radio",
             key_group=WLAN,
             name=f"{NAME_WLAN[num]}",
@@ -802,15 +803,12 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
             },
         )
         for num in NUMERIC_WLAN
-    }
+    ]
 )
-STATIC_BINARY_SENSORS_OPTIONAL.update(
-    {
+STATIC_BINARY_SENSORS_OPTIONAL.extend(
+    [
         # Guest WLANs
-        (
-            GWLAN,
-            f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
-        ): ARBinarySensorDescription(
+        ARBinarySensorDescription(
             key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
             key_group=GWLAN,
             name=NAME_GWLAN[f"{num}.{gnum}"],
@@ -823,10 +821,10 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
         )
         for gnum in NUMERIC_GWLAN
         for num in NUMERIC_WLAN
-    }
+    ]
 )
-STATIC_BUTTONS = {
-    REBOOT: ARButtonDescription(
+STATIC_BUTTONS: list[AREntityDescription] = [
+    ARButtonDescription(
         key=REBOOT,
         name="Reboot",
         icon=ICON_RESTART,
@@ -836,7 +834,7 @@ STATIC_BUTTONS = {
         service_expect_modify=False,
         entity_registry_enabled_default=True,
     ),
-    RESTART_HTTPD: ARButtonDescription(
+    ARButtonDescription(
         key=RESTART_HTTPD,
         name="Restart HTTP daemon",
         icon=ICON_RESTART,
@@ -845,7 +843,7 @@ STATIC_BUTTONS = {
         service_expect_modify=False,
         entity_registry_enabled_default=False,
     ),
-    RESTART_WIRELESS: ARButtonDescription(
+    ARButtonDescription(
         key=RESTART_WIRELESS,
         name="Restart wireless",
         icon=ICON_RESTART,
@@ -854,9 +852,9 @@ STATIC_BUTTONS = {
         service_expect_modify=False,
         entity_registry_enabled_default=False,
     ),
-}
-STATIC_BUTTONS_OPTIONAL = {
-    RESTART_FIREWALL: ARButtonDescription(
+]
+STATIC_BUTTONS_OPTIONAL: list[AREntityDescription] = [
+    ARButtonDescription(
         key=RESTART_FIREWALL,
         name="Restart firewall",
         icon=ICON_RESTART,
@@ -865,9 +863,9 @@ STATIC_BUTTONS_OPTIONAL = {
         service_expect_modify=False,
         entity_registry_enabled_default=False,
     ),
-}
-STATIC_LIGHTS = {
-    (LED, STATE): ARLightDescription(
+]
+STATIC_LIGHTS: list[AREntityDescription] = [
+    ARLightDescription(
         key=STATE,
         key_group=LED,
         name="LED",
@@ -876,10 +874,10 @@ STATIC_LIGHTS = {
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=True,
     ),
-}
-STATIC_SENSORS = {
+]
+STATIC_SENSORS: list[AREntityDescription] = [
     # AiMesh
-    (AIMESH, NUMBER): ARSensorDescription(
+    ARSensorDescription(
         key=NUMBER,
         key_group=AIMESH,
         name="AiMesh",
@@ -892,7 +890,7 @@ STATIC_SENSORS = {
         },
     ),
     # Boottime
-    (BOOTTIME, TIMESTAMP): ARSensorDescription(
+    ARSensorDescription(
         key=TIMESTAMP,
         key_group=BOOTTIME,
         name="Boot Time",
@@ -902,7 +900,7 @@ STATIC_SENSORS = {
         entity_registry_enabled_default=False,
     ),
     # Connected devices
-    (DEVICES, "number"): ARSensorDescription(
+    ARSensorDescription(
         key="number",
         key_group=DEVICES,
         name="Connected Devices",
@@ -915,7 +913,7 @@ STATIC_SENSORS = {
         },
     ),
     # CPU
-    (CPU, f"{TOTAL}_{USAGE}"): ARSensorDescription(
+    ARSensorDescription(
         key=f"{TOTAL}_{USAGE}",
         key_group=CPU,
         name=CPU.upper(),
@@ -929,7 +927,7 @@ STATIC_SENSORS = {
         },
     ),
     # LAN
-    (PORTS, f"{LAN}_{TOTAL}"): ARSensorDescription(
+    ARSensorDescription(
         key=f"{LAN}_{TOTAL}",
         key_group=PORTS,
         name="LAN Speed",
@@ -941,7 +939,7 @@ STATIC_SENSORS = {
         extra_state_attributes={f"{LAN}_{num}": f"{LAN}_{num}" for num in NUMERIC_LAN},
     ),
     # Latest connected
-    (DEVICES, "latest_time"): ARSensorDescription(
+    ARSensorDescription(
         key="latest_time",
         key_group=DEVICES,
         name="Latest Connected",
@@ -954,7 +952,7 @@ STATIC_SENSORS = {
         },
     ),
     # RAM
-    (RAM, USAGE): ARSensorDescription(
+    ARSensorDescription(
         key=USAGE,
         key_group=RAM,
         name=RAM.upper(),
@@ -971,7 +969,7 @@ STATIC_SENSORS = {
         },
     ),
     # WAN
-    (PORTS, f"{WAN}_{TOTAL}"): ARSensorDescription(
+    ARSensorDescription(
         key=f"{WAN}_{TOTAL}",
         key_group=PORTS,
         name="WAN Speed",
@@ -983,7 +981,7 @@ STATIC_SENSORS = {
         extra_state_attributes={f"{WAN}_{num}": f"{WAN}_{num}" for num in NUMERIC_WAN},
     ),
     # WAN IP
-    (WAN, IP): ARSensorDescription(
+    ARSensorDescription(
         key=IP,
         key_group=WAN,
         name="WAN IP",
@@ -1003,11 +1001,11 @@ STATIC_SENSORS = {
             "xmask": "xmask",
         },
     ),
-}
+]
 # Temperature sensors
-STATIC_SENSORS.update(
-    {
-        (TEMPERATURE, sensor): ARSensorDescription(
+STATIC_SENSORS.extend(
+    [
+        ARSensorDescription(
             key=sensor,
             key_group=TEMPERATURE,
             name=LABELS_TEMPERATURE[sensor],
@@ -1019,12 +1017,12 @@ STATIC_SENSORS.update(
             entity_registry_enabled_default=False,
         )
         for sensor in LABELS_TEMPERATURE
-    }
+    ]
 )
 # Load avg sensors
-STATIC_SENSORS.update(
-    {
-        (SYSINFO, f"{LOAD_AVG}_{sensor}"): ARSensorDescription(
+STATIC_SENSORS.extend(
+    [
+        ARSensorDescription(
             key=f"{LOAD_AVG}_{sensor}",
             key_group=SYSINFO,
             name=LABELS_LOAD_AVG[sensor],
@@ -1034,11 +1032,11 @@ STATIC_SENSORS.update(
             entity_registry_enabled_default=False,
         )
         for sensor in LABELS_LOAD_AVG
-    }
+    ]
 )
-STATIC_SWITCHES = {}
-STATIC_SWITCHES_OPTIONAL = {
-    (PARENTAL_CONTROL, STATE): ARSwitchDescription(
+STATIC_SWITCHES: list[AREntityDescription] = []
+STATIC_SWITCHES_OPTIONAL: list[AREntityDescription] = [
+    ARSwitchDescription(
         key=STATE,
         key_group=PARENTAL_CONTROL,
         name="Parental control",
@@ -1060,11 +1058,11 @@ STATIC_SWITCHES_OPTIONAL = {
             LIST: LIST,
         },
     ),
-}
-STATIC_SWITCHES_OPTIONAL.update(
-    {
+]
+STATIC_SWITCHES_OPTIONAL.extend(
+    [
         # OVPN clients
-        (VPN, f"{KEY_OVPN_CLIENT}{num}_{STATE}"): ARSwitchDescription(
+        ARSwitchDescription(
             key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_CLIENT} {num}",
@@ -1079,12 +1077,12 @@ STATIC_SWITCHES_OPTIONAL.update(
             },
         )
         for num in NUMERIC_OVPN_CLIENT
-    }
+    ]
 )
-STATIC_SWITCHES_OPTIONAL.update(
-    {
+STATIC_SWITCHES_OPTIONAL.extend(
+    [
         # OVPN servers
-        (VPN, f"{KEY_OVPN_SERVER}{num}_{STATE}"): ARSwitchDescription(
+        ARSwitchDescription(
             key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
             key_group=VPN,
             name=f"{LABEL_OVPN_SERVER} {num}",
@@ -1100,12 +1098,12 @@ STATIC_SWITCHES_OPTIONAL.update(
             },
         )
         for num in NUMERIC_OVPN_SERVER
-    }
+    ]
 )
-STATIC_SWITCHES_OPTIONAL.update(
-    {
+STATIC_SWITCHES_OPTIONAL.extend(
+    [
         # WLANs
-        (WLAN, f"{wlan}_radio"): ARSwitchDescription(
+        ARSwitchDescription(
             key=f"{wlan}_radio",
             key_group=WLAN,
             name=f"{LABEL_WLAN} {LABELS_WLAN[wlan]}",
@@ -1134,12 +1132,12 @@ STATIC_SWITCHES_OPTIONAL.update(
             },
         )
         for wlan in MAP_WLAN
-    }
+    ]
 )
-STATIC_SWITCHES_OPTIONAL.update(
-    {
+STATIC_SWITCHES_OPTIONAL.extend(
+    [
         # Guest WLANs
-        (GWLAN, f"{wlan}_{gwlan}_bss_enabled"): ARSwitchDescription(
+        ARSwitchDescription(
             key=f"{wlan}_{gwlan}_bss_enabled",
             key_group=GWLAN,
             name=f"{LABEL_GUEST} {LABELS_WLAN[wlan]} {gwlan}",
@@ -1170,10 +1168,10 @@ STATIC_SWITCHES_OPTIONAL.update(
         )
         for gwlan in NUMERIC_GWLAN
         for wlan in MAP_WLAN
-    }
+    ]
 )
-STATIC_UPDATES = {
-    (FIRMWARE, STATE): ARUpdateDescription(
+STATIC_UPDATES: list[AREntityDescription] = [
+    ARUpdateDescription(
         key=STATE,
         key_group=FIRMWARE,
         name="Firmware update",
@@ -1183,7 +1181,7 @@ STATIC_UPDATES = {
             "available": "available",
         },
     )
-}
+]
 
 ### <-- SENSORS
 

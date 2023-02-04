@@ -35,7 +35,7 @@ async def async_setup_entry(
     interfaces = entry.options[CONF_INTERFACES]
     if len(interfaces) > 0:
         _LOGGER.debug(f"Interfaces selected: {interfaces}. Initializing sensors")
-        SENSORS.update(
+        SENSORS.extend(
             list_sensors_network(
                 entry.options[CONF_INTERFACES],
                 entry.options[CONF_UNITS_SPEED],
@@ -58,6 +58,7 @@ class ARSensor(AREntity, SensorEntity):
         """Initialize AsusRouter sensor."""
 
         super().__init__(coordinator, router, description)
+        self.entity_description: ARSensorDescription = description
 
     @property
     def native_value(
