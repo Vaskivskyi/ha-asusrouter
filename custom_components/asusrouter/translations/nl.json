@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Device locatie",
                 "description": "Hoe vind je jou device",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "[NT] Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Operatie mode",
                 "data": {
                     "track_devices": "Activeer apparaat trackers",
@@ -91,7 +91,7 @@
                 "description": "Selecteer welkee optie van configuratie u wilt aanpassen",
                 "data": {
                     "credentials": "Login gegevens en connectie instellingen",
-                    "operation_mode": "Operatie modus",
+                    "operation": "Operatie modus",
                     "intervals": "Update interval",
                     "interfaces": "Interfaces voor monitoring",
                     "events": "Home Assistant events",
@@ -109,7 +109,7 @@
                     "mode": "[NT] Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Operation mode",
                 "data": {
                     "track_devices": "Activeer apparaat trackers",

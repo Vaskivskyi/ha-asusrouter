@@ -34,11 +34,11 @@ from . import helpers
 from .const import (
     BOOTTIME,
     CONF_CACHE_TIME,
+    CONF_DEFAULT_CACHE_TIME,
+    CONF_DEFAULT_MODE,
+    CONF_DEFAULT_PORT,
     CONF_MODE,
     CPU,
-    DEFAULT_CACHE_TIME,
-    DEFAULT_MODE,
-    DEFAULT_PORT,
     DEFAULT_SENSORS,
     FIRMWARE,
     GWLAN,
@@ -91,7 +91,7 @@ class ARBridge:
         self,
         hass: HomeAssistant,
         configs: dict[str, Any],
-        options: dict[str, Any] = dict(),
+        options: dict[str, Any] = {},
     ) -> None:
         """Initialize bridge."""
 
@@ -112,9 +112,9 @@ class ARBridge:
             host=configs[CONF_HOST],
             username=configs[CONF_USERNAME],
             password=configs[CONF_PASSWORD],
-            port=configs.get(CONF_PORT, DEFAULT_PORT),
+            port=configs.get(CONF_PORT, CONF_DEFAULT_PORT),
             use_ssl=configs[CONF_SSL],
-            cache_time=configs.get(CONF_CACHE_TIME, DEFAULT_CACHE_TIME),
+            cache_time=configs.get(CONF_CACHE_TIME, CONF_DEFAULT_CACHE_TIME),
             session=session,
         )
 
@@ -125,7 +125,7 @@ class ARBridge:
         return self._identity
 
     @property
-    def is_connected(self) -> bool:
+    def connected(self) -> bool:
         """Return connection status."""
 
         return self.api.connected
@@ -164,7 +164,7 @@ class ARBridge:
     async def async_cleanup_sensors(self, sensors: dict[str, Any]) -> dict[str, Any]:
         """Cleanup sensors depending on the device mode."""
 
-        mode = self._configs.get(CONF_MODE, DEFAULT_MODE)
+        mode = self._configs.get(CONF_MODE, CONF_DEFAULT_MODE)
         available = MODE_SENSORS[mode]
         _LOGGER.debug(f"Available sensors for mode=`{mode}`: {available}")
         sensors = {
@@ -349,7 +349,7 @@ class ARBridge:
 
     @staticmethod
     def _process_data_boottime(raw: dict[str, Any]) -> dict[str, Any]:
-        """Process `boottime` data"""
+        """Process `boottime` data."""
 
         raw[TIMESTAMP] = datetime.fromisoformat(raw[ISO])
         return raw
@@ -358,9 +358,9 @@ class ARBridge:
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
         """Process parental control data."""
 
-        data = dict()
+        data = {}
         data["state"] = raw.get("state")
-        devices = list()
+        devices = []
         for el in raw["rules"]:
             device = dataclasses.asdict(raw["rules"][el])
             device.pop("timemap")
@@ -410,7 +410,7 @@ class ARBridge:
             sensors = process(sensors)
             _LOGGER.debug(f"Available `{type}` sensors: {sensors}")
         except Exception as ex:
-            sensors = DEFAULT_SENSORS[type] if defaults else list()
+            sensors = DEFAULT_SENSORS[type] if defaults else []
             _LOGGER.debug(
                 f"Cannot get available `{type}` sensors with exception: {ex}. Will use the following list: {sensors}"
             )
@@ -498,7 +498,7 @@ class ARBridge:
     def _process_sensors_cpu(raw: dict[str, Any]) -> list[str]:
         """Process CPU sensors."""
 
-        sensors = list()
+        sensors = []
         for label in raw:
             for sensor in SENSORS_CPU:
                 sensors.append(f"{label}_{sensor}")
@@ -509,7 +509,7 @@ class ARBridge:
     def _process_sensors_network(raw: list[str]) -> list[str]:
         """Process network sensors."""
 
-        sensors = list()
+        sensors = []
         for label in raw:
             for el in SENSORS_NETWORK:
                 sensors.append(f"{label}_{el}")
@@ -521,7 +521,7 @@ class ARBridge:
 
         # This conversion is a legacy
         # Keep untill switching to the new ports sensors
-        sensors = list()
+        sensors = []
         for port_type in SENSORS_PORTS:
             if port_type in raw:
                 sensors.append(f"{port_type}_{TOTAL}")
@@ -533,7 +533,7 @@ class ARBridge:
     def _process_sensors_sysinfo(raw: list[str]) -> list[str]:
         """Process SysInfo sensors."""
 
-        sensors = list()
+        sensors = []
         for type in SENSORS_SYSINFO:
             if type in raw:
                 sensors.append(type)
@@ -543,7 +543,7 @@ class ARBridge:
     def _process_sensors_vpn(raw: list[str]) -> list[str]:
         """Process VPN sensors."""
 
-        sensors = list()
+        sensors = []
         for vpn in raw:
             if KEY_OVPN_CLIENT in vpn:
                 for sensor in SENSORS_VPN:
@@ -563,7 +563,7 @@ class ARBridge:
         return await self.api.async_service_reboot()
 
     async def async_adjust_wlan(self, **kwargs: Any) -> bool:
-        """Adjust WLAN settings"""
+        """Adjust WLAN settings."""
 
         if not "raw" in kwargs:
             return False
@@ -577,9 +577,9 @@ class ARBridge:
 
         args_raw = raw.copy()
 
-        args = dict()
+        args = {}
 
-        prefix = str()
+        prefix = ""
         if capabilities["api_type"] == GWLAN:
             prefix = f"wl{capabilities['api_id']}"
 
@@ -638,13 +638,13 @@ class ARBridge:
             return False
 
     async def async_parental_control(self, **kwargs: Any) -> bool:
-        """Adjust parental control rules"""
+        """Adjust parental control rules."""
 
         raw = kwargs.get("raw", None)
         if raw is None:
             return False
 
-        rules_to_change = list()
+        rules_to_change = []
 
         state = raw.get("state")
 
@@ -664,7 +664,7 @@ class ARBridge:
                     )
                 else:
                     _LOGGER.warning(
-                        f"Parental control rule is missing MAC address. This rule is skipped"
+                        "Parental control rule is missing MAC address. This rule is skipped"
                     )
         # Entities are set
         elif "entities" in raw:
@@ -684,7 +684,7 @@ class ARBridge:
             rules = await self.api.async_remove_parental_control_rules(
                 rules=rules_to_change
             )
-            return True if rules != dict() else False
+            return True if rules != {} else False
         elif state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
             _LOGGER.debug("Setting parental control rules")
             return await self.api.async_set_parental_control_rules(

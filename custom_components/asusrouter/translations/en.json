@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Device location",
                 "description": "How to find your device",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Operation mode",
                 "data": {
                     "track_devices": "Enable device trackers",
@@ -91,7 +91,7 @@
                 "description": "Please, select configurations you would like to change",
                 "data": {
                     "credentials": "Credentials and connection settings",
-                    "operation_mode": "Operation mode",
+                    "operation": "Operation mode",
                     "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor",
                     "events": "Home Assistant events",
@@ -109,7 +109,7 @@
                     "mode": "Device mode"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Operation mode",
                 "data": {
                     "track_devices": "Enable device trackers",

@@ -39,6 +39,16 @@ from .const import (
     ACCESS_POINT,
     AIMESH,
     ALIAS,
+    CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_ENABLE_CONTROL,
+    CONF_DEFAULT_INTERVALS,
+    CONF_DEFAULT_LATEST_CONNECTED,
+    CONF_DEFAULT_MODE,
+    CONF_DEFAULT_PORT,
+    CONF_DEFAULT_PORTS,
+    CONF_DEFAULT_SCAN_INTERVAL,
+    CONF_DEFAULT_SPLIT_INTERVALS,
+    CONF_DEFAULT_TRACK_DEVICES,
     CONF_ENABLE_CONTROL,
     CONF_EVENT_DEVICE_CONNECTED,
     CONF_EVENT_DEVICE_DISCONNECTED,
@@ -62,17 +72,7 @@ from .const import (
     CONNECTION_TYPE_6G,
     CONNECTION_TYPE_UNKNOWN,
     CONNECTION_TYPE_WIRED,
-    DEFAULT_CONSIDER_HOME,
-    DEFAULT_ENABLE_CONTROL,
     DEFAULT_HTTP,
-    DEFAULT_INTERVALS,
-    DEFAULT_LATEST_CONNECTED,
-    DEFAULT_MODE,
-    DEFAULT_PORT,
-    DEFAULT_PORTS,
-    DEFAULT_SCAN_INTERVAL,
-    DEFAULT_SPLIT_INTERVALS,
-    DEFAULT_TRACK_DEVICES,
     DEVICE_ATTRIBUTE_CONNECTION_TIME,
     DEVICE_ATTRIBUTE_CONNECTION_TYPE,
     DEVICE_ATTRIBUTE_GUEST,
@@ -128,15 +128,15 @@ class ARSensorHandler:
         self._hass = hass
         self._bridge = bridge
         self._connected_devices: int = 0
-        self._connected_devices_list: list[dict[str, Any]] = list()
+        self._connected_devices_list: list[dict[str, Any]] = []
         self._latest_connected: datetime | None = None
-        self._latest_connected_list: list[dict[str, Any]] = list()
+        self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_devices: int = 0
-        self._aimesh_list: list[dict[str, Any]] = list()
-        self._mode = options.get(CONF_MODE, DEFAULT_MODE)
+        self._aimesh_list: list[dict[str, Any]] = []
+        self._mode = options.get(CONF_MODE, CONF_DEFAULT_MODE)
         self._options = options
         self._split_intervals = options.get(
-            CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS
+            CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS
         )
 
     async def _get_connected_devices(self) -> dict[str, Any]:
@@ -220,17 +220,17 @@ class ARSensorHandler:
             interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
-                    DEFAULT_INTERVALS[CONF_INTERVAL + sensor_type],
+                    CONF_DEFAULT_INTERVALS[CONF_INTERVAL + sensor_type],
                 )
             )
         else:
             interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
-                    self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                    self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL),
                 )
-                if self._options.get(CONF_SPLIT_INTERVALS, DEFAULT_SPLIT_INTERVALS)
-                else self._options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+                if self._options.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS)
+                else self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
             )
 
         coordinator = DataUpdateCoordinator(
@@ -267,7 +267,7 @@ class AiMeshNode:
             TYPE: None,
             CONNECTED: None,
         }
-        self._extra_state_attributes: dict[str, Any] = dict()
+        self._extra_state_attributes: dict[str, Any] = {}
 
     @callback
     def update(
@@ -303,7 +303,7 @@ class AiMeshNode:
                 # Node level
                 self._extra_state_attributes[LEVEL] = node_info.level
                 # Node parent
-                if node_info.parent == dict():
+                if node_info.parent == {}:
                     self._extra_state_attributes[PARENT] = {
                         CONNECTION: WIRED,
                     }
@@ -314,7 +314,7 @@ class AiMeshNode:
                 # Access point
                 # self._extra_state_attributes[ACCESS_POINT] = node_info.ap
                 # Notify reconnect
-                if self.identity[CONNECTED] == False:
+                if self.identity[CONNECTED] is False:
                     event_call(
                         CONF_EVENT_NODE_RECONNECTED,
                         self.identity,
@@ -323,7 +323,7 @@ class AiMeshNode:
                 self.identity[CONNECTED] = True
             else:
                 # Notify disconnect
-                if self.identity[CONNECTED] == True:
+                if self.identity[CONNECTED] is True:
                     event_call(
                         CONF_EVENT_NODE_DISCONNECTED,
                         self.identity,
@@ -374,7 +374,7 @@ class ARConnectedDevice:
             NODE: None,
         }
         self._connected: bool = False
-        self._extra_state_attributes: dict[str, Any] = dict()
+        self._extra_state_attributes: dict[str, Any] = {}
 
     @callback
     def update(
@@ -473,7 +473,7 @@ class ARConnectedDevice:
                     format_mac(dev_info.node) if dev_info.node is not None else None
                 )
                 # If not connected before
-                if self._connected == False:
+                if self._connected is False:
                     event_call(
                         CONF_EVENT_DEVICE_RECONNECTED,
                         self.identity,
@@ -494,7 +494,7 @@ class ARConnectedDevice:
                 > consider_home
             ):
                 # Notify
-                if self._connected == True:
+                if self._connected is True:
                     event_call(
                         CONF_EVENT_DEVICE_DISCONNECTED,
                         self.identity,
@@ -512,7 +512,7 @@ class ARConnectedDevice:
                 utc_point_in_time
                 - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
             ).total_seconds() < consider_home
-            if self._connected == False:
+            if self._connected is False:
                 event_call(
                     CONF_EVENT_DEVICE_DISCONNECTED,
                     self.identity,
@@ -569,15 +569,17 @@ class ARDevice:
 
         self._bridge: ARBridge | None = None
         self._options = entry.options.copy()
-        self._mode = self._options.get(CONF_MODE, DEFAULT_MODE)
+        self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
 
         # Device configs
         self._conf_host: str = entry.data[CONF_HOST]
         self._conf_name: str = self._options[CONF_NAME]
         self._conf_port: int = self._options[CONF_PORT]
-        if self._conf_port == DEFAULT_PORT:
+        if self._conf_port == CONF_DEFAULT_PORT:
             self._conf_port = (
-                DEFAULT_PORTS[SSL] if self._options[CONF_SSL] else DEFAULT_PORTS[NO_SSL]
+                CONF_DEFAULT_PORTS[SSL]
+                if self._options[CONF_SSL]
+                else CONF_DEFAULT_PORTS[NO_SSL]
             )
 
         # Device information
@@ -586,11 +588,11 @@ class ARDevice:
         self._aimesh: dict[str, Any] = {}
         self._devices: dict[str, Any] = {}
         self._aimesh_devices: int = 0
-        self._aimesh_list: list[dict[str, Any]] = list()
+        self._aimesh_list: list[dict[str, Any]] = []
         self._connected_devices: int = 0
-        self._connected_devices_list: list[dict[str, Any]] = list()
+        self._connected_devices_list: list[dict[str, Any]] = []
         self._latest_connected: datetime | None = None
-        self._latest_connected_list: list[dict[str, Any]] = list()
+        self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
 
         self._sensor_handler: ARSensorHandler | None = None
@@ -610,28 +612,28 @@ class ARDevice:
         except (OSError, AsusRouterConnectionError) as ex:
             raise ConfigEntryNotReady from ex
 
-        if not self.bridge.is_connected:
+        if not self.bridge.connected:
             raise ConfigEntryNotReady
 
         _LOGGER.debug("Bridge connected")
 
         # Services
         async def async_service_adjust_wlan(service: ServiceCall):
-            """Handle WLAN adjust"""
+            """Handle WLAN adjust."""
 
             await self.bridge.async_adjust_wlan(raw=service.data)
 
         async def async_service_device_internet_access(service: ServiceCall):
-            """Adjust device internet access"""
+            """Adjust device internet access."""
 
             await self.bridge.async_parental_control(raw=service.data)
 
         async def async_service_remove_trackers(service: ServiceCall):
-            """Remove device trackers"""
+            """Remove device trackers."""
 
             await self.remove_trackers(raw=service.data)
 
-        if self._options.get(CONF_ENABLE_CONTROL, DEFAULT_ENABLE_CONTROL):
+        if self._options.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL):
             self.hass.services.async_register(
                 DOMAIN, "adjust_wlan", async_service_adjust_wlan
             )
@@ -734,7 +736,7 @@ class ARDevice:
             await self.update_devices()
         else:
             _LOGGER.debug(
-                f"Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
+                "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
             )
 
         # Initialise sensors
@@ -746,7 +748,7 @@ class ARDevice:
                 self.update_all,
                 timedelta(
                     seconds=self._options.get(
-                        CONF_INTERVAL_DEVICES, DEFAULT_SCAN_INTERVAL
+                        CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL
                     )
                 ),
             )
@@ -765,10 +767,10 @@ class ARDevice:
     async def update_devices(self) -> None:
         """Update AsusRouter devices tracker."""
 
-        if self._options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
-            _LOGGER.debug(f"Device tracking is disabled")
+        if self._options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES) is False:
+            _LOGGER.debug("Device tracking is disabled")
         else:
-            _LOGGER.debug(f"Device tracking is enabled")
+            _LOGGER.debug("Device tracking is enabled")
 
         new_device = False
         _LOGGER.debug(f"Updating AsusRouter device list for '{self._conf_host}'")
@@ -786,7 +788,9 @@ class ARDevice:
             self._connect_error = False
             _LOGGER.info(f"Reconnected to '{self._conf_host}'")
 
-        consider_home = self._options.get(CONF_CONSIDER_HOME, DEFAULT_CONSIDER_HOME)
+        consider_home = self._options.get(
+            CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
+        )
 
         wrt_devices = {format_mac(mac): dev for mac, dev in api_devices.items()}
         for device_mac, device in self._devices.items():
@@ -798,7 +802,7 @@ class ARDevice:
                 connected_call=self.connected_device,
             )
 
-        new_devices = list()
+        new_devices = []
 
         for device_mac, dev_info in wrt_devices.items():
             new_device = True
@@ -819,7 +823,7 @@ class ARDevice:
 
         # Connected devices sensor
         self._connected_devices = 0
-        self._connected_devices_list = list()
+        self._connected_devices_list = []
         for mac, device in self._devices.items():
             if device.is_connected:
                 self._connected_devices += 1
@@ -856,7 +860,7 @@ class ARDevice:
             )
 
         # Add new nodes
-        new_nodes = list()
+        new_nodes = []
         for node_mac, node_info in nodes.items():
             new_node = True
             node = AiMeshNode(node_mac)
@@ -876,7 +880,7 @@ class ARDevice:
 
         # AiMesh sensors
         self._aimesh_devices = 0
-        self._aimesh_list = list()
+        self._aimesh_list = []
         for mac, node in self._aimesh.items():
             if node.identity[CONNECTED]:
                 self._aimesh_devices += 1
@@ -978,7 +982,7 @@ class ARDevice:
         return req_reload
 
     def connected_device_time(self, element: dict[str, Any]) -> datetime:
-        """Get connected time for the device"""
+        """Get connected time for the device."""
 
         return element.get(CONNECTED)
 
@@ -1006,7 +1010,7 @@ class ARDevice:
 
         # Check the size
         while len(self._latest_connected_list) > self._options.get(
-            CONF_LATEST_CONNECTED, DEFAULT_LATEST_CONNECTED
+            CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
         ):
             self._latest_connected_list.pop(0)
 
@@ -1021,7 +1025,7 @@ class ARDevice:
     ):
         """Fire HA event."""
 
-        if self._options.get(event) == True:
+        if self._options.get(event) is True:
             self.hass.bus.fire(
                 f"{DOMAIN}_{event}",
                 args,
@@ -1133,6 +1137,6 @@ class ARDevice:
 
     @bridge.setter
     def bridge(self, value: ARBridge | None) -> None:
-        """Set router bridge"""
+        """Set router bridge."""
 
         self._bridge = value

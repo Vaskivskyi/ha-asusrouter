@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Localizar dispositivo",
                 "description": "Como encontrar seu dispositivo",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "Modo do dispositivo"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Modo de operação",
                 "data": {
                     "track_devices": "Habilitar rastreadores de dispositivos",
@@ -91,7 +91,7 @@
                 "description": "Favor selecionar as configurações que deseja alterar",
                 "data": {
                     "credentials": "Credenciais e configurações de conexão",
-                    "operation_mode": "Modo de operação",
+                    "operation": "Modo de operação",
                     "intervals": "Intervalos de atualização",
                     "interfaces": "Interfaces para monitorar",
                     "events": "Eventos do Home Assistant",
@@ -109,7 +109,7 @@
                     "mode": "Modo do dispositivo"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Modo de operação",
                 "data": {
                     "track_devices": "Habilitar rastreadores de dispositivos",

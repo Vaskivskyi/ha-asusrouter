@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 from .const import (
+    CONF_DEFAULT_UNITS_SPEED,
+    CONF_DEFAULT_UNITS_TRAFFIC,
     CONF_LABELS_INTERFACES,
-    DEFAULT_UNITS_SPEED,
-    DEFAULT_UNITS_TRAFFIC,
     LABEL_SPEED,
     MAP_NETWORK_TEMP,
     NAME,
@@ -21,12 +21,12 @@ from .dataclass import (
 
 def list_sensors_network(
     interfaces: list[str] | None = None,
-    units_speed: str = DEFAULT_UNITS_SPEED,
-    units_traffic: str = DEFAULT_UNITS_TRAFFIC,
+    units_speed: str = CONF_DEFAULT_UNITS_SPEED,
+    units_traffic: str = CONF_DEFAULT_UNITS_TRAFFIC,
 ) -> dict[str, Any]:
     """Compile a list of network sensors."""
 
-    sensors = dict()
+    sensors = {}
 
     if not interfaces or len(interfaces) < 1:
         return sensors

@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Emplacement de l'appareil",
                 "description": "Comment retrouver votre appareil",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "Mode de l'appareil"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Mode de fonctionnement",
                 "data": {
                     "track_devices": "Activer le suivis des périphériques",
@@ -91,7 +91,7 @@
                 "credentials": "Veuillez sélectionner les Paramétres à modifier",
                 "data": {
                     "device": "Paramètres d'identification et de connexion",
-                    "operation_mode": "Mode de fonctionnement",
+                    "operation": "Mode de fonctionnement",
                     "intervals": "Intervalles d'actualisation",
                     "interfaces": "Interfaces à monitorer",
                     "events": "Événements de Home Assistant",
@@ -109,7 +109,7 @@
                     "mode": "Mode de l'appareil"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Mode de fonctionnement",
                 "data": {
                     "track_devices": "Activer le suivis des périphériques",

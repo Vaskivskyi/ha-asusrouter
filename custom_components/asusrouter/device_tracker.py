@@ -13,9 +13,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     ASUSROUTER,
+    CONF_DEFAULT_TRACK_DEVICES,
     CONF_TRACK_DEVICES,
     DEFAULT_DEVICE_NAME,
-    DEFAULT_TRACK_DEVICES,
     DOMAIN,
 )
 from .router import ARConnectedDevice, ARDevice
@@ -29,7 +29,7 @@ async def async_setup_entry(
     """Set up device tracker for AsusRouter component."""
 
     # If device tracking is disabled
-    if entry.options.get(CONF_TRACK_DEVICES, DEFAULT_TRACK_DEVICES) == False:
+    if entry.options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES) is False:
         return
 
     router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]

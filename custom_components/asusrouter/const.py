@@ -1,4 +1,4 @@
-"""AsusRouter constants"""
+"""AsusRouter constants."""
 
 from __future__ import annotations
 
@@ -100,11 +100,13 @@ LIGHT = "light"
 LIST = "list"
 LOAD_AVG = "load_avg"
 MAC = "mac"
+METHOD = "method"
 MISC = "misc"
 MODEL = "model"
 NAME = "name"
 NETWORK = "network"
 NETWORK_STAT = "network_stat"
+NEXT = "next"
 NODE = "node"
 NO_SSL = "no_ssl"
 NUMBER = "number"
@@ -128,6 +130,7 @@ TOTAL = "total"
 TX = "tx"
 TX_SPEED = "tx_speed"
 TYPE = "type"
+UNIQUE_ID = "unique_id"
 UNKNOWN = "unknown"
 USAGE = "usage"
 USB = "usb"
@@ -358,7 +361,7 @@ DEFAULT_SENSORS: dict[str, list[str]] = {CPU: [TOTAL]}
 
 ### <-- SENSORS
 
-### CONFIGURATION ->
+# CONFIGURATION CONSTANTS & DEFAULTS -->
 
 # Keys
 CONF_CACHE_TIME = "cache_time"
@@ -366,7 +369,6 @@ CONF_CERT_PATH = "cert_path"
 CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
 CONF_ENABLE_CONTROL = "enable_control"
-CONF_ENABLE_MONITOR = "enable_monitor"
 CONF_EVENT_DEVICE_CONNECTED = "device_connected"
 CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
 CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
@@ -393,6 +395,42 @@ CONF_INTERVALS = [
     CONF_INTERVAL + WAN,
     CONF_INTERVAL + WLAN,
 ]
+CONF_LATEST_CONNECTED = "latest_connected"
+CONF_MODE = "mode"
+CONF_SPLIT_INTERVALS = "split_intervals"
+CONF_TRACK_DEVICES = "track_devices"
+CONF_UNITS = "units"
+CONF_UNITS_SPEED = "units_speed"
+CONF_UNITS_TRAFFIC = "units_traffic"
+
+# Defaults
+CONF_DEFAULT_CACHE_TIME = 5
+CONF_DEFAULT_CONSIDER_HOME = 45
+CONF_DEFAULT_ENABLE_CONTROL = False
+CONF_DEFAULT_EVENT: dict[str, bool] = {
+    CONF_EVENT_DEVICE_CONNECTED: True,
+    CONF_EVENT_DEVICE_DISCONNECTED: False,
+    CONF_EVENT_DEVICE_RECONNECTED: False,
+    CONF_EVENT_NODE_CONNECTED: True,
+    CONF_EVENT_NODE_DISCONNECTED: True,
+    CONF_EVENT_NODE_RECONNECTED: True,
+}
+CONF_DEFAULT_HIDE_PASSWORDS = False
+CONF_DEFAULT_INTERFACES = [WAN.upper()]
+CONF_DEFAULT_INTERVALS = {CONF_INTERVAL + FIRMWARE: 21600}
+CONF_DEFAULT_LATEST_CONNECTED = 5
+CONF_DEFAULT_MODE = ROUTER
+CONF_DEFAULT_PORT = 0
+CONF_DEFAULT_PORTS = {NO_SSL: 80, SSL: 8443}
+CONF_DEFAULT_SCAN_INTERVAL = 30
+CONF_DEFAULT_SPLIT_INTERVALS = False
+CONF_DEFAULT_SSL = True
+CONF_DEFAULT_TRACK_DEVICES = True
+CONF_DEFAULT_UNITS_SPEED = UnitOfDataRate.MEGABITS_PER_SECOND
+CONF_DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
+CONF_DEFAULT_USERNAME = "admin"
+
+# Labels
 CONF_LABELS_INTERFACES = {
     BRIDGE: "Bridge",
     f"{LACP}1": "LACP1",
@@ -410,13 +448,18 @@ CONF_LABELS_MODE = {
     NODE: "AiMesh node",
     ACCESS_POINT: "Access Point",
 }
-CONF_LATEST_CONNECTED = "latest_connected"
-CONF_MODE = "mode"
-CONF_SPLIT_INTERVALS = "split_intervals"
-CONF_TRACK_DEVICES = "track_devices"
-CONF_UNITS = "units"
-CONF_UNITS_SPEED = "units_speed"
-CONF_UNITS_TRAFFIC = "units_traffic"
+
+# Options that require restarting the integration
+CONF_REQ_RELOAD = [
+    CONF_CACHE_TIME,
+    CONF_CERT_PATH,
+    CONF_CONFIRM,
+    CONF_CONSIDER_HOME,
+    CONF_ENABLE_CONTROL,
+    CONF_INTERFACES,
+]
+
+# Input values
 CONF_VALUES_DATA = [
     UnitOfInformation.BITS,
     UnitOfInformation.KILOBITS,
@@ -443,57 +486,20 @@ CONF_VALUES_MODE = [
     ACCESS_POINT,
 ]
 
-# Keys that require reload of integration
-CONF_REQ_RELOAD = [
-    CONF_CACHE_TIME,
-    CONF_CERT_PATH,
-    CONF_CONFIRM,
-    CONF_CONSIDER_HOME,
-    CONF_ENABLE_CONTROL,
-    CONF_ENABLE_MONITOR,
-    CONF_INTERFACES,
-]
-
 # Defaults
-DEFAULT_CACHE_TIME = 5
-DEFAULT_CONSIDER_HOME = 45
 DEFAULT_DEVICE_NAME = "Unknown device"
-DEFAULT_ENABLE_CONTROL = False
-DEFAULT_ENABLE_MONITOR = True
-DEFAULT_EVENT: dict[str, bool] = {
-    CONF_EVENT_DEVICE_CONNECTED: True,
-    CONF_EVENT_DEVICE_DISCONNECTED: False,
-    CONF_EVENT_DEVICE_RECONNECTED: False,
-    CONF_EVENT_NODE_CONNECTED: True,
-    CONF_EVENT_NODE_DISCONNECTED: True,
-    CONF_EVENT_NODE_RECONNECTED: True,
-}
-DEFAULT_HIDE_PASSWORDS = False
 DEFAULT_HTTP = {NO_SSL: HTTP, SSL: HTTPS}
-DELAULT_INTERFACES = [WAN.upper()]
-DEFAULT_INTERVALS = {CONF_INTERVAL + FIRMWARE: 21600}
-DEFAULT_LATEST_CONNECTED = 5
-DEFAULT_PORT = 0
-DEFAULT_PORTS = {NO_SSL: 80, SSL: 8443}
-DEFAULT_SCAN_INTERVAL = 30
-DEFAULT_SPLIT_INTERVALS = False
-DEFAULT_SSL = False
-DEFAULT_TRACK_DEVICES = True
-DEFAULT_MODE = ROUTER
-DEFAULT_UNITS_SPEED = UnitOfDataRate.MEGABITS_PER_SECOND
-DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
-DEFAULT_USERNAME = "admin"
 DEFAULT_VERIFY_SSL = True
 
 # Simplified setup
 SIMPLE_SETUP_PARAMETERS = {
     SSL: {
-        CONF_PORT: DEFAULT_PORTS[SSL],
+        CONF_PORT: CONF_DEFAULT_PORTS[SSL],
         CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
         CONF_CERT_PATH: "",
     },
     NO_SSL: {
-        CONF_PORT: DEFAULT_PORTS[NO_SSL],
+        CONF_PORT: CONF_DEFAULT_PORTS[NO_SSL],
         CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
         CONF_CERT_PATH: "",
     },
@@ -800,7 +806,10 @@ STATIC_BINARY_SENSORS_OPTIONAL.update(
 STATIC_BINARY_SENSORS_OPTIONAL.update(
     {
         # Guest WLANs
-        (GWLAN, f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",): ARBinarySensorDescription(
+        (
+            GWLAN,
+            f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
+        ): ARBinarySensorDescription(
             key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
             key_group=GWLAN,
             name=NAME_GWLAN[f"{num}.{gnum}"],
@@ -1181,3 +1190,28 @@ STATIC_UPDATES = {
 
 # __init__ constants
 STOP_LISTENER = "stop_listener"
+
+# Configuration flow
+BASE = "base"
+CONFIGS = "configs"
+ERRORS = "errors"
+INTERFACES = "interfaces"
+
+RESULT_CANNOT_RESOLVE = "cannot_resolve"
+RESULT_CONNECTION_REFUSED = "connection_refused"
+RESULT_ERROR = "error"
+RESULT_LOGIN_BLOCKED = "login_blocked"
+RESULT_SUCCESS = "success"
+RESULT_UNKNOWN = "unknown"
+RESULT_WRONG_CREDENTIALS = "wrong_credentials"
+
+STEP_CREDENTIALS = "credentials"
+STEP_EVENTS = "events"
+STEP_FIND = "find"
+STEP_FINISH = "finish"
+STEP_INTERFACES = "interfaces"
+STEP_INTERVALS = "intervals"
+STEP_NAME = "name"
+STEP_OPERATION = "operation"
+STEP_OPTIONS = "options"
+STEP_SECURITY = "security"

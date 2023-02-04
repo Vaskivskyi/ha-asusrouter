@@ -1,7 +1,7 @@
 {
     "config": {
         "step": {
-            "discovery": {
+            "find": {
                 "title": "Розташування пристрою",
                 "description": "Де шукати ваш пристрій",
                 "data": {
@@ -19,7 +19,7 @@
                     "mode": "Режим роботи"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Режим роботи",
                 "data": {
                     "track_devices": "Увімкнути трекінг пристроїв",
@@ -91,7 +91,7 @@
                 "description": "Будь ласка, виберіть налаштування, які потрібно змінити",
                 "data": {
                     "credentials": "Облікові дані та налаштування підключення",
-                    "operation_mode": "Режим роботи",
+                    "operation": "Режим роботи",
                     "intervals": "Інтервали оновлення",
                     "interfaces": "Інтерфейси для відслідковування",
                     "events": "Події Home Assistant",
@@ -110,7 +110,7 @@
                     "mode": "Режим роботи"
                 }
             },
-            "operation_mode": {
+            "operation": {
                 "title": "Режим роботи",
                 "data": {
                     "track_devices": "Увімкнути трекінг пристроїв",
