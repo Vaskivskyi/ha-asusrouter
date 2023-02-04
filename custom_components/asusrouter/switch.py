@@ -1,4 +1,4 @@
-"""AsusRouter switches."""
+"""AsusRouter switch module."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter switches."""
+    """Set up AsusRouter switches."""
 
     hide = []
     if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
@@ -80,8 +80,8 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("Switch state was not set!")
-        except Exception as ex:
-            _LOGGER.error(f"Switch control has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("Switch control has returned an exception: %s", ex)
 
     async def async_turn_off(
         self,
@@ -98,5 +98,5 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("Switch state was not set!")
-        except Exception as ex:
-            _LOGGER.error(f"Switch control has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("Switch control has returned an exception: %s", ex)

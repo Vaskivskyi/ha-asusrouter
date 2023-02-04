@@ -1,4 +1,4 @@
-"""AsusRouter binary sensors."""
+"""AsusRouter binary sensor module."""
 
 from __future__ import annotations
 
@@ -38,14 +38,14 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter binary sensors."""
+    """Set up AsusRouter binary sensors."""
 
     hide = []
     if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
     if not entry.options[CONF_ENABLE_CONTROL]:
-        BINARY_SENSORS.update(STATIC_BINARY_SENSORS_OPTIONAL)
+        BINARY_SENSORS.extend(STATIC_BINARY_SENSORS_OPTIONAL)
 
     await async_setup_ar_entry(
         hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor, hide

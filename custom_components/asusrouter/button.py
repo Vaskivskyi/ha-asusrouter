@@ -1,4 +1,4 @@
-"""AsusRouter buttons."""
+"""AsusRouter button module."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup AsusRouter buttons."""
+    """Set up AsusRouter buttons."""
 
     router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
     entities = []
@@ -41,7 +41,7 @@ async def async_setup_entry(
     for button in BUTTONS:
         try:
             entities.append(ARButton(router, button))
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             _LOGGER.warning(ex)
 
     async_add_entities(entities, True)
@@ -76,5 +76,5 @@ class ARButton(ARButtonEntity, ButtonEntity):
             )
             if not result:
                 _LOGGER.debug("Button press failed!")
-        except Exception as ex:
-            _LOGGER.error(f"Button press has returned an exception: {ex}")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("Button press has returned an exception: %s", ex)
