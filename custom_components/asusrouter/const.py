@@ -40,7 +40,6 @@ from .dataclass import (
 
 ASUSROUTER = "asusrouter"
 DOMAIN = ASUSROUTER
-KEY_COORDINATOR = "coordinator"
 MANUFACTURER = "ASUSTek"
 PLATFORMS = [
     Platform.BINARY_SENSOR,
@@ -81,6 +80,7 @@ BRIDGE = "bridge"
 BYTES = "bytes"
 CONFIG = "config"
 CONNECTION = "connection"
+COORDINATOR = "coordinator"
 CORE = "core"
 CPU = "cpu"
 DEVICES = "devices"
@@ -272,7 +272,7 @@ MODE_SENSORS = {
 SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_BOOTTIME = [TIMESTAMP, ISO]
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = ["number", DEVICES, "latest", "latest_time"]
+SENSORS_CONNECTED_DEVICES = [NUMBER, DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL, USED, USAGE]
 SENSORS_FIRMWARE = [STATE]
 SENSORS_GWLAN = {
