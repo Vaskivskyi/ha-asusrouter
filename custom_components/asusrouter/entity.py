@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import ASUSROUTER, COORDINATOR, DOMAIN
-from .dataclass import ARBinaryDescription, AREntityDescription
+from .dataclass import ARBinaryDescription, AREntityDescription, ARSwitchDescription
 from .helpers import to_unique_id
 from .router import ARDevice
 
@@ -120,7 +120,7 @@ class ARBinaryEntity(AREntity):
         """Initialize AsusRouter binary entity."""
 
         super().__init__(coordinator, router, description)
-        if isinstance(description, ARBinaryDescription):
+        if isinstance(description, (ARBinaryDescription, ARSwitchDescription)):
             self._icon_onoff = bool(description.icon_on and description.icon_off)
 
     @property
@@ -134,7 +134,9 @@ class ARBinaryEntity(AREntity):
         """Get the icon."""
 
         if (
-            isinstance(self.entity_description, ARBinaryDescription)
+            isinstance(
+                self.entity_description, (ARBinaryDescription, ARSwitchDescription)
+            )
             and self._icon_onoff
         ):
             if self.is_on:
