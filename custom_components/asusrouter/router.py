@@ -920,6 +920,12 @@ class ARDevice:
 
             await self.remove_trackers(raw=service.data)
 
+        # Port forwarding service
+        async def async_service_port_forwarding(service: ServiceCall):
+            """Adjust port forwarding rules."""
+
+            await self.bridge.async_port_forwarding(raw=service.data)
+
         # Services only available in control mode
         if self._options.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL):
             self.hass.services.async_register(
@@ -929,6 +935,11 @@ class ARDevice:
             self.hass.services.async_register(
                 DOMAIN, "device_internet_access", async_service_device_internet_access
             )
+
+            if self._mode == ROUTER:
+                self.hass.services.async_register(
+                    DOMAIN, "port_forwarding", async_service_port_forwarding
+                )
 
         # Services always available
         self.hass.services.async_register(

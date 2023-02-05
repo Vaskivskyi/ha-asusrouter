@@ -110,3 +110,61 @@ remove_trackers:
           integration: asusrouter
           domain: device_tracker
           multiple: true
+port_forwarding:
+  name: Port forwarding
+  description: This service allows setting / changing / removing port forwarding rules
+  fields:
+    action:
+      name: Action
+      description: Rule action
+      required: true
+      selector:
+        select:
+          options:
+            - label: Set rule
+              value: set
+            - label: Remove rule
+              value: remove
+    ip:
+      name: IP address
+      description: IP address of a device in your local network
+      required: true
+      selector:
+        text:
+    protocol:
+      name: Protocol
+      description: Connection protocol
+      required: true
+      selector:
+        select:
+          options:
+            - TCP
+            - UDP
+            - BOTH
+    port:
+      name: Internal port
+      description: Port on your local device
+      required: false
+      selector:
+        number:
+          mode: box
+          min: 1
+          max: 65535
+    ip_external:
+      name: External IP address
+      description: To be used if access should be allowed only from a single external IP address
+      required: false
+      selector:
+        text:
+    port_external:
+      name: External port
+      description: External port(s) for connection. Can be single ports separated with comma `,`, ranges using colon `:`, or their combinations
+      required: true
+      selector:
+        text:
+    name:
+      name: Rule name
+      description: You can provide a rule name to be used in the list of port forwarding rules
+      required: false
+      selector:
+        text:
