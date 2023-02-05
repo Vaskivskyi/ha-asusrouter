@@ -10,9 +10,9 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
@@ -35,23 +35,23 @@ from .router import AiMeshNode, ARDevice
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter binary sensors."""
 
     hide = []
-    if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
+    if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
-    if not entry.options[CONF_ENABLE_CONTROL]:
+    if not config_entry.options[CONF_ENABLE_CONTROL]:
         BINARY_SENSORS.extend(STATIC_BINARY_SENSORS_OPTIONAL)
 
     await async_setup_ar_entry(
-        hass, entry, async_add_entities, BINARY_SENSORS, ARBinarySensor, hide
+        hass, config_entry, async_add_entities, BINARY_SENSORS, ARBinarySensor, hide
     )
 
-    router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
+    router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     tracked: set = set()
 
     @callback
@@ -142,7 +142,7 @@ class AMBinarySensor(BinarySensorEntity):
     def device_info(self) -> DeviceInfo:
         """Return device info."""
 
-        return DeviceInfo(
+        device_info: DeviceInfo = DeviceInfo(
             identifiers={
                 (DOMAIN, self._node.mac),
             },
@@ -150,10 +150,20 @@ class AMBinarySensor(BinarySensorEntity):
             model=self._node.native.model,
             manufacturer=MANUFACTURER,
             sw_version=self._node.native.fw,
-            via_device=(DOMAIN, self._router.mac)
-            if self._router.mac != self._node.mac
-            else None,
         )
+        if self._router.mac != self._node.mac:
+            device_info = DeviceInfo(
+                identifiers={
+                    (DOMAIN, self._node.mac),
+                },
+                name=self._node.native.model,
+                model=self._node.native.model,
+                manufacturer=MANUFACTURER,
+                sw_version=self._node.native.fw,
+                via_device=(DOMAIN, self._router.mac),
+            )
+
+        return device_info
 
     @callback
     def async_on_demand_update(self) -> None:

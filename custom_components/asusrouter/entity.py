@@ -13,9 +13,9 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from . import helpers
 from .const import ASUSROUTER, COORDINATOR, DOMAIN
-from .dataclass import AREntityDescription
+from .dataclass import ARBinaryDescription, AREntityDescription
+from .helpers import to_unique_id
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,9 +82,7 @@ class AREntity(CoordinatorEntity):
         self.coordinator = coordinator
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = helpers.to_unique_id(
-            f"{DOMAIN}_{router.mac}_{description.name}"
-        )
+        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities
 
@@ -122,7 +120,8 @@ class ARBinaryEntity(AREntity):
         """Initialize AsusRouter binary entity."""
 
         super().__init__(coordinator, router, description)
-        self._icon_onoff = bool(description.icon_on and description.icon_off)
+        if isinstance(description, ARBinaryDescription):
+            self._icon_onoff = bool(description.icon_on and description.icon_off)
 
     @property
     def is_on(self) -> bool:
@@ -134,30 +133,13 @@ class ARBinaryEntity(AREntity):
     def icon(self) -> str | None:
         """Get the icon."""
 
-        if self._icon_onoff:
+        if (
+            isinstance(self.entity_description, ARBinaryDescription)
+            and self._icon_onoff
+        ):
             if self.is_on:
                 return self.entity_description.icon_on
             return self.entity_description.icon_off
         if self.entity_description.icon:
             return self.entity_description.icon
-
-
-class ARButtonEntity:
-    """AsusRouter button entity."""
-
-    def __init__(
-        self,
-        router: ARDevice,
-        description: AREntityDescription,
-    ) -> None:
-        """Initialize AsusRouter button entity."""
-
-        self.router = router
-        self.api = router.bridge.api
-
-        self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = helpers.to_unique_id(
-            f"{DOMAIN}_{router.mac}_{description.name}"
-        )
-        self._attr_device_info = router.device_info
-        self._attr_capability_attributes = description.capabilities
+        return None

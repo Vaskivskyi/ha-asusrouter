@@ -16,12 +16,14 @@ from .router import ARDevice
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter updates."""
 
-    await async_setup_ar_entry(hass, entry, async_add_entities, UPDATES, ARUpdate)
+    await async_setup_ar_entry(
+        hass, config_entry, async_add_entities, UPDATES, ARUpdate
+    )
 
 
 class ARUpdate(ARBinaryEntity, UpdateEntity):

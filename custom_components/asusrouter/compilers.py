@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from .const import (
     CONF_DEFAULT_UNITS_SPEED,
     CONF_DEFAULT_UNITS_TRAFFIC,
@@ -14,19 +12,17 @@ from .const import (
     NETWORK,
     SENSORS_PARAM_NETWORK,
 )
-from .dataclass import (
-    ARSensorDescription,
-)
+from .dataclass import ARSensorDescription
 
 
 def list_sensors_network(
     interfaces: list[str] | None = None,
     units_speed: str = CONF_DEFAULT_UNITS_SPEED,
     units_traffic: str = CONF_DEFAULT_UNITS_TRAFFIC,
-) -> dict[str, Any]:
+) -> list[ARSensorDescription]:
     """Compile a list of network sensors."""
 
-    sensors = []
+    sensors: list[ARSensorDescription] = []
 
     if not interfaces or len(interfaces) < 1:
         return sensors
@@ -51,7 +47,7 @@ def list_sensors_network(
                     entity_registry_enabled_default=data[
                         "entity_registry_enabled_default"
                     ]
-                    or None,
+                    or True,
                     extra_state_attributes={
                         key: data["raw_attribute"] or None,
                     },

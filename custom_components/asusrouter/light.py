@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_ENABLE_CONTROL, ASUSROUTER, DOMAIN, STATIC_LIGHTS as LIGHTS
+from .const import ASUSROUTER, CONF_ENABLE_CONTROL, DOMAIN, STATIC_LIGHTS as LIGHTS
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -21,18 +21,20 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter lights."""
 
     if (
-        not entry.options[CONF_ENABLE_CONTROL]
-        or not hass.data[DOMAIN][entry.entry_id][ASUSROUTER].bridge.identity.led
+        not config_entry.options[CONF_ENABLE_CONTROL]
+        or not hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER].bridge.identity.led
     ):
         return
 
-    await async_setup_ar_entry(hass, entry, async_add_entities, LIGHTS, ARLightLED)
+    await async_setup_ar_entry(
+        hass, config_entry, async_add_entities, LIGHTS, ARLightLED
+    )
 
 
 class ARLightLED(ARBinaryEntity, LightEntity):

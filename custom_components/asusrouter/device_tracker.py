@@ -1,4 +1,4 @@
-"""AsusRouter device trackers."""
+"""AsusRouter device tracker module."""
 
 from __future__ import annotations
 
@@ -23,16 +23,19 @@ from .router import ARConnectedDevice, ARDevice
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up device tracker for AsusRouter component."""
 
     # If device tracking is disabled
-    if entry.options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES) is False:
+    if (
+        config_entry.options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES)
+        is False
+    ):
         return
 
-    router = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
+    router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     tracked: set = set()
 
     @callback
@@ -127,8 +130,8 @@ class ARDeviceEntity(ScannerEntity):
         return "mdi:lan-connect" if self._device.is_connected else "mdi:lan-disconnect"
 
     @property
-    def unique_id(self) -> str:
-        """Unique ID of the entity."""
+    def unique_id(self) -> str | None:
+        """Return unique ID of the entity."""
 
         return self._attr_unique_id
 

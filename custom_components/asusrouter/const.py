@@ -1,12 +1,13 @@
-"""AsusRouter constants."""
+"""AsusRouter constants module."""
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorDeviceClass,
-)
+from asusrouter.util import converters
+
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
@@ -24,8 +25,6 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 from homeassistant.helpers.entity import EntityCategory
-
-from asusrouter.util import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
@@ -52,9 +51,9 @@ PLATFORMS = [
     Platform.UPDATE,
 ]
 
-### <-- INTEGRATION DATA
+# <-- INTEGRATION DATA
 
-### NUMERIC -->
+# NUMERIC -->
 
 NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
 NUMERIC_GWLAN = range(1, 4)  # maximum of 4 guest WLANs from 1 to 3
@@ -64,9 +63,9 @@ NUMERIC_OVPN_SERVER = range(1, 3)  # maximum of 2 OVPN servers from 1 to 2
 NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
 
-### <-- NUMERIC
+# <-- NUMERIC
 
-### GENERAL DATA -->
+# GENERAL DATA -->
 
 ACCESS_POINT = "access_point"
 ACTION_MODE = "action_mode"
@@ -146,7 +145,7 @@ WLAN_5GHZ = "5ghz"
 WLAN_5GHZ2 = "5ghz2"
 WLAN_6GHZ = "6ghz"
 
-### <-- GENERAL DATA
+# <-- GENERAL DATA
 
 MAP_WLAN = {
     WLAN_2GHZ: 0,
@@ -155,7 +154,7 @@ MAP_WLAN = {
     WLAN_6GHZ: 3,
 }
 
-### MIGRATION TEMP -->
+# MIGRATION TEMP -->
 
 MAP_NETWORK_TEMP = {
     BRIDGE.upper(): BRIDGE,
@@ -168,15 +167,15 @@ MAP_NETWORK_TEMP = {
     "WLAN3": WLAN_6GHZ,
 }
 
-### <-- MIGRATION TEMP
+# <-- MIGRATION TEMP
 
-### GENERAL STATES -->
+# GENERAL STATES -->
 
 CONNECTED = "connected"
 
-### <-- GENERAL STATES
+# <-- GENERAL STATES
 
-### LABELS -->
+# LABELS -->
 
 CONNECTION_2G = "2.4 GHz"
 CONNECTION_5G = "5 GHz"
@@ -204,7 +203,7 @@ LABEL_WLAN_5GHZ = "5 GHz"
 LABEL_WLAN_5GHZ2 = "5 GHz-2"
 LABEL_WLAN_6GHZ = "6 GHz"
 LABELS_LOAD_AVG = {
-    f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ["1", "5", "15"]
+    f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ("1", "5", "15")
 }
 LABELS_TEMPERATURE = {
     CPU: f"{LABEL_TEMPERATURE} {CPU.upper()}",
@@ -220,9 +219,9 @@ LABELS_WLAN = {
     WLAN_6GHZ: LABEL_WLAN_6GHZ,
 }
 
-### <-- LABELS
+# <-- LABELS
 
-### MODES -->
+# MODES -->
 
 MODE_SENSORS = {
     ROUTER: [
@@ -266,9 +265,9 @@ MODE_SENSORS = {
     ],
 }
 
-### <-- MODES
+# <-- MODES
 
-### SENSORS LIST -->
+# SENSORS LIST -->
 
 SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_BOOTTIME = [TIMESTAMP, ISO]
@@ -361,7 +360,7 @@ SENSORS_WLAN = {
 # Defaults
 DEFAULT_SENSORS: dict[str, list[str]] = {CPU: [TOTAL]}
 
-### <-- SENSORS
+# <-- SENSORS
 
 # CONFIGURATION CONSTANTS & DEFAULTS -->
 
@@ -519,9 +518,9 @@ RESULT_SUCCESS = "success"
 RESULT_UNKNOWN = "unknown"
 RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 
-### <-- CONFIGURATION
+# <-- CONFIGURATION
 
-### CONSTANTS & CONVERTERS -->
+# CONSTANTS & CONVERTERS -->
 
 CONVERT_SPEED = {
     UnitOfDataRate.BITS_PER_SECOND: 1,
@@ -544,9 +543,9 @@ CONVERT_TRAFFIC = {
     UnitOfInformation.GIGABYTES: 1073741824,
 }
 
-### <-- CONSTANTS & CONVERTERS
+# <-- CONSTANTS & CONVERTERS
 
-### MISC -->
+# MISC -->
 
 # Connection state
 CONNECTION_BLOCKED = "blocked"
@@ -595,7 +594,7 @@ KEY_WLAN = "wl"
 # Generate wireless networks
 NAME_GWLAN = {}
 NAME_WLAN = {}
-for i in range(len(CONNECTION_LIST)):
+for i in NUMERIC_WLAN:
     # WLAN
     NAME_WLAN[i] = f"Wireless {CONNECTION_LIST[i]}"
     # Guest WLAN
@@ -649,18 +648,18 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
     },
 }
 
-### <-- MISC
+# <-- MISC
 
-### DIAGNOSTICS -->
+# DIAGNOSTICS -->
 
-TO_REDACT = {PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME}
-TO_REDACT_DEV = {ATTR_CONNECTIONS, ATTR_IDENTIFIERS}
-TO_REDACT_STATE = {"WAN IP"}
-TO_REDACT_ATTRS = {CONF_DEVICES, PASSWORD, IP, SSID, LIST}
+TO_REDACT: list[str] = [PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME]
+TO_REDACT_DEV: list[str] = [ATTR_CONNECTIONS, ATTR_IDENTIFIERS]
+TO_REDACT_STATE: list[str] = ["WAN IP"]
+TO_REDACT_ATTRS: list[str] = [CONF_DEVICES, PASSWORD, IP, SSID, LIST]
 
-### <-- DIAGNOSTICS
+# <-- DIAGNOSTICS
 
-### SERVICES -->
+# SERVICES -->
 
 REBOOT = "reboot"
 RESTART_FIREWALL = "restart_firewall"
@@ -692,9 +691,9 @@ SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
     "disable",
 ]
 
-### <-- SERVICES
+# <-- SERVICES
 
-### ICONS -->
+# ICONS -->
 
 ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
@@ -714,9 +713,9 @@ ICON_VPN_ON = "mdi:check-network-outline"
 ICON_WLAN_OFF = "mdi:wifi-off"
 ICON_WLAN_ON = "mdi:wifi"
 
-### <-- ICONS
+# <-- ICONS
 
-### SENSORS -->
+# SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
     # WAN state
     ARBinarySensorDescription(
@@ -766,7 +765,8 @@ STATIC_BINARY_SENSORS_OPTIONAL.extend(
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
+                f"{KEY_OVPN_CLIENT}{num}_{key}": value
+                for key, value in SENSORS_VPN.items()
             },
         )
         for num in NUMERIC_OVPN_CLIENT
@@ -782,8 +782,8 @@ STATIC_BINARY_SENSORS_OPTIONAL.extend(
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
-                for key in SENSORS_VPN_SERVER
+                f"{KEY_OVPN_SERVER}{num}_{key}": value
+                for key, value in SENSORS_VPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
@@ -799,7 +799,7 @@ STATIC_BINARY_SENSORS_OPTIONAL.extend(
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_WLAN}{num}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
+                f"{KEY_WLAN}{num}_{key}": value for key, value in SENSORS_WLAN.items()
             },
         )
         for num in NUMERIC_WLAN
@@ -815,15 +815,15 @@ STATIC_BINARY_SENSORS_OPTIONAL.extend(
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_GWLAN}{num}.{gnum}_{key}": SENSORS_GWLAN[key]
-                for key in SENSORS_GWLAN
+                f"{KEY_GWLAN}{num}.{gnum}_{key}": value
+                for key, value in SENSORS_GWLAN.items()
             },
         )
         for gnum in NUMERIC_GWLAN
         for num in NUMERIC_WLAN
     ]
 )
-STATIC_BUTTONS: list[AREntityDescription] = [
+STATIC_BUTTONS: list[ARButtonDescription] = [
     ARButtonDescription(
         key=REBOOT,
         name="Reboot",
@@ -853,7 +853,7 @@ STATIC_BUTTONS: list[AREntityDescription] = [
         entity_registry_enabled_default=False,
     ),
 ]
-STATIC_BUTTONS_OPTIONAL: list[AREntityDescription] = [
+STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
     ARButtonDescription(
         key=RESTART_FIREWALL,
         name="Restart firewall",
@@ -1008,7 +1008,7 @@ STATIC_SENSORS.extend(
         ARSensorDescription(
             key=sensor,
             key_group=TEMPERATURE,
-            name=LABELS_TEMPERATURE[sensor],
+            name=label,
             icon=ICON_TEMPERATURE,
             device_class=SensorDeviceClass.TEMPERATURE,
             state_class=SensorStateClass.MEASUREMENT,
@@ -1016,7 +1016,7 @@ STATIC_SENSORS.extend(
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         )
-        for sensor in LABELS_TEMPERATURE
+        for sensor, label in LABELS_TEMPERATURE.items()
     ]
 )
 # Load avg sensors
@@ -1025,13 +1025,13 @@ STATIC_SENSORS.extend(
         ARSensorDescription(
             key=f"{LOAD_AVG}_{sensor}",
             key_group=SYSINFO,
-            name=LABELS_LOAD_AVG[sensor],
+            name=label,
             icon=ICON_CPU,
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         )
-        for sensor in LABELS_LOAD_AVG
+        for sensor, label in LABELS_LOAD_AVG.items()
     ]
 )
 STATIC_SWITCHES: list[AREntityDescription] = []
@@ -1073,7 +1073,8 @@ STATIC_SWITCHES_OPTIONAL.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_OVPN_CLIENT}{num}_{key}": SENSORS_VPN[key] for key in SENSORS_VPN
+                f"{KEY_OVPN_CLIENT}{num}_{key}": value
+                for key, value in SENSORS_VPN.items()
             },
         )
         for num in NUMERIC_OVPN_CLIENT
@@ -1093,8 +1094,8 @@ STATIC_SWITCHES_OPTIONAL.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{KEY_OVPN_SERVER}{num}_{key}": SENSORS_VPN_SERVER[key]
-                for key in SENSORS_VPN_SERVER
+                f"{KEY_OVPN_SERVER}{num}_{key}": value
+                for key, value in SENSORS_VPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
@@ -1112,26 +1113,26 @@ STATIC_SWITCHES_OPTIONAL.extend(
             service_on=RESTART_WIRELESS,
             service_on_args={
                 ACTION_MODE: APPLY,
-                f"wl{MAP_WLAN[wlan]}_radio": 1,
+                f"wl{wlan_id}_radio": 1,
             },
             service_off=RESTART_WIRELESS,
             service_off_args={
                 ACTION_MODE: APPLY,
-                f"wl{MAP_WLAN[wlan]}_radio": 0,
+                f"wl{wlan_id}_radio": 0,
             },
             device_class=WLAN,
             capabilities={
                 API_TYPE: WLAN,
-                API_ID: MAP_WLAN[wlan],
+                API_ID: wlan_id,
             },
             service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{wlan}_{key}": SENSORS_WLAN[key] for key in SENSORS_WLAN
+                f"{wlan}_{key}": value for key, value in SENSORS_WLAN.items()
             },
         )
-        for wlan in MAP_WLAN
+        for wlan, wlan_id in MAP_WLAN.items()
     ]
 )
 STATIC_SWITCHES_OPTIONAL.extend(
@@ -1146,28 +1147,28 @@ STATIC_SWITCHES_OPTIONAL.extend(
             service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_on_args={
                 ACTION_MODE: APPLY,
-                f"wl{MAP_WLAN[wlan]}.{gwlan}_bss_enabled": 1,
-                f"wl{MAP_WLAN[wlan]}.{gwlan}_expire": 0,
+                f"wl{wlan_id}.{gwlan}_bss_enabled": 1,
+                f"wl{wlan_id}.{gwlan}_expire": 0,
             },
             service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_off_args={
                 ACTION_MODE: APPLY,
-                f"wl{MAP_WLAN[wlan]}.{gwlan}_bss_enabled": 0,
+                f"wl{wlan_id}.{gwlan}_bss_enabled": 0,
             },
             device_class=WLAN,
             capabilities={
                 API_TYPE: GWLAN,
-                API_ID: f"{MAP_WLAN[wlan]}.{gwlan}",
+                API_ID: f"{wlan_id}.{gwlan}",
             },
             service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
-                f"{wlan}_{gwlan}_{key}": SENSORS_GWLAN[key] for key in SENSORS_GWLAN
+                f"{wlan}_{gwlan}_{key}": value for key, value in SENSORS_GWLAN.items()
             },
         )
         for gwlan in NUMERIC_GWLAN
-        for wlan in MAP_WLAN
+        for wlan, wlan_id in MAP_WLAN.items()
     ]
 )
 STATIC_UPDATES: list[AREntityDescription] = [
@@ -1183,7 +1184,7 @@ STATIC_UPDATES: list[AREntityDescription] = [
     )
 ]
 
-### <-- SENSORS
+# <-- SENSORS
 
 # CONSTANTS BY MODULE -->
 

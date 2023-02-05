@@ -7,8 +7,17 @@ from datetime import datetime, timedelta
 import logging
 from typing import Any, TypeVar
 
-from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
-from homeassistant.components.device_tracker import DOMAIN as TRACKER_DOMAIN
+from asusrouter import (
+    AiMeshDevice,
+    AsusDevice,
+    AsusRouterConnectionError,
+    ConnectedDevice,
+)
+
+from homeassistant.components.device_tracker import (
+    CONF_CONSIDER_HOME,
+    DOMAIN as TRACKER_DOMAIN,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -27,13 +36,6 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
-
-from asusrouter import (
-    AiMeshDevice,
-    AsusDevice,
-    AsusRouterConnectionError,
-    ConnectedDevice,
-)
 
 from .bridge import ARBridge
 from .const import (
@@ -111,7 +113,7 @@ from .const import (
     TYPE,
     WIRED,
 )
-from .helpers import to_unique_id
+from .helpers import as_dict, to_unique_id
 
 _T = TypeVar("_T")
 _LOGGER = logging.getLogger(__name__)
@@ -206,7 +208,7 @@ class ARSensorHandler:
     async def get_coordinator(
         self,
         sensor_type: str,
-        update_method: Callable[[], Awaitable[_T]] | None = None,
+        update_method: Callable[[], Awaitable[dict[str, Any]]] | None = None,
     ) -> DataUpdateCoordinator:
         """Find coordinator for the sensor type."""
 
@@ -214,6 +216,7 @@ class ARSensorHandler:
         should_poll = True
 
         # Sensor-specific rules
+        method: Callable[[], Awaitable[dict[str, Any]]]
         if sensor_type == DEVICES:
             should_poll = False
             method = self._get_connected_devices
@@ -276,9 +279,9 @@ class AiMeshNode:
     ) -> None:
         """Initialize an AiMesh node."""
 
-        self._mac = mac
+        self._mac: str = mac
         self.native = AiMeshDevice()
-        self.identity = {
+        self.identity: dict[str, Any] = {
             MAC: None,
             IP: None,
             ALIAS: None,
@@ -292,7 +295,7 @@ class AiMeshNode:
     def update(
         self,
         node_info: AiMeshDevice | None = None,
-        event_call: CALLBACK_TYPE | None = None,
+        event_call: Callable[[str, dict[str, Any] | None], None] | None = None,
     ) -> None:
         """Update AiMesh device."""
 
@@ -333,7 +336,7 @@ class AiMeshNode:
                 # Access point
                 # self._extra_state_attributes[ACCESS_POINT] = node_info.ap
                 # Notify reconnect
-                if self.identity[CONNECTED] is False:
+                if self.identity[CONNECTED] is False and callable(event_call):
                     event_call(
                         CONF_EVENT_NODE_RECONNECTED,
                         self.identity,
@@ -342,14 +345,14 @@ class AiMeshNode:
                 self.identity[CONNECTED] = True
             else:
                 # Notify disconnect
-                if self.identity[CONNECTED] is True:
+                if self.identity[CONNECTED] is True and callable(event_call):
                     event_call(
                         CONF_EVENT_NODE_DISCONNECTED,
                         self.identity,
                     )
                 # Connection status
                 self.identity[CONNECTED] = False
-        else:
+        elif callable(event_call):
             # Notify disconnect
             event_call(
                 CONF_EVENT_NODE_DISCONNECTED,
@@ -382,7 +385,7 @@ class ARConnectedDevice:
         self._mac = mac
         self._name = name
         self._ip: str | None = None
-        self.identity = {
+        self.identity: dict[str, Any] = {
             MAC: self._mac,
             IP: self._ip,
             NAME: self._name,
@@ -398,10 +401,10 @@ class ARConnectedDevice:
     @callback
     def update(
         self,
-        dev_info: dict[str, ConnectedDevice] | None = None,
+        dev_info: ConnectedDevice | None = None,
         consider_home: int = 0,
-        event_call: CALLBACK_TYPE | None = None,
-        connected_call: CALLBACK_TYPE | None = None,
+        event_call: Callable[[str, dict[str, Any] | None], None] | None = None,
+        connected_call: Callable[[dict[str, Any] | None], None] | None = None,
     ):
         """Update AsusRouter device info."""
 
@@ -490,12 +493,12 @@ class ARConnectedDevice:
                     format_mac(dev_info.node) if dev_info.node is not None else None
                 )
                 # If not connected before
-                if self._connected is False:
+                if self._connected is False and callable(event_call):
                     event_call(
                         CONF_EVENT_DEVICE_RECONNECTED,
                         self.identity,
                     )
-                    if connected_call:
+                    if callable(connected_call):
                         connected_call(self.identity)
                 # Set state
                 self._connected = True
@@ -511,7 +514,7 @@ class ARConnectedDevice:
                 > consider_home
             ):
                 # Notify
-                if self._connected is True:
+                if self._connected is True and callable(event_call):
                     event_call(
                         CONF_EVENT_DEVICE_DISCONNECTED,
                         self.identity,
@@ -529,7 +532,7 @@ class ARConnectedDevice:
                 utc_point_in_time
                 - self._extra_state_attributes[DEVICE_ATTRIBUTE_LAST_ACTIVITY]
             ).total_seconds() < consider_home
-            if self._connected is False:
+            if self._connected is False and callable(event_call):
                 event_call(
                     CONF_EVENT_DEVICE_DISCONNECTED,
                     self.identity,
@@ -1048,7 +1051,10 @@ class ARDevice:
     def connected_device_time(self, element: dict[str, Any]) -> datetime:
         """Get connected time for the device."""
 
-        return element.get(CONNECTED)
+        connected = element.get(CONNECTED)
+        if isinstance(connected, datetime):
+            return connected
+        return datetime.utcnow()
 
     @callback
     def connected_device(
@@ -1085,7 +1091,7 @@ class ARDevice:
     def fire_event(
         self,
         event: str,
-        args: dict[str | Any] | None = None,
+        args: dict[str, Any] | None = None,
     ):
         """Fire HA event."""
 
@@ -1103,7 +1109,7 @@ class ARDevice:
         # Check that data is provided
         raw = kwargs.get("raw", None)
         if raw is None:
-            return False
+            return
 
         # Get entities to remove
         if "entities" in raw:
@@ -1111,7 +1117,10 @@ class ARDevice:
             entity_reg = er.async_get(self.hass)
             for entity in entities:
                 reg_value = entity_reg.async_get(entity)
-                mac = reg_value.capabilities[MAC]
+                if not isinstance(reg_value, er.RegistryEntry):
+                    continue
+                capabilities: dict[str, Any] = as_dict(reg_value.capabilities)
+                mac = capabilities[MAC]
                 _LOGGER.debug("Trying to remove tracker with mac: %s", mac)
                 if mac in self._devices:
                     self._devices.pop(mac)
@@ -1143,7 +1152,7 @@ class ARDevice:
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
             configuration_url=f"{HTTPS if self._options[CONF_SSL] else HTTP}://\
-                {self._conf_host}:{self._conf_port}",
+{self._conf_host}:{self._conf_port}",
         )
 
     @property

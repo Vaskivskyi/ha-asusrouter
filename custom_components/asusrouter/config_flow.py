@@ -1,10 +1,16 @@
-"""AsusRouter config flow."""
+"""AsusRouter config flow module."""
 
 from __future__ import annotations
 
 import logging
 import socket
 from typing import Any
+
+from asusrouter import (
+    AsusRouterConnectionError,
+    AsusRouterLoginBlockError,
+    AsusRouterLoginError,
+)
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
@@ -20,12 +26,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
-
-from asusrouter import (
-    AsusRouterConnectionError,
-    AsusRouterLoginBlockError,
-    AsusRouterLoginError,
-)
 
 from . import helpers
 from .bridge import ARBridge
@@ -525,7 +525,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         self._mode = CONF_DEFAULT_MODE
 
         # Steps description
-        self._steps = {
+        self._steps: dict[str, dict[str, Any]] = {
             STEP_FIND: {METHOD: self.async_step_find, NEXT: STEP_CREDENTIALS},
             STEP_CREDENTIALS: {
                 METHOD: self.async_step_credentials,
@@ -764,14 +764,14 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self.config_entry = config_entry
 
-        self._selection = {}
+        self._selection: dict[str, Any] = {}
         self._configs: dict[str, Any] = self.config_entry.data.copy()
         self._host: str = self._configs[CONF_HOST]
         self._options: dict[str, Any] = self.config_entry.options.copy()
         self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
 
         # Steps description
-        self._steps = {
+        self._steps: dict[str, dict[str, Any]] = {
             STEP_OPTIONS: {METHOD: self.async_step_options, NEXT: STEP_CREDENTIALS},
             STEP_CREDENTIALS: {
                 METHOD: self.async_step_credentials,
@@ -813,7 +813,7 @@ class AROptionsFlowHandler(OptionsFlow):
 
         schema_dict = {}
         for step in self._steps:
-            if step != step_id and step != STEP_FINISH:
+            if step not in (step_id, STEP_FINISH):
                 schema_dict.update({vol.Optional(step, default=False): bool})
 
         return self.async_show_form(
