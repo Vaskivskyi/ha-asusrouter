@@ -16,6 +16,7 @@ from asusrouter import (
     AsusRouterError,
     ConnectedDevice,
     FilterDevice,
+    PortForwarding,
 )
 from asusrouter.util import converters
 
@@ -33,6 +34,7 @@ from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
 from .const import (
+    ACTION,
     BOOTTIME,
     CONF_CACHE_TIME,
     CONF_DEFAULT_CACHE_TIME,
@@ -43,6 +45,9 @@ from .const import (
     DEFAULT_SENSORS,
     FIRMWARE,
     GWLAN,
+    IP,
+    IP_EXTERNAL,
+    IPS,
     ISO,
     KEY_OVPN_CLIENT,
     KEY_OVPN_SERVER,
@@ -56,7 +61,11 @@ from .const import (
     NETWORK_STAT,
     PARENTAL_CONTROL,
     PASSWORD,
+    PORT,
+    PORT_EXTERNAL,
+    PORT_FORWARDING,
     PORTS,
+    PROTOCOL,
     RAM,
     SENSORS,
     SENSORS_BOOTTIME,
@@ -65,6 +74,7 @@ from .const import (
     SENSORS_LED,
     SENSORS_NETWORK,
     SENSORS_PARENTAL_CONTROL,
+    SENSORS_PORT_FORWARDING,
     SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
@@ -74,6 +84,7 @@ from .const import (
     SERVICE_ALLOWED_ADJUST_GWLAN,
     SERVICE_ALLOWED_ADJUST_WLAN,
     SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
+    SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL,
     STATE,
     SYSINFO,
     TEMPERATURE,
@@ -222,6 +233,10 @@ class ARBridge:
                 SENSORS: SENSORS_PARENTAL_CONTROL,
                 METHOD: self._get_data_parental_control,
             },
+            PORT_FORWARDING: {
+                SENSORS: SENSORS_PORT_FORWARDING,
+                METHOD: self._get_data_port_forwarding,
+            },
             PORTS: {
                 SENSORS: await self._get_sensors_ports(),
                 METHOD: self._get_data_ports,
@@ -328,6 +343,13 @@ class ARBridge:
             self.api.async_get_parental_control, self._process_data_parental_control
         )
 
+    async def _get_data_port_forwarding(self) -> dict[str, Any]:
+        """Get port forwarding data from the device."""
+
+        return await self._get_data(
+            self.api.async_get_port_forwarding, self._process_data_port_forwarding
+        )
+
     async def _get_data_ports(self) -> dict[str, dict[str, int]]:
         """Get ports data from the device."""
 
@@ -384,6 +406,19 @@ class ARBridge:
         for rule in raw["rules"]:
             device = dataclasses.asdict(raw["rules"][rule])
             device.pop("timemap")
+            devices.append(device)
+        data[LIST] = devices.copy()
+        return data
+
+    @staticmethod
+    def _process_data_port_forwarding(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process `port forwarding` data."""
+
+        data = {}
+        data[STATE] = raw.get(STATE)
+        devices = []
+        for rule in raw["rules"]:
+            device = dataclasses.asdict(rule)
             devices.append(device)
         data[LIST] = devices.copy()
         return data
@@ -714,6 +749,65 @@ class ARBridge:
             return await self.api.async_set_parental_control_rules(
                 rules=rules_to_change
             )
+        return False
+
+    async def async_port_forwarding(self, **kwargs: Any) -> bool:
+        """Adjust port forwarding rules."""
+
+        raw = kwargs.get("raw", None)
+        if raw is None or ACTION not in raw:
+            return False
+
+        action = raw[ACTION]
+
+        # Remove all for IP
+        if action == "remove_ip":
+            ips = None
+            # IP or IPs list set
+            if IPS in raw:
+                ips = raw[IPS]
+            elif IP in raw:
+                ips = raw[IP]
+
+            # IP(s) not found
+            if ips is None:
+                return False
+
+            # Remove all the rules for IP(s)
+            await self.api.async_remove_port_forwarding_rules(ips=ips)
+            return True
+
+        # If not enough data provided
+        if IP not in raw or PORT_EXTERNAL not in raw or PROTOCOL not in raw:
+            _LOGGER.warning("Port forwarding service did not receive enough parameters")
+            return False
+
+        # Check that protocol is correct
+        protocol = raw[PROTOCOL].upper()
+        if protocol not in SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL:
+            _LOGGER.warning(
+                "Wrong protocol %s set for port forwarding service. Please use one of %s",
+                protocol,
+                SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL,
+            )
+
+        # Create new rule
+        rule = PortForwarding(
+            name=raw.get(NAME),
+            ip=raw[IP],
+            port=raw.get(PORT),
+            protocol=raw[PROTOCOL],
+            ip_external=raw.get(IP_EXTERNAL),
+            port_external=raw[PORT_EXTERNAL],
+        )
+
+        # Apply the action
+        if action == "set":
+            return await self.api.async_set_port_forwarding_rules(rules=rule)
+        if action == "remove":
+            await self.api.async_remove_port_forwarding_rules(rules=rule)
+            return True
+
         return False
 
     # <- SERVICES

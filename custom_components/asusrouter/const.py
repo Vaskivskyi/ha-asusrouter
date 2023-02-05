@@ -68,6 +68,7 @@ NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
 # GENERAL DATA -->
 
 ACCESS_POINT = "access_point"
+ACTION = "action"
 ACTION_MODE = "action_mode"
 ALIAS = "alias"
 AIMESH = "aimesh"
@@ -91,6 +92,8 @@ GWLAN = "gwlan"
 HTTP = "http"
 HTTPS = "https"
 IP = "ip"
+IP_EXTERNAL = "ip_external"
+IPS = "ips"
 ISO = "iso"
 LACP = "lacp"
 LAN = "lan"
@@ -113,8 +116,12 @@ NUMBER = "number"
 PARENT = "parent"
 PARENTAL_CONTROL = "parental_control"
 PASSWORD = "password"
+PORT = "port"
+PORT_EXTERNAL = "port_external"
+PORT_FORWARDING = "port_forwarding"
 PORTS = "ports"
 PRODUCT_ID = "product_id"
+PROTOCOL = "protocol"
 RAM = "ram"
 ROUTER = "router"
 RX = "rx"
@@ -232,6 +239,7 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PARENTAL_CONTROL,
+        PORT_FORWARDING,
         PORTS,
         RAM,
         SYSINFO,
@@ -295,6 +303,7 @@ SENSORS_LED = [STATE]
 SENSORS_MISC = [BOOTTIME]
 SENSORS_NETWORK = [RX, RX_SPEED, TX, TX_SPEED]
 SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PORT_FORWARDING = [STATE]
 SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
 SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
@@ -691,6 +700,18 @@ SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS: list[str] = [
     "disable",
 ]
 
+SERVICE_ALLOWED_PORT_FORWARDING_ACTION: list[str] = [
+    "remove_ip",
+    "remove",
+    "set",
+]
+
+SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL: list[str] = [
+    "TCP",
+    "UDP",
+    "BOTH",
+]
+
 # <-- SERVICES
 
 # ICONS -->
@@ -703,6 +724,8 @@ ICON_LIGHT_OFF = "mdi:led-off"
 ICON_LIGHT_ON = "mdi:led-on"
 ICON_PARENTAL_CONTROL_OFF = "mdi:magnify"
 ICON_PARENTAL_CONTROL_ON = "mdi:magnify-expand"
+ICON_PORT_FORWARDING_OFF = "mdi:lan-disconnect"
+ICON_PORT_FORWARDING_ON = "mdi:lan-connect"
 ICON_RAM = "mdi:memory"
 ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
@@ -821,6 +844,23 @@ STATIC_BINARY_SENSORS_OPTIONAL.extend(
         )
         for gnum in NUMERIC_GWLAN
         for num in NUMERIC_WLAN
+    ]
+)
+STATIC_BINARY_SENSORS_OPTIONAL.extend(
+    [
+        # Port forwarding
+        ARBinarySensorDescription(
+            key=STATE,
+            key_group=PORT_FORWARDING,
+            name="Port forwarding",
+            icon_off=ICON_PORT_FORWARDING_OFF,
+            icon_on=ICON_PORT_FORWARDING_ON,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                LIST: LIST,
+            },
+        )
     ]
 )
 STATIC_BUTTONS: list[ARButtonDescription] = [
@@ -1044,12 +1084,10 @@ STATIC_SWITCHES_OPTIONAL: list[AREntityDescription] = [
         icon_off=ICON_PARENTAL_CONTROL_OFF,
         service_off=RESTART_FIREWALL,
         service_off_args={
-            ACTION_MODE: APPLY,
             "MULTIFILTER_ALL": 0,
         },
         service_on=RESTART_FIREWALL,
         service_on_args={
-            ACTION_MODE: APPLY,
             "MULTIFILTER_ALL": 1,
         },
         entity_category=EntityCategory.CONFIG,
@@ -1112,12 +1150,10 @@ STATIC_SWITCHES_OPTIONAL.extend(
             icon_off=ICON_WLAN_OFF,
             service_on=RESTART_WIRELESS,
             service_on_args={
-                ACTION_MODE: APPLY,
                 f"wl{wlan_id}_radio": 1,
             },
             service_off=RESTART_WIRELESS,
             service_off_args={
-                ACTION_MODE: APPLY,
                 f"wl{wlan_id}_radio": 0,
             },
             device_class=WLAN,
@@ -1146,13 +1182,11 @@ STATIC_SWITCHES_OPTIONAL.extend(
             icon_off=ICON_WLAN_OFF,
             service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_on_args={
-                ACTION_MODE: APPLY,
                 f"wl{wlan_id}.{gwlan}_bss_enabled": 1,
                 f"wl{wlan_id}.{gwlan}_expire": 0,
             },
             service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
             service_off_args={
-                ACTION_MODE: APPLY,
                 f"wl{wlan_id}.{gwlan}_bss_enabled": 0,
             },
             device_class=WLAN,
@@ -1169,6 +1203,31 @@ STATIC_SWITCHES_OPTIONAL.extend(
         )
         for gwlan in NUMERIC_GWLAN
         for wlan, wlan_id in MAP_WLAN.items()
+    ]
+)
+STATIC_SWITCHES_OPTIONAL.extend(
+    [
+        # Port forwarding
+        ARSwitchDescription(
+            key=STATE,
+            key_group=PORT_FORWARDING,
+            name="Port forwarding",
+            service_off=RESTART_FIREWALL,
+            service_off_args={
+                "vts_enable_x": 0,
+            },
+            service_on=RESTART_FIREWALL,
+            service_on_args={
+                "vts_enable_x": 1,
+            },
+            icon_off=ICON_PORT_FORWARDING_OFF,
+            icon_on=ICON_PORT_FORWARDING_ON,
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=True,
+            extra_state_attributes={
+                LIST: LIST,
+            },
+        )
     ]
 )
 STATIC_UPDATES: list[AREntityDescription] = [
