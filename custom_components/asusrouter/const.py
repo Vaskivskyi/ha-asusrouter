@@ -103,6 +103,7 @@ LIGHT = "light"
 LIST = "list"
 LOAD_AVG = "load_avg"
 MAC = "mac"
+MEDIA_BRIDGE = "media_bridge"
 METHOD = "method"
 MISC = "misc"
 MODEL = "model"
@@ -260,6 +261,18 @@ MODE_SENSORS = {
         TEMPERATURE,
     ],
     ACCESS_POINT: [
+        BOOTTIME,
+        CPU,
+        FIRMWARE,
+        LED,
+        NETWORK,
+        PORTS,
+        RAM,
+        SYSINFO,
+        TEMPERATURE,
+        WLAN,
+    ],
+    MEDIA_BRIDGE: [
         BOOTTIME,
         CPU,
         FIRMWARE,
@@ -457,6 +470,7 @@ CONF_LABELS_MODE = {
     ROUTER: "Router",
     NODE: "AiMesh node",
     ACCESS_POINT: "Access Point",
+    MEDIA_BRIDGE: "Media bridge",
 }
 
 # Options that require restarting the integration
@@ -494,6 +508,7 @@ CONF_VALUES_MODE = [
     ROUTER,
     NODE,
     ACCESS_POINT,
+    MEDIA_BRIDGE,
 ]
 
 # Defaults
