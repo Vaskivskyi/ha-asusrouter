@@ -97,6 +97,7 @@ from .const import (
     LEVEL,
     LIST,
     MAC,
+    MEDIA_BRIDGE,
     METHOD,
     MODEL,
     NAME,
@@ -162,7 +163,7 @@ class ARSensorHandler:
         """Return aimesh devices sensors."""
 
         # Only in router or AP mode
-        if self._mode in (ACCESS_POINT, ROUTER):
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             return {
                 NUMBER: self._aimesh_devices,
                 LIST: self._aimesh_list,
@@ -732,7 +733,7 @@ class ARDevice:
         # <-- MIGRATION FROM OLD ASUSROTUER VERSIONS
 
         # Mode-specific
-        if self._mode in (ACCESS_POINT, ROUTER):
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             # Update AiMesh
             await self.update_nodes()
 
@@ -765,7 +766,7 @@ class ARDevice:
     ) -> None:
         """Update all AsusRouter platforms."""
 
-        if self._mode in (ACCESS_POINT, ROUTER):
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             await self.update_devices()
             await self.update_nodes()
 
@@ -781,6 +782,13 @@ class ARDevice:
         _LOGGER.debug("Updating AsusRouter device list for '%s'", self._conf_host)
         try:
             api_devices = await self.bridge.async_get_connected_devices()
+            # For Media bridge mode only leave wired devices
+            if self._mode == MEDIA_BRIDGE:
+                api_devices = {
+                    mac: description
+                    for mac, description in api_devices.items()
+                    if description.connection_type == 0
+                }
         except UpdateFailed as ex:
             if not self._connect_error:
                 self._connect_error = True
@@ -972,7 +980,7 @@ class ARDevice:
         available_sensors = await self.bridge.async_get_available_sensors()
 
         # Add devices sensors
-        if self._mode in (ACCESS_POINT, ROUTER):
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             available_sensors[DEVICES] = {SENSORS: SENSORS_CONNECTED_DEVICES}
             available_sensors[AIMESH] = {SENSORS: SENSORS_AIMESH}
 
