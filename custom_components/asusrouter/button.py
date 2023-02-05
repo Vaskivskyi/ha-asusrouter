@@ -19,7 +19,7 @@ from .const import (
     STATIC_BUTTONS_OPTIONAL,
 )
 from .dataclass import ARButtonDescription
-from .entity import ARButtonEntity
+from .helpers import to_unique_id
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,15 +27,15 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter buttons."""
 
-    router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
+    router: ARDevice = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     entities = []
 
-    if entry.options.get(CONF_MODE) == ROUTER:
+    if config_entry.options.get(CONF_MODE) == ROUTER:
         BUTTONS.extend(STATIC_BUTTONS_OPTIONAL)
 
     for button in BUTTONS:
@@ -47,7 +47,7 @@ async def async_setup_entry(
     async_add_entities(entities, True)
 
 
-class ARButton(ARButtonEntity, ButtonEntity):
+class ARButton(ButtonEntity):
     """AsusRouter button."""
 
     def __init__(
@@ -57,7 +57,14 @@ class ARButton(ARButtonEntity, ButtonEntity):
     ) -> None:
         """Initialize AsusRouter button."""
 
-        super().__init__(router, description)
+        self.router = router
+        self.api = router.bridge.api
+
+        self._attr_device_info = router.device_info
+        self._attr_name = f"{router._conf_name} {description.name}"
+        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
+        self._attr_capability_attributes = description.capabilities
+
         self._service = description.service
         self._service_args = description.service_args
         self._service_expect_modify = description.service_expect_modify

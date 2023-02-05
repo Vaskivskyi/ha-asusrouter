@@ -1,15 +1,13 @@
-"""AsusRouter diagnostics."""
+"""AsusRouter diagnostics module."""
 
 from __future__ import annotations
 
-import attr
 from typing import Any
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
     ASUSROUTER,
@@ -33,7 +31,7 @@ async def async_get_config_entry_diagnostics(
 
     router: ARDevice = hass.data[DOMAIN][entry.entry_id][ASUSROUTER]
 
-    # Gather information how this AsusWrt device is represented in Home Assistant
+    # Gather information how this device is represented in Home Assistant
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     hass_device = device_registry.async_get_device(
@@ -43,7 +41,7 @@ async def async_get_config_entry_diagnostics(
         return data
 
     data["device"] = {
-        **async_redact_data(attr.asdict(hass_device), TO_REDACT_DEV),
+        **async_redact_data(hass_device.dict_repr, TO_REDACT_DEV),
         "entities": {},
         "tracked_devices": [],
     }
@@ -69,14 +67,12 @@ async def async_get_config_entry_diagnostics(
                     dict(state_dict["attributes"]), TO_REDACT_ATTRS
                 )
             # Remove sensitive info from sensors states.
-            if any(el in entity_entry.original_name for el in TO_REDACT_STATE):
+            if entity_entry.original_name in TO_REDACT_STATE:
                 state_dict = async_redact_data(state_dict, "state")
 
         data["device"]["entities"][entity_entry.entity_id] = {
             **async_redact_data(
-                attr.asdict(
-                    entity_entry, filter=lambda attr, value: attr.name != "entity_id"
-                ),
+                entity_entry.as_partial_dict,
                 TO_REDACT,
             ),
             "state": state_dict,

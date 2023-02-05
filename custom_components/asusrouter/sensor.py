@@ -27,23 +27,25 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter sensors."""
 
-    interfaces = entry.options[CONF_INTERFACES]
+    interfaces = config_entry.options[CONF_INTERFACES]
     if len(interfaces) > 0:
         _LOGGER.debug("Interfaces selected: %s. Initializing sensors", interfaces)
         SENSORS.extend(
             list_sensors_network(
-                entry.options[CONF_INTERFACES],
-                entry.options[CONF_UNITS_SPEED],
-                entry.options[CONF_UNITS_TRAFFIC],
+                config_entry.options[CONF_INTERFACES],
+                config_entry.options[CONF_UNITS_SPEED],
+                config_entry.options[CONF_UNITS_TRAFFIC],
             )
         )
 
-    await async_setup_ar_entry(hass, entry, async_add_entities, SENSORS, ARSensor)
+    await async_setup_ar_entry(
+        hass, config_entry, async_add_entities, SENSORS, ARSensor
+    )
 
 
 class ARSensor(AREntity, SensorEntity):

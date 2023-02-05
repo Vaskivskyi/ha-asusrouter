@@ -28,20 +28,20 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up AsusRouter switches."""
 
     hide = []
-    if entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
+    if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
-    if entry.options[CONF_ENABLE_CONTROL]:
+    if config_entry.options[CONF_ENABLE_CONTROL]:
         SWITCHES.extend(STATIC_SWITCHES_OPTIONAL)
 
     await async_setup_ar_entry(
-        hass, entry, async_add_entities, SWITCHES, ARSwitch, hide
+        hass, config_entry, async_add_entities, SWITCHES, ARSwitch, hide
     )
 
 

@@ -1,13 +1,23 @@
-"""AsusRouter bridge."""
+"""AsusRouter bridge module."""
 
 from __future__ import annotations
 
-import aiohttp
 from collections.abc import Awaitable, Callable
 import dataclasses
 from datetime import datetime
 import logging
 from typing import Any
+
+import aiohttp
+from asusrouter import (
+    AiMeshDevice,
+    AsusDevice,
+    AsusRouter,
+    AsusRouterError,
+    ConnectedDevice,
+    FilterDevice,
+)
+from asusrouter.util import converters
 
 from homeassistant.const import (
     CONF_HOST,
@@ -20,16 +30,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
-
-from asusrouter import (
-    AiMeshDevice,
-    AsusDevice,
-    AsusRouter,
-    AsusRouterError,
-    ConnectedDevice,
-    FilterDevice,
-)
-from asusrouter.util import converters
 
 from . import helpers
 from .const import (
@@ -64,10 +64,10 @@ from .const import (
     SENSORS_FIRMWARE,
     SENSORS_LED,
     SENSORS_NETWORK,
+    SENSORS_PARENTAL_CONTROL,
     SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
-    SENSORS_PARENTAL_CONTROL,
     SENSORS_VPN,
     SENSORS_VPN_SERVER,
     SENSORS_WAN,
@@ -395,7 +395,7 @@ class ARBridge:
         data = helpers.as_dict(helpers.flatten_dict(raw))
 
         # This conversion is a legacy
-        # Keep untill switching to the new ports sensors
+        # Keep until switching to the new ports sensors
         for port_type in SENSORS_PORTS:
             if port_type in raw:
                 data[f"{port_type}_{TOTAL}"] = 0
@@ -413,7 +413,7 @@ class ARBridge:
     async def _get_sensors(
         self,
         method: Callable[[], Awaitable[dict[str, Any]]],
-        process: Callable[[list[str]], list[str]] | None = None,
+        process: Callable[[dict[str, Any]], list[str]] | None = None,
         sensor_type: str | None = None,
         defaults: bool = False,
     ) -> list[str]:
@@ -530,7 +530,7 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_network(raw: list[str]) -> list[str]:
+    def _process_sensors_network(raw: dict[str, Any]) -> list[str]:
         """Process network sensors."""
 
         sensors = []
@@ -540,11 +540,11 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_ports(raw: list[str]) -> list[str]:
+    def _process_sensors_ports(raw: dict[str, Any]) -> list[str]:
         """Process ports sensors."""
 
         # This conversion is a legacy
-        # Keep untill switching to the new ports sensors
+        # Keep until switching to the new ports sensors
         sensors = []
         for port_type in SENSORS_PORTS:
             if port_type in raw:
@@ -554,7 +554,7 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_sysinfo(raw: list[str]) -> list[str]:
+    def _process_sensors_sysinfo(raw: dict[str, Any]) -> list[str]:
         """Process SysInfo sensors."""
 
         sensors = []
@@ -564,7 +564,7 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_vpn(raw: list[str]) -> list[str]:
+    def _process_sensors_vpn(raw: dict[str, Any]) -> list[str]:
         """Process VPN sensors."""
 
         sensors = []
@@ -578,7 +578,7 @@ class ARBridge:
             sensors.append(f"{vpn}_state")
         return sensors
 
-    # <- PROCESS SENSORS LSIT
+    # <- PROCESS SENSORS LIST
 
     # SERVICES ->
 
@@ -593,7 +593,11 @@ class ARBridge:
         # Check entity
         entity_reg = er.async_get(self.hass)
         entity = entity_reg.async_get(raw["entity_id"])
-        capabilities = entity.capabilities
+        if not isinstance(entity, er.RegistryEntry):
+            return False
+
+        # WLAN capabilities
+        capabilities: dict[str, Any] = helpers.as_dict(entity.capabilities)
 
         args_raw = raw.copy()
 
@@ -603,13 +607,12 @@ class ARBridge:
         if capabilities["api_type"] == GWLAN:
             prefix = f"wl{capabilities['api_id']}"
 
-            for arg in args_raw:
+            for arg, value in args_raw.items():
                 if arg in SERVICE_ALLOWED_ADJUST_GWLAN:
-                    args[arg] = (
-                        str(SERVICE_ALLOWED_ADJUST_GWLAN[arg](args_raw[arg]))
-                        if SERVICE_ALLOWED_ADJUST_GWLAN[arg] is not None
-                        else str(args_raw[arg])
-                    )
+                    args[arg] = str(value)
+                    method = SERVICE_ALLOWED_ADJUST_GWLAN[arg]
+                    if method:
+                        args[arg] = method(value)
 
             if PASSWORD in args_raw:
                 args["wpa_psk"] = str(args_raw[PASSWORD])
@@ -633,13 +636,12 @@ class ARBridge:
         if capabilities["api_type"] == WLAN:
             prefix = f"wl{capabilities['api_id']}"
 
-            for arg in args_raw:
+            for arg, value in args_raw.items():
                 if arg in SERVICE_ALLOWED_ADJUST_WLAN:
-                    args[arg] = (
-                        str(SERVICE_ALLOWED_ADJUST_WLAN[arg](args_raw[arg]))
-                        if SERVICE_ALLOWED_ADJUST_WLAN[arg] is not None
-                        else str(args_raw[arg])
-                    )
+                    args[arg] = str(value)
+                    method = SERVICE_ALLOWED_ADJUST_WLAN[arg]
+                    if method:
+                        args[arg] = method(value)
 
             if PASSWORD in args_raw:
                 args["wpa_psk"] = str(args_raw[PASSWORD])
@@ -691,10 +693,13 @@ class ARBridge:
             entity_reg = er.async_get(self.hass)
             for entity in entities:
                 reg_value = entity_reg.async_get(entity)
+                if not isinstance(reg_value, er.RegistryEntry):
+                    continue
+                capabilities: dict[str, Any] = helpers.as_dict(reg_value.capabilities)
                 rules_to_change.append(
                     FilterDevice(
-                        mac=reg_value.capabilities[MAC].upper(),
-                        name=reg_value.capabilities[NAME],
+                        mac=capabilities[MAC].upper(),
+                        name=capabilities[NAME],
                         type=state,
                     )
                 )

@@ -72,11 +72,11 @@ adjust_wlan:
           unit_of_measurement: s
 device_internet_access:
   name: Device internet access control
-  description: Add / change device internet access using parental control feature of the router. Please, refer to the documentation for the aditional possible parameters
+  description: Add / change device internet access using parental control feature of the router. Please, refer to the documentation for the additional possible parameters
   fields:
     entities:
       name: Entities
-      description: Select device to add / change internet access setings
+      description: Select device to add / change internet access settings
       required: true
       selector:
         entity:

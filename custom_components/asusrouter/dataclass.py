@@ -1,4 +1,4 @@
-"""AsusRouter dataclasses."""
+"""AsusRouter dataclass module."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class AREntityDescription(EntityDescription):
     """Describe AsusRouter entity."""
 
     capabilities: dict[str, Any] | None = None
-    key_group: Callable[[dict], str] | None = None
+    key_group: str | None = None
     value: Callable[[Any], Any] = lambda val: val
     extra_state_attributes: dict[str, Any] | None = None
 
@@ -52,14 +52,17 @@ class ARLightDescription(ARBinaryDescription, LightEntityDescription):
 
 
 @dataclass
-class ARSwitchDescription(ARBinaryDescription, SwitchEntityDescription):
+class ARSwitchDescription(AREntityDescription, SwitchEntityDescription):
     """Describe AsusRouter switch."""
 
-    service_on: str | None = None
-    service_on_args: dict[str, Any] | None = None
+    icon_on: str | None = None
+    icon_off: str | None = None
+
+    service_expect_modify: bool = False
     service_off: str | None = None
     service_off_args: dict[str, Any] | None = None
-    service_expect_modify: bool = False
+    service_on: str | None = None
+    service_on_args: dict[str, Any] | None = None
 
 
 @dataclass
@@ -72,5 +75,5 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
 
 
 @dataclass
-class ARUpdateDescription(ARBinaryDescription, UpdateEntityDescription):
+class ARUpdateDescription(AREntityDescription, UpdateEntityDescription):
     """Describe AsusRouter update."""
