@@ -121,6 +121,7 @@ PORT = "port"
 PORT_EXTERNAL = "port_external"
 PORT_FORWARDING = "port_forwarding"
 PORTS = "ports"
+PORTS_LEGACY = "ports_legacy"  # To be removed in 0.22.0
 PRODUCT_ID = "product_id"
 PROTOCOL = "protocol"
 RAM = "ram"
@@ -154,6 +155,12 @@ WLAN_5GHZ2 = "5ghz2"
 WLAN_6GHZ = "6ghz"
 
 # <-- GENERAL DATA
+
+LIST_PORTS = [
+    LAN,
+    USB,
+    WAN,
+]
 
 MAP_WLAN = {
     WLAN_2GHZ: 0,
@@ -242,6 +249,7 @@ MODE_SENSORS = {
         PARENTAL_CONTROL,
         PORT_FORWARDING,
         PORTS,
+        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -256,6 +264,7 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
+        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -267,6 +276,7 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
+        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -279,6 +289,7 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
+        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -733,7 +744,8 @@ SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL: list[str] = [
 
 ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
-ICON_ETHERNET = "mdi:ethernet-cable"
+ICON_ETHERNET_ON = "mdi:ethernet-cable"
+ICON_ETHERNET_OFF = "mdi:ethernet-cable-off"
 ICON_IP = "mdi:ip"
 ICON_LIGHT_OFF = "mdi:led-off"
 ICON_LIGHT_ON = "mdi:led-on"
@@ -746,6 +758,7 @@ ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
 ICON_TEMPERATURE = "mdi:thermometer"
 ICON_UPDATE = "mdi:update"
+ICON_USB = "mdi:usb-port"
 ICON_VPN_OFF = "mdi:close-network-outline"
 ICON_VPN_ON = "mdi:check-network-outline"
 ICON_WLAN_OFF = "mdi:wifi-off"
@@ -755,7 +768,48 @@ ICON_WLAN_ON = "mdi:wifi"
 
 # SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
-    # WAN state
+    # Port status - LAN
+    ARBinarySensorDescription(
+        key=LAN,
+        key_group=PORTS,
+        name="Port Status (LAN)",
+        icon_off=ICON_ETHERNET_OFF,
+        icon_on=ICON_ETHERNET_ON,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            f"{LAN}_{LIST}": LIST,
+        },
+    ),
+    # Port status - USB
+    ARBinarySensorDescription(
+        key=USB,
+        key_group=PORTS,
+        name="Port Status (USB)",
+        icon=ICON_USB,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            f"{USB}_{LIST}": LIST,
+        },
+    ),
+    # Port status - WAN
+    ARBinarySensorDescription(
+        key=WAN,
+        key_group=PORTS,
+        name="Port Status (WAN)",
+        icon_off=ICON_ETHERNET_OFF,
+        icon_on=ICON_ETHERNET_ON,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            f"{WAN}_{LIST}": LIST,
+        },
+    ),
+    # WAN
     ARBinarySensorDescription(
         key=STATUS,
         key_group=WAN,
@@ -982,11 +1036,12 @@ STATIC_SENSORS: list[AREntityDescription] = [
         },
     ),
     # LAN
+    # To be removed in 0.22.0
     ARSensorDescription(
         key=f"{LAN}_{TOTAL}",
-        key_group=PORTS,
+        key_group=PORTS_LEGACY,
         name="LAN Speed",
-        icon=ICON_ETHERNET,
+        icon=ICON_ETHERNET_ON,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -1024,11 +1079,12 @@ STATIC_SENSORS: list[AREntityDescription] = [
         },
     ),
     # WAN
+    # To be removed in 0.22.0
     ARSensorDescription(
         key=f"{WAN}_{TOTAL}",
-        key_group=PORTS,
+        key_group=PORTS_LEGACY,
         name="WAN Speed",
-        icon=ICON_ETHERNET,
+        icon=ICON_ETHERNET_ON,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         entity_category=EntityCategory.DIAGNOSTIC,

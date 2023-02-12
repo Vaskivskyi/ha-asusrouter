@@ -53,6 +53,7 @@ from .const import (
     KEY_OVPN_SERVER,
     LED,
     LIST,
+    LIST_PORTS,
     MAC,
     METHOD,
     MODE_SENSORS,
@@ -65,6 +66,7 @@ from .const import (
     PORT_EXTERNAL,
     PORT_FORWARDING,
     PORTS,
+    PORTS_LEGACY,
     PROTOCOL,
     RAM,
     SENSORS,
@@ -241,6 +243,11 @@ class ARBridge:
                 SENSORS: await self._get_sensors_ports(),
                 METHOD: self._get_data_ports,
             },
+            # To be removed in 0.22.0
+            PORTS_LEGACY: {
+                SENSORS: await self._get_sensors_ports_legacy(),
+                METHOD: self._get_data_ports_legacy,
+            },
             RAM: {SENSORS: SENSORS_RAM, METHOD: self._get_data_ram},
             SYSINFO: {
                 SENSORS: await self._get_sensors_sysinfo(),
@@ -331,11 +338,6 @@ class ARBridge:
 
         return await self._get_data(self.api.async_get_network)
 
-    async def _get_data_ram(self) -> dict[str, Any]:
-        """Get RAM data from the device."""
-
-        return await self._get_data(self.api.async_get_ram)
-
     async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
         """Get parental control data from the device."""
 
@@ -354,6 +356,19 @@ class ARBridge:
         """Get ports data from the device."""
 
         return await self._get_data(self.api.async_get_ports, self._process_data_ports)
+
+    async def _get_data_ports_legacy(self) -> dict[str, dict[str, int]]:
+        """Get ports legacy data from the device."""
+
+        # To be removed in 0.22.0
+        return await self._get_data(
+            self.api.async_get_ports, self._process_data_ports_legacy
+        )
+
+    async def _get_data_ram(self) -> dict[str, Any]:
+        """Get RAM data from the device."""
+
+        return await self._get_data(self.api.async_get_ram)
 
     async def _get_data_sysinfo(self) -> dict[str, Any]:
         """Get sysinfo data from the device."""
@@ -427,10 +442,33 @@ class ARBridge:
     def _process_data_ports(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `ports` data."""
 
+        data: dict[str, Any] = {}
+
+        for port_type in LIST_PORTS:
+            # Mark port type as disconnected
+            data[port_type] = False
+            # Skip if no data is provided from API
+            if port_type not in raw:
+                continue
+            # Create ports list
+            data[f"{port_type}_{LIST}"] = {}
+            ports_by_type: dict[int, dict[str, Any]] = raw[port_type]
+            for port_number, port_description in ports_by_type.items():
+                # Mark port type connected
+                if port_description.get(STATE):
+                    data[port_type] = True
+                # Copy port data to the list
+                data[f"{port_type}_{LIST}"][port_number] = port_description
+
+        return data
+
+    @staticmethod
+    def _process_data_ports_legacy(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process `ports` legacy data."""
+
         data = helpers.as_dict(helpers.flatten_dict(raw))
 
-        # This conversion is a legacy
-        # Keep until switching to the new ports sensors
+        # To be removed in 0.22.0
         for port_type in SENSORS_PORTS:
             if port_type in raw:
                 data[f"{port_type}_{TOTAL}"] = 0
@@ -508,6 +546,16 @@ class ARBridge:
             sensor_type=PORTS,
         )
 
+    async def _get_sensors_ports_legacy(self) -> list[str]:
+        """Get the available ports legacy sensors."""
+
+        # To be removed in 0.22.0
+        return await self._get_sensors(
+            self.api.async_get_ports,
+            self._process_sensors_ports_legacy,
+            sensor_type=PORTS_LEGACY,
+        )
+
     async def _get_sensors_sysinfo(self) -> list[str]:
         """Get the available sysinfo sensors."""
 
@@ -578,8 +626,19 @@ class ARBridge:
     def _process_sensors_ports(raw: dict[str, Any]) -> list[str]:
         """Process ports sensors."""
 
-        # This conversion is a legacy
-        # Keep until switching to the new ports sensors
+        sensors = []
+
+        for port_type in LIST_PORTS:
+            sensors.append(port_type)
+            sensors.append(f"{port_type}_{LIST}")
+
+        return sensors
+
+    @staticmethod
+    def _process_sensors_ports_legacy(raw: dict[str, Any]) -> list[str]:
+        """Process ports legacy sensors."""
+
+        # To be removed in 0.22.0
         sensors = []
         for port_type in SENSORS_PORTS:
             if port_type in raw:
