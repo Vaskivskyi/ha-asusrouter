@@ -516,7 +516,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
     VERSION = 4
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise config flow."""
 
         self._configs: dict[str, Any] = {}
