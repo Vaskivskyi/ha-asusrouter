@@ -82,6 +82,9 @@
             "password_missing": "Password is missing",
             "unknown": "Unknown error",
             "wrong_credentials": "Wrong credentials"
+        },
+        "abort": {
+            "not_router": "Not an Asus router. Cannot be configured"
         }
     },
     "options": {

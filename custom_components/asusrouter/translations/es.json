@@ -83,6 +83,9 @@
             "password_missing": "Falta la contraseña",
             "unknown": "Error desconocido",
             "wrong_credentials": "Credenciales inválidos"
+        },
+        "abort": {
+            "not_router": "[NT] Not an Asus router. Cannot be configured"
         }
     },
     "options": {
