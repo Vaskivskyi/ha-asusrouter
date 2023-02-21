@@ -526,6 +526,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         self._options: dict[str, Any] = {}
         self._unique_id: str | None = None
         self._mode = CONF_DEFAULT_MODE
+        self.description_placeholders: dict[str, Any] = {}
 
         # Steps description
         self._steps: dict[str, dict[str, Any]] = {
@@ -568,7 +569,18 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         # Save host
         assert discovery_info.ssdp_location is not None
-        self._configs[CONF_HOST] = urlparse(discovery_info.ssdp_location).hostname
+        host = urlparse(discovery_info.ssdp_location).hostname
+        self._configs[CONF_HOST] = host
+
+        # Friendly name
+        name = discovery_info.upnp[ssdp.ATTR_UPNP_FRIENDLY_NAME]
+
+        # Set the title placeholder
+        self.description_placeholders = {
+            CONF_NAME: name,
+            CONF_HOST: host,
+        }
+        self.context["title_placeholders"] = self.description_placeholders
 
         # Check if configured already
         await self.async_set_unique_id(serial_number)
