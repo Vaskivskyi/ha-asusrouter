@@ -14,10 +14,7 @@ from asusrouter import (
     ConnectedDevice,
 )
 
-from homeassistant.components.device_tracker import (
-    CONF_CONSIDER_HOME,
-    DOMAIN as TRACKER_DOMAIN,
-)
+from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -61,7 +58,6 @@ from .const import (
     CONF_EVENT_NODE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
-    CONF_LABELS_INTERFACES,
     CONF_LATEST_CONNECTED,
     CONF_MODE,
     CONF_REQ_RELOAD,
@@ -114,7 +110,7 @@ from .const import (
     TYPE,
     WIRED,
 )
-from .helpers import as_dict, to_unique_id
+from .helpers import as_dict
 
 _T = TypeVar("_T")
 _LOGGER = logging.getLogger(__name__)
@@ -653,84 +649,6 @@ class ARDevice:
 
         # Initialize services
         await self._init_services()
-
-        # MIGRATION FROM OLD ASUSROTUER VERSIONS -->
-        # Tracked entities
-        entity_reg = er.async_get(self.hass)
-        tracked_entries = er.async_entries_for_config_entry(
-            entity_reg, self._config_entry.entry_id
-        )
-        for entry in tracked_entries:
-            uid: str = entry.unique_id
-            # For device_tracker entities
-            if entry.domain == TRACKER_DOMAIN:
-                # Only MAC as unique_id -> migrate to the new schema
-                if len(uid) == 17:
-                    device_mac = uid
-                    new_uid = f"{self.mac}_{device_mac}"
-                    _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
-
-                    # If this uid was already used - remove as duplicate
-                    conflict_entity_id = entity_reg.async_get_entity_id(
-                        entry.domain, DOMAIN, new_uid
-                    )
-                    if conflict_entity_id:
-                        entity_reg.async_remove(entry.entity_id)
-                        continue
-
-                    entity_reg.async_update_entity(
-                        entry.entity_id, new_unique_id=f"{self.mac}_{uid}"
-                    )
-                else:
-                    device_mac = (uid.split("_"))[1]
-
-                self._devices[device_mac] = ARConnectedDevice(
-                    device_mac, entry.original_name
-                )
-            # Other entities
-            else:
-                if self._conf_name in uid:
-                    new_uid = uid.replace(self._conf_name, self.mac)
-                    new_uid = to_unique_id(new_uid)
-                    _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
-
-                    # If this uid was already used - remove as duplicate
-                    conflict_entity_id = entity_reg.async_get_entity_id(
-                        entry.domain, DOMAIN, new_uid
-                    )
-                    if conflict_entity_id:
-                        entity_reg.async_remove(entry.entity_id)
-                        continue
-
-                    if new_uid != uid:
-                        entity_reg.async_update_entity(
-                            entry.entity_id, new_unique_id=new_uid
-                        )
-                    uid = new_uid
-
-                # Rename network interfaces
-                for interface, label in CONF_LABELS_INTERFACES.items():
-                    lookup = to_unique_id(interface)
-                    if lookup == to_unique_id(label):
-                        continue
-                    if lookup in uid:
-                        new_uid = uid.replace(lookup, label)
-                        new_uid = to_unique_id(new_uid)
-                        _LOGGER.debug("Migrating entity `%s`", entry.entity_id)
-
-                        # If this uid was already used - remove as duplicate
-                        conflict_entity_id = entity_reg.async_get_entity_id(
-                            entry.domain, DOMAIN, new_uid
-                        )
-                        if conflict_entity_id:
-                            entity_reg.async_remove(entry.entity_id)
-                            continue
-
-                        if new_uid != uid:
-                            entity_reg.async_update_entity(
-                                entry.entity_id, new_unique_id=new_uid
-                            )
-        # <-- MIGRATION FROM OLD ASUSROTUER VERSIONS
 
         # Mode-specific
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
