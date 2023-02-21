@@ -67,12 +67,6 @@
                 "data": {
                     "hide_passwords": "Hide passwords from sensors and attributes"
                 }
-            },
-            "name": {
-                "title": "Device name",
-                "data": {
-                    "name": "Leave blank to use device model as the name"
-                }
             }
         },
         "error": {

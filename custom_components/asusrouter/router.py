@@ -18,7 +18,6 @@ from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
-    CONF_NAME,
     CONF_PORT,
     CONF_SCAN_INTERVAL,
     CONF_SSL,
@@ -587,8 +586,8 @@ class ARDevice:
 
         # Device configs
         self._conf_host: str = config_entry.data[CONF_HOST]
-        self._conf_name: str = self._options[CONF_NAME]
         self._conf_port: int = self._options[CONF_PORT]
+        self._conf_name: str = "AsusRouter"
 
         if self._conf_port == CONF_DEFAULT_PORT:
             self._conf_port = (
@@ -644,8 +643,7 @@ class ARDevice:
 
         # Use device model as the default device name if name not set
         if self._identity.model is not None:
-            if self._conf_name is None or self._conf_name == "":
-                self._conf_name = self._identity.model
+            self._conf_name = self._identity.model
 
         # Initialize services
         await self._init_services()

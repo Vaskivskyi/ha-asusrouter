@@ -67,12 +67,6 @@
                 "data": {
                     "hide_passwords": "Ocultar senhas de sensores e atributos"
                 }
-            },
-            "name": {
-                "title": "Nome do dispositivo",
-                "data": {
-                    "name": "Deixe em branco para usar o modelo do dispositivo como o nome"
-                }
             }
         },
         "error": {

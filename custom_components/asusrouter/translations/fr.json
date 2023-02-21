@@ -67,12 +67,6 @@
                 "data": {
                     "hide_passwords": "Masquer les mots de passe des capteurs et attributs"
                 }
-            },
-            "name": {
-                "title": "Nom du périphérique",
-                "data": {
-                    "name": "Laissez vide pour utiliser le modèle de l'appareil comme nom"
-                }
             }
         },
         "error": {

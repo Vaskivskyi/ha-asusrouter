@@ -67,12 +67,6 @@
                 "data": {
                     "hide_passwords": "Skrýt hesla ze senzorů a atributů"
                 }
-            },
-            "name": {
-                "title": "Název zařízení",
-                "data": {
-                    "name": "Chcete-li jako název použít model zařízení, ponechte prázdné"
-                }
             }
         },
         "error": {
