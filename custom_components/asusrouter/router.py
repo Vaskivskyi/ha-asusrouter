@@ -14,10 +14,7 @@ from asusrouter import (
     ConnectedDevice,
 )
 
-from homeassistant.components.device_tracker import (
-    CONF_CONSIDER_HOME,
-    DOMAIN as TRACKER_DOMAIN,
-)
+from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -61,7 +58,6 @@ from .const import (
     CONF_EVENT_NODE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
-    CONF_LABELS_INTERFACES,
     CONF_LATEST_CONNECTED,
     CONF_MODE,
     CONF_REQ_RELOAD,
@@ -114,7 +110,7 @@ from .const import (
     TYPE,
     WIRED,
 )
-from .helpers import as_dict, to_unique_id
+from .helpers import as_dict
 
 _T = TypeVar("_T")
 _LOGGER = logging.getLogger(__name__)
