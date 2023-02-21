@@ -82,6 +82,9 @@
             "password_missing": "Chýba heslo",
             "unknown": "Neznáma chyba",
             "wrong_credentials": "Chybné prihlasovacie údaje"
+        },
+        "abort": {
+            "not_router": "[NT] Not an Asus router. Cannot be configured"
         }
     },
     "options": {

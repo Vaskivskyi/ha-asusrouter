@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import socket
 from typing import Any
+from urllib.parse import urlparse
 
 from asusrouter import (
     AsusRouterConnectionError,
@@ -13,6 +14,7 @@ from asusrouter import (
 )
 import voluptuous as vol
 
+from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_HOST,
@@ -92,6 +94,7 @@ from .const import (
     STEP_OPERATION,
     STEP_OPTIONS,
     STEP_SECURITY,
+    STEP_SSDP,
     UNIQUE_ID,
 )
 
@@ -527,6 +530,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         # Steps description
         self._steps: dict[str, dict[str, Any]] = {
             STEP_FIND: {METHOD: self.async_step_find, NEXT: STEP_CREDENTIALS},
+            STEP_SSDP: {NEXT: STEP_CREDENTIALS},
             STEP_CREDENTIALS: {
                 METHOD: self.async_step_credentials,
                 NEXT: STEP_OPERATION,
@@ -541,6 +545,37 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             STEP_NAME: {METHOD: self.async_step_name, NEXT: STEP_FINISH},
             STEP_FINISH: {METHOD: self.async_step_finish},
         }
+
+    # SSDP
+
+    async def async_step_ssdp(
+        self,
+        discovery_info: ssdp.SsdpServiceInfo,
+    ) -> FlowResult:
+        """Flow initiated by SSDP discovery."""
+
+        step_id = STEP_SSDP
+
+        # Get the serial number
+        serial_number = discovery_info.upnp[ssdp.ATTR_UPNP_SERIAL]
+
+        # Make sure, this is actually a router
+        if (
+            discovery_info.upnp[ssdp.ATTR_UPNP_MODEL_DESCRIPTION]
+            != "ASUS Wireless Router"
+        ):
+            return self.async_abort(reason="not_router")
+
+        # Save host
+        assert discovery_info.ssdp_location is not None
+        self._configs[CONF_HOST] = urlparse(discovery_info.ssdp_location).hostname
+
+        # Check if configured already
+        await self.async_set_unique_id(serial_number)
+        self._abort_if_unique_id_configured()
+
+        # Process to setup
+        return await _async_process_step(self._steps, step_id)
 
     # User setup
 
