@@ -90,7 +90,6 @@ from .const import (
     STEP_FINISH,
     STEP_INTERFACES,
     STEP_INTERVALS,
-    STEP_NAME,
     STEP_OPERATION,
     STEP_OPTIONS,
     STEP_SECURITY,
@@ -496,21 +495,6 @@ def _create_form_security(
     return vol.Schema(schema)
 
 
-def _create_form_name(
-    user_input: dict[str, Any] | None = None,
-) -> vol.Schema:
-    """Create a form for the 'name' step."""
-
-    if not user_input:
-        user_input = {}
-
-    schema = {
-        vol.Optional(CONF_NAME, default=user_input.get(CONF_NAME, "")): cv.string,
-    }
-
-    return vol.Schema(schema)
-
-
 # <- FORMS
 
 
@@ -542,8 +526,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             },
             STEP_INTERVALS: {METHOD: self.async_step_intervals, NEXT: STEP_INTERFACES},
             STEP_INTERFACES: {METHOD: self.async_step_interfaces, NEXT: STEP_SECURITY},
-            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_NAME},
-            STEP_NAME: {METHOD: self.async_step_name, NEXT: STEP_FINISH},
+            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_FINISH},
             STEP_FINISH: {METHOD: self.async_step_finish},
         }
 
@@ -749,27 +732,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             return self.async_show_form(
                 step_id=step_id,
                 data_schema=_create_form_security(user_input),
-            )
-
-        self._options.update(user_input)
-
-        # Proceed to the next step
-        return await _async_process_step(self._steps, step_id)
-
-    # Step #7 - select device name
-    async def async_step_name(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
-        """Name the device step."""
-
-        step_id = STEP_NAME
-
-        if not user_input:
-            user_input = {}
-            return self.async_show_form(
-                step_id=step_id,
-                data_schema=_create_form_name(user_input),
             )
 
         self._options.update(user_input)

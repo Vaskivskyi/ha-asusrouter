@@ -67,12 +67,6 @@
                 "data": {
                     "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
                 }
-            },
-            "name": {
-                "title": "Device naam",
-                "data": {
-                    "name": "Laat leeg om device model te gebruiken als naam"
-                }
             }
         },
         "error": {
