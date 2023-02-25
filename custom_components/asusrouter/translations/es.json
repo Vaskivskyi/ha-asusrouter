@@ -80,7 +80,7 @@
             "wrong_credentials": "Credenciales inválidos"
         },
         "abort": {
-            "not_router": "[NT] Not an Asus router. Cannot be configured"
+            "not_router": "No es un router Asus. No puede ser configurado"
         }
     },
     "options": {
