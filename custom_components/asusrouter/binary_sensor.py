@@ -115,9 +115,7 @@ class AMBinarySensor(BinarySensorEntity):
 
         self._router = router
         self._node = node
-        self._attr_unique_id = to_unique_id(
-            f"{DOMAIN}_{router.mac}_{AIMESH}_{node.mac}"
-        )
+        self._attr_unique_id = to_unique_id(f"{router.mac}_{AIMESH}_{node.mac}")
         self._attr_name = f"AiMesh {node.native.model} ({node.native.mac})"
 
     @property

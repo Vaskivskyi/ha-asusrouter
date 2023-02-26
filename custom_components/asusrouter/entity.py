@@ -82,7 +82,7 @@ class AREntity(CoordinatorEntity):
         self.coordinator = coordinator
 
         self._attr_name = f"{router._conf_name} {description.name}"
-        self._attr_unique_id = to_unique_id(f"{DOMAIN}_{router.mac}_{description.name}")
+        self._attr_unique_id = to_unique_id(f"{router.mac}_{description.name}")
         self._attr_device_info = router.device_info
         self._attr_capability_attributes = description.capabilities
 
