@@ -79,6 +79,7 @@
         "wrong_credentials": "Wrong credentials"
       },
       "abort": {
+        "no_serial": "This device does not provide serial number. Discovery aborted",
         "not_router": "Not an Asus router. Cannot be configured"
       }
     },

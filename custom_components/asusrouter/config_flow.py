@@ -544,6 +544,10 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         # Get the serial number
         serial_number = discovery_info.upnp.get(ssdp.ATTR_UPNP_SERIAL)
 
+        # Abort if no serial number provided
+        if not serial_number or serial_number == "":
+            return self.async_abort(reason="no_serial")
+
         # Check if configured already
         await self.async_set_unique_id(serial_number)
         self._abort_if_unique_id_configured()
