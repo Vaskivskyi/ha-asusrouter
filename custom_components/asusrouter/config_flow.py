@@ -645,6 +645,9 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
                 self._options.update(result[CONFIGS])
                 # Set unique ID obtained from the device during the check
                 await self.async_set_unique_id(result[UNIQUE_ID])
+                self._abort_if_unique_id_configured(
+                    updates={CONF_HOST: self._configs[CONF_HOST]}
+                )
                 # Proceed to the next step
                 return await _async_process_step(self._steps, step_id)
 
