@@ -12,12 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_sensors_network
-from .const import (
-    CONF_INTERFACES,
-    CONF_UNITS_SPEED,
-    CONF_UNITS_TRAFFIC,
-    STATIC_SENSORS as SENSORS,
-)
+from .const import CONF_INTERFACES, CONF_UNITS_SPEED, CONF_UNITS_TRAFFIC, STATIC_SENSORS
 from .dataclass import ARSensorDescription
 from .entity import AREntity, async_setup_ar_entry
 from .router import ARDevice
@@ -32,10 +27,12 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter sensors."""
 
+    sensors = STATIC_SENSORS.copy()
+
     interfaces = config_entry.options[CONF_INTERFACES]
     if len(interfaces) > 0:
         _LOGGER.debug("Interfaces selected: %s. Initializing sensors", interfaces)
-        SENSORS.extend(
+        sensors.extend(
             list_sensors_network(
                 config_entry.options[CONF_INTERFACES],
                 config_entry.options[CONF_UNITS_SPEED],
@@ -44,7 +41,7 @@ async def async_setup_entry(
         )
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, SENSORS, ARSensor
+        hass, config_entry, async_add_entities, sensors, ARSensor
     )
 
 

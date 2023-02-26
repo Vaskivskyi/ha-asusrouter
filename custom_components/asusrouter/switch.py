@@ -16,7 +16,7 @@ from .const import (
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
     PASSWORD,
-    STATIC_SWITCHES as SWITCHES,
+    STATIC_SWITCHES,
     STATIC_SWITCHES_OPTIONAL,
 )
 from .dataclass import ARSwitchDescription
@@ -33,15 +33,17 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter switches."""
 
+    switches = STATIC_SWITCHES.copy()
+
     hide = []
     if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
     if config_entry.options[CONF_ENABLE_CONTROL]:
-        SWITCHES.extend(STATIC_SWITCHES_OPTIONAL)
+        switches.extend(STATIC_SWITCHES_OPTIONAL)
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, SWITCHES, ARSwitch, hide
+        hass, config_entry, async_add_entities, switches, ARSwitch, hide
     )
 
 

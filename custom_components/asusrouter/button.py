@@ -15,7 +15,7 @@ from .const import (
     CONF_MODE,
     DOMAIN,
     ROUTER,
-    STATIC_BUTTONS as BUTTONS,
+    STATIC_BUTTONS,
     STATIC_BUTTONS_OPTIONAL,
 )
 from .dataclass import ARButtonDescription
@@ -32,19 +32,21 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter buttons."""
 
+    buttons = STATIC_BUTTONS.copy()
+
     router: ARDevice = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     entities = []
 
     if config_entry.options.get(CONF_MODE) == ROUTER:
-        BUTTONS.extend(STATIC_BUTTONS_OPTIONAL)
+        buttons.extend(STATIC_BUTTONS_OPTIONAL)
 
-    for button in BUTTONS:
+    for button in buttons:
         try:
             entities.append(ARButton(router, button))
         except Exception as ex:  # pylint: disable=broad-except
             _LOGGER.warning(ex)
 
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class ARButton(ButtonEntity):

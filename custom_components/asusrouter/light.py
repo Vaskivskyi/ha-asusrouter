@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import ASUSROUTER, CONF_ENABLE_CONTROL, DOMAIN, STATIC_LIGHTS as LIGHTS
+from .const import ASUSROUTER, CONF_ENABLE_CONTROL, DOMAIN, STATIC_LIGHTS
 from .dataclass import ARLightDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -26,6 +26,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter lights."""
 
+    lights = STATIC_LIGHTS.copy()
+
     if (
         not config_entry.options[CONF_ENABLE_CONTROL]
         or not hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER].bridge.identity.led
@@ -33,7 +35,7 @@ async def async_setup_entry(
         return
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, LIGHTS, ARLightLED
+        hass, config_entry, async_add_entities, lights, ARLightLED
     )
 
 

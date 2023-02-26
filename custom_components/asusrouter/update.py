@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import STATIC_UPDATES as UPDATES
+from .const import STATIC_UPDATES
 from .dataclass import ARUpdateDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -21,8 +21,10 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter updates."""
 
+    updates = STATIC_UPDATES.copy()
+
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, UPDATES, ARUpdate
+        hass, config_entry, async_add_entities, updates, ARUpdate
     )
 
 

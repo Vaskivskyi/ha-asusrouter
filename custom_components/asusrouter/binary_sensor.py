@@ -24,7 +24,7 @@ from .const import (
     DOMAIN,
     MANUFACTURER,
     PASSWORD,
-    STATIC_BINARY_SENSORS as BINARY_SENSORS,
+    STATIC_BINARY_SENSORS,
     STATIC_BINARY_SENSORS_OPTIONAL,
 )
 from .dataclass import ARBinarySensorDescription
@@ -40,15 +40,17 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter binary sensors."""
 
+    binary_sensors = STATIC_BINARY_SENSORS.copy()
+
     hide = []
     if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
     if not config_entry.options[CONF_ENABLE_CONTROL]:
-        BINARY_SENSORS.extend(STATIC_BINARY_SENSORS_OPTIONAL)
+        binary_sensors.extend(STATIC_BINARY_SENSORS_OPTIONAL)
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, BINARY_SENSORS, ARBinarySensor, hide
+        hass, config_entry, async_add_entities, binary_sensors, ARBinarySensor, hide
     )
 
     router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
