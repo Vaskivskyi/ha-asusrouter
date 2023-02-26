@@ -541,11 +541,15 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         step_id = STEP_SSDP
 
         # Get the serial number
-        serial_number = discovery_info.upnp[ssdp.ATTR_UPNP_SERIAL]
+        serial_number = discovery_info.upnp.get(ssdp.ATTR_UPNP_SERIAL)
+
+        # Check if configured already
+        await self.async_set_unique_id(serial_number)
+        self._abort_if_unique_id_configured()
 
         # Make sure, this is actually a router
         if (
-            discovery_info.upnp[ssdp.ATTR_UPNP_MODEL_DESCRIPTION]
+            discovery_info.upnp.get(ssdp.ATTR_UPNP_MODEL_DESCRIPTION)
             != "ASUS Wireless Router"
         ):
             return self.async_abort(reason="not_router")
@@ -564,10 +568,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             CONF_HOST: host,
         }
         self.context["title_placeholders"] = self.description_placeholders
-
-        # Check if configured already
-        await self.async_set_unique_id(serial_number)
-        self._abort_if_unique_id_configured()
 
         # Process to setup
         return await _async_process_step(self._steps, step_id)
