@@ -1346,3 +1346,5 @@ STEP_OPERATION = "operation"
 STEP_OPTIONS = "options"
 STEP_SECURITY = "security"
 STEP_SSDP = "ssdp"
+
+SSDP_SERVER = "AsusWRT"

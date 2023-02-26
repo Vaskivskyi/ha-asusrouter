@@ -84,6 +84,7 @@ from .const import (
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
+    SSDP_SERVER,
     STEP_CREDENTIALS,
     STEP_EVENTS,
     STEP_FIND,
@@ -547,10 +548,10 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(serial_number)
         self._abort_if_unique_id_configured()
 
-        # Make sure, this is actually a router
+        # Make sure, this is actually an AsusWRT-powered device
         if (
-            discovery_info.upnp.get(ssdp.ATTR_UPNP_MODEL_DESCRIPTION)
-            != "ASUS Wireless Router"
+            not discovery_info.ssdp_server
+            or SSDP_SERVER not in discovery_info.ssdp_server
         ):
             return self.async_abort(reason="not_router")
 
