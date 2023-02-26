@@ -62,7 +62,7 @@ async def async_setup_ar_entry(
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.warning(ex)
 
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class AREntity(CoordinatorEntity):
