@@ -645,6 +645,28 @@ class ARDevice:
         if self._identity.model is not None:
             self._conf_name = self._identity.model
 
+        # Migrate from 0.21.x and below
+        # To be removed in 0.25.0
+        # Tracked entities
+        entity_reg = er.async_get(self.hass)
+        tracked_entries = er.async_entries_for_config_entry(
+            entity_reg, self._config_entry.entry_id
+        )
+        for entry in tracked_entries:
+            uid: str = entry.unique_id
+            if DOMAIN in uid:
+                new_uid = uid.replace(f"{DOMAIN}_", "")
+
+                # Check whether UID has duplicate
+                conflict_entity_id = entity_reg.async_get_entity_id(
+                    entry.domain, DOMAIN, new_uid
+                )
+                if conflict_entity_id:
+                    entity_reg.async_remove(entry.entity_id)
+                    continue
+
+                entity_reg.async_update_entity(entry.entity_id, new_unique_id=new_uid)
+
         # Initialize services
         await self._init_services()
 
