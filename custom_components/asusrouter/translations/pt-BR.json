@@ -79,6 +79,7 @@
             "wrong_credentials": "Credenciais inválidas"
         },
         "abort": {
+            "already_configured": "[NT] Device is already configured",
             "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
             "not_router": "[NT] Not an Asus router. Cannot be configured"
         }
