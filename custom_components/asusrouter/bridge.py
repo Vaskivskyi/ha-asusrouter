@@ -66,7 +66,6 @@ from .const import (
     PORT_EXTERNAL,
     PORT_FORWARDING,
     PORTS,
-    PORTS_LEGACY,
     PROTOCOL,
     RAM,
     SENSORS,
@@ -77,7 +76,6 @@ from .const import (
     SENSORS_NETWORK,
     SENSORS_PARENTAL_CONTROL,
     SENSORS_PORT_FORWARDING,
-    SENSORS_PORTS,
     SENSORS_RAM,
     SENSORS_SYSINFO,
     SENSORS_VPN,
@@ -91,7 +89,6 @@ from .const import (
     SYSINFO,
     TEMPERATURE,
     TIMESTAMP,
-    TOTAL,
     VPN,
     WAN,
     WLAN,
@@ -243,11 +240,6 @@ class ARBridge:
                 SENSORS: await self._get_sensors_ports(),
                 METHOD: self._get_data_ports,
             },
-            # To be removed in 0.22.0
-            PORTS_LEGACY: {
-                SENSORS: await self._get_sensors_ports_legacy(),
-                METHOD: self._get_data_ports_legacy,
-            },
             RAM: {SENSORS: SENSORS_RAM, METHOD: self._get_data_ram},
             SYSINFO: {
                 SENSORS: await self._get_sensors_sysinfo(),
@@ -357,14 +349,6 @@ class ARBridge:
 
         return await self._get_data(self.api.async_get_ports, self._process_data_ports)
 
-    async def _get_data_ports_legacy(self) -> dict[str, dict[str, int]]:
-        """Get ports legacy data from the device."""
-
-        # To be removed in 0.22.0
-        return await self._get_data(
-            self.api.async_get_ports, self._process_data_ports_legacy
-        )
-
     async def _get_data_ram(self) -> dict[str, Any]:
         """Get RAM data from the device."""
 
@@ -462,24 +446,6 @@ class ARBridge:
 
         return data
 
-    @staticmethod
-    def _process_data_ports_legacy(raw: dict[str, Any]) -> dict[str, Any]:
-        """Process `ports` legacy data."""
-
-        data = helpers.as_dict(helpers.flatten_dict(raw))
-
-        # To be removed in 0.22.0
-        for port_type in SENSORS_PORTS:
-            if port_type in raw:
-                data[f"{port_type}_{TOTAL}"] = 0
-                for port_id in raw[port_type]:
-                    data[f"{port_type}_{port_id}"] = raw[port_type][port_id].get(
-                        "link_rate"
-                    )
-                    data[f"{port_type}_{TOTAL}"] += data[f"{port_type}_{port_id}"]
-
-        return data
-
     # <- PROCESS DATA
 
     # GET SENSORS LIST ->
@@ -544,16 +510,6 @@ class ARBridge:
             self.api.async_get_ports,
             self._process_sensors_ports,
             sensor_type=PORTS,
-        )
-
-    async def _get_sensors_ports_legacy(self) -> list[str]:
-        """Get the available ports legacy sensors."""
-
-        # To be removed in 0.22.0
-        return await self._get_sensors(
-            self.api.async_get_ports,
-            self._process_sensors_ports_legacy,
-            sensor_type=PORTS_LEGACY,
         )
 
     async def _get_sensors_sysinfo(self) -> list[str]:
@@ -632,19 +588,6 @@ class ARBridge:
             sensors.append(port_type)
             sensors.append(f"{port_type}_{LIST}")
 
-        return sensors
-
-    @staticmethod
-    def _process_sensors_ports_legacy(raw: dict[str, Any]) -> list[str]:
-        """Process ports legacy sensors."""
-
-        # To be removed in 0.22.0
-        sensors = []
-        for port_type in SENSORS_PORTS:
-            if port_type in raw:
-                sensors.append(f"{port_type}_{TOTAL}")
-                for port_id in raw[port_type]:
-                    sensors.append(f"{port_type}_{port_id}")
         return sensors
 
     @staticmethod

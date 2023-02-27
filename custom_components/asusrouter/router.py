@@ -667,6 +667,9 @@ class ARDevice:
 
                 entity_reg.async_update_entity(entry.entity_id, new_unique_id=new_uid)
 
+            if any(id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")):
+                entity_reg.async_remove(entry.entity_id)
+
         # Initialize services
         await self._init_services()
 

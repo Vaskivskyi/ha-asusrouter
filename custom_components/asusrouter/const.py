@@ -121,7 +121,6 @@ PORT = "port"
 PORT_EXTERNAL = "port_external"
 PORT_FORWARDING = "port_forwarding"
 PORTS = "ports"
-PORTS_LEGACY = "ports_legacy"  # To be removed in 0.22.0
 PRODUCT_ID = "product_id"
 PROTOCOL = "protocol"
 RAM = "ram"
@@ -249,7 +248,6 @@ MODE_SENSORS = {
         PARENTAL_CONTROL,
         PORT_FORWARDING,
         PORTS,
-        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -264,7 +262,6 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
-        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -276,7 +273,6 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
-        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -289,7 +285,6 @@ MODE_SENSORS = {
         LED,
         NETWORK,
         PORTS,
-        PORTS_LEGACY,
         RAM,
         SYSINFO,
         TEMPERATURE,
@@ -1035,19 +1030,6 @@ STATIC_SENSORS: list[AREntityDescription] = [
             f"{num}_{USAGE}": f"{CORE}_{num}" for num in NUMERIC_CORES
         },
     ),
-    # LAN
-    # To be removed in 0.22.0
-    ARSensorDescription(
-        key=f"{LAN}_{TOTAL}",
-        key_group=PORTS_LEGACY,
-        name="LAN Speed",
-        icon=ICON_ETHERNET_ON,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-        extra_state_attributes={f"{LAN}_{num}": f"{LAN}_{num}" for num in NUMERIC_LAN},
-    ),
     # Latest connected
     ARSensorDescription(
         key="latest_time",
@@ -1077,19 +1059,6 @@ STATIC_SENSORS: list[AREntityDescription] = [
             TOTAL: TOTAL,
             USED: USED,
         },
-    ),
-    # WAN
-    # To be removed in 0.22.0
-    ARSensorDescription(
-        key=f"{WAN}_{TOTAL}",
-        key_group=PORTS_LEGACY,
-        name="WAN Speed",
-        icon=ICON_ETHERNET_ON,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-        extra_state_attributes={f"{WAN}_{num}": f"{WAN}_{num}" for num in NUMERIC_WAN},
     ),
     # WAN IP
     ARSensorDescription(
