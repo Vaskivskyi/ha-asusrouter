@@ -89,13 +89,14 @@
             "options": {
                 "title": "Configurations to change",
                 "description": "Please, select configurations you would like to change",
-                "data": {
+                "menu_options": {
                     "credentials": "Credentials and connection settings",
                     "operation": "Operation mode",
                     "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor",
                     "events": "Home Assistant events",
-                    "security": "Security options"
+                    "security": "Security options",
+                    "finish": "Save and finish"
                 }
             },
             "credentials": {

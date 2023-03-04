@@ -89,13 +89,14 @@
             "options": {
                 "title": "Paramétrages à changer",
                 "credentials": "Veuillez sélectionner les Paramétres à modifier",
-                "data": {
+                "menu_options": {
                     "device": "Paramètres d'identification et de connexion",
                     "operation": "Mode de fonctionnement",
                     "intervals": "Intervalles d'actualisation",
                     "interfaces": "Interfaces à monitorer",
                     "events": "Événements de Home Assistant",
-                    "security": "Options de sécurité"
+                    "security": "Options de sécurité",
+                    "finish": "[NT] Save and finish"
                 }
             },
             "credentials": {

@@ -787,24 +787,6 @@ class AROptionsFlowHandler(OptionsFlow):
         self._options: dict[str, Any] = self.config_entry.options.copy()
         self._mode = self._options.get(CONF_MODE, CONF_DEFAULT_MODE)
 
-        # Steps description
-        self._steps: dict[str, dict[str, Any]] = {
-            STEP_OPTIONS: {METHOD: self.async_step_options, NEXT: STEP_CREDENTIALS},
-            STEP_CREDENTIALS: {
-                METHOD: self.async_step_credentials,
-                NEXT: STEP_OPERATION,
-            },
-            STEP_OPERATION: {
-                METHOD: self.async_step_operation,
-                NEXT: STEP_INTERVALS,
-            },
-            STEP_INTERVALS: {METHOD: self.async_step_intervals, NEXT: STEP_INTERFACES},
-            STEP_INTERFACES: {METHOD: self.async_step_interfaces, NEXT: STEP_EVENTS},
-            STEP_EVENTS: {METHOD: self.async_step_events, NEXT: STEP_SECURITY},
-            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_FINISH},
-            STEP_FINISH: {METHOD: self.async_step_finish},
-        }
-
     async def async_step_init(
         self,
         user_input: dict[str, Any] | None = None,
@@ -819,25 +801,20 @@ class AROptionsFlowHandler(OptionsFlow):
     ) -> FlowResult:
         """Step to select options to change."""
 
-        step_id = STEP_OPTIONS
-
-        if user_input:
-            self._selection.update(user_input)
-            return await _async_process_step(self._steps, step_id)
-
-        if not user_input:
-            user_input = self._selection.copy()
-
-        schema_dict = {}
-        for step in self._steps:
-            if step not in (step_id, STEP_FINISH):
-                schema_dict.update({vol.Optional(step, default=False): bool})
-
-        return self.async_show_form(
-            step_id=step_id,
-            data_schema=vol.Schema(schema_dict),
+        return self.async_show_menu(
+            step_id=STEP_OPTIONS,
+            menu_options=[
+                STEP_CREDENTIALS,
+                STEP_OPERATION,
+                STEP_INTERVALS,
+                STEP_INTERFACES,
+                STEP_EVENTS,
+                STEP_SECURITY,
+                STEP_FINISH,
+            ],
         )
 
+    # Credentials
     async def async_step_credentials(
         self,
         user_input: dict[str, Any] | None = None,
@@ -847,9 +824,6 @@ class AROptionsFlowHandler(OptionsFlow):
         step_id = STEP_CREDENTIALS
 
         errors = {}
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if user_input:
             self._options.update(user_input)
@@ -861,7 +835,7 @@ class AROptionsFlowHandler(OptionsFlow):
                 errors[BASE] = result[ERRORS]
             else:
                 self._options.update(result[CONFIGS])
-                return await _async_process_step(self._steps, step_id, errors)
+                return await self.async_step_options()
 
         if not user_input:
             user_input = self._options.copy()
@@ -872,6 +846,7 @@ class AROptionsFlowHandler(OptionsFlow):
             errors=errors,
         )
 
+    # Operation mode
     async def async_step_operation(
         self,
         user_input: dict[str, Any] | None = None,
@@ -879,9 +854,6 @@ class AROptionsFlowHandler(OptionsFlow):
         """Step to select operation mode."""
 
         step_id = STEP_OPERATION
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -892,8 +864,9 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self._options.update(user_input)
 
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
+    # Update intervals
     async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
@@ -901,9 +874,6 @@ class AROptionsFlowHandler(OptionsFlow):
         """Step to select intervals."""
 
         step_id = STEP_INTERVALS
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -914,8 +884,9 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self._options.update(user_input)
 
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
+    # Interfaces to monitor
     async def async_step_interfaces(
         self,
         user_input: dict[str, Any] | None = None,
@@ -923,9 +894,6 @@ class AROptionsFlowHandler(OptionsFlow):
         """Step to select network interfaces."""
 
         step_id = STEP_INTERFACES
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -944,8 +912,9 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self._options.update(user_input)
 
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
+    # HA events
     async def async_step_events(
         self,
         user_input: dict[str, Any] | None = None,
@@ -953,9 +922,6 @@ class AROptionsFlowHandler(OptionsFlow):
         """Events step."""
 
         step_id = STEP_EVENTS
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -966,8 +932,9 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self._options.update(user_input)
 
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
+    # Security options
     async def async_step_security(
         self,
         user_input: dict[str, Any] | None = None,
@@ -975,9 +942,6 @@ class AROptionsFlowHandler(OptionsFlow):
         """Security step."""
 
         step_id = STEP_SECURITY
-
-        if self._selection.get(step_id, False) is False:
-            return await _async_process_step(self._steps, step_id)
 
         if not user_input:
             user_input = self._options.copy()
@@ -988,7 +952,7 @@ class AROptionsFlowHandler(OptionsFlow):
 
         self._options.update(user_input)
 
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
     # Step Finish
     async def async_step_finish(
