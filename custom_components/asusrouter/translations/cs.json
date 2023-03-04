@@ -89,13 +89,14 @@
             "options": {
                 "title": "Změnit konfiguraci",
                 "description": "Vyberte prosím konfigurace, které chcete změnit",
-                "data": {
+                "menu_options": {
                     "credentials": "Přihlašovací údaje a nastavení připojení",
                     "operation": "Provozní režim",
                     "intervals": "Intervaly aktualizace",
                     "interfaces": "Rozhraní ke sledování",
                     "events": "Události Home Assistant",
-                    "security": "Možnosti zabezpečení"
+                    "security": "Možnosti zabezpečení",
+                    "finish": "[NT] Save and finish"
                 }
             },
             "credentials": {

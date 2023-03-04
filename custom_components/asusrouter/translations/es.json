@@ -90,13 +90,14 @@
             "options": {
                 "title": "Opciones a cambiar",
                 "description": "Por favor, selecciona las opciones que deseas cambiar",
-                "data": {
+                "menu_options": {
                     "credentials": "Credenciales y configuración de conexión",
                     "operation": "Modo de funcionamiento",
                     "intervals": "Intervalos de actualización",
                     "interfaces": "Interfaces a monitorizar",
                     "events": "Eventos Home Assistant",
-                    "security": "Opciones de seguridad"
+                    "security": "Opciones de seguridad",
+                    "finish": "[NT] Save and finish"
                 }
             },
             "credentials": {

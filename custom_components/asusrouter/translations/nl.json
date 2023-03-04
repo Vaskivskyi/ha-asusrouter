@@ -89,13 +89,14 @@
             "options": {
                 "title": "Verander configuratie",
                 "description": "Selecteer welkee optie van configuratie u wilt aanpassen",
-                "data": {
+                "menu_options": {
                     "credentials": "Login gegevens en connectie instellingen",
                     "operation": "Operatie modus",
                     "intervals": "Update interval",
                     "interfaces": "Interfaces voor monitoring",
                     "events": "Home Assistant events",
-                    "security": "Beveiliging opties"
+                    "security": "Beveiliging opties",
+                    "finish": "[NT] Save and finish"
                 }
             },
             "credentials": {
