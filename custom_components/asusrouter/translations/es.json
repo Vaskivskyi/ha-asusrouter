@@ -16,19 +16,24 @@
                     "username": "Usuario",
                     "password": "Contraseña",
                     "port": "Puerto (0 para usar el valor por defecto)",
-                    "ssl": "Usar conexión SSL",
-                    "mode": "Modo de dispositivo"
+                    "ssl": "Usar conexión SSL"
                 }
             },
             "operation": {
                 "title": "Modo de funcionamiento",
                 "data": {
-                    "track_devices": "Habilitar rastreadores de dispositivo",
-                    "enable_monitor": "Habilitar monitorización de dispositivo",
+                    "mode": "Modo de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor",
-                    "latest_connected": "Número de dispositivos más recientes a almacenar"
-
+                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Habilitar rastreadores de dispositivo",
+                    "latest_connected": "Número de dispositivos más recientes a almacenar",
+                    "interval_devices": "Actualización del dispositivo / AiMesh",
+                    "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')"
                 }
             },
             "intervals": {
@@ -36,8 +41,6 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "Actualización del dispositivo / AiMesh",
-                    "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
                     "interval_firmware": "Datos firmware",
@@ -89,10 +92,10 @@
         "step": {
             "options": {
                 "title": "Opciones a cambiar",
-                "description": "Por favor, selecciona las opciones que deseas cambiar",
                 "menu_options": {
                     "credentials": "Credenciales y configuración de conexión",
                     "operation": "Modo de funcionamiento",
+                    "connected_devices": "[NT] Connected devices",
                     "intervals": "Intervalos de actualización",
                     "interfaces": "Interfaces a monitorizar",
                     "events": "Eventos Home Assistant",
@@ -107,18 +110,24 @@
                     "username": "Usuario",
                     "password": "Contraseña",
                     "port": "Puerto (0 para usar el valor por defecto)",
-                    "ssl": "Usar conexión SSL",
-                    "mode": "Modo de dispositivo"
+                    "ssl": "Usar conexión SSL"
                 }
             },
             "operation": {
                 "title": "Modo de funcionamiento",
                 "data": {
-                    "track_devices": "Habilitar rastreadores de dispositivo",
-                    "enable_monitor": "Habilitar monitorización de dispositivo",
+                    "mode": "Modo de dispositivo",
                     "enable_control": "Habilitar control del dispositivo",
-                    "split_intervals": "Habilitar intervalos de actualización por sensor",
-                    "latest_connected": "Número de dispositivos más recientes a almacenar"
+                    "split_intervals": "Habilitar intervalos de actualización por sensor"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Habilitar rastreadores de dispositivo",
+                    "latest_connected": "Número de dispositivos más recientes a almacenar",
+                    "interval_devices": "Actualización del dispositivo / AiMesh",
+                    "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')"
                 }
             },
             "intervals": {
@@ -126,8 +135,6 @@
                 "description": "Los valores se indican en segundos",
                 "data": {
                     "cache_time": "Tiempo de caché para los datos del dispositivo",
-                    "interval_devices": "Actualización del dispositivo / AiMesh",
-                    "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')",
                     "scan_interval": "Intervalo para actualizar entidades",
                     "interval_cpu": "Datos CPU",
                     "interval_firmware": "Datos firmware",

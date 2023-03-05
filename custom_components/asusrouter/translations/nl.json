@@ -16,18 +16,24 @@
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
                     "port": "Poort (0 voor standaard waarde)",
-                    "ssl": "Gebruik SSL verbinding",
-                    "mode": "[NT] Device mode"
+                    "ssl": "Gebruik SSL verbinding"
                 }
             },
             "operation": {
                 "title": "Operatie mode",
                 "data": {
-                    "track_devices": "Activeer apparaat trackers",
-                    "enable_monitor": "Activeer apparaat monitoring",
+                    "mode": "[NT] Device mode",
                     "enable_control": "Activeer apparaat controle",
-                    "split_intervals": "Activeer per-sensor update interval",
-                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?"
+                    "split_intervals": "Activeer per-sensor update interval"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Activeer apparaat trackers",
+                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
+                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
                 }
             },
             "intervals": {
@@ -35,8 +41,6 @@
                 "description": "Waarde in secondes",
                 "data": {
                     "cache_time": "Caching tijd",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",
@@ -88,10 +92,10 @@
         "step": {
             "options": {
                 "title": "Verander configuratie",
-                "description": "Selecteer welkee optie van configuratie u wilt aanpassen",
                 "menu_options": {
                     "credentials": "Login gegevens en connectie instellingen",
                     "operation": "Operatie modus",
+                    "connected_devices": "[NT] Connected devices",
                     "intervals": "Update interval",
                     "interfaces": "Interfaces voor monitoring",
                     "events": "Home Assistant events",
@@ -106,18 +110,24 @@
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
                     "port": "Poort (0 voor standaard waarde)",
-                    "ssl": "Gebruik SSL verbinding",
-                    "mode": "[NT] Device mode"
+                    "ssl": "Gebruik SSL verbinding"
                 }
             },
             "operation": {
                 "title": "Operation mode",
                 "data": {
-                    "track_devices": "Activeer apparaat trackers",
-                    "enable_monitor": "Activeer apparaat monitoring",
+                    "mode": "[NT] Device mode",
                     "enable_control": "Activeer apparaat controle",
-                    "split_intervals": "Activeer per-sensor update interval",
-                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?"
+                    "split_intervals": "Activeer per-sensor update interval"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Activeer apparaat trackers",
+                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
+                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
                 }
             },
             "intervals": {
@@ -125,8 +135,6 @@
                 "description": "Waardes zijn in secondes",
                 "data": {
                     "cache_time": "Caching tijd",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",

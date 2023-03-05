@@ -1304,6 +1304,7 @@ RESULT_SUCCESS = "success"
 RESULT_UNKNOWN = "unknown"
 RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 
+STEP_CONNECTED_DEVICES = "connected_devices"
 STEP_CREDENTIALS = "credentials"
 STEP_EVENTS = "events"
 STEP_FIND = "find"

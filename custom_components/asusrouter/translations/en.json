@@ -16,18 +16,24 @@
                     "username": "Username",
                     "password": "Password",
                     "port": "Port (0 to use default value)",
-                    "ssl": "Use SSL connection",
-                    "mode": "Device mode"
+                    "ssl": "Use SSL connection"
                 }
             },
             "operation": {
                 "title": "Operation mode",
                 "data": {
-                    "track_devices": "Enable device trackers",
-                    "enable_monitor": "Enable device monitoring",
+                    "mode": "Device mode",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals",
-                    "latest_connected": "Number of latest connected devices to store"
+                    "split_intervals": "Enable per-sensor update intervals"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Enable device trackers",
+                    "latest_connected": "Number of latest connected devices to store",
+                    "interval_devices": "Devices / AiMesh update",
+                    "consider_home": "Consider device at home for (after last 'online' state)"
                 }
             },
             "intervals": {
@@ -35,8 +41,6 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Devices / AiMesh update",
-                    "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",
@@ -88,10 +92,10 @@
         "step": {
             "options": {
                 "title": "Configurations to change",
-                "description": "Please, select configurations you would like to change",
                 "menu_options": {
-                    "credentials": "Credentials and connection settings",
+                    "credentials": "Credentials and connection",
                     "operation": "Operation mode",
+                    "connected_devices": "Connected devices",
                     "intervals": "Update intervals",
                     "interfaces": "Interfaces to monitor",
                     "events": "Home Assistant events",
@@ -106,18 +110,24 @@
                     "username": "Username",
                     "password": "Password",
                     "port": "Port (0 to use default value)",
-                    "ssl": "Use SSL connection",
-                    "mode": "Device mode"
+                    "ssl": "Use SSL connection"
                 }
             },
             "operation": {
                 "title": "Operation mode",
                 "data": {
-                    "track_devices": "Enable device trackers",
-                    "enable_monitor": "Enable device monitoring",
+                    "mode": "Device mode",
                     "enable_control": "Enable device control",
-                    "split_intervals": "Enable per-sensor update intervals",
-                    "latest_connected": "Number of latest connected devices to store"
+                    "split_intervals": "Enable per-sensor update intervals"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Enable device trackers",
+                    "latest_connected": "Number of latest connected devices to store",
+                    "interval_devices": "Devices / AiMesh update",
+                    "consider_home": "Consider device at home for (after last 'online' state)"
                 }
             },
             "intervals": {
@@ -125,8 +135,6 @@
                 "description": "Values are in seconds",
                 "data": {
                     "cache_time": "Caching time",
-                    "interval_devices": "Devices / AiMesh update",
-                    "consider_home": "Consider device at home for (after last 'online' state)",
                     "scan_interval": "Entities update",
                     "interval_cpu": "CPU data",
                     "interval_firmware": "Firmware data",

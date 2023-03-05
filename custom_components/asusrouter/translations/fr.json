@@ -16,18 +16,24 @@
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
                     "port": "Port (0 pour utiliser la valeur par défaut)",
-                    "ssl": "Utiliser une connexion SSL",
-                    "mode": "Mode de l'appareil"
+                    "ssl": "Utiliser une connexion SSL"
                 }
             },
             "operation": {
                 "title": "Mode de fonctionnement",
                 "data": {
-                    "track_devices": "Activer le suivis des périphériques",
-                    "enable_monitor": "Activer la surveillance des périphériques",
+                    "mode": "Mode de l'appareil",
                     "enable_control": "Activer le contrôle des périphériques",
-                    "split_intervals": "Activer les intervalles de mise à jour par capteur",
-                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker"
+                    "split_intervals": "Activer les intervalles de mise à jour par capteur"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Activer le suivis des périphériques",
+                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker",
+                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)"
                 }
             },
             "intervals": {
@@ -35,8 +41,6 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
                     "interval_firmware": "Données du micrologiciel",
@@ -88,10 +92,10 @@
         "step": {
             "options": {
                 "title": "Paramétrages à changer",
-                "credentials": "Veuillez sélectionner les Paramétres à modifier",
                 "menu_options": {
                     "device": "Paramètres d'identification et de connexion",
                     "operation": "Mode de fonctionnement",
+                    "connected_devices": "[NT] Connected devices",
                     "intervals": "Intervalles d'actualisation",
                     "interfaces": "Interfaces à monitorer",
                     "events": "Événements de Home Assistant",
@@ -106,18 +110,24 @@
                     "username": "Nom d'utilisateur",
                     "password": "Mot de pass",
                     "port": "Port (0 pour utiliser la valeur par défaut)",
-                    "ssl": "Utiliser une connexion SSL",
-                    "mode": "Mode de l'appareil"
+                    "ssl": "Utiliser une connexion SSL"
                 }
             },
             "operation": {
                 "title": "Mode de fonctionnement",
                 "data": {
-                    "track_devices": "Activer le suivis des périphériques",
-                    "enable_monitor": "Activer la surveillance des périphériques",
+                    "mode": "Mode de l'appareil",
                     "enable_control": "Activer le contrôle des périphériques",
-                    "split_intervals": "Activer les intervalles de mise à jour par capteur",
-                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker"
+                    "split_intervals": "Activer les intervalles de mise à jour par capteur"
+                }
+            },
+            "connected_devices": {
+                "title": "Connected devices",
+                "data": {
+                    "track_devices": "Activer le suivis des périphériques",
+                    "latest_connected": "Nombre d'appareils connectés les plus récents à stocker",
+                    "interval_devices": "[NT] Devices / AiMesh update",
+                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)"
                 }
             },
             "intervals": {
@@ -125,8 +135,6 @@
                 "description": "Les valeurs sont en secondes",
                 "data": {
                     "cache_time": "Temps de mise en cache",
-                    "interval_devices": "Appareils / Mise à jour AiMesh",
-                    "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)",
                     "scan_interval": "Intervalles d'actualisation des entités",
                     "interval_cpu": "Données CPU",
                     "interval_firmware": "Données du micrologiciel",
