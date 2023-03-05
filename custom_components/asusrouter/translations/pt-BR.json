@@ -27,6 +27,17 @@
                     "split_intervals": "Habilitar intervalos de atualização por sensor"
                 }
             },
+            "options": {
+                "title": "[NT] Additional options",
+                "menu_options": {
+                    "connected_devices": "[NT] Connected devices",
+                    "intervals": "Intervalos de atualização",
+                    "interfaces": "Interfaces para monitorar",
+                    "events": "Eventos do Home Assistant",
+                    "security": "Opções de segurança",
+                    "finish": "[NT] Save and finish"
+                }
+            },
             "connected_devices": {
                 "title": "Connected devices",
                 "data": {
@@ -64,6 +75,18 @@
                     "interfaces": "Selecione interfaces de rede para monitorar",
                     "units_speed": "Unidades de velocidade",
                     "units_traffic": "Unidades de tráfego"
+                }
+            },
+            "events": {
+                "title": "Eventos",
+                "description": "Quais eventos devem ser disparados",
+                "data": {
+                    "device_connected": "Dispositivo conectato (o dispositivo não foi rastreado anteriormente)",
+                    "device_disconnected": "Dispositivo desconectato",
+                    "device_reconnected": "Dispositivo reconectado (o dispositivo já foi rastreado anteriormente)",
+                    "node_connected": "Nó AiMesh conectado (o dispositivo não foi rastreado anteriormente)",
+                    "node_disconnected": "Nó AiMesh desconectado",
+                    "node_reconnected": "Nó AiMesh reconectado"
                 }
             },
             "security": {

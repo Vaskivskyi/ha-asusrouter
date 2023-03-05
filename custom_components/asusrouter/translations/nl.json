@@ -27,6 +27,17 @@
                     "split_intervals": "Activeer per-sensor update interval"
                 }
             },
+            "options": {
+                "title": "[NT] Additional options",
+                "menu_options": {
+                    "connected_devices": "[NT] Connected devices",
+                    "intervals": "Update interval",
+                    "interfaces": "Interfaces voor monitoring",
+                    "events": "Home Assistant events",
+                    "security": "Beveiliging opties",
+                    "finish": "[NT] Save and finish"
+                }
+            },
             "connected_devices": {
                 "title": "Connected devices",
                 "data": {
@@ -64,6 +75,18 @@
                     "interfaces": "Selecteer netwerk interfaces voor monitoring",
                     "units_speed": "Eenheden per snelheid",
                     "units_traffic": "Eenhenden for verkeer"
+                }
+            },
+            "events": {
+                "title": "Gebeurtenis",
+                "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
+                "data": {
+                    "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
+                    "device_disconnected": "Apparaat verbroken",
+                    "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)",
+                    "node_connected": "[NT] AiMesh node connected (not seen before)",
+                    "node_disconnected": "[NT] AiMesh node disconnected",
+                    "node_reconnected": "[NT] AiMesh node reconnected"
                 }
             },
             "security": {

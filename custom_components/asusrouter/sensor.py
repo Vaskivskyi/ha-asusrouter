@@ -29,7 +29,7 @@ async def async_setup_entry(
 
     sensors = STATIC_SENSORS.copy()
 
-    interfaces = config_entry.options[CONF_INTERFACES]
+    interfaces = config_entry.options.get(CONF_INTERFACES, [])
     if len(interfaces) > 0:
         _LOGGER.debug("Interfaces selected: %s. Initializing sensors", interfaces)
         sensors.extend(

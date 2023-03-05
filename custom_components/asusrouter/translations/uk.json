@@ -27,6 +27,17 @@
                     "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
                 }
             },
+            "options": {
+                "title": "Додаткові налаштування",
+                "menu_options": {
+                    "connected_devices": "Підключені пристрої",
+                    "intervals": "Інтервали оновлення",
+                    "interfaces": "Інтерфейси для відслідковування",
+                    "events": "Події Home Assistant",
+                    "security": "Налаштування безпеки",
+                    "finish": "Зберегти і завершити"
+                }
+            },
             "connected_devices": {
                 "title": "Connected devices",
                 "data": {
@@ -64,6 +75,18 @@
                     "interfaces": "Виберіть інтерфейси для відслідковування",
                     "units_speed": "Одиниці вимірювання швидкості",
                     "units_traffic": "Одиниці вимірювання трафіку"
+                }
+            },
+            "events": {
+                "title": "Події",
+                "description": "Які події повинні викликатися",
+                "data": {
+                    "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
+                    "device_disconnected": "Пристрій відключено",
+                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
+                    "node_connected": "AiMesh нода підключена (підключено вперше)",
+                    "node_disconnected": "AiMesh нода відключена",
+                    "node_reconnected": "AiMesh нода знов підключена"
                 }
             },
             "security": {

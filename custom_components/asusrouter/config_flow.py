@@ -345,9 +345,7 @@ def _create_form_connected_devices(
     schema = {
         vol.Required(
             CONF_TRACK_DEVICES,
-            default=user_input.get(
-                CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES
-            ),
+            default=user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES),
         ): cv.boolean,
         vol.Required(
             CONF_LATEST_CONNECTED,
@@ -357,13 +355,11 @@ def _create_form_connected_devices(
         ): cv.positive_int,
         vol.Required(
             CONF_INTERVAL_DEVICES,
-            default=user_input.get(
-                CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL
-            ),
+            default=user_input.get(CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL),
         ): cv.positive_int,
     }
 
-    if mode in(ACCESS_POINT, ROUTER):
+    if mode in (ACCESS_POINT, ROUTER):
         schema.update(
             {
                 vol.Required(
@@ -380,7 +376,7 @@ def _create_form_connected_devices(
 
 def _create_form_intervals(
     user_input: dict[str, Any] | None = None,
-    mode: str = ROUTER,
+    mode: str = CONF_DEFAULT_MODE,
 ) -> vol.Schema:
     """Create a form for the 'intervals' step."""
 
@@ -393,7 +389,6 @@ def _create_form_intervals(
             default=user_input.get(CONF_CACHE_TIME, CONF_DEFAULT_CACHE_TIME),
         ): cv.positive_int,
     }
-
 
     split = user_input.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS)
     conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
@@ -529,16 +524,12 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             },
             STEP_OPERATION: {
                 METHOD: self.async_step_operation,
-                NEXT: STEP_INTERVALS,
+                NEXT: STEP_OPTIONS,
             },
-            STEP_INTERVALS: {METHOD: self.async_step_intervals, NEXT: STEP_INTERFACES},
-            STEP_INTERFACES: {METHOD: self.async_step_interfaces, NEXT: STEP_SECURITY},
-            STEP_SECURITY: {METHOD: self.async_step_security, NEXT: STEP_FINISH},
-            STEP_FINISH: {METHOD: self.async_step_finish},
+            STEP_OPTIONS: {METHOD: self.async_step_options},
         }
 
     # SSDP
-
     async def async_step_ssdp(
         self,
         discovery_info: ssdp.SsdpServiceInfo,
@@ -584,7 +575,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         return await _async_process_step(self._steps, step_id)
 
     # User setup
-
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
@@ -593,7 +583,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_find(user_input)
 
-    # Step #1 - find the device
+    # Find the device
     async def async_step_find(
         self,
         user_input: dict[str, Any] | None = None,
@@ -627,7 +617,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Step #2 - credentials, SSL and operation mode
+    # Credentials & connection
     async def async_step_credentials(
         self,
         user_input: dict[str, Any] | None = None,
@@ -664,7 +654,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Step #3 - operation settings
+    # Operation settings
     async def async_step_operation(
         self,
         user_input: dict[str, Any] | None = None,
@@ -687,7 +677,51 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         # Proceed to the next step
         return await _async_process_step(self._steps, step_id)
 
-    # Step #4 - time intervals
+    # Options
+    async def async_step_options(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step to select options to change."""
+
+        menu_options = [
+            STEP_INTERVALS,
+            STEP_INTERFACES,
+            STEP_EVENTS,
+            STEP_SECURITY,
+            STEP_OPTIONS,
+            STEP_FINISH,
+        ]
+
+        # Mode-specific
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
+            menu_options.insert(0, STEP_CONNECTED_DEVICES)
+
+        return self.async_show_menu(
+            step_id=STEP_OPTIONS,
+            menu_options=menu_options,
+        )
+
+    # Connected devices
+    async def async_step_connected_devices(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step to select connected devices settings."""
+
+        step_id = STEP_CONNECTED_DEVICES
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_connected_devices(user_input, self._mode),
+            )
+        self._options.update(user_input)
+
+        return await self.async_step_options()
+
+    # Time intervals
     async def async_step_intervals(
         self,
         user_input: dict[str, Any] | None = None,
@@ -705,10 +739,9 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        # Proceed to the next step
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
-    # Step #5 - network interfaces to monitor
+    # Network monitoring
     async def async_step_interfaces(
         self,
         user_input: dict[str, Any] | None = None,
@@ -729,10 +762,29 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        # Proceed to the next step
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
-    # Step #6 - security options
+    # HA events
+    async def async_step_events(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Events step."""
+
+        step_id = STEP_EVENTS
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_events(user_input),
+            )
+
+        self._options.update(user_input)
+
+        return await self.async_step_options()
+
+    # Security
     async def async_step_security(
         self,
         user_input: dict[str, Any] | None = None,
@@ -750,8 +802,7 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         self._options.update(user_input)
 
-        # Proceed to the next step
-        return await _async_process_step(self._steps, step_id)
+        return await self.async_step_options()
 
     # Step Finish
     async def async_step_finish(
@@ -879,7 +930,7 @@ class AROptionsFlowHandler(OptionsFlow):
         self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
 
         return await self.async_step_options()
-    
+
     # Connected devices
     async def async_step_connected_devices(
         self,
@@ -930,6 +981,8 @@ class AROptionsFlowHandler(OptionsFlow):
 
         if not user_input:
             user_input = self._options.copy()
+            if user_input.get(INTERFACES) is None:
+                user_input[INTERFACES] = []
             selected = user_input[INTERFACES].copy()
             interfaces = await _async_get_network_interfaces(
                 self.hass, self._configs, self._options
