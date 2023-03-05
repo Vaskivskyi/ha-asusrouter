@@ -32,6 +32,7 @@ from homeassistant.helpers import config_validation as cv
 from . import helpers
 from .bridge import ARBridge
 from .const import (
+    ACCESS_POINT,
     BASE,
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
@@ -74,6 +75,7 @@ from .const import (
     ERRORS,
     FIRMWARE,
     INTERFACES,
+    MEDIA_BRIDGE,
     METHOD,
     NEXT,
     RESULT_CANNOT_RESOLVE,
@@ -85,6 +87,7 @@ from .const import (
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
     SSDP_SERVER,
+    STEP_CONNECTED_DEVICES,
     STEP_CREDENTIALS,
     STEP_EVENTS,
     STEP_FIND,
@@ -299,9 +302,6 @@ def _create_form_credentials(
         vol.Optional(
             CONF_SSL, default=user_input.get(CONF_SSL, CONF_DEFAULT_SSL)
         ): cv.boolean,
-        vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
-            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
-        ),
     }
 
     return vol.Schema(schema)
@@ -317,6 +317,9 @@ def _create_form_operation(
         user_input = {}
 
     schema = {
+        vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
+            {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
+        ),
         vol.Required(
             CONF_ENABLE_CONTROL,
             default=user_input.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL),
@@ -327,20 +330,46 @@ def _create_form_operation(
         ): cv.boolean,
     }
 
-    # Only in router mode
-    if mode == ROUTER:
+    return vol.Schema(schema)
+
+
+def _create_form_connected_devices(
+    user_input: dict[str, Any] | None = None,
+    mode: str = CONF_DEFAULT_MODE,
+) -> vol.Schema:
+    """Create a form for the `connected_devices` step."""
+
+    if not user_input:
+        user_input = {}
+
+    schema = {
+        vol.Required(
+            CONF_TRACK_DEVICES,
+            default=user_input.get(
+                CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES
+            ),
+        ): cv.boolean,
+        vol.Required(
+            CONF_LATEST_CONNECTED,
+            default=user_input.get(
+                CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
+            ),
+        ): cv.positive_int,
+        vol.Required(
+            CONF_INTERVAL_DEVICES,
+            default=user_input.get(
+                CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL
+            ),
+        ): cv.positive_int,
+    }
+
+    if mode in(ACCESS_POINT, ROUTER):
         schema.update(
             {
                 vol.Required(
-                    CONF_TRACK_DEVICES,
+                    CONF_CONSIDER_HOME,
                     default=user_input.get(
-                        CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES
-                    ),
-                ): cv.boolean,
-                vol.Required(
-                    CONF_LATEST_CONNECTED,
-                    default=user_input.get(
-                        CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
+                        CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
                     ),
                 ): cv.positive_int,
             }
@@ -365,29 +394,6 @@ def _create_form_intervals(
         ): cv.positive_int,
     }
 
-    # Only in router mode
-    if mode == ROUTER:
-        schema.update(
-            {
-                vol.Required(
-                    CONF_INTERVAL_DEVICES,
-                    default=user_input.get(
-                        CONF_INTERVAL_DEVICES, CONF_DEFAULT_SCAN_INTERVAL
-                    ),
-                ): cv.positive_int,
-            }
-        )
-        if user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES):
-            schema.update(
-                {
-                    vol.Required(
-                        CONF_CONSIDER_HOME,
-                        default=user_input.get(
-                            CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
-                        ),
-                    ): cv.positive_int,
-                }
-            )
 
     split = user_input.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS)
     conf_scan_interval = user_input.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
@@ -633,8 +639,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input:
-            # Save the operation mode
-            self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
             # Check credentials and connection
             result = await _async_check_connection(self.hass, self._configs, user_input)
             # Show errors if any
@@ -677,6 +681,8 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             )
 
         self._options.update(user_input)
+        # Save the operation mode
+        self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
 
         # Proceed to the next step
         return await _async_process_step(self._steps, step_id)
@@ -801,17 +807,24 @@ class AROptionsFlowHandler(OptionsFlow):
     ) -> FlowResult:
         """Step to select options to change."""
 
+        menu_options = [
+            STEP_CREDENTIALS,
+            STEP_OPERATION,
+            STEP_INTERVALS,
+            STEP_INTERFACES,
+            STEP_EVENTS,
+            STEP_SECURITY,
+            STEP_OPTIONS,
+            STEP_FINISH,
+        ]
+
+        # Mode-specific
+        if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
+            menu_options.insert(2, STEP_CONNECTED_DEVICES)
+
         return self.async_show_menu(
             step_id=STEP_OPTIONS,
-            menu_options=[
-                STEP_CREDENTIALS,
-                STEP_OPERATION,
-                STEP_INTERVALS,
-                STEP_INTERFACES,
-                STEP_EVENTS,
-                STEP_SECURITY,
-                STEP_FINISH,
-            ],
+            menu_options=menu_options,
         )
 
     # Credentials
@@ -827,7 +840,6 @@ class AROptionsFlowHandler(OptionsFlow):
 
         if user_input:
             self._options.update(user_input)
-            self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
             result = await _async_check_connection(
                 self.hass, self._configs, self._options
             )
@@ -862,6 +874,27 @@ class AROptionsFlowHandler(OptionsFlow):
                 data_schema=_create_form_operation(user_input, self._mode),
             )
 
+        self._options.update(user_input)
+        # Save the operation mode
+        self._mode = user_input.get(CONF_MODE, CONF_DEFAULT_MODE)
+
+        return await self.async_step_options()
+    
+    # Connected devices
+    async def async_step_connected_devices(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step to select connected devices settings."""
+
+        step_id = STEP_CONNECTED_DEVICES
+
+        if not user_input:
+            user_input = self._options.copy()
+            return self.async_show_form(
+                step_id=step_id,
+                data_schema=_create_form_connected_devices(user_input, self._mode),
+            )
         self._options.update(user_input)
 
         return await self.async_step_options()
