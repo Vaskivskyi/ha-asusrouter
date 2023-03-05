@@ -890,15 +890,22 @@ class AROptionsFlowHandler(OptionsFlow):
         errors = {}
 
         if user_input:
-            self._options.update(user_input)
-            result = await _async_check_connection(
-                self.hass, self._configs, self._options
-            )
-            if ERRORS in result:
-                errors[BASE] = result[ERRORS]
-            else:
-                self._options.update(result[CONFIGS])
-                return await self.async_step_options()
+            if (
+                user_input[CONF_USERNAME] != self._options[CONF_USERNAME]
+                or user_input[CONF_PASSWORD] != self._options[CONF_PASSWORD]
+                or user_input[CONF_PORT] != self._options[CONF_PORT]
+                or user_input[CONF_SSL] != self._options[CONF_SSL]
+            ):
+                self._options.update(user_input)
+                result = await _async_check_connection(
+                    self.hass, self._configs, self._options
+                )
+                if ERRORS in result:
+                    errors[BASE] = result[ERRORS]
+                else:
+                    self._options.update(result[CONFIGS])
+                    return await self.async_step_options()
+            return await self.async_step_options()
 
         if not user_input:
             user_input = self._options.copy()
