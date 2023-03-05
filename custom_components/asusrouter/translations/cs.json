@@ -24,7 +24,7 @@
                 "data": {
                     "mode": "[NT] Device mode",
                     "enable_control": "Povolit ovládání zařízení",
-                    "split_intervals": "Povolit intervaly aktualizace pro každý senzor",
+                    "split_intervals": "Povolit intervaly aktualizace pro každý senzor"
                 }
             },
             "connected_devices": {
