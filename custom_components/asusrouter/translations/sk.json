@@ -27,6 +27,17 @@
                     "split_intervals": "Povoliť intervaly aktualizáce pre každý senzor"
                 }
             },
+            "options": {
+                "title": "[NT] Additional options",
+                "menu_options": {
+                    "connected_devices": "[NT] Connected devices",
+                    "intervals": "Intervaly aktualizácie",
+                    "interfaces": "Rozhrania sledovania",
+                    "events": "Udalosti Home Assistant",
+                    "security": "Možnosti zabezpečenia",
+                    "finish": "[NT] Save and finish"
+                }
+            },
             "connected_devices": {
                 "title": "Connected devices",
                 "data": {
@@ -64,6 +75,18 @@
                     "interfaces": "Vyberte sieťové rozhranie sledovania",
                     "units_speed": "Jednotky pre rýchlost",
                     "units_traffic": "Jednotky pre sieťovú prevádzku"
+                }
+            },
+            "events": {
+                "title": "Udalosti",
+                "description": "Ktoré udalosti sa majú oznamovať",
+                "data": {
+                    "device_connected": "Zariadenie pripojené (zariadenie nebolo predtým sledované)",
+                    "device_disconnected": "Zariadenie odpojené",
+                    "device_reconnected": "Zariadenie bolo znovu pripojené (toto zariadenie už bolo sledované)",
+                    "node_connected": "[NT] AiMesh node connected (not seen before)",
+                    "node_disconnected": "[NT] AiMesh node disconnected",
+                    "node_reconnected": "[NT] AiMesh node reconnected"
                 }
             },
             "security": {

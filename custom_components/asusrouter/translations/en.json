@@ -27,6 +27,17 @@
                     "split_intervals": "Enable per-sensor update intervals"
                 }
             },
+            "options": {
+                "title": "Additional options",
+                "menu_options": {
+                    "connected_devices": "Connected devices",
+                    "intervals": "Update intervals",
+                    "interfaces": "Interfaces to monitor",
+                    "events": "Home Assistant events",
+                    "security": "Security options",
+                    "finish": "Save and finish"
+                }
+            },
             "connected_devices": {
                 "title": "Connected devices",
                 "data": {
@@ -64,6 +75,18 @@
                     "interfaces": "Select network interfaces to monitor",
                     "units_speed": "Units for speed",
                     "units_traffic": "Units for traffic"
+                }
+            },
+            "events": {
+                "title": "Events",
+                "description": "Which events should be raised",
+                "data": {
+                    "device_connected": "Device connected (the device was not tracked before)",
+                    "device_disconnected": "Device disconnected",
+                    "device_reconnected": "Device reconnected (this device was already tracked before)",
+                    "node_connected": "AiMesh node connected (not seen before)",
+                    "node_disconnected": "AiMesh node disconnected",
+                    "node_reconnected": "AiMesh node reconnected"
                 }
             },
             "security": {
