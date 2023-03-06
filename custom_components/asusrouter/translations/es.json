@@ -28,18 +28,18 @@
                 }
             },
             "options": {
-                "title": "[NT] Additional options",
+                "title": "Opciones adicionales",
                 "menu_options": {
-                    "connected_devices": "[NT] Connected devices",
+                    "connected_devices": "Dispositivos conectados",
                     "intervals": "Intervalos de actualización",
                     "interfaces": "Interfaces a monitorizar",
                     "events": "Eventos Home Assistant",
                     "security": "Opciones de seguridad",
-                    "finish": "[NT] Save and finish"
+                    "finish": "Guardar y finalizar"
                 }
             },
             "connected_devices": {
-                "title": "Connected devices",
+                "title": "Dispositivos conectados",
                 "data": {
                     "track_devices": "Habilitar rastreadores de dispositivo",
                     "latest_connected": "Número de dispositivos más recientes a almacenar",
@@ -106,8 +106,8 @@
             "wrong_credentials": "Credenciales inválidos"
         },
         "abort": {
-            "already_configured": "[NT] Device is already configured",
-            "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
+            "already_configured": "El dispositivo ya está configurado",
+            "no_serial": "Este dispositivo no provee un número de serie. Cancelado descubrimiento",
             "not_router": "No es un router Asus. No puede ser configurado"
         }
     },
@@ -118,12 +118,12 @@
                 "menu_options": {
                     "credentials": "Credenciales y configuración de conexión",
                     "operation": "Modo de funcionamiento",
-                    "connected_devices": "[NT] Connected devices",
+                    "connected_devices": "Dispositivos conectados",
                     "intervals": "Intervalos de actualización",
                     "interfaces": "Interfaces a monitorizar",
                     "events": "Eventos Home Assistant",
                     "security": "Opciones de seguridad",
-                    "finish": "[NT] Save and finish"
+                    "finish": "Guardar y finalizar"
                 }
             },
             "credentials": {
