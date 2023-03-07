@@ -28,14 +28,14 @@
                 }
             },
             "options": {
-                "title": "[NT] Additional options",
+                "title": "Opções adicionais",
                 "menu_options": {
-                    "connected_devices": "[NT] Connected devices",
+                    "connected_devices": "Dispositivos conectados",
                     "intervals": "Intervalos de atualização",
                     "interfaces": "Interfaces para monitorar",
                     "events": "Eventos do Home Assistant",
                     "security": "Opções de segurança",
-                    "finish": "[NT] Save and finish"
+                    "finish": "Guardar e finalizar"
                 }
             },
             "connected_devices": {
@@ -106,9 +106,9 @@
             "wrong_credentials": "Credenciais inválidas"
         },
         "abort": {
-            "already_configured": "[NT] Device is already configured",
-            "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
-            "not_router": "[NT] Not an Asus router. Cannot be configured"
+            "already_configured": "Dispositivo já configurado",
+            "no_serial": "Este dispositivo não fornece um número de série. Descobrimento abortado.",
+            "not_router": "Não é um roteador ASUS. Não é possível configurar."
         }
     },
     "options": {
@@ -118,12 +118,12 @@
                 "menu_options": {
                     "credentials": "Credenciais e configurações de conexão",
                     "operation": "Modo de operação",
-                    "connected_devices": "[NT] Connected devices",
+                    "connected_devices": "Dispositivos conectados",
                     "intervals": "Intervalos de atualização",
                     "interfaces": "Interfaces para monitorar",
                     "events": "Eventos do Home Assistant",
                     "security": "Opções de segurança",
-                    "finish": "[NT] Save and finish"
+                    "finish": "Guardar e finalizar"
                 }
             },
             "credentials": {
