@@ -183,6 +183,9 @@
           "units_traffic": "Einheiten für den Verkehr"
         },
         "title": "Zu überwachende Schnittstellen"
+      },
+      "events": {
+        "title": "Veranstaltungen"
       }
     }
   }
