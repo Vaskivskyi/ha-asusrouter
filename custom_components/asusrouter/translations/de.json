@@ -76,6 +76,9 @@
           "units_speed": "Einheiten für Geschwindigkeit",
           "units_traffic": "Einheiten für den Verkehr"
         }
+      },
+      "events": {
+        "title": "Veranstaltungen"
       }
     }
   }
