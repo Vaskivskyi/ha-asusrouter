@@ -98,7 +98,8 @@
     },
     "error": {
       "cannot_resolve_host": "Kann den Hostnamen nicht auflösen. Versuchen Sie es mit der IP-Adresse",
-      "connection_refused": "Verbindung abgelehnt"
+      "connection_refused": "Verbindung abgelehnt",
+      "error": "Verbindung nicht möglich"
     }
   }
 }
