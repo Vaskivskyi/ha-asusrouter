@@ -202,6 +202,9 @@
           "hide_passwords": "Passwörter vor Sensoren und Attributen verbergen"
         }
       }
+    },
+    "error": {
+      "connection_refused": "Verbindung abgelehnt"
     }
   }
 }
