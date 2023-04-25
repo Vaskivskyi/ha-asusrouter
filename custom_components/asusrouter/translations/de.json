@@ -192,7 +192,8 @@
           "device_disconnected": "Gerät getrennt",
           "device_reconnected": "Gerät neu verbunden (dieses Gerät wurde bereits zuvor getrackt)",
           "node_connected": "AiMesh-Knoten verbunden (noch nie zuvor gesehen)",
-          "node_disconnected": "AiMesh-Knoten getrennt"
+          "node_disconnected": "AiMesh-Knoten getrennt",
+          "node_reconnected": "AiMesh-Knoten wieder verbunden"
         }
       }
     }
