@@ -99,7 +99,8 @@
     "error": {
       "cannot_resolve_host": "Kann den Hostnamen nicht auflösen. Versuchen Sie es mit der IP-Adresse",
       "connection_refused": "Verbindung abgelehnt",
-      "error": "Verbindung nicht möglich"
+      "error": "Verbindung nicht möglich",
+      "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie mal"
     }
   }
 }
