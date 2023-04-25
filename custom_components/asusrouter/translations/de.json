@@ -116,7 +116,8 @@
       "options": {
         "title": "Konfigurationen zu ändern",
         "menu_options": {
-          "credentials": "Anmeldeinformationen und Verbindung"
+          "credentials": "Anmeldeinformationen und Verbindung",
+          "operation": "Betriebsmodus"
         }
       }
     }
