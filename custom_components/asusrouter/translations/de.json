@@ -172,7 +172,8 @@
       "interfaces": {
         "data": {
           "interfaces": "Wählen Sie die zu überwachenden Netzwerkschnittstellen aus"
-        }
+        },
+        "title": "Zu überwachende Schnittstellen"
       }
     }
   }
