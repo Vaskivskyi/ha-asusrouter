@@ -106,7 +106,8 @@
       "wrong_credentials": "Falsche Anmeldeinformationen"
     },
     "abort": {
-      "already_configured": "Gerät ist bereits konfiguriert"
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "no_serial": "Dieses Gerät gibt keine Seriennummer an. Erkennung abgebrochen"
     }
   }
 }
