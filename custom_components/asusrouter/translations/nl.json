@@ -123,7 +123,8 @@
           "interfaces": "Interfaces voor monitoring",
           "events": "Home Assistant events",
           "security": "Beveiliging opties",
-          "finish": "[NT] Save and finish"
+          "finish": "[NT] Save and finish",
+          "device": "Identificatie- en verbindingsparameters"
         }
       },
       "credentials": {
