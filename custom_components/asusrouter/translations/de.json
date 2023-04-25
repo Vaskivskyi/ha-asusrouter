@@ -133,7 +133,8 @@
         "data": {
           "username": "Nutzername",
           "password": "Passwort",
-          "port": "Port (0, um den Standardwert zu verwenden)"
+          "port": "Port (0, um den Standardwert zu verwenden)",
+          "ssl": "Verwenden Sie eine SSL-Verbindung"
         }
       }
     }
