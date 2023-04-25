@@ -119,7 +119,8 @@
           "credentials": "Anmeldeinformationen und Verbindung",
           "operation": "Betriebsmodus",
           "connected_devices": "Verbundene Geräte",
-          "intervals": "Aktualisierungsintervalle"
+          "intervals": "Aktualisierungsintervalle",
+          "interfaces": "Zu überwachende Schnittstellen"
         }
       }
     }
