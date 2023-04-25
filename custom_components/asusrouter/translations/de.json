@@ -195,6 +195,9 @@
           "node_disconnected": "AiMesh-Knoten getrennt",
           "node_reconnected": "AiMesh-Knoten wieder verbunden"
         }
+      },
+      "security": {
+        "title": "Sicherheit"
       }
     }
   }
