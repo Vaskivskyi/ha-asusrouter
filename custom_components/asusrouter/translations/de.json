@@ -189,7 +189,8 @@
         "description": "Welche Ereignisse sollten ausgelöst werden",
         "data": {
           "device_connected": "Gerät verbunden (das Gerät wurde zuvor nicht getrackt)",
-          "device_disconnected": "Gerät getrennt"
+          "device_disconnected": "Gerät getrennt",
+          "device_reconnected": "Gerät neu verbunden (dieses Gerät wurde bereits zuvor getrackt)"
         }
       }
     }
