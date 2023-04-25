@@ -14,7 +14,8 @@
         "description": "Dasselbe wie für das Geräte-Webpanel",
         "data": {
           "username": "Nutzername",
-          "password": "Passwort"
+          "password": "Passwort",
+          "port": "Port (0, um den Standardwert zu verwenden)"
         }
       }
     }
