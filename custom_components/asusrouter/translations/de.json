@@ -37,6 +37,9 @@
           "security": "Sicherheitsoptionen",
           "finish": "Speichern und fertig"
         }
+      },
+      "connected_devices": {
+        "title": "Verbundene Geräte"
       }
     }
   }
