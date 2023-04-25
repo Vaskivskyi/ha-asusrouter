@@ -138,7 +138,10 @@
         }
       },
       "operation": {
-        "title": "Betriebsmodus"
+        "title": "Betriebsmodus",
+        "data": {
+          "mode": "Gerätemodus"
+        }
       }
     }
   }
