@@ -129,7 +129,10 @@
       },
       "credentials": {
         "title": "Referenzen",
-        "description": "Dasselbe wie für das Geräte-Webpanel"
+        "description": "Dasselbe wie für das Geräte-Webpanel",
+        "data": {
+          "username": "Nutzername"
+        }
       }
     }
   }
