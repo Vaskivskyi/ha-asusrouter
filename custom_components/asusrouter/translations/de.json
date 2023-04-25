@@ -41,7 +41,8 @@
       "connected_devices": {
         "title": "Verbundene Geräte",
         "data": {
-          "track_devices": "Geräte-Tracker aktivieren"
+          "track_devices": "Geräte-Tracker aktivieren",
+          "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen"
         }
       }
     }
