@@ -117,7 +117,8 @@
         "title": "Konfigurationen zu ändern",
         "menu_options": {
           "credentials": "Anmeldeinformationen und Verbindung",
-          "operation": "Betriebsmodus"
+          "operation": "Betriebsmodus",
+          "connected_devices": "Verbundene Geräte"
         }
       }
     }
