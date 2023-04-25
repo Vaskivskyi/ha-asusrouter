@@ -167,6 +167,11 @@
           "interval_misc": "Verschiedene Daten",
           "interval_network_stat": "Netzwerkstatistikdaten"
         }
+      },
+      "interfaces": {
+        "data": {
+          "interfaces": "Wählen Sie die zu überwachenden Netzwerkschnittstellen aus"
+        }
       }
     }
   }
