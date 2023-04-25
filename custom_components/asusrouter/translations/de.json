@@ -153,6 +153,9 @@
           "interval_devices": "Geräte / AiMesh-Update",
           "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"
         }
+      },
+      "intervals": {
+        "title": "Aktualisierungsintervalle"
       }
     }
   }
