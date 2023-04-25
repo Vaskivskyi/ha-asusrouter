@@ -63,7 +63,8 @@
           "interval_ports": "Portdaten",
           "interval_ram": "RAM-Daten",
           "interval_sysinfo": "Sysinfo-Daten",
-          "interval_temperature": "Temperaturdaten"
+          "interval_temperature": "Temperaturdaten",
+          "interval_vpn": "VPN-Daten"
         }
       }
     }
