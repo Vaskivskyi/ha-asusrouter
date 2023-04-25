@@ -42,7 +42,8 @@
         "title": "Verbundene Geräte",
         "data": {
           "track_devices": "Geräte-Tracker aktivieren",
-          "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen"
+          "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
+          "interval_devices": "Geräte / AiMesh-Update"
         }
       }
     }
