@@ -123,7 +123,8 @@
           "interfaces": "Interfaces to monitor",
           "events": "Home Assistant events",
           "security": "Security options",
-          "finish": "Save and finish"
+          "finish": "Save and finish",
+          "device": "Identification and connection parameters"
         }
       },
       "credentials": {
