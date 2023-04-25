@@ -126,6 +126,9 @@
           "finish": "Speichern und fertig",
           "device": "Identifikations- und Verbindungsparameter"
         }
+      },
+      "credentials": {
+        "title": "Referenzen"
       }
     }
   }
