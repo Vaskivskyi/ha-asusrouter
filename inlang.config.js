@@ -15,7 +15,7 @@ export async function defineConfig(env) {
   );
 
   const pluginConfig = {
-      pathPattern: "custom_components/asusrouter/translations/{language}.json",
+      pathPattern: "./custom_components/asusrouter/translations/{language}.json",
   };
 
   return {
