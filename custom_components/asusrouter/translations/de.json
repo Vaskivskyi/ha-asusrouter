@@ -172,7 +172,8 @@
           "interval_temperature": "Temperaturdaten",
           "interval_sysinfo": "Sysinfo-Daten",
           "interval_ram": "RAM-Daten",
-          "interval_ports": "Portdaten"
+          "interval_ports": "Portdaten",
+          "interval_parental_control": "Daten der Kindersicherung"
         }
       },
       "interfaces": {
