@@ -206,7 +206,8 @@
     "error": {
       "connection_refused": "Verbindung abgelehnt",
       "error": "Verbindung nicht möglich",
-      "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie mal"
+      "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie mal",
+      "not_confirmed": "Sie müssen bestätigen"
     }
   }
 }
