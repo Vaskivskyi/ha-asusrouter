@@ -78,7 +78,8 @@
         }
       },
       "events": {
-        "title": "Events"
+        "title": "Events",
+        "description": "Welche Ereignisse sollten ausgelöst werden"
       }
     }
   }
