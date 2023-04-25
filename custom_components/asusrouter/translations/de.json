@@ -23,7 +23,8 @@
         "title": "Betriebsmodus",
         "data": {
           "mode": "Gerätemodus",
-          "enable_control": "Aktivieren Sie die Gerätesteuerung"
+          "enable_control": "Aktivieren Sie die Gerätesteuerung",
+          "split_intervals": "Aktivieren Sie Aktualisierungsintervalle pro Sensor"
         }
       }
     }
