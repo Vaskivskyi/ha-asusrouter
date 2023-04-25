@@ -48,7 +48,8 @@
         }
       },
       "intervals": {
-        "title": "Aktualisierungsintervalle"
+        "title": "Aktualisierungsintervalle",
+        "description": "Die Werte sind in Sekunden"
       }
     }
   }
