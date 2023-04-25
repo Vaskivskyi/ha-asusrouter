@@ -39,7 +39,10 @@
         }
       },
       "connected_devices": {
-        "title": "Verbundene Geräte"
+        "title": "Verbundene Geräte",
+        "data": {
+          "track_devices": "Geräte-Tracker aktivieren"
+        }
       }
     }
   }
