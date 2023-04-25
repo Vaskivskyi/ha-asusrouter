@@ -59,7 +59,8 @@
           "interval_light": "Lichtdaten",
           "interval_misc": "Verschiedene Daten",
           "interval_network_stat": "Netzwerkstatistikdaten",
-          "interval_parental_control": "Daten der Kindersicherung"
+          "interval_parental_control": "Daten der Kindersicherung",
+          "interval_ports": "Portdaten"
         }
       }
     }
