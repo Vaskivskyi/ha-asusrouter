@@ -166,7 +166,8 @@
           "interval_light": "Lichtdaten",
           "interval_misc": "Verschiedene Daten",
           "interval_network_stat": "Netzwerkstatistikdaten",
-          "interval_wlan": "WLAN-Daten"
+          "interval_wlan": "WLAN-Daten",
+          "interval_wan": "WAN-Daten"
         }
       },
       "interfaces": {
