@@ -3,7 +3,8 @@
     "flow_title": "{name} ({host})",
     "step": {
       "find": {
-        "title": "Gerätestandort"
+        "title": "Gerätestandort",
+        "description": "So finden Sie Ihr Gerät"
       }
     }
   }
