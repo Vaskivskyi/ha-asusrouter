@@ -68,6 +68,9 @@
           "interval_wan": "WAN-Daten",
           "interval_wlan": "WLAN-Daten"
         }
+      },
+      "interfaces": {
+        "title": "Zu überwachende Schnittstellen"
       }
     }
   }
