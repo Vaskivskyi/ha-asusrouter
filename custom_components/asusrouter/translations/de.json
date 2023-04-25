@@ -104,6 +104,9 @@
       "password_missing": "Passwort fehlt",
       "unknown": "Unbekannter Fehler",
       "wrong_credentials": "Falsche Anmeldeinformationen"
+    },
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert"
     }
   }
 }
