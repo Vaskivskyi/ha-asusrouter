@@ -73,7 +73,8 @@
         "title": "Zu überwachende Schnittstellen",
         "data": {
           "interfaces": "Wählen Sie die zu überwachenden Netzwerkschnittstellen aus",
-          "units_speed": "Einheiten für Geschwindigkeit"
+          "units_speed": "Einheiten für Geschwindigkeit",
+          "units_traffic": "Einheiten für den Verkehr"
         }
       }
     }
