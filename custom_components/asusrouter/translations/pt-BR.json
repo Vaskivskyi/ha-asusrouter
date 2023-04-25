@@ -123,7 +123,8 @@
           "interfaces": "Interfaces para monitorar",
           "events": "Eventos do Home Assistant",
           "security": "Opções de segurança",
-          "finish": "Guardar e finalizar"
+          "finish": "Guardar e finalizar",
+          "device": "Parâmetros de identificação e conexão"
         }
       },
       "credentials": {
