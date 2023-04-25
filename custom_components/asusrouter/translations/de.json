@@ -160,7 +160,8 @@
         "data": {
           "cache_time": "Caching-Zeit",
           "scan_interval": "Aktualisierung der Entitäten",
-          "interval_cpu": "CPU-Daten"
+          "interval_cpu": "CPU-Daten",
+          "interval_firmware": "Firmware-Daten"
         }
       }
     }
