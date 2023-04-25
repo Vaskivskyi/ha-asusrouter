@@ -185,7 +185,8 @@
         "title": "Zu überwachende Schnittstellen"
       },
       "events": {
-        "title": "Veranstaltungen"
+        "title": "Veranstaltungen",
+        "description": "Welche Ereignisse sollten ausgelöst werden"
       }
     }
   }
