@@ -18,6 +18,9 @@
           "port": "Port (0, um den Standardwert zu verwenden)",
           "ssl": "Verwenden Sie eine SSL-Verbindung"
         }
+      },
+      "operation": {
+        "title": "Betriebsmodus"
       }
     }
   }
