@@ -123,7 +123,8 @@
           "interfaces": "Rozhrania sledovania",
           "events": "Udalosti Home Assistant",
           "security": "Možnosti zabezpečenia",
-          "finish": "[NT] Save and finish"
+          "finish": "[NT] Save and finish",
+          "device": "Parametre identifikácie a pripojenia"
         }
       },
       "credentials": {
