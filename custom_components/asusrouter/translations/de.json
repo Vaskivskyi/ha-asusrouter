@@ -26,6 +26,9 @@
           "enable_control": "Aktivieren Sie die Gerätesteuerung",
           "split_intervals": "Aktivieren Sie Aktualisierungsintervalle pro Sensor"
         }
+      },
+      "options": {
+        "title": "Zusatzoptionen"
       }
     }
   }
