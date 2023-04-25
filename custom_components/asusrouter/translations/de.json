@@ -169,7 +169,8 @@
           "interval_wlan": "WLAN-Daten",
           "interval_wan": "WAN-Daten",
           "interval_vpn": "VPN-Daten",
-          "interval_temperature": "Temperaturdaten"
+          "interval_temperature": "Temperaturdaten",
+          "interval_sysinfo": "Sysinfo-Daten"
         }
       },
       "interfaces": {
