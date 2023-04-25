@@ -156,7 +156,10 @@
       },
       "intervals": {
         "title": "Aktualisierungsintervalle",
-        "description": "Die Werte sind in Sekunden"
+        "description": "Die Werte sind in Sekunden",
+        "data": {
+          "cache_time": "Caching-Zeit"
+        }
       }
     }
   }
