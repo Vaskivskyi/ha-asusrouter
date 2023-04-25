@@ -10,7 +10,8 @@
         }
       },
       "credentials": {
-        "title": "Referenzen"
+        "title": "Referenzen",
+        "description": "Dasselbe wie für das Geräte-Webpanel"
       }
     }
   }
