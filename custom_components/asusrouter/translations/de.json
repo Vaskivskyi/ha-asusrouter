@@ -164,7 +164,8 @@
           "interval_firmware": "Firmware-Daten",
           "interval_gwlan": "GWLAN-Intervall",
           "interval_light": "Lichtdaten",
-          "interval_misc": "Verschiedene Daten"
+          "interval_misc": "Verschiedene Daten",
+          "interval_network_stat": "Netzwerkstatistikdaten"
         }
       }
     }
