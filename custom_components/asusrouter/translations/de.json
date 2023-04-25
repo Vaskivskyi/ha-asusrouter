@@ -131,7 +131,8 @@
         "title": "Referenzen",
         "description": "Dasselbe wie für das Geräte-Webpanel",
         "data": {
-          "username": "Nutzername"
+          "username": "Nutzername",
+          "password": "Passwort"
         }
       }
     }
