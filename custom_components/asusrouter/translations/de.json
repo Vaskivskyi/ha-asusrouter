@@ -32,7 +32,8 @@
         "menu_options": {
           "connected_devices": "Verbundene Geräte",
           "intervals": "Aktualisierungsintervalle",
-          "interfaces": "Zu überwachende Schnittstellen"
+          "interfaces": "Zu überwachende Schnittstellen",
+          "events": "Home Assistant-Ereignisse"
         }
       }
     }
