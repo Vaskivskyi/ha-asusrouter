@@ -1,214 +1,214 @@
 {
-    "config": {
-        "flow_title": "{name} ({host})",
-        "step": {
-            "find": {
-                "title": "Розташування пристрою",
-                "description": "Де шукати ваш пристрій",
-                "data": {
-                    "host": "Ім'я хоста / IP адреса"
-                }
-            },
-            "credentials": {
-                "title": "Параметри для входу",
-                "description": "Такі самі, як для веб-панелі пристрою",
-                "data": {
-                    "username": "Ім'я користувача",
-                    "password": "Пароль",
-                    "port": "Порт (0 щоб використати стандартне значення)",
-                    "ssl": "Використовувати SSL"
-                }
-            },
-            "operation": {
-                "title": "Режим роботи",
-                "data": {
-                    "mode": "Режим роботи",
-                    "enable_control": "Увімкнути контроль пристрою",
-                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
-                }
-            },
-            "options": {
-                "title": "Додаткові налаштування",
-                "menu_options": {
-                    "connected_devices": "Підключені пристрої",
-                    "intervals": "Інтервали оновлення",
-                    "interfaces": "Інтерфейси для відслідковування",
-                    "events": "Події Home Assistant",
-                    "security": "Налаштування безпеки",
-                    "finish": "Зберегти і завершити"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Увімкнути трекінг пристроїв",
-                    "latest_connected": "Кількість останніх підключених пристроїв для зберігання",
-                    "interval_devices": "Оновлення пристроїв / AiMesh",
-                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
-                }
-            },
-            "intervals": {
-                "title": "Інтервали оновлення",
-                "description": "Значення в секундах",
-                "data": {
-                    "cache_time": "Час кешування",
-                    "scan_interval": "Інтервал оновлення",
-                    "interval_cpu": "Оновлення даних CPU",
-                    "interval_firmware": "Оновлення даних прошивки",
-                    "interval_gwlan": "Оновлення даних гостьових WLAN",
-                    "interval_light": "Оновлення даних light",
-                    "interval_misc": "Оновлення даних misc",
-                    "interval_network_stat": "Оновлення даних network stat",
-                    "interval_parental_control": "Оновлення даних parental control",
-                    "interval_ports": "Оновлення даних ports",
-                    "interval_ram": "Оновлення даних RAM",
-                    "interval_sysinfo": "Оновлення даних sysinfo",
-                    "interval_temperature": "Оновлення даних temperature",
-                    "interval_vpn": "Оновлення даних VPN",
-                    "interval_wan": "Оновлення даних WAN",
-                    "interval_wlan": "Оновлення даних WLAN"
-                }
-            },
-            "interfaces": {
-                "title": "Інтерфейси для відслідковування",
-                "data": {
-                    "interfaces": "Виберіть інтерфейси для відслідковування",
-                    "units_speed": "Одиниці вимірювання швидкості",
-                    "units_traffic": "Одиниці вимірювання трафіку"
-                }
-            },
-            "events": {
-                "title": "Події",
-                "description": "Які події повинні викликатися",
-                "data": {
-                    "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
-                    "device_disconnected": "Пристрій відключено",
-                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
-                    "node_connected": "AiMesh нода підключена (підключено вперше)",
-                    "node_disconnected": "AiMesh нода відключена",
-                    "node_reconnected": "AiMesh нода знов підключена"
-                }
-            },
-            "security": {
-                "title": "Безпека",
-                "data": {
-                    "hide_passwords": "Приховати паролі з сенсорів та атрибутів"
-                }
-            }
-        },
-        "error": {
-            "cannot_resolve_host": "Неможливо знайти ім'я хоста. Спробуйте використати IP адресу",
-            "connection_refused": "З'єднання відхилено",
-            "error": "Не вдалося підключитися",
-            "login_blocked": "Вхід заблоковано пристроєм. Будь ласка, зачекайте",
-            "password_missing": "Пароль відсутній",
-            "unknown": "Невідома помилка",
-            "wrong_credentials": "Неправильні облікові дані"
-        },
-        "abort": {
-            "already_configured": "Пристрій вже налаштовано",
-            "no_serial": "Пристрій не надає серійний номер. Налаштування скасоване",
-            "not_router": "Пристрій не є роутером Asus. Налаштування неможливе"
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Розташування пристрою",
+        "description": "Де шукати ваш пристрій",
+        "data": {
+          "host": "Ім'я хоста / IP адреса"
         }
+      },
+      "credentials": {
+        "title": "Параметри для входу",
+        "description": "Такі самі, як для веб-панелі пристрою",
+        "data": {
+          "username": "Ім'я користувача",
+          "password": "Пароль",
+          "port": "Порт (0 щоб використати стандартне значення)",
+          "ssl": "Використовувати SSL"
+        }
+      },
+      "operation": {
+        "title": "Режим роботи",
+        "data": {
+          "mode": "Режим роботи",
+          "enable_control": "Увімкнути контроль пристрою",
+          "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
+        }
+      },
+      "options": {
+        "title": "Додаткові налаштування",
+        "menu_options": {
+          "connected_devices": "Підключені пристрої",
+          "intervals": "Інтервали оновлення",
+          "interfaces": "Інтерфейси для відслідковування",
+          "events": "Події Home Assistant",
+          "security": "Налаштування безпеки",
+          "finish": "Зберегти і завершити"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Увімкнути трекінг пристроїв",
+          "latest_connected": "Кількість останніх підключених пристроїв для зберігання",
+          "interval_devices": "Оновлення пристроїв / AiMesh",
+          "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
+        }
+      },
+      "intervals": {
+        "title": "Інтервали оновлення",
+        "description": "Значення в секундах",
+        "data": {
+          "cache_time": "Час кешування",
+          "scan_interval": "Інтервал оновлення",
+          "interval_cpu": "Оновлення даних CPU",
+          "interval_firmware": "Оновлення даних прошивки",
+          "interval_gwlan": "Оновлення даних гостьових WLAN",
+          "interval_light": "Оновлення даних light",
+          "interval_misc": "Оновлення даних misc",
+          "interval_network_stat": "Оновлення даних network stat",
+          "interval_parental_control": "Оновлення даних parental control",
+          "interval_ports": "Оновлення даних ports",
+          "interval_ram": "Оновлення даних RAM",
+          "interval_sysinfo": "Оновлення даних sysinfo",
+          "interval_temperature": "Оновлення даних temperature",
+          "interval_vpn": "Оновлення даних VPN",
+          "interval_wan": "Оновлення даних WAN",
+          "interval_wlan": "Оновлення даних WLAN"
+        }
+      },
+      "interfaces": {
+        "title": "Інтерфейси для відслідковування",
+        "data": {
+          "interfaces": "Виберіть інтерфейси для відслідковування",
+          "units_speed": "Одиниці вимірювання швидкості",
+          "units_traffic": "Одиниці вимірювання трафіку"
+        }
+      },
+      "events": {
+        "title": "Події",
+        "description": "Які події повинні викликатися",
+        "data": {
+          "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
+          "device_disconnected": "Пристрій відключено",
+          "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
+          "node_connected": "AiMesh нода підключена (підключено вперше)",
+          "node_disconnected": "AiMesh нода відключена",
+          "node_reconnected": "AiMesh нода знов підключена"
+        }
+      },
+      "security": {
+        "title": "Безпека",
+        "data": {
+          "hide_passwords": "Приховати паролі з сенсорів та атрибутів"
+        }
+      }
     },
-    "options": {
-        "step": {
-            "options": {
-                "title": "Зміна налаштувань",
-                "menu_options": {
-                    "credentials": "Облікові дані та підключення",
-                    "operation": "Режим роботи",
-                    "connected_devices": "Підключені пристрої",
-                    "intervals": "Інтервали оновлення",
-                    "interfaces": "Інтерфейси для відслідковування",
-                    "events": "Події Home Assistant",
-                    "security": "Налаштування безпеки",
-                    "finish": "Зберегти і завершити"
-                }
-            },
-            "credentials": {
-                "title": "Параметри для входу",
-                "description": "Такі самі, як для веб-панелі пристрою",
-                "data": {
-                    "username": "Ім'я користувача",
-                    "password": "Пароль",
-                    "port": "Порт (0 щоб використати стандартне значення)",
-                    "ssl": "Використовувати SSL"
-                }
-            },
-            "operation": {
-                "title": "Режим роботи",
-                "data": {
-                    "mode": "Режим роботи",
-                    "enable_control": "Увімкнути контроль пристрою",
-                    "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Увімкнути трекінг пристроїв",
-                    "latest_connected": "Кількість останніх підключених пристроїв для зберігання",
-                    "interval_devices": "Оновлення пристроїв / AiMesh",
-                    "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
-                }
-            },
-            "intervals": {
-                "title": "Інтервали оновлення",
-                "description": "Значення в секундах",
-                "data": {
-                    "cache_time": "Час кешування",
-                    "scan_interval": "Інтервал оновлення",
-                    "interval_cpu": "Оновлення даних CPU",
-                    "interval_firmware": "Оновлення даних прошивки",
-                    "interval_gwlan": "Оновлення даних гостьових WLAN",
-                    "interval_light": "Оновлення даних light",
-                    "interval_misc": "Оновлення даних misc",
-                    "interval_network_stat": "Оновлення даних network stat",
-                    "interval_parental_control": "Оновлення даних parental control",
-                    "interval_ports": "Оновлення даних ports",
-                    "interval_ram": "Оновлення даних RAM",
-                    "interval_sysinfo": "Оновлення даних sysinfo",
-                    "interval_temperature": "Оновлення даних temperature",
-                    "interval_vpn": "Оновлення даних VPN",
-                    "interval_wan": "Оновлення даних WAN",
-                    "interval_wlan": "Оновлення даних WLAN"
-                }
-            },
-            "interfaces": {
-                "title": "Інтерфейси для відслідковування",
-                "data": {
-                    "interfaces": "Виберіть інтерфейси для відслідковування",
-                    "units_speed": "Одиниці вимірювання швидкості",
-                    "units_traffic": "Одиниці вимірювання трафіку"
-                }
-            },
-            "events": {
-                "title": "Події",
-                "description": "Які події повинні викликатися",
-                "data": {
-                    "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
-                    "device_disconnected": "Пристрій відключено",
-                    "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
-                    "node_connected": "AiMesh нода підключена (підключено вперше)",
-                    "node_disconnected": "AiMesh нода відключена",
-                    "node_reconnected": "AiMesh нода знов підключена"
-                }
-            },
-            "security": {
-                "title": "Безпека",
-                "data": {
-                    "hide_passwords": "Приховати паролі з сенсорів та атрибутів"
-                }
-            }
-        },
-        "error": {
-            "connection_refused": "З'єднання відхилено",
-            "error": "Не вдалося підключитися",
-            "login_blocked": "Вхід заблоковано пристроєм. Будь ласка, зачекайте",
-            "not_confirmed": "Необхідне підтвердження",
-            "unknown": "Невідома помилка",
-            "wrong_credentials": "Неправильні облікові дані"
-        }
+    "error": {
+      "cannot_resolve_host": "Неможливо знайти ім'я хоста. Спробуйте використати IP адресу",
+      "connection_refused": "З'єднання відхилено",
+      "error": "Не вдалося підключитися",
+      "login_blocked": "Вхід заблоковано пристроєм. Будь ласка, зачекайте",
+      "password_missing": "Пароль відсутній",
+      "unknown": "Невідома помилка",
+      "wrong_credentials": "Неправильні облікові дані"
+    },
+    "abort": {
+      "already_configured": "Пристрій вже налаштовано",
+      "no_serial": "Пристрій не надає серійний номер. Налаштування скасоване",
+      "not_router": "Пристрій не є роутером Asus. Налаштування неможливе"
     }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Зміна налаштувань",
+        "menu_options": {
+          "credentials": "Облікові дані та підключення",
+          "operation": "Режим роботи",
+          "connected_devices": "Підключені пристрої",
+          "intervals": "Інтервали оновлення",
+          "interfaces": "Інтерфейси для відслідковування",
+          "events": "Події Home Assistant",
+          "security": "Налаштування безпеки",
+          "finish": "Зберегти і завершити"
+        }
+      },
+      "credentials": {
+        "title": "Параметри для входу",
+        "description": "Такі самі, як для веб-панелі пристрою",
+        "data": {
+          "username": "Ім'я користувача",
+          "password": "Пароль",
+          "port": "Порт (0 щоб використати стандартне значення)",
+          "ssl": "Використовувати SSL"
+        }
+      },
+      "operation": {
+        "title": "Режим роботи",
+        "data": {
+          "mode": "Режим роботи",
+          "enable_control": "Увімкнути контроль пристрою",
+          "split_intervals": "Незалежне налаштування інтервалу оновлення сенсорів"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Увімкнути трекінг пристроїв",
+          "latest_connected": "Кількість останніх підключених пристроїв для зберігання",
+          "interval_devices": "Оновлення пристроїв / AiMesh",
+          "consider_home": "Вважати приистрій 'вдома' протягом (після останнього значення 'online')"
+        }
+      },
+      "intervals": {
+        "title": "Інтервали оновлення",
+        "description": "Значення в секундах",
+        "data": {
+          "cache_time": "Час кешування",
+          "scan_interval": "Інтервал оновлення",
+          "interval_cpu": "Оновлення даних CPU",
+          "interval_firmware": "Оновлення даних прошивки",
+          "interval_gwlan": "Оновлення даних гостьових WLAN",
+          "interval_light": "Оновлення даних light",
+          "interval_misc": "Оновлення даних misc",
+          "interval_network_stat": "Оновлення даних network stat",
+          "interval_parental_control": "Оновлення даних parental control",
+          "interval_ports": "Оновлення даних ports",
+          "interval_ram": "Оновлення даних RAM",
+          "interval_sysinfo": "Оновлення даних sysinfo",
+          "interval_temperature": "Оновлення даних temperature",
+          "interval_vpn": "Оновлення даних VPN",
+          "interval_wan": "Оновлення даних WAN",
+          "interval_wlan": "Оновлення даних WLAN"
+        }
+      },
+      "interfaces": {
+        "title": "Інтерфейси для відслідковування",
+        "data": {
+          "interfaces": "Виберіть інтерфейси для відслідковування",
+          "units_speed": "Одиниці вимірювання швидкості",
+          "units_traffic": "Одиниці вимірювання трафіку"
+        }
+      },
+      "events": {
+        "title": "Події",
+        "description": "Які події повинні викликатися",
+        "data": {
+          "device_connected": "Пристрій підключено (цей пристрій раніше не відслідковувався)",
+          "device_disconnected": "Пристрій відключено",
+          "device_reconnected": "Пристрій знов підключено (цей пристрій вже відслідковувався)",
+          "node_connected": "AiMesh нода підключена (підключено вперше)",
+          "node_disconnected": "AiMesh нода відключена",
+          "node_reconnected": "AiMesh нода знов підключена"
+        }
+      },
+      "security": {
+        "title": "Безпека",
+        "data": {
+          "hide_passwords": "Приховати паролі з сенсорів та атрибутів"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "З'єднання відхилено",
+      "error": "Не вдалося підключитися",
+      "login_blocked": "Вхід заблоковано пристроєм. Будь ласка, зачекайте",
+      "not_confirmed": "Необхідне підтвердження",
+      "unknown": "Невідома помилка",
+      "wrong_credentials": "Неправильні облікові дані"
+    }
+  }
 }
