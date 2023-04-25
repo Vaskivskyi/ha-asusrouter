@@ -171,7 +171,8 @@
           "interval_vpn": "VPN-Daten",
           "interval_temperature": "Temperaturdaten",
           "interval_sysinfo": "Sysinfo-Daten",
-          "interval_ram": "RAM-Daten"
+          "interval_ram": "RAM-Daten",
+          "interval_ports": "Portdaten"
         }
       },
       "interfaces": {
