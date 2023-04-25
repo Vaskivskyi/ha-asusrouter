@@ -159,7 +159,8 @@
         "description": "Die Werte sind in Sekunden",
         "data": {
           "cache_time": "Caching-Zeit",
-          "scan_interval": "Aktualisierung der Entitäten"
+          "scan_interval": "Aktualisierung der Entitäten",
+          "interval_cpu": "CPU-Daten"
         }
       }
     }
