@@ -110,5 +110,12 @@
       "no_serial": "Dieses Gerät gibt keine Seriennummer an. Erkennung abgebrochen",
       "not_router": "Kein Asus-Router. Kann nicht konfiguriert werden"
     }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Konfigurationen zu ändern"
+      }
+    }
   }
 }
