@@ -30,7 +30,8 @@
       "options": {
         "title": "Zusatzoptionen",
         "menu_options": {
-          "connected_devices": "Verbundene Geräte"
+          "connected_devices": "Verbundene Geräte",
+          "intervals": "Aktualisierungsintervalle"
         }
       }
     }
