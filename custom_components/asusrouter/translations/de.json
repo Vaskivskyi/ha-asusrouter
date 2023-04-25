@@ -28,7 +28,10 @@
         }
       },
       "options": {
-        "title": "Zusatzoptionen"
+        "title": "Zusatzoptionen",
+        "menu_options": {
+          "connected_devices": "Verbundene Geräte"
+        }
       }
     }
   }
