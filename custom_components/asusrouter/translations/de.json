@@ -107,7 +107,8 @@
     },
     "abort": {
       "already_configured": "Gerät ist bereits konfiguriert",
-      "no_serial": "Dieses Gerät gibt keine Seriennummer an. Erkennung abgebrochen"
+      "no_serial": "Dieses Gerät gibt keine Seriennummer an. Erkennung abgebrochen",
+      "not_router": "Kein Asus-Router. Kann nicht konfiguriert werden"
     }
   }
 }
