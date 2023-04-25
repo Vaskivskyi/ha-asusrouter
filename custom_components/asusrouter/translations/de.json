@@ -22,7 +22,8 @@
       "operation": {
         "title": "Betriebsmodus",
         "data": {
-          "mode": "Gerätemodus"
+          "mode": "Gerätemodus",
+          "enable_control": "Aktivieren Sie die Gerätesteuerung"
         }
       }
     }
