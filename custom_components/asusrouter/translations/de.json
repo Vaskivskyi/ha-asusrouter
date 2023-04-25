@@ -150,7 +150,8 @@
         "data": {
           "track_devices": "Geräte-Tracker aktivieren",
           "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
-          "interval_devices": "Geräte / AiMesh-Update"
+          "interval_devices": "Geräte / AiMesh-Update",
+          "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"
         }
       }
     }
