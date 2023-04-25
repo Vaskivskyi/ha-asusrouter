@@ -62,7 +62,8 @@
           "interval_parental_control": "Daten der Kindersicherung",
           "interval_ports": "Portdaten",
           "interval_ram": "RAM-Daten",
-          "interval_sysinfo": "Sysinfo-Daten"
+          "interval_sysinfo": "Sysinfo-Daten",
+          "interval_temperature": "Temperaturdaten"
         }
       }
     }
