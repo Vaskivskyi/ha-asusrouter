@@ -95,6 +95,9 @@
           "hide_passwords": "Passwörter vor Sensoren und Attributen verbergen"
         }
       }
+    },
+    "error": {
+      "cannot_resolve_host": "Kann den Hostnamen nicht auflösen. Versuchen Sie es mit der IP-Adresse"
     }
   }
 }
