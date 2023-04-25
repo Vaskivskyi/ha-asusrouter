@@ -122,7 +122,8 @@
           "intervals": "Aktualisierungsintervalle",
           "interfaces": "Zu überwachende Schnittstellen",
           "events": "Home Assistant-Ereignisse",
-          "security": "Sicherheitsoptionen"
+          "security": "Sicherheitsoptionen",
+          "finish": "Speichern und fertig"
         }
       }
     }
