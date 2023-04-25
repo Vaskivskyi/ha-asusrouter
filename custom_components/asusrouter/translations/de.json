@@ -204,7 +204,8 @@
       }
     },
     "error": {
-      "connection_refused": "Verbindung abgelehnt"
+      "connection_refused": "Verbindung abgelehnt",
+      "error": "Verbindung nicht möglich"
     }
   }
 }
