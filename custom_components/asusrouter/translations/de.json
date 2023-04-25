@@ -114,7 +114,10 @@
   "options": {
     "step": {
       "options": {
-        "title": "Konfigurationen zu ändern"
+        "title": "Konfigurationen zu ändern",
+        "menu_options": {
+          "credentials": "Anmeldeinformationen und Verbindung"
+        }
       }
     }
   }
