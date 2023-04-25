@@ -118,7 +118,8 @@
         "menu_options": {
           "credentials": "Anmeldeinformationen und Verbindung",
           "operation": "Betriebsmodus",
-          "connected_devices": "Verbundene Geräte"
+          "connected_devices": "Verbundene Geräte",
+          "intervals": "Aktualisierungsintervalle"
         }
       }
     }
