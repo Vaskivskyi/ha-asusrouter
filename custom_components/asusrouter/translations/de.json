@@ -4,7 +4,10 @@
     "step": {
       "find": {
         "title": "Gerätestandort",
-        "description": "So finden Sie Ihr Gerät"
+        "description": "So finden Sie Ihr Gerät",
+        "data": {
+          "host": "Hostname / IP-Adresse"
+        }
       }
     }
   }
