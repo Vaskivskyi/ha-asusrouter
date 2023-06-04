@@ -1056,8 +1056,10 @@ class ARDevice:
         """Fire HA event."""
 
         if self._options.get(event) is True:
+            event_name = f"{DOMAIN}_{event}"
+            _LOGGER.debug("Firing event: `%s`", event_name)
             self.hass.bus.fire(
-                f"{DOMAIN}_{event}",
+                event_name,
                 args,
             )
 
