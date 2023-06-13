@@ -1,0 +1,214 @@
+{
+    "config": {
+        "flow_title": "{name} ({host})",
+        "step": {
+            "find": {
+                "title": "Местоположение устройства",
+                "description": "Как найти свое устройство",
+                "data": {
+                    "host": "Имя хоста / IP-адрес"
+                }
+            },
+            "credentials": {
+                "title": "Учетные данные",
+                "description": "Те же, что и для веб-интерфейса устройства",
+                "data": {
+                    "username": "Имя пользователя",
+                    "password": "Пароль",
+                    "port": "Порт (0 - использовать значение по умолчанию)",
+                    "ssl": "Использовать SSL-соединение"
+                }
+            },
+            "operation": {
+                "title": "Режим работы",
+                "data": {
+                    "mode": "Режим работы устройства",
+                    "enable_control": "Включить управление устройством",
+                    "split_intervals": "Включить настройки частоты обновлений для каждого сенсора"
+                }
+            },
+            "options": {
+                "title": "Дополнительные параметры",
+                "menu_options": {
+                    "connected_devices": "Подключенные устройства",
+                    "intervals": "Частота обновлений",
+                    "interfaces": "Мониторинг интерфейсов",
+                    "events": "События Home Assistant",
+                    "security": "Параметры безопасности",
+                    "finish": "Сохранить и завершить"
+                }
+            },
+            "connected_devices": {
+                "title": "Подключенные устройства",
+                "data": {
+                    "track_devices": "Включить отслеживание устройств",
+                    "latest_connected": "Количество последних подключенных устройств для сохранения",
+                    "interval_devices": "Обновление устройств / AiMesh",
+                    "consider_home": "Считать 'дома' в течение (после последнего состояния 'онлайн')"
+                }
+            },
+            "intervals": {
+                "title": "Частота обновлений",
+                "description": "Значения указываются в секундах",
+                "data": {
+                    "cache_time": "Время кэширования",
+                    "scan_interval": "Обновление объектов",
+                    "interval_cpu": "Данные процессора",
+                    "interval_firmware": "Данные прошивки",
+                    "interval_gwlan": "Интервал GWLAN",
+                    "interval_light": "Данные LED-подсветки",
+                    "interval_misc": "Прочие данные",
+                    "interval_network_stat": "Данные о состоянии сети",
+                    "interval_parental_control": "Данные родительского контроля",
+                    "interval_ports": "Данные портов",
+                    "interval_ram": "Данные RAM",
+                    "interval_sysinfo": "Информация о системе",
+                    "interval_temperature": "Данные о температуре",
+                    "interval_vpn": "Данные VPN",
+                    "interval_wan": "Данные WAN",
+                    "interval_wlan": "Данные WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Мониторинг интерфейсов",
+                "data": {
+                    "interfaces": "Выберите сетевые интерфейсы для мониторинга",
+                    "units_speed": "Единицы измерения скорости",
+                    "units_traffic": "Единицы измерения трафика"
+                }
+            },
+            "events": {
+                "title": "События",
+                "description": "Какие события необходимо вызывать",
+                "data": {
+                    "device_connected": "Устройство подключено (устройство ранее не отслеживалось)",
+                    "device_disconnected": "Устройство отключено",
+                    "device_reconnected": "Устройство повторно подключено (это устройство уже отслеживалось ранее)",
+                    "node_connected": "Узел AiMesh подключен (не отслеживался ранее)",
+                    "node_disconnected": "Узел AiMesh отключен",
+                    "node_reconnected": "Узел AiMesh повторно подключен"
+                }
+            },
+            "security": {
+                "title": "Безопасность",
+                "data": {
+                    "hide_passwords": "Скрыть пароли от сенсоров и атрибутов"
+                }
+            }
+        },
+        "error": {
+            "cannot_resolve_host": "Не удается разрешить имя хоста. Попробуйте использовать IP-адрес",
+            "connection_refused": "Отказ в подключении",
+            "error": "Не удалось подключиться",
+            "login_blocked": "Вход заблокирован устройством. Пожалуйста, подождите",
+            "password_missing": "Отсутствует пароль",
+            "unknown": "Неизвестная ошибка",
+            "wrong_credentials": "Неверные учетные данные"
+        },
+        "abort": {
+            "already_configured": "Устройство уже настроено",
+            "no_serial": "Это устройство не предоставляет серийный номер. Обнаружение прервано",
+            "not_router": "Не является маршрутизатором Asus. Настройка невозможна"
+        }
+    },
+    "options": {
+        "step": {
+            "options": {
+                "title": "Изменение конфигурации",
+                "menu_options": {
+                    "credentials": "Учетные данные и подключение",
+                    "operation": "Режим работы",
+                    "connected_devices": "Подключенные устройства",
+                    "intervals": "Частота обновлений",
+                    "interfaces": "Мониторинг интерфейсов",
+                    "events": "События Home Assistant",
+                    "security": "Параметры безопасности",
+                    "finish": "Сохранить и завершить"
+                }
+            },
+            "credentials": {
+                "title": "Учетные данные",
+                "description": "Те же, что и для веб-интерфейса устройства",
+                "data": {
+                    "username": "Имя пользователя",
+                    "password": "Пароль",
+                    "port": "Порт (0 - использовать значение по умолчанию)",
+                    "ssl": "Использовать SSL-соединение"
+                }
+            },
+            "operation": {
+                "title": "Режим работы",
+                "data": {
+                    "mode": "Режим работы устройства",
+                    "enable_control": "Включить управление устройством",
+                    "split_intervals": "Включить настройки частоты обновлений для каждого сенсора"
+                }
+            },
+            "connected_devices": {
+                "title": "Подключенные устройства",
+                "data": {
+                    "track_devices": "Включить отслеживание устройств",
+                    "latest_connected": "Количество последних подключенных устройств для сохранения",
+                    "interval_devices": "Обновление устройств / AiMesh",
+                    "consider_home": "Считать 'дома' в течение (после последнего состояния 'онлайн')"
+                }
+            },
+            "intervals": {
+                "title": "Частота обновлений",
+                "description": "Значения указываются в секундах",
+                "data": {
+                    "cache_time": "Время кэширования",
+                    "scan_interval": "Обновление объектов",
+                    "interval_cpu": "Данные процессора",
+                    "interval_firmware": "Данные прошивки",
+                    "interval_gwlan": "Интервал GWLAN",
+                    "interval_light": "Данные LED-подсветки",
+                    "interval_misc": "Прочие данные",
+                    "interval_network_stat": "Данные о состоянии сети",
+                    "interval_parental_control": "Данные родительского контроля",
+                    "interval_ports": "Данные портов",
+                    "interval_ram": "Данные RAM",
+                    "interval_sysinfo": "Информация о системе",
+                    "interval_temperature": "Данные о температуре",
+                    "interval_vpn": "Данные VPN",
+                    "interval_wan": "Данные WAN",
+                    "interval_wlan": "Данные WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Мониторинг интерфейсов",
+                "data": {
+                    "interfaces": "Выберите сетевые интерфейсы для мониторинга",
+                    "units_speed": "Единицы измерения скорости",
+                    "units_traffic": "Единицы измерения трафика"
+                }
+            },
+            "events": {
+                "title": "События",
+                "description": "Какие события необходимо вызывать",
+                "data": {
+                    "device_connected": "Устройство подключено (устройство ранее не отслеживалось)",
+                    "device_disconnected": "Устройство отключено",
+                    "device_reconnected": "Устройство повторно подключено (это устройство уже отслеживалось ранее)",
+                    "node_connected": "Узел AiMesh подключен (не отслеживался ранее)",
+                    "node_disconnected": "Узел AiMesh отключен",
+                    "node_reconnected": "Узел AiMesh повторно подключен"
+                }
+            },
+            "security": {
+                "title": "Безопасность",
+                "data": {
+                    "hide_passwords": "Скрыть пароли от сенсоров и атрибутов"
+                }
+            }
+        },
+        "error": {
+            "connection_refused": "Отказ в подключении",
+            "error": "Не удалось подключиться",
+            "login_blocked": "Вход заблокирован устройством. Пожалуйста, подождите",
+            "not_confirmed": "Подтвердите",
+            "unknown": "Неизвестная ошибка",
+            "wrong_credentials": "Неверные учетные данные"
+        }
+    }
+}
