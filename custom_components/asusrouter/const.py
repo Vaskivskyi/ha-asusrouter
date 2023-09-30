@@ -19,12 +19,12 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_VERIFY_SSL,
     PERCENTAGE,
+    EntityCategory,
     Platform,
     UnitOfDataRate,
     UnitOfInformation,
     UnitOfTemperature,
 )
-from homeassistant.helpers.entity import EntityCategory
 
 from .dataclass import (
     ARBinarySensorDescription,
