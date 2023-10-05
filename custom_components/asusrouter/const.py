@@ -6,7 +6,6 @@ from collections.abc import Callable
 from typing import Any
 
 from asusrouter.util import converters
-
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -648,7 +647,10 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         NAME: f"{LABEL_RX}",
         "icon": "mdi:download-outline",
         "state_class": SensorStateClass.TOTAL_INCREASING,
-        "factor": CONVERT_TRAFFIC,
+        "device_class": SensorDeviceClass.DATA_SIZE,
+        "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.GIGABYTES,
+        "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
         "raw_attribute": BYTES,
     },
@@ -656,7 +658,10 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         NAME: f"{LABEL_RX} {LABEL_SPEED}",
         "icon": "mdi:download-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
-        "factor": CONVERT_SPEED,
+        "device_class": SensorDeviceClass.DATA_RATE,
+        "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
         "raw_attribute": BITS_PER_SECOND,
     },
@@ -664,7 +669,10 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         NAME: f"{LABEL_TX}",
         "icon": "mdi:upload-outline",
         "state_class": SensorStateClass.TOTAL_INCREASING,
-        "factor": CONVERT_TRAFFIC,
+        "device_class": SensorDeviceClass.DATA_SIZE,
+        "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.GIGABYTES,
+        "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
         "raw_attribute": BYTES,
     },
@@ -672,7 +680,10 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         NAME: f"{LABEL_TX} {LABEL_SPEED}",
         "icon": "mdi:upload-network-outline",
         "state_class": SensorStateClass.MEASUREMENT,
-        "factor": CONVERT_SPEED,
+        "device_class": SensorDeviceClass.DATA_RATE,
+        "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
         "raw_attribute": BITS_PER_SECOND,
     },
