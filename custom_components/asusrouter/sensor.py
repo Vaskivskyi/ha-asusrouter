@@ -12,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .compilers import list_sensors_network
-from .const import CONF_INTERFACES, CONF_UNITS_SPEED, CONF_UNITS_TRAFFIC, STATIC_SENSORS
+from .const import CONF_INTERFACES, STATIC_SENSORS
 from .dataclass import ARSensorDescription
 from .entity import AREntity, async_setup_ar_entry
 from .router import ARDevice
@@ -35,8 +35,6 @@ async def async_setup_entry(
         sensors.extend(
             list_sensors_network(
                 config_entry.options[CONF_INTERFACES],
-                config_entry.options[CONF_UNITS_SPEED],
-                config_entry.options[CONF_UNITS_TRAFFIC],
             )
         )
 
@@ -67,6 +65,4 @@ class ARSensor(AREntity, SensorEntity):
 
         description = self.entity_description
         state = self.coordinator.data.get(description.key)
-        if state is not None and description.factor and isinstance(state, Real):
-            return round(state / description.factor, description.precision)
         return state

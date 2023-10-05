@@ -7,13 +7,12 @@ import socket
 from typing import Any
 from urllib.parse import urlparse
 
+import voluptuous as vol
 from asusrouter import (
     AsusRouterConnectionError,
     AsusRouterLoginBlockError,
     AsusRouterLoginError,
 )
-import voluptuous as vol
-
 from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
@@ -50,8 +49,6 @@ from .const import (
     CONF_DEFAULT_SPLIT_INTERVALS,
     CONF_DEFAULT_SSL,
     CONF_DEFAULT_TRACK_DEVICES,
-    CONF_DEFAULT_UNITS_SPEED,
-    CONF_DEFAULT_UNITS_TRAFFIC,
     CONF_DEFAULT_USERNAME,
     CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
@@ -65,10 +62,6 @@ from .const import (
     CONF_MODE,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
-    CONF_UNITS_SPEED,
-    CONF_UNITS_TRAFFIC,
-    CONF_VALUES_DATA,
-    CONF_VALUES_DATARATE,
     CONF_VALUES_MODE,
     CONFIGS,
     DOMAIN,
@@ -447,14 +440,6 @@ def _create_form_interfaces(
                 for interface in user_input[INTERFACES]
             }
         ),
-        vol.Required(
-            CONF_UNITS_SPEED,
-            default=user_input.get(CONF_UNITS_SPEED, CONF_DEFAULT_UNITS_SPEED),
-        ): vol.In({datarate: datarate for datarate in CONF_VALUES_DATARATE}),
-        vol.Required(
-            CONF_UNITS_TRAFFIC,
-            default=user_input.get(CONF_UNITS_TRAFFIC, CONF_DEFAULT_UNITS_TRAFFIC),
-        ): vol.In({data: data for data in CONF_VALUES_DATA}),
     }
 
     return vol.Schema(schema)

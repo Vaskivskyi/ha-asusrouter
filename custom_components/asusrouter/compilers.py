@@ -17,8 +17,6 @@ from .dataclass import ARSensorDescription
 
 def list_sensors_network(
     interfaces: list[str] | None = None,
-    units_speed: str = CONF_DEFAULT_UNITS_SPEED,
-    units_traffic: str = CONF_DEFAULT_UNITS_TRAFFIC,
 ) -> list[ARSensorDescription]:
     """Compile a list of network sensors."""
 
@@ -31,9 +29,6 @@ def list_sensors_network(
         interface = MAP_NETWORK_TEMP.get(intf, intf)
         for sensor_type, data in SENSORS_PARAM_NETWORK.items():
             key = f"{interface}_{sensor_type}"
-            units = units_traffic
-            if LABEL_SPEED in data[NAME]:
-                units = units_speed
             sensors.append(
                 ARSensorDescription(
                     key=key,
@@ -42,8 +37,13 @@ def list_sensors_network(
                     or None,
                     icon=data["icon"] or None,
                     state_class=data["state_class"] or None,
-                    native_unit_of_measurement=units or None,
-                    factor=data["factor"][units] or None,
+                    device_class=data["device_class"] or None,
+                    native_unit_of_measurement=data["native_unit_of_measurement"]
+                    or None,
+                    suggested_unit_of_measurement=data["suggested_unit_of_measurement"]
+                    or None,
+                    suggested_display_precision=data["suggested_display_precision"]
+                    or None,
                     entity_registry_enabled_default=data[
                         "entity_registry_enabled_default"
                     ]
