@@ -562,6 +562,9 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(serial_number)
         self._abort_if_unique_id_configured()
 
+        _LOGGER.debug("Discovered SSDP device with serial number: %s", serial_number)
+        _LOGGER.debug("Discovered SSDP device: %s", discovery_info)
+
         # Make sure, this is actually an AsusWRT-powered device
         if (
             not discovery_info.ssdp_server
