@@ -8,7 +8,7 @@ from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
 from asusrouter.modules.parental_control import AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wlan import AsusWLAN
+from asusrouter.modules.wlan import AsusWLAN, Wlan
 from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
@@ -220,11 +220,11 @@ LABELS_LOAD_AVG = {
     f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ("1", "5", "15")
 }
 LABELS_TEMPERATURE = {
-    CPU: f"{LABEL_TEMPERATURE} {CPU.upper()}",
-    WLAN_2GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_2G}",
-    WLAN_5GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_5G}",
-    WLAN_5GHZ2: f"{LABEL_TEMPERATURE} {CONNECTION_5G2}",
-    WLAN_6GHZ: f"{LABEL_TEMPERATURE} {CONNECTION_6G}",
+    "cpu": "Temperature CPU",
+    str(Wlan.FREQ_2G): "Temperature 2.4 GHz",
+    str(Wlan.FREQ_5G): "Temperature 5 GHz",
+    str(Wlan.FREQ_5G2): "Temperature 5 GHz-2",
+    str(Wlan.FREQ_6G): "Temperature 6 GHz",
 }
 LABELS_WLAN = {
     WLAN_2GHZ: LABEL_WLAN_2GHZ,
