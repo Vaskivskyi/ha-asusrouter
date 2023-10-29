@@ -83,7 +83,7 @@ AsusRouter supports virtually every AsusWRT-powered device.
 |---|---|---|---|
 |[GT-AXE11000](https://asusrouter.vaskivskyi.com/devices/GT-AXE11000.html)|💛 Expected to work||<a href="https://amzn.to/3Gotj9R" rel="nofollow sponsored" target="_blank">find it</a>|
 |[GT-AXE16000](https://asusrouter.vaskivskyi.com/devices/GT-AXE16000.html)|💚 Confirmed|Stock:<li>`388.21617`</li>|<a href="https://amzn.to/3vObLyZ" rel="nofollow sponsored" target="_blank">find it</a>|
-|[RT-AXE7800](https://asusrouter.vaskivskyi.com/devices/RT-AXE7800.html)|💛 Expected to work||<a href="https://amzn.to/3jUr2LU" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AXE7800](https://asusrouter.vaskivskyi.com/devices/RT-AXE7800.html)|💚 Confirmed|Stock:<li>`388_22068`</li>|<a href="https://amzn.to/3jUr2LU" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi ET8](https://asusrouter.vaskivskyi.com/devices/ZenWiFiET8.html)|💛 Expected to work||<a href="https://amzn.to/3Iks0La" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi Pro ET12](https://asusrouter.vaskivskyi.com/devices/ZenWiFiProET12.html)|💛 Expected to work||<a href="https://amzn.to/3GTz68P" rel="nofollow sponsored" target="_blank">find it</a>|
 
@@ -104,14 +104,14 @@ AsusRouter supports virtually every AsusWRT-powered device.
 |[RT-AX82U](https://asusrouter.vaskivskyi.com/devices/RT-AX82U.html)|💚 Confirmed|Stock:<li>`386.48664`</li><li>`386.49674`</li>|<a href="https://amzn.to/3Gv2Bxi" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX86S](https://asusrouter.vaskivskyi.com/devices/RT-AX86S.html)|💚 Confirmed|Stock:<li>`386.46061`</li><li>`386.48260`</li><li>`386.49447`</li><li>`388.22525`</li>Merlin:<li>`386.7_2`</li>|<a href="https://amzn.to/3GuKac5" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX86U](https://asusrouter.vaskivskyi.com/devices/RT-AX86U.html)|💚 Confirmed|Stock:<li>`386.46061`</li><li>`386.48260`</li><li>`386.49447`</li><li>`388.22525`</li>Merlin:<li>`386.7_2`</li>|<a href="https://amzn.to/3WCBcPO" rel="nofollow sponsored" target="_blank">find it</a>|
-|[RT-AX86U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX86UPro.html)|💛 Expected to work||<a href="https://amzn.to/3ZDM41T" rel="nofollow sponsored" target="_blank">find it</a>|
-|[RT-AX88U](https://asusrouter.vaskivskyi.com/devices/RT-AX88U.html)|💚 Confirmed|Stock:<li>`386.45934`</li><li>`386.48631`</li>Merlin:<li>`386.5_2`</li><li>`386.8_0`</li><li>`388.1_0`</li>|<a href="https://amzn.to/3i2VfYu" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX86U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX86UPro.html)|💚 Confirmed|Stock:<li>`388.23565`</li>|<a href="https://amzn.to/3ZDM41T" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX88U](https://asusrouter.vaskivskyi.com/devices/RT-AX88U.html)|💚 Confirmed|Stock:<li>`386.45934`</li><li>`386.48631`</li>Merlin:<li>`386.5_2`</li><li>`386.8_0`</li><li>`388.1_0`</li><li>`388.2_0`</li><li>`388.4_0`</li>|<a href="https://amzn.to/3i2VfYu" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX88U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX88UPro.html)|💛 Expected to work||<a href="https://amzn.to/3QNDpFZ" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX89X](https://asusrouter.vaskivskyi.com/devices/RT-AX89X.html)|💚 Confirmed||<a href="https://amzn.to/3i55b3S" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX92U](https://asusrouter.vaskivskyi.com/devices/RT-AX92U.html)|💚 Confirmed|Stock:<li>`386.46061`</li>|<a href="https://amzn.to/3jJJgzt" rel="nofollow sponsored" target="_blank">find it</a>|
 |[TUF-AX4200](https://asusrouter.vaskivskyi.com/devices/TUF-AX4200.html)|💛 Expected to work||<a href="https://amzn.to/3kexPjC" rel="nofollow sponsored" target="_blank">find it</a>|
-|[TUF-AX5400](https://asusrouter.vaskivskyi.com/devices/TUF-AX5400.html)|💚 Confirmed|Stock:<li>`386.50224`</li><li>`388.21224`</li><li>`388_22525`</li>|<a href="https://amzn.to/3hXgzyQ" rel="nofollow sponsored" target="_blank">find it</a>|
-|[TUF-AX6000](https://asusrouter.vaskivskyi.com/devices/TUF-AX6000.html)|💛 Expected to work||<a href="https://amzn.to/3CXqxaG" rel="nofollow sponsored" target="_blank">find it</a>|
+|[TUF-AX5400](https://asusrouter.vaskivskyi.com/devices/TUF-AX5400.html)|💚 Confirmed|Stock:<li>`386.50224`</li><li>`388.21224`</li><li>`388.22525`</li>|<a href="https://amzn.to/3hXgzyQ" rel="nofollow sponsored" target="_blank">find it</a>|
+|[TUF-AX6000](https://asusrouter.vaskivskyi.com/devices/TUF-AX6000.html)|💚 Confirmed|Stock:<li>`388.32432`</li>|<a href="https://amzn.to/3CXqxaG" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi AX (XT8)](https://asusrouter.vaskivskyi.com/devices/ZenWiFiAX(XT8).html)|💚 Confirmed|Stock:<li>`386.48706`</li>Merlin:<li>`386.7_2-gnuton1`</li>|<a href="https://amzn.to/3GuvY2L" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi AX Hybrid (XP4)](https://asusrouter.vaskivskyi.com/devices/ZenWiFiAXHybrid(XP4).html)|💛 Expected to work||<a href="https://amzn.to/3Itxnbb" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi AX Mini (XD4)](https://asusrouter.vaskivskyi.com/devices/ZenWiFiAXMini(XD4).html)|💚 Confirmed|Stock:<li>`386.48790`</li><li>`386.49599`</li>|<a href="https://amzn.to/3hYGuGl" rel="nofollow sponsored" target="_blank">find it</a>|
@@ -121,7 +121,7 @@ AsusRouter supports virtually every AsusWRT-powered device.
 |[ZenWiFi XD5](https://asusrouter.vaskivskyi.com/devices/ZenWiFiXD5.html)|💛 Expected to work||<a href="https://amzn.to/3YrhgjM" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi XD6](https://asusrouter.vaskivskyi.com/devices/ZenWiFiXD6.html)|💚 Confirmed|Stock:<li>`388.21380`</li>|<a href="https://amzn.to/3jW23s4" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi XD6S](https://asusrouter.vaskivskyi.com/devices/ZenWiFiXD6S.html)|💚 Confirmed|Stock:<li>`388.21380`</li>|<a href="https://amzn.to/3YMbyIZ" rel="nofollow sponsored" target="_blank">find it</a>|
-|[ZenWiFi XT9](https://asusrouter.vaskivskyi.com/devices/ZenWiFiXT9.html)|💛 Expected to work||<a href="https://amzn.to/3JZOgLF" rel="nofollow sponsored" target="_blank">find it</a>|
+|[ZenWiFi XT9](https://asusrouter.vaskivskyi.com/devices/ZenWiFiXT9.html)|💚 Confirmed|Stock:<li>`388_23285`</li>|<a href="https://amzn.to/3JZOgLF" rel="nofollow sponsored" target="_blank">find it</a>|
 
 ### WiFi 5 | 802.11ac
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
