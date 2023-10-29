@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
+from asusrouter.modules.homeassistant import convert_to_ha_state_bool
+from asusrouter.modules.state import AsusState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -27,7 +29,7 @@ async def async_setup_ar_entry(
     async_add_entities: AddEntitiesCallback,
     sensors: list[AREntityDescription],
     sensor_class: type[AREntity],
-    hide: list[str] | None = None,
+    hide: Optional[list[str]] = None,
 ) -> None:
     """Set up AsusRouter entities."""
 
@@ -124,13 +126,15 @@ class ARBinaryEntity(AREntity):
             self._icon_onoff = bool(description.icon_on and description.icon_off)
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> Optional[bool]:
         """Get the state."""
 
-        return self.coordinator.data.get(self.entity_description.key)
+        return convert_to_ha_state_bool(
+            self.coordinator.data.get(self.entity_description.key)
+        )
 
     @property
-    def icon(self) -> str | None:
+    def icon(self) -> Optional[str]:
         """Get the icon."""
 
         if (
@@ -145,3 +149,20 @@ class ARBinaryEntity(AREntity):
         if self.entity_description.icon:
             return self.entity_description.icon
         return None
+
+    async def _set_state(
+        self,
+        state: AsusState,
+        arguments: Optional[dict[str, Any]] = None,
+        expect_modify: bool = False,
+    ) -> None:
+        """Set switch state."""
+
+        try:
+            _LOGGER.debug("Setting state to %s", state)
+            result = await self.api.async_set_state(state, arguments, expect_modify)
+            await self.coordinator.async_request_refresh()
+            if not result:
+                _LOGGER.debug("State was not set!")
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("Unable to set state with an exception: %s", ex)

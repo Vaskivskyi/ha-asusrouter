@@ -2,24 +2,22 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 import dataclasses
-from datetime import datetime
 import logging
-from typing import Any
+from collections.abc import Callable
+from typing import Any, Optional
 
 import aiohttp
-from asusrouter import (
-    AiMeshDevice,
-    AsusDevice,
-    AsusRouter,
-    AsusRouterError,
-    ConnectedDevice,
-    FilterDevice,
-    PortForwarding,
+from asusrouter import AsusRouter
+from asusrouter.error import AsusRouterError
+from asusrouter.modules.aimesh import AiMeshDevice
+from asusrouter.modules.client import AsusClient
+from asusrouter.modules.data import AsusData
+from asusrouter.modules.homeassistant import (
+    convert_to_ha_sensors,
+    convert_to_ha_state_bool,
 )
-from asusrouter.util import converters
-
+from asusrouter.modules.identity import AsusDevice
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -28,13 +26,11 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
 from .const import (
-    ACTION,
     BOOTTIME,
     CONF_CACHE_TIME,
     CONF_DEFAULT_CACHE_TIME,
@@ -45,50 +41,29 @@ from .const import (
     DEFAULT_SENSORS,
     FIRMWARE,
     GWLAN,
-    IP,
-    IP_EXTERNAL,
-    IPS,
-    ISO,
-    KEY_OVPN_CLIENT,
-    KEY_OVPN_SERVER,
     LED,
     LIST,
     LIST_PORTS,
-    MAC,
     METHOD,
     MODE_SENSORS,
-    NAME,
     NETWORK,
     NETWORK_STAT,
     PARENTAL_CONTROL,
-    PASSWORD,
-    PORT,
-    PORT_EXTERNAL,
     PORT_FORWARDING,
     PORTS,
-    PROTOCOL,
     RAM,
     SENSORS,
     SENSORS_BOOTTIME,
-    SENSORS_CPU,
     SENSORS_FIRMWARE,
     SENSORS_LED,
-    SENSORS_NETWORK,
     SENSORS_PARENTAL_CONTROL,
     SENSORS_PORT_FORWARDING,
     SENSORS_RAM,
     SENSORS_SYSINFO,
-    SENSORS_VPN,
-    SENSORS_VPN_SERVER,
     SENSORS_WAN,
-    SERVICE_ALLOWED_ADJUST_GWLAN,
-    SERVICE_ALLOWED_ADJUST_WLAN,
-    SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS,
-    SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL,
     STATE,
     SYSINFO,
     TEMPERATURE,
-    TIMESTAMP,
     VPN,
     WAN,
     WLAN,
@@ -104,7 +79,7 @@ class ARBridge:
         self,
         hass: HomeAssistant,
         configs: dict[str, Any],
-        options: dict[str, Any] | None = None,
+        options: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize bridge to the library."""
 
@@ -122,7 +97,7 @@ class ARBridge:
         self._api = self._get_api(self._configs, session)
 
         self._host = self._configs[CONF_HOST]
-        self._identity: AsusDevice | None = None
+        self._identity: Optional[AsusDevice] = None
 
         self._active: bool = False
 
@@ -131,7 +106,7 @@ class ARBridge:
         """Get AsusRouter API."""
 
         return AsusRouter(
-            host=configs[CONF_HOST],
+            hostname=configs[CONF_HOST],
             username=configs[CONF_USERNAME],
             password=configs[CONF_PASSWORD],
             port=configs.get(CONF_PORT, CONF_DEFAULT_PORT),
@@ -159,12 +134,15 @@ class ARBridge:
         return self.api.connected
 
     @property
-    def identity(self) -> AsusDevice:
+    def identity(self) -> Optional[AsusDevice]:
         """Return device identity."""
 
         return self._identity
 
-    # CONNECTION ->
+    # --------------------
+    # Connection -->
+    # --------------------
+
     async def async_connect(self) -> None:
         """Connect to the device."""
 
@@ -187,9 +165,11 @@ class ARBridge:
 
         _LOGGER.debug("Cleaning up")
 
-        await self.api.connection.async_cleanup()
+        await self.api.async_cleanup()
 
-    # <- CONNECTION
+    # --------------------
+    # <-- Connection
+    # --------------------
 
     async def async_cleanup_sensors(self, sensors: dict[str, Any]) -> dict[str, Any]:
         """Cleanup sensors depending on the device mode."""
@@ -272,13 +252,13 @@ class ARBridge:
     # General method
     async def _get_data(
         self,
-        method: Callable[[], Awaitable[dict[str, Any]]],
+        datatype: AsusData,
         process: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Get data from the device. This is a generic method."""
 
         try:
-            raw = await method()
+            raw = await self.api.async_get_data(datatype)
             if process is not None:
                 return process(raw)
             return self._process_data(raw)
@@ -289,95 +269,95 @@ class ARBridge:
     async def async_get_aimesh_nodes(self) -> dict[str, AiMeshDevice]:
         """Get dict of AiMesh nodes."""
 
-        return await self._get_data(self.api.async_get_aimesh)
+        return await self._get_data(AsusData.AIMESH)
 
     # Connected devices
-    async def async_get_connected_devices(self) -> dict[str, ConnectedDevice]:
-        """Get dict of connected devices."""
+    async def async_get_clients(self) -> dict[str, AsusClient]:
+        """Get clients."""
 
-        return await self._get_data(self.api.async_get_connected_devices)
+        return await self._get_data(AsusData.CLIENTS)
 
     # Sensor-specific methods
     async def _get_data_boottime(self) -> dict[str, Any]:
         """Get `boottime` data from the device."""
 
-        return await self._get_data(
-            self.api.async_get_boottime, self._process_data_boottime
-        )
+        return await self._get_data(AsusData.BOOTTIME)
 
     async def _get_data_cpu(self) -> dict[str, Any]:
         """Get CPU data from the device."""
 
-        return await self._get_data(self.api.async_get_cpu)
+        return await self._get_data(AsusData.CPU)
 
     async def _get_data_firmware(self) -> dict[str, Any]:
         """Get firmware data from the device."""
 
-        return await self._get_data(self.api.async_get_firmware)
+        return await self._get_data(AsusData.FIRMWARE)
 
     async def _get_data_gwlan(self) -> dict[str, Any]:
         """Get GWLAN data from the device."""
 
-        return await self._get_data(self.api.async_get_gwlan)
+        return await self._get_data(AsusData.GWLAN)
 
     async def _get_data_led(self) -> dict[str, Any]:
         """Get light data from the device."""
 
-        return await self._get_data(self.api.async_get_led)
+        return await self._get_data(AsusData.LED)
 
     async def _get_data_network(self) -> dict[str, Any]:
         """Get network data from device."""
 
-        return await self._get_data(self.api.async_get_network)
+        return await self._get_data(AsusData.NETWORK)
 
     async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
         """Get parental control data from the device."""
 
         return await self._get_data(
-            self.api.async_get_parental_control, self._process_data_parental_control
+            AsusData.PARENTAL_CONTROL,
+            self._process_data_parental_control,
         )
 
     async def _get_data_port_forwarding(self) -> dict[str, Any]:
         """Get port forwarding data from the device."""
 
         return await self._get_data(
-            self.api.async_get_port_forwarding, self._process_data_port_forwarding
+            AsusData.PORT_FORWARDING,
+            self._process_data_port_forwarding,
         )
 
     async def _get_data_ports(self) -> dict[str, dict[str, int]]:
         """Get ports data from the device."""
 
-        return await self._get_data(self.api.async_get_ports, self._process_data_ports)
+        return await self._get_data(AsusData.PORTS, self._process_data_ports)
 
     async def _get_data_ram(self) -> dict[str, Any]:
         """Get RAM data from the device."""
 
-        return await self._get_data(self.api.async_get_ram)
+        return await self._get_data(AsusData.RAM)
 
     async def _get_data_sysinfo(self) -> dict[str, Any]:
         """Get sysinfo data from the device."""
 
-        return await self._get_data(self.api.async_get_sysinfo)
+        return await self._get_data(AsusData.SYSINFO)
 
     async def _get_data_temperature(self) -> dict[str, Any]:
         """Get temperarture data from the device."""
 
-        return await self._get_data(self.api.async_get_temperature)
+        return await self._get_data(AsusData.TEMPERATURE)
 
     async def _get_data_vpn(self) -> dict[str, Any]:
         """Get VPN data from the device."""
 
-        return await self._get_data(self.api.async_get_vpn)
+        return await self._get_data(AsusData.OPENVPN)
 
     async def _get_data_wan(self) -> dict[str, Any]:
         """Get WAN data from the device."""
 
-        return await self._get_data(self.api.async_get_wan)
+        return await self._get_data(AsusData.WAN)
 
     async def _get_data_wlan(self) -> dict[str, Any]:
         """Get WLAN data from the device."""
 
-        return await self._get_data(self.api.async_get_wlan)
+        return await self._get_data(AsusData.WLAN)
 
     # <- GET DATA FROM DEVICE
 
@@ -389,18 +369,11 @@ class ARBridge:
         return helpers.as_dict(helpers.flatten_dict(raw))
 
     @staticmethod
-    def _process_data_boottime(raw: dict[str, Any]) -> dict[str, Any]:
-        """Process `boottime` data."""
-
-        raw[TIMESTAMP] = datetime.fromisoformat(raw[ISO])
-        return raw
-
-    @staticmethod
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `parental control` data."""
 
-        data = {}
-        data[STATE] = raw.get(STATE)
+        data: dict[str, Any] = {}
+        data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
         devices = []
         for rule in raw["rules"]:
             device = dataclasses.asdict(raw["rules"][rule])
@@ -413,8 +386,8 @@ class ARBridge:
     def _process_data_port_forwarding(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `port forwarding` data."""
 
-        data = {}
-        data[STATE] = raw.get(STATE)
+        data: dict[str, Any] = {}
+        data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
         devices = []
         for rule in raw["rules"]:
             device = dataclasses.asdict(rule)
@@ -451,7 +424,7 @@ class ARBridge:
     # GET SENSORS LIST ->
     async def _get_sensors(
         self,
-        method: Callable[[], Awaitable[dict[str, Any]]],
+        datatype: AsusData,
         process: Callable[[dict[str, Any]], list[str]] | None = None,
         sensor_type: str | None = None,
         defaults: bool = False,
@@ -460,7 +433,10 @@ class ARBridge:
 
         sensors = []
         try:
-            data = await method()
+            data = await self.api.async_get_data(datatype)
+            _LOGGER.debug(
+                "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
+            )
             sensors = (
                 process(data) if process is not None else self._process_sensors(data)
             )
@@ -480,7 +456,7 @@ class ARBridge:
         """Get the available CPU sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_cpu,
+            AsusData.CPU,
             self._process_sensors_cpu,
             sensor_type=CPU,
             defaults=True,
@@ -490,7 +466,7 @@ class ARBridge:
         """Get the available GWLAN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_gwlan,
+            AsusData.GWLAN,
             sensor_type=GWLAN,
         )
 
@@ -498,7 +474,7 @@ class ARBridge:
         """Get the available network stat sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_network,
+            AsusData.NETWORK,
             self._process_sensors_network,
             sensor_type=NETWORK_STAT,
         )
@@ -507,7 +483,7 @@ class ARBridge:
         """Get the available ports sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_ports,
+            AsusData.PORTS,
             self._process_sensors_ports,
             sensor_type=PORTS,
         )
@@ -516,7 +492,7 @@ class ARBridge:
         """Get the available sysinfo sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_sysinfo,
+            AsusData.SYSINFO,
             self._process_sensors_sysinfo,
             sensor_type=SYSINFO,
         )
@@ -524,22 +500,20 @@ class ARBridge:
     async def _get_sensors_temperature(self) -> list[str]:
         """Get the available temperature sensors."""
 
-        return await self._get_sensors(
-            self.api.async_get_temperature, sensor_type=TEMPERATURE
-        )
+        return await self._get_sensors(AsusData.TEMPERATURE, sensor_type=TEMPERATURE)
 
     async def _get_sensors_vpn(self) -> list[str]:
         """Get the available VPN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_vpn, self._process_sensors_vpn, sensor_type=VPN
+            AsusData.OPENVPN, self._process_sensors_vpn, sensor_type=VPN
         )
 
     async def _get_sensors_wlan(self) -> list[str]:
         """Get the available WLAN sensors."""
 
         return await self._get_sensors(
-            self.api.async_get_wlan,
+            AsusData.WLAN,
             sensor_type=WLAN,
         )
 
@@ -561,22 +535,13 @@ class ARBridge:
     def _process_sensors_cpu(raw: dict[str, Any]) -> list[str]:
         """Process CPU sensors."""
 
-        sensors = []
-        for label in raw:
-            for sensor in SENSORS_CPU:
-                sensors.append(f"{label}_{sensor}")
-
-        return sensors
+        return convert_to_ha_sensors(raw, AsusData.CPU)
 
     @staticmethod
     def _process_sensors_network(raw: dict[str, Any]) -> list[str]:
         """Process network sensors."""
 
-        sensors = []
-        for label in raw:
-            for sensor_type in SENSORS_NETWORK:
-                sensors.append(f"{label}_{sensor_type}")
-        return sensors
+        return convert_to_ha_sensors(raw, AsusData.NETWORK)
 
     @staticmethod
     def _process_sensors_ports(raw: dict[str, Any]) -> list[str]:
@@ -604,212 +569,6 @@ class ARBridge:
     def _process_sensors_vpn(raw: dict[str, Any]) -> list[str]:
         """Process VPN sensors."""
 
-        sensors = []
-        for vpn in raw:
-            if KEY_OVPN_CLIENT in vpn:
-                for sensor in SENSORS_VPN:
-                    sensors.append(f"{vpn}_{sensor}")
-            elif KEY_OVPN_SERVER in vpn:
-                for sensor in SENSORS_VPN_SERVER:
-                    sensors.append(f"{vpn}_{sensor}")
-            sensors.append(f"{vpn}_state")
-        return sensors
+        return convert_to_ha_sensors(raw, AsusData.OPENVPN)
 
     # <- PROCESS SENSORS LIST
-
-    # SERVICES ->
-
-    async def async_adjust_wlan(self, **kwargs: Any) -> bool:
-        """Adjust WLAN settings."""
-
-        if "raw" not in kwargs:
-            return False
-
-        raw = kwargs["raw"]
-
-        # Check entity
-        entity_reg = er.async_get(self.hass)
-        entity = entity_reg.async_get(raw["entity_id"])
-        if not isinstance(entity, er.RegistryEntry):
-            return False
-
-        # WLAN capabilities
-        capabilities: dict[str, Any] = helpers.as_dict(entity.capabilities)
-
-        args_raw = raw.copy()
-
-        args = {}
-
-        prefix = ""
-        if capabilities["api_type"] == GWLAN:
-            prefix = f"wl{capabilities['api_id']}"
-
-            for arg, value in args_raw.items():
-                if arg in SERVICE_ALLOWED_ADJUST_GWLAN:
-                    args[arg] = str(value)
-                    method = SERVICE_ALLOWED_ADJUST_GWLAN[arg]
-                    if method:
-                        args[arg] = method(value)
-
-            if PASSWORD in args_raw:
-                args["wpa_psk"] = str(args_raw[PASSWORD])
-            if STATE in args_raw:
-                args["bss_enabled"] = str(converters.int_from_bool(args_raw[STATE]))
-            if "expire" in args_raw:
-                args["expire_tmp"] = str(0)
-
-            # Name arguments correctly
-            service_args = {f"{prefix}_{arg}": value for arg, value in args.items()}
-
-            # We need to specify unit/subunit, otherwise expiry timer will not reset
-            service_args["wl_unit"] = str(capabilities["api_id"][0])
-            service_args["wl_subunit"] = str(capabilities["api_id"][-1])
-
-            return await self.api.async_service_generic(
-                service="restart_wireless;restart_firewall",
-                arguments=service_args,
-                expect_modify=True,
-            )
-        if capabilities["api_type"] == WLAN:
-            prefix = f"wl{capabilities['api_id']}"
-
-            for arg, value in args_raw.items():
-                if arg in SERVICE_ALLOWED_ADJUST_WLAN:
-                    args[arg] = str(value)
-                    method = SERVICE_ALLOWED_ADJUST_WLAN[arg]
-                    if method:
-                        args[arg] = method(value)
-
-            if PASSWORD in args_raw:
-                args["wpa_psk"] = str(args_raw[PASSWORD])
-            if STATE in args_raw:
-                args["radio"] = str(converters.int_from_bool(args_raw[STATE]))
-
-            # Name arguments correctly
-            service_args = {f"{prefix}_{arg}": value for arg, value in args.items()}
-
-            return await self.api.async_service_generic(
-                service="restart_wireless",
-                arguments=service_args,
-                expect_modify=True,
-            )
-        return False
-
-    async def async_parental_control(self, **kwargs: Any) -> bool:
-        """Adjust parental control rules."""
-
-        raw = kwargs.get("raw", None)
-        if raw is None:
-            return False
-
-        rules_to_change = []
-
-        state = raw.get(STATE)
-
-        # Devices are set
-        if "devices" in raw:
-            rules = raw["devices"]
-            for rule in rules:
-                if MAC in rule:
-                    mac = rule[MAC].upper()
-                    name = rule.get(NAME, mac)
-                    rules_to_change.append(
-                        FilterDevice(
-                            mac=mac,
-                            name=name,
-                            type=state,
-                        )
-                    )
-                else:
-                    _LOGGER.warning(
-                        "Parental control rule is missing MAC address. This rule is skipped"
-                    )
-        # Entities are set
-        elif "entities" in raw:
-            entities = raw["entities"]
-            entity_reg = er.async_get(self.hass)
-            for entity in entities:
-                reg_value = entity_reg.async_get(entity)
-                if not isinstance(reg_value, er.RegistryEntry):
-                    continue
-                capabilities: dict[str, Any] = helpers.as_dict(reg_value.capabilities)
-                rules_to_change.append(
-                    FilterDevice(
-                        mac=capabilities[MAC].upper(),
-                        name=capabilities[NAME],
-                        type=state,
-                    )
-                )
-        if state == "remove":
-            _LOGGER.debug("Removing parental control rules")
-            rules = await self.api.async_remove_parental_control_rules(
-                rules=rules_to_change
-            )
-            return rules != {}
-        if state in SERVICE_ALLOWED_DEVICE_INTERNET_ACCCESS:
-            _LOGGER.debug("Setting parental control rules")
-            return await self.api.async_set_parental_control_rules(
-                rules=rules_to_change
-            )
-        return False
-
-    async def async_port_forwarding(self, **kwargs: Any) -> bool:
-        """Adjust port forwarding rules."""
-
-        raw = kwargs.get("raw", None)
-        if raw is None or ACTION not in raw:
-            return False
-
-        action = raw[ACTION]
-
-        # Remove all for IP
-        if action == "remove_ip":
-            ips = None
-            # IP or IPs list set
-            if IPS in raw:
-                ips = raw[IPS]
-            elif IP in raw:
-                ips = raw[IP]
-
-            # IP(s) not found
-            if ips is None:
-                return False
-
-            # Remove all the rules for IP(s)
-            await self.api.async_remove_port_forwarding_rules(ips=ips)
-            return True
-
-        # If not enough data provided
-        if IP not in raw or PORT_EXTERNAL not in raw or PROTOCOL not in raw:
-            _LOGGER.warning("Port forwarding service did not receive enough parameters")
-            return False
-
-        # Check that protocol is correct
-        protocol = raw[PROTOCOL].upper()
-        if protocol not in SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL:
-            _LOGGER.warning(
-                "Wrong protocol %s set for port forwarding service. Please use one of %s",
-                protocol,
-                SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL,
-            )
-
-        # Create new rule
-        rule = PortForwarding(
-            name=raw.get(NAME),
-            ip=raw[IP],
-            port=raw.get(PORT),
-            protocol=raw[PROTOCOL],
-            ip_external=raw.get(IP_EXTERNAL),
-            port_external=raw[PORT_EXTERNAL],
-        )
-
-        # Apply the action
-        if action == "set":
-            return await self.api.async_set_port_forwarding_rules(rules=rule)
-        if action == "remove":
-            await self.api.async_remove_port_forwarding_rules(rules=rule)
-            return True
-
-        return False
-
-    # <- SERVICES

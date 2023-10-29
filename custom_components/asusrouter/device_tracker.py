@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .client import ARClient
 from .const import (
     ASUSROUTER,
     CONF_DEFAULT_TRACK_DEVICES,
@@ -18,7 +19,7 @@ from .const import (
     DEFAULT_DEVICE_NAME,
     DOMAIN,
 )
-from .router import ARConnectedDevice, ARDevice
+from .router import ARDevice
 
 
 async def async_setup_entry(
@@ -80,16 +81,16 @@ class ARDeviceEntity(ScannerEntity):
     def __init__(
         self,
         router: ARDevice,
-        device: ARConnectedDevice,
+        device: ARClient,
     ) -> None:
         """Initialize connected device."""
 
         self._router = router
         self._device = device
-        self._attr_unique_id = f"{router.mac}_{device.mac}"
+        self._attr_unique_id = f"{router.mac}_{device.mac_address}"
         self._attr_name = device.name or DEFAULT_DEVICE_NAME
         self._attr_capability_attributes = {
-            "mac": device.mac,
+            "mac": device.mac_address,
             "name": self._attr_name,
         }
 
@@ -100,25 +101,25 @@ class ARDeviceEntity(ScannerEntity):
         return SourceType.ROUTER
 
     @property
-    def is_connected(self) -> bool:
+    def is_connected(self) -> Optional[bool]:
         """Device status."""
 
-        return self._device.is_connected
+        return self._device.state
 
     @property
-    def ip_address(self) -> str:
+    def ip_address(self) -> Optional[str]:
         """Device IP address."""
 
-        return self._device.ip
+        return self._device.ip_address
 
     @property
     def mac_address(self) -> str:
         """Device MAC address."""
 
-        return self._device.mac
+        return self._device.mac_address
 
     @property
-    def hostname(self) -> str:
+    def hostname(self) -> Optional[str]:
         """Device hostname."""
 
         return self._device.name
@@ -127,7 +128,7 @@ class ARDeviceEntity(ScannerEntity):
     def icon(self) -> str:
         """Device icon."""
 
-        return "mdi:lan-connect" if self._device.is_connected else "mdi:lan-disconnect"
+        return "mdi:lan-connect" if self._device.state else "mdi:lan-disconnect"
 
     @property
     def unique_id(self) -> str | None:
@@ -145,8 +146,8 @@ class ARDeviceEntity(ScannerEntity):
     def async_on_demand_update(self) -> None:
         """Update the state."""
 
-        if self._device.mac in self._router.devices:
-            self._device = self._router.devices[self._device.mac]
+        if self._device.mac_address in self._router.devices:
+            self._device = self._router.devices[self._device.mac_address]
             self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
