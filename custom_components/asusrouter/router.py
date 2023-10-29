@@ -5,10 +5,9 @@ from __future__ import annotations
 import logging
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 from asusrouter.error import AsusRouterAccessError
-from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.connection import ConnectionType
 from asusrouter.modules.identity import AsusDevice
 from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
@@ -29,12 +28,12 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
+from .aimesh import AiMeshNode
 from .bridge import ARBridge
 from .client import ARClient
 from .const import (
     ACCESS_POINT,
     AIMESH,
-    ALIAS,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_INTERVALS,
     CONF_DEFAULT_LATEST_CONNECTED,
@@ -45,8 +44,6 @@ from .const import (
     CONF_DEFAULT_SPLIT_INTERVALS,
     CONF_DEFAULT_TRACK_DEVICES,
     CONF_EVENT_NODE_CONNECTED,
-    CONF_EVENT_NODE_DISCONNECTED,
-    CONF_EVENT_NODE_RECONNECTED,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
@@ -55,35 +52,26 @@ from .const import (
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
     CONNECTED,
-    CONNECTION,
     COORDINATOR,
     DEVICES,
     DOMAIN,
     FIRMWARE,
     HTTP,
     HTTPS,
-    IP,
-    LEVEL,
     LIST,
     MAC,
     MEDIA_BRIDGE,
     METHOD,
-    MODEL,
     NO_SSL,
     NUMBER,
-    PARENT,
-    PRODUCT_ID,
     ROUTER,
     SENSORS,
     SENSORS_AIMESH,
     SENSORS_CONNECTED_DEVICES,
     SSL,
-    TYPE,
-    WIRED,
 )
 from .helpers import as_dict
 
-_T = TypeVar("_T")
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -141,7 +129,7 @@ class ARSensorHandler:
         self,
         clients_number: int,
         clients_list: list[Any],
-        latest_connected: datetime | None,
+        latest_connected: Optional[datetime],
         latest_connected_list: list[Any],
     ) -> bool:
         """Update connected devices attribute."""
@@ -176,7 +164,7 @@ class ARSensorHandler:
     async def get_coordinator(
         self,
         sensor_type: str,
-        update_method: Callable[[], Awaitable[dict[str, Any]]] | None = None,
+        update_method: Optional[Callable[[], Awaitable[dict[str, Any]]]] = None,
     ) -> DataUpdateCoordinator:
         """Find coordinator for the sensor type."""
 
@@ -236,108 +224,6 @@ class ARSensorHandler:
         await coordinator.async_refresh()
 
         return coordinator
-
-
-class AiMeshNode:
-    """Representation of an AiMesh node."""
-
-    def __init__(
-        self,
-        mac: str,
-    ) -> None:
-        """Initialize an AiMesh node."""
-
-        self._mac: str = mac
-        self.native = AiMeshDevice()
-        self.identity: dict[str, Any] = {
-            MAC: None,
-            IP: None,
-            ALIAS: None,
-            MODEL: None,
-            TYPE: None,
-            CONNECTED: None,
-        }
-        self._extra_state_attributes: dict[str, Any] = {}
-
-    @callback
-    def update(
-        self,
-        node_info: AiMeshDevice | None = None,
-        event_call: Callable[[str, dict[str, Any] | None], None] | None = None,
-    ) -> None:
-        """Update AiMesh device."""
-
-        if node_info:
-            self.native = node_info
-            self._mac = self._extra_state_attributes[MAC] = self.identity[
-                MAC
-            ] = format_mac(node_info.mac)
-            # Online
-            if node_info.status:
-                # State: router / node
-                self._extra_state_attributes[TYPE] = self.identity[
-                    TYPE
-                ] = node_info.type
-                # IP
-                self._extra_state_attributes[IP] = self.identity[IP] = node_info.ip
-                # Alias
-                self._extra_state_attributes[ALIAS] = self.identity[
-                    ALIAS
-                ] = node_info.alias
-                # Model
-                self._extra_state_attributes[MODEL] = self.identity[
-                    MODEL
-                ] = node_info.model
-                # Product ID
-                self._extra_state_attributes[PRODUCT_ID] = node_info.product_id
-                # Node level
-                self._extra_state_attributes[LEVEL] = node_info.level
-                # Node parent
-                if node_info.parent == {}:
-                    self._extra_state_attributes[PARENT] = {
-                        CONNECTION: WIRED,
-                    }
-                else:
-                    self._extra_state_attributes[PARENT] = node_info.parent
-                # Node config
-                # self._extra_state_attributes[CONFIG] = node_info.config
-                # Access point
-                # self._extra_state_attributes[ACCESS_POINT] = node_info.ap
-                # Notify reconnect
-                if self.identity[CONNECTED] is False and callable(event_call):
-                    event_call(
-                        CONF_EVENT_NODE_RECONNECTED,
-                        self.identity,
-                    )
-                # Connection status
-                self.identity[CONNECTED] = True
-            else:
-                # Notify disconnect
-                if self.identity[CONNECTED] is True and callable(event_call):
-                    event_call(
-                        CONF_EVENT_NODE_DISCONNECTED,
-                        self.identity,
-                    )
-                # Connection status
-                self.identity[CONNECTED] = False
-        elif callable(event_call):
-            # Notify disconnect
-            event_call(
-                CONF_EVENT_NODE_DISCONNECTED,
-                self.identity,
-            )
-
-    @property
-    def mac(self):
-        """Return node mac address."""
-
-        return self._mac
-
-    @property
-    def extra_state_attributes(self):
-        """Return extra state attributes."""
-
-        return self._extra_state_attributes
 
 
 class ARDevice:
@@ -470,7 +356,7 @@ class ARDevice:
 
     async def update_all(
         self,
-        now: datetime | None = None,
+        now: Optional[datetime] = None,
     ) -> None:
         """Update all AsusRouter platforms."""
 

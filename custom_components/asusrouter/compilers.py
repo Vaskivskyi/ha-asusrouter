@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 from .const import (
-    CONF_DEFAULT_UNITS_SPEED,
-    CONF_DEFAULT_UNITS_TRAFFIC,
     CONF_LABELS_INTERFACES,
-    LABEL_SPEED,
     MAP_NETWORK_TEMP,
     NAME,
     NETWORK,
@@ -16,7 +15,7 @@ from .dataclass import ARSensorDescription
 
 
 def list_sensors_network(
-    interfaces: list[str] | None = None,
+    interfaces: Optional[list[str]] = None,
 ) -> list[ARSensorDescription]:
     """Compile a list of network sensors."""
 

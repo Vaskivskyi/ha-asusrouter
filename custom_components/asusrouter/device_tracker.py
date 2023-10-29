@@ -131,7 +131,7 @@ class ARDeviceEntity(ScannerEntity):
         return "mdi:lan-connect" if self._device.state else "mdi:lan-disconnect"
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> Optional[str]:
         """Return unique ID of the entity."""
 
         return self._attr_unique_id
