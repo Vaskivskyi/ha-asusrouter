@@ -109,6 +109,7 @@ AsusRouter supports virtually every AsusWRT-powered device.
 |[RT-AX88U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX88UPro.html)|💛 Expected to work||<a href="https://amzn.to/3QNDpFZ" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX89X](https://asusrouter.vaskivskyi.com/devices/RT-AX89X.html)|💚 Confirmed||<a href="https://amzn.to/3i55b3S" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX92U](https://asusrouter.vaskivskyi.com/devices/RT-AX92U.html)|💚 Confirmed|Stock:<li>`386.46061`</li>|<a href="https://amzn.to/3jJJgzt" rel="nofollow sponsored" target="_blank">find it</a>|
+|[TUF-AX3000 V2](https://asusrouter.vaskivskyi.com/devices/TUF-AX3000V2.html)|💚 Confirmed|Stock:<li>`388.23785`</li>|<a href="https://amzn.to/3QzzD4C" rel="nofollow sponsored" target="_blank">find it</a>|
 |[TUF-AX4200](https://asusrouter.vaskivskyi.com/devices/TUF-AX4200.html)|💛 Expected to work||<a href="https://amzn.to/3kexPjC" rel="nofollow sponsored" target="_blank">find it</a>|
 |[TUF-AX5400](https://asusrouter.vaskivskyi.com/devices/TUF-AX5400.html)|💚 Confirmed|Stock:<li>`386.50224`</li><li>`388.21224`</li><li>`388.22525`</li>|<a href="https://amzn.to/3hXgzyQ" rel="nofollow sponsored" target="_blank">find it</a>|
 |[TUF-AX6000](https://asusrouter.vaskivskyi.com/devices/TUF-AX6000.html)|💚 Confirmed|Stock:<li>`388.32432`</li>|<a href="https://amzn.to/3CXqxaG" rel="nofollow sponsored" target="_blank">find it</a>|
