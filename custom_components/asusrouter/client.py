@@ -44,10 +44,12 @@ class ARClient:
     def __init__(
         self,
         mac: str,
+        name: Optional[str] = None,
     ):
         """Initialize the client."""
 
         self._mac = mac
+        self._name = name
 
     @callback
     def update(
@@ -61,7 +63,7 @@ class ARClient:
 
         utc_now: datetime = datetime.now(timezone.utc)
 
-        state: ConnectionState = ConnectionState.DISCONNECTED
+        state: Optional[ConnectionState] = None
 
         # If client information is provided
         if client_info is not None:
@@ -186,7 +188,7 @@ class ARClient:
     def name(self) -> Optional[str]:
         """Return name."""
 
-        return self.description.name if self.description is not None else None
+        return self.description.name if self.description is not None else self._name
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

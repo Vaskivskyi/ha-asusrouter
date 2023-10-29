@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from asusrouter.error import AsusRouterAccessError
-from asusrouter.modules.connection import ConnectionType
+from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.identity import AsusDevice
 from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
@@ -35,6 +35,7 @@ from .const import (
     ACCESS_POINT,
     AIMESH,
     CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_EVENT,
     CONF_DEFAULT_INTERVALS,
     CONF_DEFAULT_LATEST_CONNECTED,
     CONF_DEFAULT_MODE,
@@ -308,6 +309,7 @@ class ARDevice:
         tracked_entries = er.async_entries_for_config_entry(
             entity_reg, self._config_entry.entry_id
         )
+
         for entry in tracked_entries:
             uid: str = entry.unique_id
             if DOMAIN in uid:
@@ -325,6 +327,14 @@ class ARDevice:
 
             if any(id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")):
                 entity_reg.async_remove(entry.entity_id)
+
+            # Clients already tracked
+            if entry.domain != "device_tracker":
+                continue
+            capabilities = entry.capabilities
+            if "mac" in capabilities:
+                mac = capabilities["mac"]
+                self._clients[mac] = ARClient(mac)
 
         # Mode-specific
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
@@ -419,11 +429,22 @@ class ARDevice:
         new_client = False
 
         for client_mac, client_info in clients.items():
+            # We proceed only if device is online
+            # This way we'll avoid adding long history of devices
+            # which might have been connected long time ago
+            # and are not important anymore
+            state = client_info.state
+            if state is not ConnectionState.CONNECTED:
+                continue
+
             # Flag that new client is added
             new_client = True
 
             # Create new client and process it
-            client = ARClient(client_mac)
+            client_name = (
+                client_info.description.name if client_info.description else None
+            )
+            client = ARClient(client_mac, client_name)
             client.update(
                 client_info,
                 event_call=self.fire_event,
@@ -438,6 +459,7 @@ class ARDevice:
 
         # Notify about new clients
         for client in new_clients:
+            _LOGGER.debug("New client: %s", client.identity)
             self.fire_event(
                 "device_connected",
                 client.identity,
@@ -675,9 +697,12 @@ class ARDevice:
     ):
         """Fire HA event."""
 
-        if self._options.get(event) is True:
+        _event_status = self._options.get(event)
+        if _event_status is None:
+            _event_status = CONF_DEFAULT_EVENT.get(event, False)
+        if _event_status is True:
             event_name = f"{DOMAIN}_{event}"
-            _LOGGER.debug("Firing event: `%s`", event_name)
+            _LOGGER.debug("Firing event `%s` with arguments: %s", event_name, args)
             self.hass.bus.fire(
                 event_name,
                 args,
