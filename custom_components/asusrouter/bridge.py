@@ -556,14 +556,13 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_sysinfo(raw: dict[str, Any]) -> list[str]:
+    def _process_sensors_sysinfo(raw: Optional[dict[str, Any]]) -> list[str]:
         """Process SysInfo sensors."""
 
-        sensors = []
-        for sensor_type in SENSORS_SYSINFO:
-            if sensor_type in raw:
-                sensors.append(sensor_type)
-        return sensors
+        if raw is None or not isinstance(raw, dict):
+            return []
+
+        return SENSORS_SYSINFO
 
     @staticmethod
     def _process_sensors_vpn(raw: dict[str, Any]) -> list[str]:
