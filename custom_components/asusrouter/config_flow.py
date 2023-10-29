@@ -7,13 +7,11 @@ import socket
 from typing import Any
 from urllib.parse import urlparse
 
-from asusrouter import (
-    AsusRouterConnectionError,
-    AsusRouterLoginBlockError,
-    AsusRouterLoginError,
-)
 import voluptuous as vol
-
+from asusrouter import AsusData
+from asusrouter.error import AsusRouterAccessError
+from asusrouter.modules.endpoint.error import AccessError
+from asusrouter.modules.homeassistant import convert_to_ha_sensors_group
 from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
@@ -29,7 +27,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 
-from . import helpers
 from .bridge import ARBridge
 from .const import (
     ACCESS_POINT,
@@ -38,7 +35,6 @@ from .const import (
     CONF_CONSIDER_HOME,
     CONF_DEFAULT_CACHE_TIME,
     CONF_DEFAULT_CONSIDER_HOME,
-    CONF_DEFAULT_ENABLE_CONTROL,
     CONF_DEFAULT_EVENT,
     CONF_DEFAULT_HIDE_PASSWORDS,
     CONF_DEFAULT_INTERFACES,
@@ -50,10 +46,7 @@ from .const import (
     CONF_DEFAULT_SPLIT_INTERVALS,
     CONF_DEFAULT_SSL,
     CONF_DEFAULT_TRACK_DEVICES,
-    CONF_DEFAULT_UNITS_SPEED,
-    CONF_DEFAULT_UNITS_TRAFFIC,
     CONF_DEFAULT_USERNAME,
-    CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL,
@@ -65,10 +58,6 @@ from .const import (
     CONF_MODE,
     CONF_SPLIT_INTERVALS,
     CONF_TRACK_DEVICES,
-    CONF_UNITS_SPEED,
-    CONF_UNITS_TRAFFIC,
-    CONF_VALUES_DATA,
-    CONF_VALUES_DATARATE,
     CONF_VALUES_MODE,
     CONFIGS,
     DOMAIN,
@@ -79,7 +68,6 @@ from .const import (
     METHOD,
     NEXT,
     RESULT_CANNOT_RESOLVE,
-    RESULT_CONNECTION_REFUSED,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
     RESULT_SUCCESS,
@@ -141,7 +129,9 @@ async def _async_get_network_interfaces(
     try:
         if not bridge.connected:
             await bridge.async_connect()
-        labels = helpers.list_from_dict(await bridge.api.async_get_network())
+        labels = convert_to_ha_sensors_group(
+            await bridge.api.async_get_data(AsusData.NETWORK)
+        )
         await bridge.async_disconnect()
         _LOGGER.debug("Found network interfaces: %s", labels)
         return labels
@@ -177,33 +167,68 @@ async def _async_check_connection(
     # Connect
     try:
         await bridge.async_connect()
-    # Credentials error
-    except AsusRouterLoginError:
-        _LOGGER.error("Error during connection to '%s'. Wrong credentials", host)
-        return {
-            ERRORS: RESULT_WRONG_CREDENTIALS,
-        }
-    # Login blocked by the device
-    except AsusRouterLoginBlockError as ex:
+    except AsusRouterAccessError as ex:
+        args = ex.args
+        # Wrong credentials
+        if args[1] == AccessError.CREDENTIALS:
+            _LOGGER.error("Error during connection to `%s`. Wrong credentials", host)
+            return {
+                ERRORS: RESULT_WRONG_CREDENTIALS,
+            }
+        # Try again later / too many attempts
+        if args[1] == AccessError.TRY_AGAIN:
+            timeout = args[2].get("timeout")
+            _LOGGER.error(
+                "Device `%s` has reported block for the login (to many wrong attempts were made). \
+                    Please try again in `%s` seconds",
+                host,
+                timeout,
+            )
+            return {
+                ERRORS: RESULT_LOGIN_BLOCKED,
+            }
+        # Reset required
+        if args[1] == AccessError.RESET_REQUIRED:
+            _LOGGER.error(
+                "Device `%s` requires a reset. Please reset the device. You won't be able to \
+                    login to the device until the reset is done.",
+                host,
+            )
+            return {
+                ERRORS: RESULT_LOGIN_BLOCKED,
+            }
+        # Captcha required
+        if args[1] == AccessError.CAPTCHA:
+            _LOGGER.error(
+                "Device `%s` requires a captcha. Please login to the device and complete the captcha. \
+                    Integration cannot proceed with the captcha request. You need either to disable \
+                    captcha or login via Web UI from the HA IP address, complete it and try again. \
+                    Sometimes, you can also reboot the device to fix this issue.",
+                host,
+            )
+            return {
+                ERRORS: RESULT_LOGIN_BLOCKED,
+            }
+        # Another error
+        if args[1] == AccessError.ANOTHER:
+            _LOGGER.error("Device `%s` has reported `another` error.", host)
+            return {
+                ERRORS: RESULT_ERROR,
+            }
+        # Unknown error
+        if args[1] == AccessError.UNKNOWN:
+            _LOGGER.error("Device `%s` has reported `unknown` error.", host)
+            return {
+                ERRORS: RESULT_UNKNOWN,
+            }
+        # Anything else
         _LOGGER.error(
-            "Device '%s' has reported block for the login (to many wrong attempts were made). \
-                Please try again in %s seconds",
-            host,
-            ex.timeout,
+            "Error during connection to `%s`. Original exception: %s", host, ex
         )
         return {
-            ERRORS: RESULT_LOGIN_BLOCKED,
+            ERRORS: RESULT_UNKNOWN,
         }
-    # Connection refused
-    except AsusRouterConnectionError as ex:
-        _LOGGER.error(
-            "Connection refused by `%s`. Check SSL and port settings. Original exception: %s",
-            host,
-            ex,
-        )
-        return {
-            ERRORS: RESULT_CONNECTION_REFUSED,
-        }
+
     # Anything else
     except Exception as ex:  # pylint: disable=broad-except
         _LOGGER.error(
@@ -320,10 +345,6 @@ def _create_form_operation(
         vol.Required(CONF_MODE, default=user_input.get(CONF_MODE, mode)): vol.In(
             {mode: CONF_LABELS_MODE.get(mode, mode) for mode in CONF_VALUES_MODE}
         ),
-        vol.Required(
-            CONF_ENABLE_CONTROL,
-            default=user_input.get(CONF_ENABLE_CONTROL, CONF_DEFAULT_ENABLE_CONTROL),
-        ): cv.boolean,
         vol.Required(
             CONF_SPLIT_INTERVALS,
             default=user_input.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS),
@@ -447,14 +468,6 @@ def _create_form_interfaces(
                 for interface in user_input[INTERFACES]
             }
         ),
-        vol.Required(
-            CONF_UNITS_SPEED,
-            default=user_input.get(CONF_UNITS_SPEED, CONF_DEFAULT_UNITS_SPEED),
-        ): vol.In({datarate: datarate for datarate in CONF_VALUES_DATARATE}),
-        vol.Required(
-            CONF_UNITS_TRAFFIC,
-            default=user_input.get(CONF_UNITS_TRAFFIC, CONF_DEFAULT_UNITS_TRAFFIC),
-        ): vol.In({data: data for data in CONF_VALUES_DATA}),
     }
 
     return vol.Schema(schema)

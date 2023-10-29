@@ -19,13 +19,11 @@ from .const import (
     AIMESH,
     ASUSROUTER,
     CONF_DEFAULT_HIDE_PASSWORDS,
-    CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
     DOMAIN,
     MANUFACTURER,
     PASSWORD,
     STATIC_BINARY_SENSORS,
-    STATIC_BINARY_SENSORS_OPTIONAL,
 )
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -45,9 +43,6 @@ async def async_setup_entry(
     hide = []
     if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
-
-    if not config_entry.options[CONF_ENABLE_CONTROL]:
-        binary_sensors.extend(STATIC_BINARY_SENSORS_OPTIONAL)
 
     await async_setup_ar_entry(
         hass, config_entry, async_add_entities, binary_sensors, ARBinarySensor, hide

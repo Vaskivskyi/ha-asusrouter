@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
+from asusrouter.modules.state import AsusState
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
@@ -19,25 +20,25 @@ from homeassistant.helpers.entity import EntityDescription
 class AREntityDescription(EntityDescription):
     """Describe AsusRouter entity."""
 
-    capabilities: dict[str, Any] | None = None
-    key_group: str | None = None
+    capabilities: Optional[dict[str, Any]] = None
+    key_group: Optional[str] = None
     value: Callable[[Any], Any] = lambda val: val
-    extra_state_attributes: dict[str, Any] | None = None
+    extra_state_attributes: Optional[dict[str, Any]] = None
 
 
 @dataclass
 class ARBinaryDescription(AREntityDescription, BinarySensorEntityDescription):
     """Describe AsusRouter binary entity."""
 
-    icon_on: str | None = None
-    icon_off: str | None = None
+    icon_on: Optional[str] = None
+    icon_off: Optional[str] = None
 
 
 @dataclass
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """Describe AsusRouter sensor."""
 
-    factor: int | None = None
+    factor: Optional[int] = None
     precision: int = 3
 
 
@@ -55,23 +56,24 @@ class ARLightDescription(ARBinaryDescription, LightEntityDescription):
 class ARSwitchDescription(AREntityDescription, SwitchEntityDescription):
     """Describe AsusRouter switch."""
 
-    icon_on: str | None = None
-    icon_off: str | None = None
+    icon_on: Optional[str] = None
+    icon_off: Optional[str] = None
 
-    service_expect_modify: bool = False
-    service_off: str | None = None
-    service_off_args: dict[str, Any] | None = None
-    service_on: str | None = None
-    service_on_args: dict[str, Any] | None = None
+    state_on: Optional[AsusState] = None
+    state_on_args: Optional[dict[str, Any]] = None
+    state_off: Optional[AsusState] = None
+    state_off_args: Optional[dict[str, Any]] = None
+
+    state_expect_modify: bool = False
 
 
 @dataclass
 class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
     """Describe AsusRouter button."""
 
-    service: str | None = None
-    service_args: dict[str, Any] | None = None
-    service_expect_modify: bool = False
+    state: Optional[str] = None
+    state_args: Optional[dict[str, Any]] = None
+    state_expect_modify: bool = False
 
 
 @dataclass
