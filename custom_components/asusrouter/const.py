@@ -646,7 +646,6 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "suggested_unit_of_measurement": UnitOfInformation.GIGABYTES,
         "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
-        "raw_attribute": BYTES,
     },
     RX_SPEED: {
         NAME: f"{LABEL_RX} {LABEL_SPEED}",
@@ -657,7 +656,6 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
-        "raw_attribute": BITS_PER_SECOND,
     },
     TX: {
         NAME: f"{LABEL_TX}",
@@ -668,7 +666,6 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "suggested_unit_of_measurement": UnitOfInformation.GIGABYTES,
         "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
-        "raw_attribute": BYTES,
     },
     TX_SPEED: {
         NAME: f"{LABEL_TX} {LABEL_SPEED}",
@@ -679,7 +676,6 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
         "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "suggested_display_precision": 3,
         "entity_registry_enabled_default": True,
-        "raw_attribute": BITS_PER_SECOND,
     },
 }
 
