@@ -217,7 +217,7 @@ LABEL_WLAN_5GHZ = "5 GHz"
 LABEL_WLAN_5GHZ2 = "5 GHz-2"
 LABEL_WLAN_6GHZ = "6 GHz"
 LABELS_LOAD_AVG = {
-    f"{sensor}": f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ("1", "5", "15")
+    sensor: f"{LABEL_LOAD_AVG} ({sensor} min)" for sensor in ("1", "5", "15")
 }
 LABELS_TEMPERATURE = {
     "cpu": "Temperature CPU",
