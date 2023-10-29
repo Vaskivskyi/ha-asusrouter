@@ -253,11 +253,12 @@ class ARBridge:
         self,
         datatype: AsusData,
         process: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+        force: bool = False,
     ) -> dict[str, Any]:
         """Get data from the device. This is a generic method."""
 
         try:
-            raw = await self.api.async_get_data(datatype)
+            raw = await self.api.async_get_data(datatype, force=force)
             if process is not None:
                 return process(raw)
             return self._process_data(raw)
@@ -274,7 +275,7 @@ class ARBridge:
     async def async_get_clients(self) -> dict[str, AsusClient]:
         """Get clients."""
 
-        return await self._get_data(AsusData.CLIENTS)
+        return await self._get_data(AsusData.CLIENTS, force=True)
 
     # Sensor-specific methods
     async def _get_data_boottime(self) -> dict[str, Any]:
