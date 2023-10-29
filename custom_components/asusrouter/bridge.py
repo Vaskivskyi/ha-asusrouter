@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
-from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import aiohttp
 from asusrouter import AsusRouter

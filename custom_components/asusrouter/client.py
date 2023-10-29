@@ -19,14 +19,27 @@ from asusrouter.modules.homeassistant import (
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import format_mac
 
-from custom_components.asusrouter.const import (
-    CONF_EVENT_DEVICE_DISCONNECTED,
-    CONF_EVENT_DEVICE_RECONNECTED,
-)
-
 
 class ARClient:
     """AsussRouter Client class."""
+
+    # To be recieved from the device
+    # Client description
+    description: Optional[AsusClientDescription] = None
+    # Connection description - AsusClientConnection / AsusClientConnectionWlan
+    connection: Optional[AsusClientConnection] = None
+
+    # To be generated for other parts of the integration
+    _identity: Optional[dict[str, Any]] = None
+    _extra_state_attributes: dict[str, Any] = {}
+
+    # Connection state
+    _state: ConnectionState = ConnectionState.UNKNOWN
+
+    # Device last active
+    _last_activity: Optional[datetime] = None
+    # Device connected since
+    _since: Optional[datetime] = None
 
     def __init__(
         self,
@@ -35,16 +48,6 @@ class ARClient:
         """Initialize the client."""
 
         self._mac = mac
-
-        self.description: Optional[AsusClientDescription] = None
-        self.connection: Optional[AsusClientConnection] = None
-        self._identity: Optional[dict[str, Any]] = None
-        self._extra_state_attributes: dict[str, Any] = {}
-
-        self._state: ConnectionState = ConnectionState.UNKNOWN
-        self._last_activity: Optional[datetime] = None
-
-        self._since: Optional[datetime] = None
 
     @callback
     def update(
@@ -92,7 +95,7 @@ class ARClient:
             # Fire event and connected callback
             if self._state is ConnectionState.DISCONNECTED:
                 if event_call is not None:
-                    event_call(CONF_EVENT_DEVICE_RECONNECTED, self.identity)
+                    event_call("device_reconnected", self.identity)
                 if connected_call is not None:
                     connected_call(self.identity)
 
@@ -113,7 +116,7 @@ class ARClient:
             # Fire event
             if event_call is not None:
                 event_call(
-                    CONF_EVENT_DEVICE_DISCONNECTED,
+                    "device_disconnected",
                     self.identity,
                 )
 
