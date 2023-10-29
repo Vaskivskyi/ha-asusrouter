@@ -47,9 +47,6 @@ def list_sensors_network(
                         "entity_registry_enabled_default"
                     ]
                     or True,
-                    extra_state_attributes={
-                        key: data["raw_attribute"] or None,
-                    },
                 )
             )
 
