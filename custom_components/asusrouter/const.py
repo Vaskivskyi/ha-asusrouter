@@ -5,7 +5,12 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from asusrouter.util import converters
+from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
+from asusrouter.modules.parental_control import AsusParentalControl
+from asusrouter.modules.port_forwarding import AsusPortForwarding
+from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wlan import AsusWLAN
+from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -202,10 +207,7 @@ CONNECTION_LIST = [
 ]
 CONNECTION_WIRED = "Wired"
 
-LABEL_GUEST = "Guest"
 LABEL_LOAD_AVG = "Load Average"
-LABEL_OVPN_CLIENT = "OpenVPN Client"
-LABEL_OVPN_SERVER = "OpenVPN Server"
 LABEL_RX = "Download"
 LABEL_SPEED = "Speed"
 LABEL_TEMPERATURE = "Temperature"
@@ -296,7 +298,7 @@ MODE_SENSORS = {
 # SENSORS LIST -->
 
 SENSORS_AIMESH = [NUMBER, LIST]
-SENSORS_BOOTTIME = [TIMESTAMP, ISO]
+SENSORS_BOOTTIME = ["datetime"]
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = [NUMBER, DEVICES, "latest", "latest_time"]
 SENSORS_CPU = [TOTAL, USED, USAGE]
@@ -350,7 +352,7 @@ SENSORS_VPN_SERVER = {
 }
 SENSORS_WAN = [
     STATUS,
-    IP,
+    "ip_address",
     "ip_type",
     "gateway",
     "mask",
@@ -613,13 +615,6 @@ DEVICE_ATTRIBUTES: list[str] = [
     DEVICE_ATTRIBUTE_TX_SPEED,
 ]
 
-# Params to generate sensors
-KEY_GWLAN = "wl"
-KEY_OVPN_CLIENT = "vpn_client"
-KEY_OVPN_SERVER = "vpn_server"
-KEY_SENSOR_ID = "{}_{}"
-KEY_WLAN = "wl"
-
 # Generate wireless networks
 NAME_GWLAN = {}
 NAME_WLAN = {}
@@ -702,28 +697,19 @@ TO_REDACT_ATTRS: list[str] = [CONF_DEVICES, PASSWORD, IP, SSID, LIST]
 
 # SERVICES -->
 
-REBOOT = "reboot"
-RESTART_FIREWALL = "restart_firewall"
-RESTART_HTTPD = "restart_httpd"
-RESTART_WIRELESS = "restart_wireless"
-START_VPNCLIENT = "start_vpnclient"
-STOP_VPNCLIENT = "stop_vpnclient"
-START_VPNSERVER = "start_vpnserver"
-STOP_VPNSERVER = "stop_vpnserver"
-
 SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
-    "sync_node": converters.int_from_bool,
-    "bw_enabled": converters.int_from_bool,
+    "sync_node": converters.safe_int,
+    "bw_enabled": converters.safe_int,
     "bw_dl": None,
     "bw_ul": None,
     "expire": None,
-    "closed": converters.int_from_bool,
-    "lanaccess": converters.int_from_bool,
+    "closed": converters.safe_int,
+    "lanaccess": converters.safe_int,
     SSID: None,
 }
 
 SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
-    "closed": converters.int_from_bool,
+    "closed": converters.safe_int,
     SSID: None,
 }
 
@@ -774,218 +760,110 @@ ICON_WLAN_ON = "mdi:wifi"
 
 # SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
-    # Port status - LAN
+    # Port status / LAN
     ARBinarySensorDescription(
-        key=LAN,
-        key_group=PORTS,
+        key="lan",
+        key_group="ports",
         name="Port Status (LAN)",
-        icon_off=ICON_ETHERNET_OFF,
         icon_on=ICON_ETHERNET_ON,
+        icon_off=ICON_ETHERNET_OFF,
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            f"{LAN}_{LIST}": LIST,
+            "lan_list": "list",
         },
     ),
-    # Port status - USB
+    # Port status / USB
     ARBinarySensorDescription(
-        key=USB,
-        key_group=PORTS,
+        key="usb",
+        key_group="ports",
         name="Port Status (USB)",
         icon=ICON_USB,
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            f"{USB}_{LIST}": LIST,
+            "usb_list": "list",
         },
     ),
-    # Port status - WAN
+    # Port status / WAN
     ARBinarySensorDescription(
-        key=WAN,
-        key_group=PORTS,
+        key="wan",
+        key_group="ports",
         name="Port Status (WAN)",
-        icon_off=ICON_ETHERNET_OFF,
         icon_on=ICON_ETHERNET_ON,
+        icon_off=ICON_ETHERNET_OFF,
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            f"{WAN}_{LIST}": LIST,
+            "wan_list": "list",
         },
     ),
     # WAN
     ARBinarySensorDescription(
-        key=STATUS,
-        key_group=WAN,
-        name=WAN.upper(),
+        key="status",
+        key_group="wan",
+        name="WAN",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            DNS: DNS,
+            "dns": "dns",
             "gateway": "gateway",
-            IP: IP,
+            "ip_address": "ip_address",
             "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
-            "xdns": f"x{DNS}",
+            "xdns": "xdns",
             "xgateway": "xgateway",
-            "xip": f"x{IP}",
+            "xip": "xip",
             "xtype": "xip_type",
             "xmask": "xmask",
         },
     ),
 ]
-STATIC_BINARY_SENSORS_OPTIONAL: list[AREntityDescription] = [
-    # Parental control state
-    ARBinarySensorDescription(
-        key=STATE,
-        key_group=PARENTAL_CONTROL,
-        name="Parental control",
-        icon_off=ICON_PARENTAL_CONTROL_OFF,
-        icon_on=ICON_PARENTAL_CONTROL_ON,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=True,
-        extra_state_attributes={
-            LIST: LIST,
-        },
-    ),
-]
-STATIC_BINARY_SENSORS_OPTIONAL.extend(
-    [
-        # OVPN clients
-        ARBinarySensorDescription(
-            key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
-            key_group=VPN,
-            name=f"{LABEL_OVPN_CLIENT} {num}",
-            device_class=BinarySensorDeviceClass.CONNECTIVITY,
-            entity_registry_enabled_default=False,
-            extra_state_attributes={
-                f"{KEY_OVPN_CLIENT}{num}_{key}": value
-                for key, value in SENSORS_VPN.items()
-            },
-        )
-        for num in NUMERIC_OVPN_CLIENT
-    ]
-)
-STATIC_BINARY_SENSORS_OPTIONAL.extend(
-    [
-        # OVPN servers
-        ARBinarySensorDescription(
-            key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
-            key_group=VPN,
-            name=f"{LABEL_OVPN_SERVER} {num}",
-            device_class=BinarySensorDeviceClass.CONNECTIVITY,
-            entity_registry_enabled_default=False,
-            extra_state_attributes={
-                f"{KEY_OVPN_SERVER}{num}_{key}": value
-                for key, value in SENSORS_VPN_SERVER.items()
-            },
-        )
-        for num in NUMERIC_OVPN_SERVER
-    ]
-)
-STATIC_BINARY_SENSORS_OPTIONAL.extend(
-    [
-        # WLANs
-        ARBinarySensorDescription(
-            key=f"{KEY_WLAN}{num}_radio",
-            key_group=WLAN,
-            name=f"{NAME_WLAN[num]}",
-            device_class=BinarySensorDeviceClass.CONNECTIVITY,
-            entity_registry_enabled_default=True,
-            extra_state_attributes={
-                f"{KEY_WLAN}{num}_{key}": value for key, value in SENSORS_WLAN.items()
-            },
-        )
-        for num in NUMERIC_WLAN
-    ]
-)
-STATIC_BINARY_SENSORS_OPTIONAL.extend(
-    [
-        # Guest WLANs
-        ARBinarySensorDescription(
-            key=f"{KEY_GWLAN}{num}.{gnum}_bss_enabled",
-            key_group=GWLAN,
-            name=NAME_GWLAN[f"{num}.{gnum}"],
-            device_class=BinarySensorDeviceClass.CONNECTIVITY,
-            entity_registry_enabled_default=True,
-            extra_state_attributes={
-                f"{KEY_GWLAN}{num}.{gnum}_{key}": value
-                for key, value in SENSORS_GWLAN.items()
-            },
-        )
-        for gnum in NUMERIC_GWLAN
-        for num in NUMERIC_WLAN
-    ]
-)
-STATIC_BINARY_SENSORS_OPTIONAL.extend(
-    [
-        # Port forwarding
-        ARBinarySensorDescription(
-            key=STATE,
-            key_group=PORT_FORWARDING,
-            name="Port forwarding",
-            icon_off=ICON_PORT_FORWARDING_OFF,
-            icon_on=ICON_PORT_FORWARDING_ON,
-            entity_category=EntityCategory.DIAGNOSTIC,
-            entity_registry_enabled_default=True,
-            extra_state_attributes={
-                LIST: LIST,
-            },
-        )
-    ]
-)
 STATIC_BUTTONS: list[ARButtonDescription] = [
     ARButtonDescription(
-        key=REBOOT,
+        key="reboot",
         name="Reboot",
         icon=ICON_RESTART,
-        service=REBOOT,
-        service_args={},
+        state=AsusSystem.REBOOT,
         device_class=ButtonDeviceClass.RESTART,
-        service_expect_modify=False,
         entity_registry_enabled_default=True,
     ),
     ARButtonDescription(
-        key=RESTART_HTTPD,
+        key="restart_httpd",
         name="Restart HTTP daemon",
         icon=ICON_RESTART,
-        service=RESTART_HTTPD,
-        service_args={},
-        service_expect_modify=False,
+        state=AsusSystem.RESTART_HTTPD,
         entity_registry_enabled_default=False,
     ),
     ARButtonDescription(
-        key=RESTART_WIRELESS,
+        key="restart_wireless",
         name="Restart wireless",
         icon=ICON_RESTART,
-        service=RESTART_WIRELESS,
-        service_args={},
-        service_expect_modify=False,
+        state=AsusSystem.RESTART_WIRELESS,
         entity_registry_enabled_default=False,
     ),
 ]
 STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
     ARButtonDescription(
-        key=RESTART_FIREWALL,
+        key="restart_firewall",
         name="Restart firewall",
         icon=ICON_RESTART,
-        service=RESTART_FIREWALL,
-        service_args={},
-        service_expect_modify=False,
+        state=AsusSystem.RESTART_FIREWALL,
         entity_registry_enabled_default=False,
     ),
 ]
 STATIC_LIGHTS: list[AREntityDescription] = [
     ARLightDescription(
-        key=STATE,
-        key_group=LED,
+        key="state",
+        key_group="led",
         name="LED",
-        icon_off=ICON_LIGHT_OFF,
         icon_on=ICON_LIGHT_ON,
+        icon_off=ICON_LIGHT_OFF,
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=True,
     ),
@@ -993,21 +871,21 @@ STATIC_LIGHTS: list[AREntityDescription] = [
 STATIC_SENSORS: list[AREntityDescription] = [
     # AiMesh
     ARSensorDescription(
-        key=NUMBER,
-        key_group=AIMESH,
+        key="number",
+        key_group="aimesh",
         name="AiMesh",
         icon=ICON_DEVICES,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            LIST: LIST,
+            "list": "list",
         },
     ),
     # Boottime
     ARSensorDescription(
-        key=TIMESTAMP,
-        key_group=BOOTTIME,
+        key="datetime",
+        key_group="boottime",
         name="Boot Time",
         icon=ICON_RESTART,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -1017,77 +895,74 @@ STATIC_SENSORS: list[AREntityDescription] = [
     # Connected devices
     ARSensorDescription(
         key="number",
-        key_group=DEVICES,
+        key_group="devices",
         name="Connected Devices",
         icon=ICON_ROUTER,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            DEVICES: DEVICES,
+            "devices": "devices",
         },
     ),
     # CPU
     ARSensorDescription(
-        key=f"{TOTAL}_{USAGE}",
-        key_group=CPU,
-        name=CPU.upper(),
+        key="total_usage",
+        key_group="cpu",
+        name="CPU",
         icon=ICON_CPU,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        extra_state_attributes={
-            f"{num}_{USAGE}": f"{CORE}_{num}" for num in NUMERIC_CORES
-        },
+        extra_state_attributes={f"{num}_usage": f"core_{num}" for num in NUMERIC_CORES},
     ),
     # Latest connected
     ARSensorDescription(
         key="latest_time",
-        key_group=DEVICES,
+        key_group="devices",
         name="Latest Connected",
         icon=ICON_DEVICES,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            "latest": LIST,
+            "latest": "list",
         },
     ),
     # RAM
     ARSensorDescription(
-        key=USAGE,
-        key_group=RAM,
-        name=RAM.upper(),
+        key="usage",
+        key_group="ram",
+        name="RAM",
         icon=ICON_RAM,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        precision=2,
         extra_state_attributes={
-            FREE: FREE,
-            TOTAL: TOTAL,
-            USED: USED,
+            "free": "free",
+            "total": "total",
+            "used": "used",
         },
     ),
     # WAN IP
     ARSensorDescription(
-        key=IP,
-        key_group=WAN,
+        key="ip_address",
+        key_group="wan",
         name="WAN IP",
         icon=ICON_IP,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         extra_state_attributes={
-            DNS: DNS,
+            "dns": "dns",
             "gateway": "gateway",
             "ip_type": "ip_type",
             "mask": "mask",
             "private_subnet": "private_subnet",
-            "xdns": f"x{DNS}",
+            "xdns": "xdns",
             "xgateway": "xgateway",
-            "xip": f"x{IP}",
+            "xip": "xip",
             "xtype": "xip_type",
             "xmask": "xmask",
         },
@@ -1098,7 +973,7 @@ STATIC_SENSORS.extend(
     [
         ARSensorDescription(
             key=sensor,
-            key_group=TEMPERATURE,
+            key_group="temperature",
             name=label,
             icon=ICON_TEMPERATURE,
             device_class=SensorDeviceClass.TEMPERATURE,
@@ -1114,8 +989,8 @@ STATIC_SENSORS.extend(
 STATIC_SENSORS.extend(
     [
         ARSensorDescription(
-            key=f"{LOAD_AVG}_{sensor}",
-            key_group=SYSINFO,
+            key=f"load_avg_{sensor}",
+            key_group="sysinfo",
             name=label,
             icon=ICON_CPU,
             state_class=SensorStateClass.MEASUREMENT,
@@ -1125,94 +1000,92 @@ STATIC_SENSORS.extend(
         for sensor, label in LABELS_LOAD_AVG.items()
     ]
 )
-STATIC_SWITCHES: list[AREntityDescription] = []
-STATIC_SWITCHES_OPTIONAL: list[AREntityDescription] = [
+STATIC_SWITCHES: list[AREntityDescription] = [
     ARSwitchDescription(
-        key=STATE,
-        key_group=PARENTAL_CONTROL,
+        key="state",
+        key_group="parental_control",
         name="Parental control",
         icon_on=ICON_PARENTAL_CONTROL_ON,
+        state_on=AsusParentalControl.ON,
         icon_off=ICON_PARENTAL_CONTROL_OFF,
-        service_off=RESTART_FIREWALL,
-        service_off_args={
-            "MULTIFILTER_ALL": 0,
-        },
-        service_on=RESTART_FIREWALL,
-        service_on_args={
-            "MULTIFILTER_ALL": 1,
-        },
+        state_off=AsusParentalControl.OFF,
         entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=True,
+        entity_registry_enabled_default=False,
         extra_state_attributes={
-            LIST: LIST,
+            "list": "list",
         },
     ),
 ]
-STATIC_SWITCHES_OPTIONAL.extend(
+STATIC_SWITCHES.extend(
     [
-        # OVPN clients
+        # OpenVPN clients
         ARSwitchDescription(
-            key=f"{KEY_OVPN_CLIENT}{num}_{STATE}",
+            key=f"client_{num}_state",
             key_group=VPN,
-            name=f"{LABEL_OVPN_CLIENT} {num}",
+            name=f"OpenVPN Client {num}",
             icon_on=ICON_VPN_ON,
+            state_on=AsusOVPNClient.ON,
+            state_on_args={"id": num},
             icon_off=ICON_VPN_OFF,
-            service_on=f"{START_VPNCLIENT}{num}",
-            service_off=f"{STOP_VPNCLIENT}{num}",
+            state_off=AsusOVPNClient.OFF,
+            state_off_args={"id": num},
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{KEY_OVPN_CLIENT}{num}_{key}": value
-                for key, value in SENSORS_VPN.items()
+                f"client_{num}_{key}": value for key, value in SENSORS_VPN.items()
             },
         )
         for num in NUMERIC_OVPN_CLIENT
     ]
 )
-STATIC_SWITCHES_OPTIONAL.extend(
+STATIC_SWITCHES.extend(
     [
-        # OVPN servers
+        # OpenVPN servers
         ARSwitchDescription(
-            key=f"{KEY_OVPN_SERVER}{num}_{STATE}",
+            key=f"server_{num}_{STATE}",
             key_group=VPN,
-            name=f"{LABEL_OVPN_SERVER} {num}",
+            name=f"OpenVPN Server {num}",
             icon_on=ICON_VPN_ON,
+            state_on=AsusOVPNServer.ON,
+            state_on_args={"id": num},
             icon_off=ICON_VPN_OFF,
-            service_on=f"{START_VPNSERVER}{num}",
-            service_off=f"{STOP_VPNSERVER}{num}",
+            state_off=AsusOVPNServer.OFF,
+            state_off_args={"id": num},
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{KEY_OVPN_SERVER}{num}_{key}": value
+                f"server_{num}_{key}": value
                 for key, value in SENSORS_VPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
     ]
 )
-STATIC_SWITCHES_OPTIONAL.extend(
+STATIC_SWITCHES.extend(
     [
         # WLANs
         ARSwitchDescription(
             key=f"{wlan}_radio",
-            key_group=WLAN,
-            name=f"{LABEL_WLAN} {LABELS_WLAN[wlan]}",
+            key_group="wlan",
+            name=f"Wireless {LABELS_WLAN[wlan]}",
             icon_on=ICON_WLAN_ON,
+            state_on=AsusWLAN.ON,
+            state_on_args={
+                API_ID: wlan_id,
+                API_TYPE: "wlan",
+            },
             icon_off=ICON_WLAN_OFF,
-            service_on=RESTART_WIRELESS,
-            service_on_args={
-                f"wl{wlan_id}_radio": 1,
+            state_off=AsusWLAN.OFF,
+            state_off_args={
+                API_ID: wlan_id,
+                API_TYPE: "wlan",
             },
-            service_off=RESTART_WIRELESS,
-            service_off_args={
-                f"wl{wlan_id}_radio": 0,
-            },
-            device_class=WLAN,
+            state_expect_modify=True,
+            device_class="wlan",
             capabilities={
-                API_TYPE: WLAN,
+                API_TYPE: "wlan",
                 API_ID: wlan_id,
             },
-            service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=True,
             extra_state_attributes={
@@ -1222,32 +1095,33 @@ STATIC_SWITCHES_OPTIONAL.extend(
         for wlan, wlan_id in MAP_WLAN.items()
     ]
 )
-STATIC_SWITCHES_OPTIONAL.extend(
+STATIC_SWITCHES.extend(
     [
         # Guest WLANs
         ARSwitchDescription(
             key=f"{wlan}_{gwlan}_bss_enabled",
-            key_group=GWLAN,
-            name=f"{LABEL_GUEST} {LABELS_WLAN[wlan]} {gwlan}",
+            key_group="gwlan",
+            name=f"Guest {LABELS_WLAN[wlan]} {gwlan}",
             icon_on=ICON_WLAN_ON,
+            state_on=AsusWLAN.ON,
+            state_on_args={
+                API_ID: f"{wlan_id}.{gwlan}",
+                API_TYPE: "gwlan",
+            },
             icon_off=ICON_WLAN_OFF,
-            service_on=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
-            service_on_args={
-                f"wl{wlan_id}.{gwlan}_bss_enabled": 1,
-                f"wl{wlan_id}.{gwlan}_expire": 0,
+            state_off=AsusWLAN.OFF,
+            state_off_args={
+                API_ID: f"{wlan_id}.{gwlan}",
+                API_TYPE: "gwlan",
             },
-            service_off=f"{RESTART_WIRELESS};{RESTART_FIREWALL}",
-            service_off_args={
-                f"wl{wlan_id}.{gwlan}_bss_enabled": 0,
-            },
-            device_class=WLAN,
+            state_expect_modify=True,
+            device_class="wlan",
             capabilities={
-                API_TYPE: GWLAN,
+                API_TYPE: "gwlan",
                 API_ID: f"{wlan_id}.{gwlan}",
             },
-            service_expect_modify=True,
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             extra_state_attributes={
                 f"{wlan}_{gwlan}_{key}": value for key, value in SENSORS_GWLAN.items()
             },
@@ -1256,35 +1130,29 @@ STATIC_SWITCHES_OPTIONAL.extend(
         for wlan, wlan_id in MAP_WLAN.items()
     ]
 )
-STATIC_SWITCHES_OPTIONAL.extend(
+STATIC_SWITCHES.extend(
     [
         # Port forwarding
         ARSwitchDescription(
-            key=STATE,
-            key_group=PORT_FORWARDING,
+            key="state",
+            key_group="port_forwarding",
             name="Port forwarding",
-            service_off=RESTART_FIREWALL,
-            service_off_args={
-                "vts_enable_x": 0,
-            },
-            service_on=RESTART_FIREWALL,
-            service_on_args={
-                "vts_enable_x": 1,
-            },
-            icon_off=ICON_PORT_FORWARDING_OFF,
             icon_on=ICON_PORT_FORWARDING_ON,
+            state_on=AsusPortForwarding.ON,
+            icon_off=ICON_PORT_FORWARDING_OFF,
+            state_off=AsusPortForwarding.OFF,
             entity_category=EntityCategory.CONFIG,
-            entity_registry_enabled_default=True,
+            entity_registry_enabled_default=False,
             extra_state_attributes={
-                LIST: LIST,
+                "list": "list",
             },
         )
     ]
 )
 STATIC_UPDATES: list[AREntityDescription] = [
     ARUpdateDescription(
-        key=STATE,
-        key_group=FIRMWARE,
+        key="state",
+        key_group="firmware",
         name="Firmware update",
         icon=ICON_UPDATE,
         extra_state_attributes={

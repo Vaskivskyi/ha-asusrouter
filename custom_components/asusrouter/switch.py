@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
+from asusrouter.modules.state import AsusState
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -13,11 +14,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     CONF_DEFAULT_HIDE_PASSWORDS,
-    CONF_ENABLE_CONTROL,
     CONF_HIDE_PASSWORDS,
     PASSWORD,
     STATIC_SWITCHES,
-    STATIC_SWITCHES_OPTIONAL,
 )
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
@@ -39,9 +38,6 @@ async def async_setup_entry(
     if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
         hide.append(PASSWORD)
 
-    if config_entry.options[CONF_ENABLE_CONTROL]:
-        switches.extend(STATIC_SWITCHES_OPTIONAL)
-
     await async_setup_ar_entry(
         hass, config_entry, async_add_entities, switches, ARSwitch, hide
     )
@@ -61,11 +57,14 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
         super().__init__(coordinator, router, description)
         self.entity_description: ARSwitchDescription = description
 
-        self._service_on = description.service_on
-        self._service_on_args = description.service_on_args
-        self._service_off = description.service_off
-        self._service_off_args = description.service_off_args
-        self._service_expect_modify = description.service_expect_modify
+        # State on
+        self._state_on = description.state_on
+        self._state_on_args = description.state_on_args
+        # State off
+        self._state_off = description.state_off
+        self._state_off_args = description.state_off_args
+        # Expect modify
+        self._state_expect_modify = description.state_expect_modify
 
     async def async_turn_on(
         self,
@@ -73,17 +72,11 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     ) -> None:
         """Turn on switch."""
 
-        try:
-            result = await self.api.async_service_generic_apply(
-                self._service_on,
-                arguments=self._service_on_args,
-                expect_modify=self._service_expect_modify,
-            )
-            await self.coordinator.async_request_refresh()
-            if not result:
-                _LOGGER.debug("Switch state was not set!")
-        except Exception as ex:  # pylint: disable=broad-except
-            _LOGGER.error("Switch control has returned an exception: %s", ex)
+        await self._set_state(
+            state=self._state_on,
+            arguments=self._state_on_args,
+            expect_modify=self._state_expect_modify,
+        )
 
     async def async_turn_off(
         self,
@@ -91,14 +84,8 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     ) -> None:
         """Turn off switch."""
 
-        try:
-            result = await self.api.async_service_generic_apply(
-                self._service_off,
-                arguments=self._service_off_args,
-                expect_modify=self._service_expect_modify,
-            )
-            await self.coordinator.async_request_refresh()
-            if not result:
-                _LOGGER.debug("Switch state was not set!")
-        except Exception as ex:  # pylint: disable=broad-except
-            _LOGGER.error("Switch control has returned an exception: %s", ex)
+        await self._set_state(
+            state=self._state_off,
+            arguments=self._state_off_args,
+            expect_modify=self._state_expect_modify,
+        )
