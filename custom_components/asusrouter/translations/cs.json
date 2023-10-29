@@ -1,214 +1,215 @@
 {
-    "config": {
-        "flow_title": "{name} ({host})",
-        "step": {
-            "find": {
-                "title": "Přidat zařízení",
-                "description": "Jak přidat své zařízení",
-                "data": {
-                    "host": "Hostitel / IP addresa"
-                }
-            },
-            "credentials": {
-                "title": "Přihlašovací údaje",
-                "description": "Stejné jako pro webový panel zařízení",
-                "data": {
-                    "username": "Uživatelské jméno",
-                    "password": "Heslo",
-                    "port": "Port (0 pro použití výchozí hodnoty)",
-                    "ssl": "Použít připojení SSL"
-                }
-            },
-            "operation": {
-                "title": "Provozní režim",
-                "data": {
-                    "mode": "[NT] Device mode",
-                    "enable_control": "Povolit ovládání zařízení",
-                    "split_intervals": "Povolit intervaly aktualizace pro každý senzor"
-                }
-            },
-            "options": {
-                "title": "[NT] Additional options",
-                "menu_options": {
-                    "connected_devices": "[NT] Connected devices",
-                    "intervals": "Intervaly aktualizace",
-                    "interfaces": "Rozhraní ke sledování",
-                    "events": "Události Home Assistant",
-                    "security": "Možnosti zabezpečení",
-                    "finish": "[NT] Save and finish"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Povolit sledování zařízení",
-                    "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
-                }
-            },
-            "intervals": {
-                "title": "Intervaly aktualizace",
-                "description": "Hodnoty jsou v sekundách",
-                "data": {
-                    "cache_time": "Čas mezipaměti",
-                    "scan_interval": "Aktualizace entit",
-                    "interval_cpu": "Data CPU",
-                    "interval_firmware": "Data firmwaru",
-                    "interval_gwlan": "Interval GWLAN",
-                    "interval_light": "Lehká aktualizace dat",
-                    "interval_misc": "Různá data",
-                    "interval_network_stat": "Údaje o statistikách sítě",
-                    "interval_parental_control": "Data rodičovské kontroly",
-                    "interval_ports": "Data portů",
-                    "interval_ram": "Data RAM",
-                    "interval_sysinfo": "Data systém info",
-                    "interval_temperature": "Údaje o teplotě",
-                    "interval_vpn": "Data VPN",
-                    "interval_wan": "Data WAN",
-                    "interval_wlan": "Data WLAN"
-                }
-            },
-            "interfaces": {
-                "title": "Rozhraní ke sledování",
-                "data": {
-                    "interfaces": "Vyberte síťová rozhraní ke sledování",
-                    "units_speed": "Jednotky pro rychlost",
-                    "units_traffic": "Jednotky pro provoz"
-                }
-            },
-            "events": {
-                "title": "Události",
-                "description": "Které události by měly být oznámeny",
-                "data": {
-                    "device_connected": "Zařízení připojeno (zařízení nebylo dříve sledováno)",
-                    "device_disconnected": "Zařízení odpojeno",
-                    "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
-                }
-            },
-            "security": {
-                "title": "Zabezpečení",
-                "data": {
-                    "hide_passwords": "Skrýt hesla ze senzorů a atributů"
-                }
-            }
-        },
-        "error": {
-            "cannot_resolve_host": "Nelze přeložit název hostitele. Zkuste použít IP adresu",
-            "connection_refused": "Připojení odmítnuto",
-            "error": "Nepodařilo se připojit",
-            "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
-            "password_missing": "Chybí heslo",
-            "unknown": "Neznámá chyba",
-            "wrong_credentials": "Chybné přihlašovací údaje"
-        },
-        "abort": {
-            "already_configured": "[NT] Device is already configured",
-            "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
-            "not_router": "[NT] Not an Asus router. Cannot be configured"
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Přidat zařízení",
+        "description": "Jak přidat své zařízení",
+        "data": {
+          "host": "Hostitel / IP addresa"
         }
+      },
+      "credentials": {
+        "title": "Přihlašovací údaje",
+        "description": "Stejné jako pro webový panel zařízení",
+        "data": {
+          "username": "Uživatelské jméno",
+          "password": "Heslo",
+          "port": "Port (0 pro použití výchozí hodnoty)",
+          "ssl": "Použít připojení SSL"
+        }
+      },
+      "operation": {
+        "title": "Provozní režim",
+        "data": {
+          "mode": "[NT] Device mode",
+          "enable_control": "Povolit ovládání zařízení",
+          "split_intervals": "Povolit intervaly aktualizace pro každý senzor"
+        }
+      },
+      "options": {
+        "title": "[NT] Additional options",
+        "menu_options": {
+          "connected_devices": "[NT] Connected devices",
+          "intervals": "Intervaly aktualizace",
+          "interfaces": "Rozhraní ke sledování",
+          "events": "Události Home Assistant",
+          "security": "Možnosti zabezpečení",
+          "finish": "[NT] Save and finish"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Povolit sledování zařízení",
+          "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
+          "interval_devices": "[NT] Devices / AiMesh update",
+          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
+        }
+      },
+      "intervals": {
+        "title": "Intervaly aktualizace",
+        "description": "Hodnoty jsou v sekundách",
+        "data": {
+          "cache_time": "Čas mezipaměti",
+          "scan_interval": "Aktualizace entit",
+          "interval_cpu": "Data CPU",
+          "interval_firmware": "Data firmwaru",
+          "interval_gwlan": "Interval GWLAN",
+          "interval_light": "Lehká aktualizace dat",
+          "interval_misc": "Různá data",
+          "interval_network_stat": "Údaje o statistikách sítě",
+          "interval_parental_control": "Data rodičovské kontroly",
+          "interval_ports": "Data portů",
+          "interval_ram": "Data RAM",
+          "interval_sysinfo": "Data systém info",
+          "interval_temperature": "Údaje o teplotě",
+          "interval_vpn": "Data VPN",
+          "interval_wan": "Data WAN",
+          "interval_wlan": "Data WLAN"
+        }
+      },
+      "interfaces": {
+        "title": "Rozhraní ke sledování",
+        "data": {
+          "interfaces": "Vyberte síťová rozhraní ke sledování",
+          "units_speed": "Jednotky pro rychlost",
+          "units_traffic": "Jednotky pro provoz"
+        }
+      },
+      "events": {
+        "title": "Události",
+        "description": "Které události by měly být oznámeny",
+        "data": {
+          "device_connected": "Zařízení připojeno (zařízení nebylo dříve sledováno)",
+          "device_disconnected": "Zařízení odpojeno",
+          "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)",
+          "node_connected": "[NT] AiMesh node connected (not seen before)",
+          "node_disconnected": "[NT] AiMesh node disconnected",
+          "node_reconnected": "[NT] AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Zabezpečení",
+        "data": {
+          "hide_passwords": "Skrýt hesla ze senzorů a atributů"
+        }
+      }
     },
-    "options": {
-        "step": {
-            "options": {
-                "title": "Změnit konfiguraci",
-                "menu_options": {
-                    "credentials": "Přihlašovací údaje a nastavení připojení",
-                    "operation": "Provozní režim",
-                    "connected_devices": "[NT] Connected devices",
-                    "intervals": "Intervaly aktualizace",
-                    "interfaces": "Rozhraní ke sledování",
-                    "events": "Události Home Assistant",
-                    "security": "Možnosti zabezpečení",
-                    "finish": "[NT] Save and finish"
-                }
-            },
-            "credentials": {
-                "title": "Přihlašovací údaje",
-                "description": "Stejné jako pro webový panel zařízení",
-                "data": {
-                    "username": "Uživatelské jméno",
-                    "password": "Heslo",
-                    "port": "Port (0 pro použití výchozí hodnoty)",
-                    "ssl": "Použít připojení SSL"
-                }
-            },
-            "operation": {
-                "title": "Provozní režim",
-                "data": {
-                    "mode": "[NT] Device mode",
-                    "enable_control": "Povolit ovládání zařízení",
-                    "split_intervals": "Povolit intervaly aktualizace pro každý senzor"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Povolit sledování zařízení",
-                    "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
-                }
-            },
-            "intervals": {
-                "title": "Intervaly aktualizace",
-                "description": "Hodnoty jsou v sekundách",
-                "data": {
-                    "cache_time": "Čas mezipaměti",
-                    "scan_interval": "Aktualizace entit",
-                    "interval_cpu": "Data CPU",
-                    "interval_firmware": "Data firmwaru",
-                    "interval_gwlan": "Interval GWLAN",
-                    "interval_light": "Lehká aktualizace dat",
-                    "interval_misc": "Různá data",
-                    "interval_network_stat": "Údaje o statistikách sítě",
-                    "interval_parental_control": "Data rodičovské kontroly",
-                    "interval_ports": "Data portů",
-                    "interval_ram": "Data RAM",
-                    "interval_sysinfo": "Data systém info",
-                    "interval_temperature": "Údaje o teplotě",
-                    "interval_vpn": "Data VPN",
-                    "interval_wan": "Data WAN",
-                    "interval_wlan": "Data WLAN"
-                }
-            },
-            "interfaces": {
-                "title": "Rozhraní ke sledování",
-                "data": {
-                    "interfaces": "Vyberte síťová rozhraní ke sledování",
-                    "units_speed": "Jednotky pro rychlost",
-                    "units_traffic": "Jednotky pro provoz"
-                }
-            },
-            "events": {
-                "title": "Události",
-                "description": "Které události by měly být oznámeny",
-                "data": {
-                    "device_connected": "Zařízení připojeno (zařízení nebylo dříve sledováno)",
-                    "device_disconnected": "Zařízení odpojeno",
-                    "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
-                }
-            },
-            "security": {
-                "title": "Zabezpečení",
-                "data": {
-                    "hide_passwords": "Skrýt hesla ze senzorů a atributů"
-                }
-            }
-        },
-        "error": {
-            "connection_refused": "Připojení odmítnuto",
-            "error": "Nepodařilo se připojit",
-            "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
-            "not_confirmed": "Nepotvrzeno",
-            "unknown": "Neznámá chyba",
-            "wrong_credentials": "Chybné přihlašovací údaje"
-        }
+    "error": {
+      "cannot_resolve_host": "Nelze přeložit název hostitele. Zkuste použít IP adresu",
+      "connection_refused": "Připojení odmítnuto",
+      "error": "Nepodařilo se připojit",
+      "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
+      "password_missing": "Chybí heslo",
+      "unknown": "Neznámá chyba",
+      "wrong_credentials": "Chybné přihlašovací údaje"
+    },
+    "abort": {
+      "already_configured": "[NT] Device is already configured",
+      "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
+      "not_router": "[NT] Not an Asus router. Cannot be configured"
     }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Změnit konfiguraci",
+        "menu_options": {
+          "credentials": "Přihlašovací údaje a nastavení připojení",
+          "operation": "Provozní režim",
+          "connected_devices": "[NT] Connected devices",
+          "intervals": "Intervaly aktualizace",
+          "interfaces": "Rozhraní ke sledování",
+          "events": "Události Home Assistant",
+          "security": "Možnosti zabezpečení",
+          "finish": "[NT] Save and finish",
+          "device": "Identifikační a spojovací parametry"
+        }
+      },
+      "credentials": {
+        "title": "Přihlašovací údaje",
+        "description": "Stejné jako pro webový panel zařízení",
+        "data": {
+          "username": "Uživatelské jméno",
+          "password": "Heslo",
+          "port": "Port (0 pro použití výchozí hodnoty)",
+          "ssl": "Použít připojení SSL"
+        }
+      },
+      "operation": {
+        "title": "Provozní režim",
+        "data": {
+          "mode": "[NT] Device mode",
+          "enable_control": "Povolit ovládání zařízení",
+          "split_intervals": "Povolit intervaly aktualizace pro každý senzor"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Povolit sledování zařízení",
+          "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
+          "interval_devices": "[NT] Devices / AiMesh update",
+          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
+        }
+      },
+      "intervals": {
+        "title": "Intervaly aktualizace",
+        "description": "Hodnoty jsou v sekundách",
+        "data": {
+          "cache_time": "Čas mezipaměti",
+          "scan_interval": "Aktualizace entit",
+          "interval_cpu": "Data CPU",
+          "interval_firmware": "Data firmwaru",
+          "interval_gwlan": "Interval GWLAN",
+          "interval_light": "Lehká aktualizace dat",
+          "interval_misc": "Různá data",
+          "interval_network_stat": "Údaje o statistikách sítě",
+          "interval_parental_control": "Data rodičovské kontroly",
+          "interval_ports": "Data portů",
+          "interval_ram": "Data RAM",
+          "interval_sysinfo": "Data systém info",
+          "interval_temperature": "Údaje o teplotě",
+          "interval_vpn": "Data VPN",
+          "interval_wan": "Data WAN",
+          "interval_wlan": "Data WLAN"
+        }
+      },
+      "interfaces": {
+        "title": "Rozhraní ke sledování",
+        "data": {
+          "interfaces": "Vyberte síťová rozhraní ke sledování",
+          "units_speed": "Jednotky pro rychlost",
+          "units_traffic": "Jednotky pro provoz"
+        }
+      },
+      "events": {
+        "title": "Události",
+        "description": "Které události by měly být oznámeny",
+        "data": {
+          "device_connected": "Zařízení připojeno (zařízení nebylo dříve sledováno)",
+          "device_disconnected": "Zařízení odpojeno",
+          "device_reconnected": "Zařízení bylo znovu připojeno (toto zařízení již bylo sledováno dříve)",
+          "node_connected": "[NT] AiMesh node connected (not seen before)",
+          "node_disconnected": "[NT] AiMesh node disconnected",
+          "node_reconnected": "[NT] AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Zabezpečení",
+        "data": {
+          "hide_passwords": "Skrýt hesla ze senzorů a atributů"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "Připojení odmítnuto",
+      "error": "Nepodařilo se připojit",
+      "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
+      "not_confirmed": "Nepotvrzeno",
+      "unknown": "Neznámá chyba",
+      "wrong_credentials": "Chybné přihlašovací údaje"
+    }
+  }
 }

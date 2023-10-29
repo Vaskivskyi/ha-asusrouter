@@ -1,0 +1,213 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Gerätestandort",
+        "description": "So finden Sie Ihr Gerät",
+        "data": {
+          "host": "Hostname / IP-Adresse"
+        }
+      },
+      "credentials": {
+        "title": "Referenzen",
+        "description": "Dasselbe wie für das Geräte-Webpanel",
+        "data": {
+          "username": "Nutzername",
+          "password": "Passwort",
+          "port": "Port (0, um den Standardwert zu verwenden)",
+          "ssl": "Verwenden Sie eine SSL-Verbindung"
+        }
+      },
+      "operation": {
+        "title": "Betriebsmodus",
+        "data": {
+          "mode": "Gerätemodus",
+          "enable_control": "Aktivieren Sie die Gerätesteuerung",
+          "split_intervals": "Aktivieren Sie Aktualisierungsintervalle pro Sensor"
+        }
+      },
+      "options": {
+        "title": "Zusatzoptionen",
+        "menu_options": {
+          "connected_devices": "Verbundene Geräte",
+          "intervals": "Aktualisierungsintervalle",
+          "interfaces": "Zu überwachende Schnittstellen",
+          "events": "Home Assistant-Ereignisse",
+          "security": "Sicherheitsoptionen",
+          "finish": "Speichern und fertig"
+        }
+      },
+      "connected_devices": {
+        "title": "Verbundene Geräte",
+        "data": {
+          "track_devices": "Geräte-Tracker aktivieren",
+          "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
+          "interval_devices": "Geräte / AiMesh-Update",
+          "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"
+        }
+      },
+      "intervals": {
+        "title": "Aktualisierungsintervalle",
+        "description": "Die Werte sind in Sekunden",
+        "data": {
+          "cache_time": "Caching-Zeit",
+          "scan_interval": "Aktualisierung der Entitäten",
+          "interval_cpu": "CPU-Daten",
+          "interval_firmware": "Firmware-Daten",
+          "interval_gwlan": "GWLAN-Intervall",
+          "interval_light": "Lichtdaten",
+          "interval_misc": "Verschiedene Daten",
+          "interval_network_stat": "Netzwerkstatistikdaten",
+          "interval_parental_control": "Daten der Kindersicherung",
+          "interval_ports": "Portdaten",
+          "interval_ram": "RAM-Daten",
+          "interval_sysinfo": "Sysinfo-Daten",
+          "interval_temperature": "Temperaturdaten",
+          "interval_vpn": "VPN-Daten",
+          "interval_wan": "WAN-Daten",
+          "interval_wlan": "WLAN-Daten"
+        }
+      },
+      "interfaces": {
+        "title": "Zu überwachende Schnittstellen",
+        "data": {
+          "interfaces": "Wählen Sie die zu überwachenden Netzwerkschnittstellen aus",
+          "units_speed": "Einheiten für Geschwindigkeit",
+          "units_traffic": "Einheiten für den Verkehr"
+        }
+      },
+      "events": {
+        "title": "Events",
+        "description": "Welche Ereignisse sollten ausgelöst werden",
+        "data": {
+          "device_connected": "Gerät verbunden (das Gerät wurde zuvor nicht getrackt)",
+          "device_disconnected": "Gerät getrennt",
+          "device_reconnected": "Gerät neu verbunden (dieses Gerät wurde bereits zuvor getrackt)",
+          "node_connected": "AiMesh-Knoten verbunden (noch nie zuvor gesehen)",
+          "node_disconnected": "AiMesh-Knoten getrennt",
+          "node_reconnected": "AiMesh-Knoten wieder verbunden"
+        }
+      },
+      "security": {
+        "title": "Sicherheit",
+        "data": {
+          "hide_passwords": "Passwörter vor Sensoren und Attributen verbergen"
+        }
+      }
+    },
+    "error": {
+      "cannot_resolve_host": "Kann den Hostnamen nicht auflösen. Versuchen Sie es mit der IP-Adresse",
+      "connection_refused": "Verbindung abgelehnt",
+      "error": "Verbindung nicht möglich",
+      "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie",
+      "password_missing": "Passwort fehlt",
+      "unknown": "Unbekannter Fehler",
+      "wrong_credentials": "Falsche Anmeldeinformationen"
+    },
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "no_serial": "Dieses Gerät gibt keine Seriennummer an. Erkennung abgebrochen",
+      "not_router": "Kein Asus-Router. Kann nicht konfiguriert werden"
+    }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Konfigurationen zu ändern",
+        "menu_options": {
+          "credentials": "Anmeldeinformationen und Verbindung",
+          "operation": "Betriebsmodus",
+          "connected_devices": "Verbundene Geräte",
+          "intervals": "Aktualisierungsintervalle",
+          "interfaces": "Zu überwachende Schnittstellen",
+          "events": "Home Assistant-Ereignisse",
+          "security": "Sicherheitsoptionen",
+          "finish": "Speichern und fertig",
+          "device": "Identifikations- und Verbindungsparameter"
+        }
+      },
+      "credentials": {
+        "title": "Referenzen",
+        "description": "Dasselbe wie für das Geräte-Webpanel",
+        "data": {
+          "username": "Nutzername",
+          "password": "Passwort",
+          "port": "Port (0, um den Standardwert zu verwenden)",
+          "ssl": "Verwenden Sie eine SSL-Verbindung"
+        }
+      },
+      "operation": {
+        "title": "Betriebsmodus",
+        "data": {
+          "mode": "Gerätemodus",
+          "enable_control": "Aktivieren Sie die Gerätesteuerung",
+          "split_intervals": "Aktivieren Sie Aktualisierungsintervalle pro Sensor"
+        }
+      },
+      "connected_devices": {
+        "title": "Verbundene Geräte",
+        "data": {
+          "track_devices": "Geräte-Tracker aktivieren",
+          "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
+          "interval_devices": "Geräte / AiMesh-Update",
+          "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"
+        }
+      },
+      "intervals": {
+        "title": "Aktualisierungsintervalle",
+        "description": "Die Werte sind in Sekunden",
+        "data": {
+          "cache_time": "Caching-Zeit",
+          "scan_interval": "Aktualisierung der Entitäten",
+          "interval_cpu": "CPU-Daten",
+          "interval_firmware": "Firmware-Daten",
+          "interval_gwlan": "GWLAN-Intervall",
+          "interval_light": "Lichtdaten",
+          "interval_misc": "Verschiedene Daten",
+          "interval_network_stat": "Netzwerkstatistikdaten",
+          "interval_wlan": "WLAN-Daten",
+          "interval_wan": "WAN-Daten",
+          "interval_vpn": "VPN-Daten",
+          "interval_temperature": "Temperaturdaten",
+          "interval_sysinfo": "Sysinfo-Daten",
+          "interval_ram": "RAM-Daten",
+          "interval_ports": "Portdaten",
+          "interval_parental_control": "Daten der Kindersicherung"
+        }
+      },
+      "interfaces": {
+        "data": {
+          "interfaces": "Wählen Sie die zu überwachenden Netzwerkschnittstellen aus",
+          "units_speed": "Einheiten für Geschwindigkeit",
+          "units_traffic": "Einheiten für den Verkehr"
+        },
+        "title": "Zu überwachende Schnittstellen"
+      },
+      "events": {
+        "title": "Veranstaltungen",
+        "description": "Welche Ereignisse sollten ausgelöst werden",
+        "data": {
+          "device_connected": "Gerät verbunden (das Gerät wurde zuvor nicht getrackt)",
+          "device_disconnected": "Gerät getrennt",
+          "device_reconnected": "Gerät neu verbunden (dieses Gerät wurde bereits zuvor getrackt)",
+          "node_connected": "AiMesh-Knoten verbunden (noch nie zuvor gesehen)",
+          "node_disconnected": "AiMesh-Knoten getrennt",
+          "node_reconnected": "AiMesh-Knoten wieder verbunden"
+        }
+      },
+      "security": {
+        "title": "Sicherheit",
+        "data": {
+          "hide_passwords": "Passwörter vor Sensoren und Attributen verbergen"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "Verbindung abgelehnt",
+      "error": "Verbindung nicht möglich",
+      "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie mal",
+      "not_confirmed": "Sie müssen bestätigen"
+    }
+  }
+}

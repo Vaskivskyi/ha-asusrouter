@@ -1,214 +1,215 @@
 {
-    "config": {
-        "flow_title": "{name} ({host})",
-        "step": {
-            "find": {
-                "title": "Device locatie",
-                "description": "Hoe vind je jou device",
-                "data": {
-                    "host": "Hostnaam / IP adres"
-                }
-            },
-            "credentials": {
-                "title": "Login gegevens",
-                "description": "Dezelfde als die van je router web paneel",
-                "data": {
-                    "username": "Gebruikersnaam",
-                    "password": "Wachtwoord",
-                    "port": "Poort (0 voor standaard waarde)",
-                    "ssl": "Gebruik SSL verbinding"
-                }
-            },
-            "operation": {
-                "title": "Operatie mode",
-                "data": {
-                    "mode": "[NT] Device mode",
-                    "enable_control": "Activeer apparaat controle",
-                    "split_intervals": "Activeer per-sensor update interval"
-                }
-            },
-            "options": {
-                "title": "[NT] Additional options",
-                "menu_options": {
-                    "connected_devices": "[NT] Connected devices",
-                    "intervals": "Update interval",
-                    "interfaces": "Interfaces voor monitoring",
-                    "events": "Home Assistant events",
-                    "security": "Beveiliging opties",
-                    "finish": "[NT] Save and finish"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Activeer apparaat trackers",
-                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
-                }
-            },
-            "intervals": {
-                "title": "Update interval",
-                "description": "Waarde in secondes",
-                "data": {
-                    "cache_time": "Caching tijd",
-                    "scan_interval": "Entities update",
-                    "interval_cpu": "CPU data",
-                    "interval_firmware": "Firmware data",
-                    "interval_gwlan": "GWLAN interval",
-                    "interval_light": "Kicht data",
-                    "interval_misc": "Overige data",
-                    "interval_network_stat": "Network statestieken data",
-                    "interval_parental_control": "Ouders controlle data",
-                    "interval_ports": "Poorten data",
-                    "interval_ram": "RAM data",
-                    "interval_sysinfo": "Sysinfo data",
-                    "interval_temperature": "Temperstuur data",
-                    "interval_vpn": "VPN data",
-                    "interval_wan": "WAN data",
-                    "interval_wlan": "WLAN data"
-                }
-            },
-            "interfaces": {
-                "title": "Interface voor monitoring",
-                "data": {
-                    "interfaces": "Selecteer netwerk interfaces voor monitoring",
-                    "units_speed": "Eenheden per snelheid",
-                    "units_traffic": "Eenhenden for verkeer"
-                }
-            },
-            "events": {
-                "title": "Gebeurtenis",
-                "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
-                "data": {
-                    "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
-                    "device_disconnected": "Apparaat verbroken",
-                    "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
-                }
-            },
-            "security": {
-                "title": "Beveiliging",
-                "data": {
-                    "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
-                }
-            }
-        },
-        "error": {
-            "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
-            "connection_refused": "Connectie afgewezen",
-            "error": "Problemen met connectie",
-            "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
-            "password_missing": "Wachtwoord mist",
-            "unknown": "Onbekende fout",
-            "wrong_credentials": "Verkeerde login gegevens"
-        },
-        "abort": {
-            "already_configured": "[NT] Device is already configured",
-            "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
-            "not_router": "[NT] Not an Asus router. Cannot be configured"
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Device locatie",
+        "description": "Hoe vind je jou device",
+        "data": {
+          "host": "Hostnaam / IP adres"
         }
+      },
+      "credentials": {
+        "title": "Login gegevens",
+        "description": "Dezelfde als die van je router web paneel",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "port": "Poort (0 voor standaard waarde)",
+          "ssl": "Gebruik SSL verbinding"
+        }
+      },
+      "operation": {
+        "title": "Operatie mode",
+        "data": {
+          "mode": "[NT] Device mode",
+          "enable_control": "Activeer apparaat controle",
+          "split_intervals": "Activeer per-sensor update interval"
+        }
+      },
+      "options": {
+        "title": "[NT] Additional options",
+        "menu_options": {
+          "connected_devices": "[NT] Connected devices",
+          "intervals": "Update interval",
+          "interfaces": "Interfaces voor monitoring",
+          "events": "Home Assistant events",
+          "security": "Beveiliging opties",
+          "finish": "[NT] Save and finish"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Activeer apparaat trackers",
+          "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
+          "interval_devices": "[NT] Devices / AiMesh update",
+          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
+        }
+      },
+      "intervals": {
+        "title": "Update interval",
+        "description": "Waarde in secondes",
+        "data": {
+          "cache_time": "Caching tijd",
+          "scan_interval": "Entities update",
+          "interval_cpu": "CPU data",
+          "interval_firmware": "Firmware data",
+          "interval_gwlan": "GWLAN interval",
+          "interval_light": "Kicht data",
+          "interval_misc": "Overige data",
+          "interval_network_stat": "Network statestieken data",
+          "interval_parental_control": "Ouders controlle data",
+          "interval_ports": "Poorten data",
+          "interval_ram": "RAM data",
+          "interval_sysinfo": "Sysinfo data",
+          "interval_temperature": "Temperstuur data",
+          "interval_vpn": "VPN data",
+          "interval_wan": "WAN data",
+          "interval_wlan": "WLAN data"
+        }
+      },
+      "interfaces": {
+        "title": "Interface voor monitoring",
+        "data": {
+          "interfaces": "Selecteer netwerk interfaces voor monitoring",
+          "units_speed": "Eenheden per snelheid",
+          "units_traffic": "Eenhenden for verkeer"
+        }
+      },
+      "events": {
+        "title": "Gebeurtenis",
+        "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
+        "data": {
+          "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
+          "device_disconnected": "Apparaat verbroken",
+          "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)",
+          "node_connected": "[NT] AiMesh node connected (not seen before)",
+          "node_disconnected": "[NT] AiMesh node disconnected",
+          "node_reconnected": "[NT] AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Beveiliging",
+        "data": {
+          "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
+        }
+      }
     },
-    "options": {
-        "step": {
-            "options": {
-                "title": "Verander configuratie",
-                "menu_options": {
-                    "credentials": "Login gegevens en connectie instellingen",
-                    "operation": "Operatie modus",
-                    "connected_devices": "[NT] Connected devices",
-                    "intervals": "Update interval",
-                    "interfaces": "Interfaces voor monitoring",
-                    "events": "Home Assistant events",
-                    "security": "Beveiliging opties",
-                    "finish": "[NT] Save and finish"
-                }
-            },
-            "credentials": {
-                "title": "Login gegevens",
-                "description": "Dezelfde als die van je router web paneel",
-                "data": {
-                    "username": "Gebruikersnaam",
-                    "password": "Wachtwoord",
-                    "port": "Poort (0 voor standaard waarde)",
-                    "ssl": "Gebruik SSL verbinding"
-                }
-            },
-            "operation": {
-                "title": "Operation mode",
-                "data": {
-                    "mode": "[NT] Device mode",
-                    "enable_control": "Activeer apparaat controle",
-                    "split_intervals": "Activeer per-sensor update interval"
-                }
-            },
-            "connected_devices": {
-                "title": "Connected devices",
-                "data": {
-                    "track_devices": "Activeer apparaat trackers",
-                    "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
-                    "interval_devices": "[NT] Devices / AiMesh update",
-                    "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
-                }
-            },
-            "intervals": {
-                "title": "Update intervals",
-                "description": "Waardes zijn in secondes",
-                "data": {
-                    "cache_time": "Caching tijd",
-                    "scan_interval": "Entities update",
-                    "interval_cpu": "CPU data",
-                    "interval_firmware": "Firmware data",
-                    "interval_gwlan": "GWLAN interval",
-                    "interval_light": "Kicht data",
-                    "interval_misc": "Overige data",
-                    "interval_network_stat": "Network stat data",
-                    "interval_parental_control": "Ouders controlle data",
-                    "interval_ports": "Poorten data",
-                    "interval_ram": "RAM data",
-                    "interval_sysinfo": "Sysinfo data",
-                    "interval_temperature": "Temperstuur data",
-                    "interval_vpn": "VPN data",
-                    "interval_wan": "WAN data",
-                    "interval_wlan": "WLAN data"
-                }
-            },
-            "interfaces": {
-                "title": "Interfaces to monitor",
-                "data": {
-                    "interfaces": "Selecteer netwerk interfaces voor monitoring",
-                    "units_speed": "Eenheden per snelheid",
-                    "units_traffic": "Eenhenden for verkeer"
-                }
-            },
-            "events": {
-                "title": "Gebeurtenis",
-                "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
-                "data": {
-                    "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
-                    "device_disconnected": "Apparaat verbroken",
-                    "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)",
-                    "node_connected": "[NT] AiMesh node connected (not seen before)",
-                    "node_disconnected": "[NT] AiMesh node disconnected",
-                    "node_reconnected": "[NT] AiMesh node reconnected"
-                }
-            },
-            "security": {
-                "title": "Security",
-                "data": {
-                    "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
-                }
-            }
-        },
-        "error": {
-            "connection_refused": "Connectie afgewezen",
-            "error": "Problemen met connectie",
-            "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
-            "not_confirmed": "U dient te bevestigen",
-            "unknown": "Onbekende fout",
-            "wrong_credentials": "Verkeerde login gegevens"
-        }
+    "error": {
+      "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
+      "connection_refused": "Connectie afgewezen",
+      "error": "Problemen met connectie",
+      "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
+      "password_missing": "Wachtwoord mist",
+      "unknown": "Onbekende fout",
+      "wrong_credentials": "Verkeerde login gegevens"
+    },
+    "abort": {
+      "already_configured": "[NT] Device is already configured",
+      "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
+      "not_router": "[NT] Not an Asus router. Cannot be configured"
     }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Verander configuratie",
+        "menu_options": {
+          "credentials": "Login gegevens en connectie instellingen",
+          "operation": "Operatie modus",
+          "connected_devices": "[NT] Connected devices",
+          "intervals": "Update interval",
+          "interfaces": "Interfaces voor monitoring",
+          "events": "Home Assistant events",
+          "security": "Beveiliging opties",
+          "finish": "[NT] Save and finish",
+          "device": "Identificatie- en verbindingsparameters"
+        }
+      },
+      "credentials": {
+        "title": "Login gegevens",
+        "description": "Dezelfde als die van je router web paneel",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "port": "Poort (0 voor standaard waarde)",
+          "ssl": "Gebruik SSL verbinding"
+        }
+      },
+      "operation": {
+        "title": "Operation mode",
+        "data": {
+          "mode": "[NT] Device mode",
+          "enable_control": "Activeer apparaat controle",
+          "split_intervals": "Activeer per-sensor update interval"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Activeer apparaat trackers",
+          "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
+          "interval_devices": "[NT] Devices / AiMesh update",
+          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
+        }
+      },
+      "intervals": {
+        "title": "Update intervals",
+        "description": "Waardes zijn in secondes",
+        "data": {
+          "cache_time": "Caching tijd",
+          "scan_interval": "Entities update",
+          "interval_cpu": "CPU data",
+          "interval_firmware": "Firmware data",
+          "interval_gwlan": "GWLAN interval",
+          "interval_light": "Kicht data",
+          "interval_misc": "Overige data",
+          "interval_network_stat": "Network stat data",
+          "interval_parental_control": "Ouders controlle data",
+          "interval_ports": "Poorten data",
+          "interval_ram": "RAM data",
+          "interval_sysinfo": "Sysinfo data",
+          "interval_temperature": "Temperstuur data",
+          "interval_vpn": "VPN data",
+          "interval_wan": "WAN data",
+          "interval_wlan": "WLAN data"
+        }
+      },
+      "interfaces": {
+        "title": "Interfaces to monitor",
+        "data": {
+          "interfaces": "Selecteer netwerk interfaces voor monitoring",
+          "units_speed": "Eenheden per snelheid",
+          "units_traffic": "Eenhenden for verkeer"
+        }
+      },
+      "events": {
+        "title": "Gebeurtenis",
+        "description": "Welke gebeurtenis moet meer prioriteit krijgen?",
+        "data": {
+          "device_connected": "Apparaat verbonden (het apparaat was niet eerder gevolgt)",
+          "device_disconnected": "Apparaat verbroken",
+          "device_reconnected": "Apparaat opnieuw verbonden (Het apparaart is al eens gevolgt)",
+          "node_connected": "[NT] AiMesh node connected (not seen before)",
+          "node_disconnected": "[NT] AiMesh node disconnected",
+          "node_reconnected": "[NT] AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "data": {
+          "hide_passwords": "Verberg wachtwoorden voor sensoren en accessoires"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "Connectie afgewezen",
+      "error": "Problemen met connectie",
+      "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
+      "not_confirmed": "U dient te bevestigen",
+      "unknown": "Onbekende fout",
+      "wrong_credentials": "Verkeerde login gegevens"
+    }
+  }
 }
