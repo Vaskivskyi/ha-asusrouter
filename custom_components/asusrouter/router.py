@@ -100,7 +100,7 @@ class ARSensorHandler:
         # Sensors
         self._clients_number: int = 0
         self._clients_list: list[dict[str, Any]] = []
-        self._latest_connected: datetime | None = None
+        self._latest_connected: Optional[datetime] = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
@@ -263,7 +263,7 @@ class ARDevice:
         self._mac: str = ""
 
         # Device sensors
-        self._sensor_handler: ARSensorHandler | None = None
+        self._sensor_handler: Optional[ARSensorHandler] = None
         self._sensor_coordinator: dict[str, Any] = {}
 
         self._aimesh: dict[str, Any] = {}
@@ -272,11 +272,11 @@ class ARDevice:
         self._clients_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
-        self._latest_connected: datetime | None = None
+        self._latest_connected: Optional[datetime] = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
 
-        # On-clode parameters
+        # On-close parameters
         self._on_close: list[Callable] = []
 
     async def setup(self) -> None:
@@ -665,13 +665,15 @@ class ARDevice:
     ) -> None:
         """Mark device connected."""
 
-        mac = identity.get(MAC, None)
-        if not mac:
+        _LOGGER.warning("Device connected: %s", identity)
+
+        mac = identity.get("mac")
+        if mac is None:
             return
 
         # If device already in list
         for device in self._latest_connected_list:
-            if device.get(MAC, None) == mac:
+            if device.get("mac") == mac:
                 self._latest_connected_list.remove(device)
 
         # Sort the list by time

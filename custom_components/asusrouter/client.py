@@ -19,6 +19,8 @@ from asusrouter.modules.homeassistant import (
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import format_mac
 
+from .helpers import clean_dict
+
 
 class ARClient:
     """AsussRouter Client class."""
@@ -38,8 +40,6 @@ class ARClient:
 
     # Device last active
     _last_activity: Optional[datetime] = None
-    # Device connected since
-    _since: Optional[datetime] = None
 
     def __init__(
         self,
@@ -73,15 +73,6 @@ class ARClient:
             # Connection
             self.connection = client_info.connection
 
-            # Get the correct since attribute
-            self._since = (
-                self.connection.since
-                if isinstance(self.connection, AsusClientConnectionWlan)
-                else utc_now
-                if self._since is None
-                else self._since
-            )
-
             # Connected state
             state = client_info.state
 
@@ -113,7 +104,6 @@ class ARClient:
         ):
             # Update connection status
             self._state = ConnectionState.DISCONNECTED
-            self._since = None
 
             # Fire event
             if event_call is not None:
@@ -142,7 +132,7 @@ class ARClient:
             identity["guest_id"] = self.connection.guest_id
             identity["connected"] = self.connection.since
 
-        return identity
+        return clean_dict(identity)
 
     def generate_extra_state_attributes(self) -> dict[str, Any]:
         """Generate extra state attributes."""
@@ -164,7 +154,7 @@ class ARClient:
             attributes["rx_speed"] = self.connection.rx_speed
             attributes["tx_speed"] = self.connection.tx_speed
 
-        return attributes
+        return clean_dict(attributes)
 
     @property
     def state(self) -> Optional[bool]:
