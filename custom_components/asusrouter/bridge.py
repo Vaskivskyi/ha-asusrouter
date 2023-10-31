@@ -375,10 +375,12 @@ class ARBridge:
         data: dict[str, Any] = {}
         data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
         devices = []
-        for rule in raw["rules"]:
-            device = dataclasses.asdict(raw["rules"][rule])
-            device.pop("timemap")
-            devices.append(device)
+        rules = raw.get("rules")
+        if rules is not None:
+            for rule in raw["rules"]:
+                device = dataclasses.asdict(raw["rules"][rule])
+                device.pop("timemap")
+                devices.append(device)
         data[LIST] = devices.copy()
         return data
 
@@ -389,9 +391,11 @@ class ARBridge:
         data: dict[str, Any] = {}
         data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
         devices = []
-        for rule in raw["rules"]:
-            device = dataclasses.asdict(rule)
-            devices.append(device)
+        rules = raw.get("rules")
+        if rules is not None:
+            for rule in rules:
+                device = dataclasses.asdict(rule)
+                devices.append(device)
         data[LIST] = devices.copy()
         return data
 
