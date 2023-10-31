@@ -341,8 +341,8 @@ class ARDevice:
             # Update AiMesh
             await self.update_nodes()
 
-            # Update devices
-            await self.update_devices()
+            # Update clients
+            await self.update_clients()
         else:
             _LOGGER.debug(
                 "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
@@ -371,17 +371,19 @@ class ARDevice:
         """Update all AsusRouter platforms."""
 
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
-            await self.update_devices()
+            await self.update_clients()
             await self.update_nodes()
 
-    async def update_devices(self) -> None:
-        """Update AsusRouter devices tracker."""
+    async def update_clients(self) -> None:
+        """Update AsusRouter clients."""
 
+        # Check clients tracking settings
         if self._options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES) is False:
             _LOGGER.debug("Device tracking is disabled")
         else:
             _LOGGER.debug("Device tracking is enabled")
 
+        # Get client list
         _LOGGER.debug("Updating AsusRouter device list for '%s'", self._conf_host)
         try:
             api_clients = await self.bridge.async_get_clients()
@@ -397,21 +399,23 @@ class ARDevice:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    "Error connecting to '%s' for device update: %s",
+                    "Cannot get clients from '%s': %s",
                     self._conf_host,
                     ex,
                 )
             return
 
+        # Notify about reconnection
         if self._connect_error:
             self._connect_error = False
             _LOGGER.info("Reconnected to '%s'", self._conf_host)
 
+        # Get the consider home settings
         consider_home = self._options.get(
             CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
         )
 
-        # Get clients
+        # Format clients MAC
         clients = {format_mac(mac): client for mac, client in api_clients.items()}
 
         # Update known clients
@@ -421,7 +425,6 @@ class ARDevice:
                 client_info,
                 consider_home,
                 event_call=self.fire_event,
-                connected_call=self.connected_device,
             )
 
         # Add new clients
@@ -447,8 +450,8 @@ class ARDevice:
             client = ARClient(client_mac, client_name)
             client.update(
                 client_info,
+                consider_home,
                 event_call=self.fire_event,
-                connected_call=self.connected_device,
             )
 
             # Add client to the storage
@@ -477,7 +480,55 @@ class ARDevice:
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_client:
             async_dispatcher_send(self.hass, self.signal_device_new)
+
+        # Update latest connected sensors
+        self.update_latest_connected()
+
         await self._update_unpolled_sensors()
+
+    def update_latest_connected(self) -> None:
+        """Update latest connected sensors."""
+
+        def latest_connected_time(self, element: dict[str, Any]) -> datetime:
+            """Get connected time for the device."""
+
+            connected = element.get("connected")
+            if isinstance(connected, datetime):
+                return connected
+            # If not connected, return the current time
+            # This is just a fallback, since the device should be connected
+            return datetime.now(timezone.utc)
+
+        # New list
+        new_list = []
+
+        # We take all the clients currently connected from the self._clients_list
+        # which have the connected time set
+        for client in self._clients_list:
+            if client.get("connected"):
+                new_list.append(client)
+
+        # Append any client which was already in the list self._latest_connected_list
+        # but is not in the new list. This means that the client has disconnected,
+        # but the sensor should be showing all the connections made
+        # Since client itself might have changed, we should compare MAC addresses
+        for client in self._latest_connected_list:
+            if client["mac"] not in [x["mac"] for x in new_list]:
+                new_list.append(client)
+
+        # Sort the list by time using the latest_connected_time function
+        # Newer devices should be at the end of the list
+        new_list.sort(key=lambda x: latest_connected_time(self, x))
+
+        # Reduce the list to the size specified in the configuration
+        while len(new_list) > self._options.get(
+            CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
+        ):
+            new_list.pop(0)
+
+        # Update the self._latest_connected and self._latest_connected_list
+        self._latest_connected = new_list[-1].get(CONNECTED)
+        self._latest_connected_list = new_list
 
     async def update_nodes(self) -> None:
         """Update AsusRouter AiMesh nodes."""
@@ -649,47 +700,6 @@ class ARDevice:
 
         self._options.update(new_options)
         return require_reload
-
-    def connected_device_time(self, element: dict[str, Any]) -> datetime:
-        """Get connected time for the device."""
-
-        connected = element.get("connected")
-        if isinstance(connected, datetime):
-            return connected
-        return datetime.now(timezone.utc)
-
-    @callback
-    def connected_device(
-        self,
-        identity: dict[str, Any],
-    ) -> None:
-        """Mark device connected."""
-
-        _LOGGER.warning("Device connected: %s", identity)
-
-        mac = identity.get("mac")
-        if mac is None:
-            return
-
-        # If device already in list
-        for device in self._latest_connected_list:
-            if device.get("mac") == mac:
-                self._latest_connected_list.remove(device)
-
-        # Sort the list by time
-        self._latest_connected_list.sort(key=self.connected_device_time)
-
-        # Add new identity
-        self._latest_connected_list.append(identity)
-
-        # Check the size
-        while len(self._latest_connected_list) > self._options.get(
-            CONF_LATEST_CONNECTED, CONF_DEFAULT_LATEST_CONNECTED
-        ):
-            self._latest_connected_list.pop(0)
-
-        # Update latest connected time
-        self._latest_connected = self._latest_connected_list[-1].get(CONNECTED)
 
     @callback
     def fire_event(

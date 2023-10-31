@@ -57,7 +57,6 @@ class ARClient:
         client_info: Optional[AsusClient] = None,
         consider_home: int = 0,
         event_call: Optional[Callable[[str, Optional[dict[str, Any]]], None]] = None,
-        connected_call: Optional[Callable[[Optional[dict[str, Any]]], None]] = None,
     ):
         """Update client information."""
 
@@ -89,8 +88,6 @@ class ARClient:
             if self._state is ConnectionState.DISCONNECTED:
                 if event_call is not None:
                     event_call("device_reconnected", self.identity)
-                if connected_call is not None:
-                    connected_call(self.identity)
 
             # Update connection status
             self._state = ConnectionState.CONNECTED
