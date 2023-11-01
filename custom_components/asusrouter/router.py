@@ -527,8 +527,10 @@ class ARDevice:
             new_list.pop(0)
 
         # Update the self._latest_connected and self._latest_connected_list
-        self._latest_connected = new_list[-1].get(CONNECTED)
-        self._latest_connected_list = new_list
+        # Check that list has at least one element so that we don't get an error
+        if len(new_list) > 0:
+            self._latest_connected = new_list[-1].get(CONNECTED)
+            self._latest_connected_list = new_list
 
     async def update_nodes(self) -> None:
         """Update AsusRouter AiMesh nodes."""
