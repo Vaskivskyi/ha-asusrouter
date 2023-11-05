@@ -7,7 +7,7 @@ from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-from asusrouter.error import AsusRouterAccessError
+from asusrouter.error import AsusRouterError
 from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.identity import AsusDevice
 from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
@@ -287,7 +287,7 @@ class ARDevice:
         # Connect & check connection
         try:
             await self.bridge.async_connect()
-        except (OSError, AsusRouterAccessError) as ex:
+        except (OSError, AsusRouterError) as ex:
             raise ConfigEntryNotReady from ex
         if not self.bridge.connected:
             raise ConfigEntryNotReady
