@@ -209,7 +209,7 @@ class ARBridge:
                 METHOD: self._get_data_network,
             },
             "ovpn_client": {
-                SENSORS: await self._get_sensors_ovpn_client(),
+                SENSORS: await self._get_sensors_modern(AsusData.OPENVPN_CLIENT),
                 METHOD: self._get_data_ovpn_client,
             },
             "ovpn_server": {
@@ -241,6 +241,10 @@ class ARBridge:
                 SENSORS: SENSORS_WAN,
                 METHOD: self._get_data_wan,
             },
+            "wireguard_client": {
+                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_CLIENT),
+                METHOD: self._get_data_wireguard_client,
+            },
             WLAN: {
                 SENSORS: await self._get_sensors_wlan(),
                 METHOD: self._get_data_wlan,
@@ -267,6 +271,19 @@ class ARBridge:
             if process is not None:
                 return process(raw)
             return self._process_data(raw)
+        except AsusRouterError as ex:
+            raise UpdateFailed(ex) from ex
+
+    async def _get_data_modern(
+        self,
+        datatype: AsusData,
+        force: bool = False,
+    ) -> dict[str, Any]:
+        """Get data from the device. This is a generic method."""
+
+        try:
+            raw = await self.api.async_get_data(datatype, force=force)
+            return self._process_data_modern(raw)
         except AsusRouterError as ex:
             raise UpdateFailed(ex) from ex
 
@@ -316,9 +333,7 @@ class ARBridge:
     async def _get_data_ovpn_client(self) -> dict[str, Any]:
         """Get OpenVPN client data from the device."""
 
-        return await self._get_data(
-            AsusData.OPENVPN_CLIENT, self._process_data_ovpn_client
-        )
+        return await self._get_data_modern(AsusData.OPENVPN_CLIENT)
 
     async def _get_data_ovpn_server(self) -> dict[str, Any]:
         """Get OpenVPN server data from the device."""
@@ -366,6 +381,11 @@ class ARBridge:
 
         return await self._get_data(AsusData.WAN)
 
+    async def _get_data_wireguard_client(self) -> dict[str, Any]:
+        """Get OpenVPN client data from the device."""
+
+        return await self._get_data_modern(AsusData.WIREGUARD_CLIENT)
+
     async def _get_data_wlan(self) -> dict[str, Any]:
         """Get WLAN data from the device."""
 
@@ -381,7 +401,7 @@ class ARBridge:
         return helpers.as_dict(helpers.flatten_dict(raw))
 
     @staticmethod
-    def _process_data_ovpn_client(raw: dict[str, Any]) -> dict[str, Any]:
+    def _process_data_modern(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `ovpn_client` data."""
 
         return helpers.clean_dict(convert_to_ha_data(raw, AsusData.OPENVPN_CLIENT))
@@ -474,6 +494,30 @@ class ARBridge:
             )
         return sensors
 
+    async def _get_sensors_modern(
+        self, datatype: AsusData, sensor_type: Optional[str] = None
+    ) -> list[str]:
+        """Get the available sensors. This is a generic method."""
+
+        sensors = []
+        try:
+            data = await self.api.async_get_data(datatype)
+            _LOGGER.debug(
+                "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
+            )
+            sensors = convert_to_ha_sensors(data, datatype)
+            _LOGGER.debug("Available `%s` sensors: %s", sensor_type, sensors)
+        except AsusRouterError as ex:
+            if sensor_type in DEFAULT_SENSORS:
+                sensors = DEFAULT_SENSORS[sensor_type]
+            _LOGGER.debug(
+                "Cannot get available `%s` sensors with exception: %s. \
+                    Will use the following list: {sensors}",
+                sensor_type,
+                ex,
+            )
+        return sensors
+
     async def _get_sensors_cpu(self) -> list[str]:
         """Get the available CPU sensors."""
 
@@ -499,15 +543,6 @@ class ARBridge:
             AsusData.NETWORK,
             self._process_sensors_network,
             sensor_type=NETWORK_STAT,
-        )
-
-    async def _get_sensors_ovpn_client(self) -> list[str]:
-        """Get the available OpenVPN client sensors."""
-
-        return await self._get_sensors(
-            AsusData.OPENVPN_CLIENT,
-            self._process_sensors_ovpn_client,
-            sensor_type="ovpn_client",
         )
 
     async def _get_sensors_ovpn_server(self) -> list[str]:
@@ -596,12 +631,6 @@ class ARBridge:
             return []
 
         return SENSORS_SYSINFO
-
-    @staticmethod
-    def _process_sensors_ovpn_client(raw: dict[str, Any]) -> list[str]:
-        """Process OpenVPN client sensors."""
-
-        return convert_to_ha_sensors(raw, AsusData.OPENVPN_CLIENT)
 
     @staticmethod
     def _process_sensors_ovpn_server(raw: dict[str, Any]) -> list[str]:

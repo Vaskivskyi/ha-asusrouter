@@ -8,6 +8,7 @@ from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
 from asusrouter.modules.parental_control import AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import AsusWireGuardClient
 from asusrouter.modules.wlan import AsusWLAN, Wlan
 from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -262,6 +263,7 @@ MODE_SENSORS[ROUTER].extend(
         PORT_FORWARDING,
         VPN,
         WAN,
+        "wireguard_client",
     ]
 )
 
@@ -342,6 +344,24 @@ SENSORS_WAN = [
     "xgateway",
     "xdns",
 ]
+SENSORS_WIREGUARD_CLIENT = {
+    "active": "active",
+    "address": "address",
+    "allowed_ips": "allowed_ips",
+    "endpoint_address": "endpoint_address",
+    "endpoint_port": "endpoint_port",
+    "error": "error",
+    "keep_alive": "keep_alive",
+    "login": "login",
+    "name": "name",
+    "nat": "nat",
+    "password": "password",
+    "private_key": "private_key",
+    "psk": "psk",
+    "public_key": "public_key",
+    "vpnc_id": "vpnc_id",
+    "vpnc_unit": "vpnc_unit",
+}
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
     "channel": "channel",
@@ -1034,6 +1054,28 @@ STATIC_SWITCHES.extend(
             },
         )
         for num in NUMERIC_OVPN_SERVER
+    ]
+)
+STATIC_SWITCHES.extend(
+    [
+        # WireGuard clients
+        ARSwitchDescription(
+            key=f"{num}_state",
+            key_group="wireguard_client",
+            name=f"WireGuard Client {num}",
+            icon_on=ICON_VPN_ON,
+            state_on=AsusWireGuardClient.ON,
+            state_on_args={"id": num},
+            icon_off=ICON_VPN_OFF,
+            state_off=AsusWireGuardClient.OFF,
+            state_off_args={"id": num},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_CLIENT.items()
+            },
+        )
+        for num in range(1, 6)
     ]
 )
 STATIC_SWITCHES.extend(
