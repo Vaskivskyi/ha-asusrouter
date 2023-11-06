@@ -61,7 +61,6 @@ PLATFORMS = [
 NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
 NUMERIC_GWLAN = range(1, 4)  # maximum of 4 guest WLANs from 1 to 3
 NUMERIC_LAN = range(1, 9)  # maximum of 8 LAN ports from 1 to 8
-NUMERIC_OVPN_CLIENT = range(1, 6)  # maximum of 5 OVPN clients from 1 to 5
 NUMERIC_OVPN_SERVER = range(1, 3)  # maximum of 2 OVPN servers from 1 to 2
 NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
@@ -238,23 +237,6 @@ LABELS_WLAN = {
 # MODES -->
 
 MODE_SENSORS = {
-    ROUTER: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        GWLAN,
-        LED,
-        NETWORK,
-        PARENTAL_CONTROL,
-        PORT_FORWARDING,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        VPN,
-        WAN,
-        WLAN,
-    ],
     NODE: [
         BOOTTIME,
         CPU,
@@ -266,31 +248,22 @@ MODE_SENSORS = {
         SYSINFO,
         TEMPERATURE,
     ],
-    ACCESS_POINT: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        WLAN,
-    ],
-    MEDIA_BRIDGE: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        WLAN,
-    ],
 }
+MODE_SENSORS[ACCESS_POINT] = MODE_SENSORS[NODE]
+MODE_SENSORS[ACCESS_POINT].extend([WLAN])
+MODE_SENSORS[MEDIA_BRIDGE] = MODE_SENSORS[ACCESS_POINT]
+MODE_SENSORS[ROUTER] = MODE_SENSORS[ACCESS_POINT]
+MODE_SENSORS[ROUTER].extend(
+    [
+        GWLAN,
+        "ovpn_client",
+        "ovpn_server",
+        PARENTAL_CONTROL,
+        PORT_FORWARDING,
+        VPN,
+        WAN,
+    ]
+)
 
 # <-- MODES
 
@@ -321,15 +294,16 @@ SENSORS_GWLAN = {
 SENSORS_LED = [STATE]
 SENSORS_MISC = [BOOTTIME]
 SENSORS_NETWORK = [RX, RX_SPEED, TX, TX_SPEED]
-SENSORS_PARENTAL_CONTROL = [STATE]
-SENSORS_PORT_FORWARDING = [STATE]
-SENSORS_PORTS = [LAN, WAN]
-SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
-SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
-SENSORS_VPN = {
+SENSORS_OVPN_CLIENT = {
+    "active": "active",
     "auth_read": "auth_read",
-    "errno": "error_code",
+    "datetime": "update_time",
+    "errno": "error",
+    "error": "error",
     IP: "local_ip",
+    "login": "login",
+    "name": "name",
+    "password": "password",
     "post_compress": "post_compress_bytes",
     "post_decompress": "post_decompress_bytes",
     "pre_compress": "pre_compress_bytes",
@@ -343,8 +317,14 @@ SENSORS_VPN = {
     "tcp_udp_write": "tcp_udp_write_bytes",
     "tun_tap_read": "tun_tap_read_bytes",
     "tun_tap_write": "tun_tap_write_bytes",
-    "datetime": "update_time",
+    "vpnc_id": "vpnc_id",
+    "vpnc_unit": "vpnc_unit",
 }
+SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PORT_FORWARDING = [STATE]
+SENSORS_PORTS = [LAN, WAN]
+SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
+SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
 SENSORS_VPN_SERVER = {
     "client_list": "client_list",
     "routing_table": "routing_table",
@@ -1015,8 +995,8 @@ STATIC_SWITCHES.extend(
     [
         # OpenVPN clients
         ARSwitchDescription(
-            key=f"client_{num}_state",
-            key_group=VPN,
+            key=f"{num}_state",
+            key_group="ovpn_client",
             name=f"OpenVPN Client {num}",
             icon_on=ICON_VPN_ON,
             state_on=AsusOVPNClient.ON,
@@ -1027,18 +1007,18 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"client_{num}_{key}": value for key, value in SENSORS_VPN.items()
+                f"{num}_{key}": value for key, value in SENSORS_OVPN_CLIENT.items()
             },
         )
-        for num in NUMERIC_OVPN_CLIENT
+        for num in range(1, 6)
     ]
 )
 STATIC_SWITCHES.extend(
     [
         # OpenVPN servers
         ARSwitchDescription(
-            key=f"server_{num}_{STATE}",
-            key_group=VPN,
+            key=f"{num}_{STATE}",
+            key_group="ovpn_server",
             name=f"OpenVPN Server {num}",
             icon_on=ICON_VPN_ON,
             state_on=AsusOVPNServer.ON,
