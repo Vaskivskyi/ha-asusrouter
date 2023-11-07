@@ -12,12 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import (
-    CONF_DEFAULT_HIDE_PASSWORDS,
-    CONF_HIDE_PASSWORDS,
-    PASSWORD,
-    STATIC_SWITCHES,
-)
+from .const import CONF_DEFAULT_HIDE_PASSWORDS, CONF_HIDE_PASSWORDS, STATIC_SWITCHES
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
@@ -36,7 +31,7 @@ async def async_setup_entry(
 
     hide = []
     if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
-        hide.append(PASSWORD)
+        hide.extend(["password", "private_key", "psk"])
 
     await async_setup_ar_entry(
         hass, config_entry, async_add_entities, switches, ARSwitch, hide
