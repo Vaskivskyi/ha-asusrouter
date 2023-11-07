@@ -15,6 +15,7 @@ from asusrouter.modules.data import AsusData
 from asusrouter.modules.homeassistant import (
     convert_to_ha_data,
     convert_to_ha_sensors,
+    convert_to_ha_sensors_list,
     convert_to_ha_state_bool,
 )
 from asusrouter.modules.identity import AsusDevice
@@ -64,7 +65,6 @@ from .const import (
     STATE,
     SYSINFO,
     TEMPERATURE,
-    VPN,
     WAN,
     WLAN,
 )
@@ -245,6 +245,10 @@ class ARBridge:
                 SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_CLIENT),
                 METHOD: self._get_data_wireguard_client,
             },
+            "wireguard_server": {
+                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_SERVER),
+                METHOD: self._get_data_wireguard_server,
+            },
             WLAN: {
                 SENSORS: await self._get_sensors_wlan(),
                 METHOD: self._get_data_wlan,
@@ -382,9 +386,14 @@ class ARBridge:
         return await self._get_data(AsusData.WAN)
 
     async def _get_data_wireguard_client(self) -> dict[str, Any]:
-        """Get OpenVPN client data from the device."""
+        """Get WireGuard client data from the device."""
 
         return await self._get_data_modern(AsusData.WIREGUARD_CLIENT)
+
+    async def _get_data_wireguard_server(self) -> dict[str, Any]:
+        """Get WireGuard server data from the device."""
+
+        return await self._get_data_modern(AsusData.WIREGUARD_SERVER)
 
     async def _get_data_wlan(self) -> dict[str, Any]:
         """Get WLAN data from the device."""
@@ -404,7 +413,7 @@ class ARBridge:
     def _process_data_modern(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `ovpn_client` data."""
 
-        return helpers.clean_dict(convert_to_ha_data(raw, AsusData.OPENVPN_CLIENT))
+        return helpers.clean_dict(convert_to_ha_data(raw))
 
     @staticmethod
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
@@ -494,9 +503,7 @@ class ARBridge:
             )
         return sensors
 
-    async def _get_sensors_modern(
-        self, datatype: AsusData, sensor_type: Optional[str] = None
-    ) -> list[str]:
+    async def _get_sensors_modern(self, datatype: AsusData) -> list[str]:
         """Get the available sensors. This is a generic method."""
 
         sensors = []
@@ -505,15 +512,15 @@ class ARBridge:
             _LOGGER.debug(
                 "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
             )
-            sensors = convert_to_ha_sensors(data, datatype)
-            _LOGGER.debug("Available `%s` sensors: %s", sensor_type, sensors)
+            sensors = convert_to_ha_sensors_list(data)
+            _LOGGER.debug("Available `%s` sensors: %s", datatype.value, sensors)
         except AsusRouterError as ex:
-            if sensor_type in DEFAULT_SENSORS:
-                sensors = DEFAULT_SENSORS[sensor_type]
+            if datatype.value in DEFAULT_SENSORS:
+                sensors = DEFAULT_SENSORS[datatype.value]
             _LOGGER.debug(
                 "Cannot get available `%s` sensors with exception: %s. \
                     Will use the following list: {sensors}",
-                sensor_type,
+                datatype.value,
                 ex,
             )
         return sensors

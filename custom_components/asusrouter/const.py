@@ -8,7 +8,7 @@ from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
 from asusrouter.modules.parental_control import AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wireguard import AsusWireGuardClient
+from asusrouter.modules.wireguard import AsusWireGuardClient, AsusWireGuardServer
 from asusrouter.modules.wlan import AsusWLAN, Wlan
 from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -264,6 +264,7 @@ MODE_SENSORS[ROUTER].extend(
         VPN,
         WAN,
         "wireguard_client",
+        "wireguard_server",
     ]
 )
 
@@ -361,6 +362,18 @@ SENSORS_WIREGUARD_CLIENT = {
     "public_key": "public_key",
     "vpnc_id": "vpnc_id",
     "vpnc_unit": "vpnc_unit",
+}
+SENSORS_WIREGUARD_SERVER = {
+    "address": "address",
+    "dns": "dns",
+    "keep_alive": "keep_alive",
+    "lan_access": "lan_access",
+    "nat6": "nat6",
+    "port": "port",
+    "private_key": "private_key",
+    "psk": "psk_state",
+    "public_key": "public_key",
+    "clients": "clients",
 }
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
@@ -996,6 +1009,7 @@ STATIC_SENSORS.extend(
     ]
 )
 STATIC_SWITCHES: list[AREntityDescription] = [
+    # Parental control
     ARSwitchDescription(
         key="state",
         key_group="parental_control",
@@ -1009,7 +1023,7 @@ STATIC_SWITCHES: list[AREntityDescription] = [
         extra_state_attributes={
             "list": "list",
         },
-    ),
+    )
 ]
 STATIC_SWITCHES.extend(
     [
@@ -1076,6 +1090,26 @@ STATIC_SWITCHES.extend(
             },
         )
         for num in range(1, 6)
+    ]
+)
+STATIC_SWITCHES.extend(
+    [
+        # WireGuard Server
+        ARSwitchDescription(
+            key=f"{num}_state",
+            key_group="wireguard_server",
+            name=f"WireGuard Server {num}",
+            icon_on=ICON_VPN_ON,
+            state_on=AsusWireGuardServer.ON,
+            icon_off=ICON_VPN_OFF,
+            state_off=AsusWireGuardServer.OFF,
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_SERVER.items()
+            },
+        )
+        for num in range(1, 2)
     ]
 )
 STATIC_SWITCHES.extend(
