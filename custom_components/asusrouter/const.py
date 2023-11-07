@@ -323,15 +323,43 @@ SENSORS_OVPN_CLIENT = {
     "vpnc_id": "vpnc_id",
     "vpnc_unit": "vpnc_unit",
 }
+SENSORS_OVPN_SERVER = {
+    "address": "address",
+    "advertise_dns": "advertise_dns",
+    "allow_lan": "allow_lan",
+    "allow_specific_clients": "allow_specific_clients",
+    "allow_wan": "allow_wan",
+    "auth_mode": "auth_mode",
+    "cipher": "cipher",
+    "client_list": "clients",
+    "client_specific_config": "client_specific_config",
+    "client_to_client": "client_to_client",
+    "clients": "clients",
+    "compression": "compression",
+    "dhcp": "dhcp",
+    "digest": "digest",
+    "hmac": "hmac",
+    "interface": "interface",
+    "netmask": "netmask",
+    "password_only": "password_only",
+    "port": "port",
+    "protocol": "protocol",
+    "remote_address": "remote_address",
+    "response_to_dns": "response_to_dns",
+    "routing_table": "routing_table",
+    "server_r1": "server_r1",
+    "server_r2": "server_r2",
+    "subnet": "subnet",
+    "tls_keysize": "tls_keysize",
+    "tls_reneg": "tls_reneg",
+    "unit": "unit",
+}
+
 SENSORS_PARENTAL_CONTROL = [STATE]
 SENSORS_PORT_FORWARDING = [STATE]
 SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
 SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
-SENSORS_VPN_SERVER = {
-    "client_list": "client_list",
-    "routing_table": "routing_table",
-}
 SENSORS_WAN = [
     STATUS,
     "ip_address",
@@ -1063,8 +1091,7 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"server_{num}_{key}": value
-                for key, value in SENSORS_VPN_SERVER.items()
+                f"{num}_{key}": value for key, value in SENSORS_OVPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
