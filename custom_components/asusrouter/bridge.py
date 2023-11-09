@@ -25,7 +25,7 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
@@ -46,7 +46,6 @@ from .const import (
     METHOD,
     MODE_SENSORS,
     NETWORK,
-    NETWORK_STAT,
     PARENTAL_CONTROL,
     PORT_FORWARDING,
     PORTS,
@@ -58,7 +57,6 @@ from .const import (
     SENSORS_PARENTAL_CONTROL,
     SENSORS_PORT_FORWARDING,
     SENSORS_RAM,
-    SENSORS_SYSINFO,
     SENSORS_WAN,
     STATE,
     SYSINFO,
@@ -90,7 +88,7 @@ class ARBridge:
             self._configs.update(options)
 
         # Get session from HA
-        session = async_get_clientsession(hass)
+        session = async_create_clientsession(hass)
 
         # Initialize API
         self._api = self._get_api(self._configs, session)
