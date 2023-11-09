@@ -1128,8 +1128,10 @@ STATIC_SWITCHES.extend(
             name=f"WireGuard Server {num}",
             icon_on=ICON_VPN_ON,
             state_on=AsusWireGuardServer.ON,
+            state_on_args={"id": num},
             icon_off=ICON_VPN_OFF,
             state_off=AsusWireGuardServer.OFF,
+            state_off_args={"id": num},
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
