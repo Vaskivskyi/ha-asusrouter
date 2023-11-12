@@ -7,7 +7,8 @@ from typing import Any
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
 from .const import (
     ASUSROUTER,
@@ -82,7 +83,7 @@ async def async_get_config_entry_diagnostics(
         data["device"]["tracked_devices"].append(
             {
                 "name": device.name,
-                "ip_address": device.ip,
+                "ip_address": device.ip_address,
                 "last_activity": device.extra_state_attributes[
                     DEVICE_ATTRIBUTE_LAST_ACTIVITY
                 ]
