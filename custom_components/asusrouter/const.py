@@ -522,6 +522,7 @@ CONF_REQ_RELOAD = [
     CONF_CONFIRM,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
+    CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
 ]
 
@@ -722,7 +723,15 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
 TO_REDACT: list[str] = [PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME]
 TO_REDACT_DEV: list[str] = [ATTR_CONNECTIONS, ATTR_IDENTIFIERS]
 TO_REDACT_STATE: list[str] = ["WAN IP"]
-TO_REDACT_ATTRS: list[str] = [CONF_DEVICES, PASSWORD, IP, SSID, LIST, "private_key", "psk"]
+TO_REDACT_ATTRS: list[str] = [
+    CONF_DEVICES,
+    PASSWORD,
+    IP,
+    SSID,
+    LIST,
+    "private_key",
+    "psk",
+]
 
 # <-- DIAGNOSTICS
 
