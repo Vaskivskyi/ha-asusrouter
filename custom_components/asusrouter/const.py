@@ -8,6 +8,7 @@ from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
 from asusrouter.modules.parental_control import AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import AsusWireGuardClient, AsusWireGuardServer
 from asusrouter.modules.wlan import AsusWLAN, Wlan
 from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -61,7 +62,6 @@ PLATFORMS = [
 NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
 NUMERIC_GWLAN = range(1, 4)  # maximum of 4 guest WLANs from 1 to 3
 NUMERIC_LAN = range(1, 9)  # maximum of 8 LAN ports from 1 to 8
-NUMERIC_OVPN_CLIENT = range(1, 6)  # maximum of 5 OVPN clients from 1 to 5
 NUMERIC_OVPN_SERVER = range(1, 3)  # maximum of 2 OVPN servers from 1 to 2
 NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
 NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
@@ -238,23 +238,6 @@ LABELS_WLAN = {
 # MODES -->
 
 MODE_SENSORS = {
-    ROUTER: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        GWLAN,
-        LED,
-        NETWORK,
-        PARENTAL_CONTROL,
-        PORT_FORWARDING,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        VPN,
-        WAN,
-        WLAN,
-    ],
     NODE: [
         BOOTTIME,
         CPU,
@@ -266,31 +249,24 @@ MODE_SENSORS = {
         SYSINFO,
         TEMPERATURE,
     ],
-    ACCESS_POINT: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        WLAN,
-    ],
-    MEDIA_BRIDGE: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-        WLAN,
-    ],
 }
+MODE_SENSORS[ACCESS_POINT] = MODE_SENSORS[NODE]
+MODE_SENSORS[ACCESS_POINT].extend([WLAN])
+MODE_SENSORS[MEDIA_BRIDGE] = MODE_SENSORS[ACCESS_POINT]
+MODE_SENSORS[ROUTER] = MODE_SENSORS[ACCESS_POINT]
+MODE_SENSORS[ROUTER].extend(
+    [
+        GWLAN,
+        "ovpn_client",
+        "ovpn_server",
+        PARENTAL_CONTROL,
+        PORT_FORWARDING,
+        VPN,
+        "wan",
+        "wireguard_client",
+        "wireguard_server",
+    ]
+)
 
 # <-- MODES
 
@@ -321,15 +297,16 @@ SENSORS_GWLAN = {
 SENSORS_LED = [STATE]
 SENSORS_MISC = [BOOTTIME]
 SENSORS_NETWORK = [RX, RX_SPEED, TX, TX_SPEED]
-SENSORS_PARENTAL_CONTROL = [STATE]
-SENSORS_PORT_FORWARDING = [STATE]
-SENSORS_PORTS = [LAN, WAN]
-SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
-SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
-SENSORS_VPN = {
+SENSORS_OVPN_CLIENT = {
+    "active": "active",
     "auth_read": "auth_read",
-    "errno": "error_code",
+    "datetime": "update_time",
+    "errno": "error",
+    "error": "error",
     IP: "local_ip",
+    "login": "login",
+    "name": "name",
+    "password": "password",
     "post_compress": "post_compress_bytes",
     "post_decompress": "post_decompress_bytes",
     "pre_compress": "pre_compress_bytes",
@@ -343,25 +320,84 @@ SENSORS_VPN = {
     "tcp_udp_write": "tcp_udp_write_bytes",
     "tun_tap_read": "tun_tap_read_bytes",
     "tun_tap_write": "tun_tap_write_bytes",
-    "datetime": "update_time",
+    "vpnc_id": "vpnc_id",
+    "vpnc_unit": "vpnc_unit",
 }
-SENSORS_VPN_SERVER = {
-    "client_list": "client_list",
+SENSORS_OVPN_SERVER = {
+    "address": "address",
+    "advertise_dns": "advertise_dns",
+    "allow_lan": "allow_lan",
+    "allow_specific_clients": "allow_specific_clients",
+    "allow_wan": "allow_wan",
+    "auth_mode": "auth_mode",
+    "cipher": "cipher",
+    "client_list": "clients",
+    "client_specific_config": "client_specific_config",
+    "client_to_client": "client_to_client",
+    "clients": "clients",
+    "compression": "compression",
+    "dhcp": "dhcp",
+    "digest": "digest",
+    "hmac": "hmac",
+    "interface": "interface",
+    "netmask": "netmask",
+    "password_only": "password_only",
+    "port": "port",
+    "protocol": "protocol",
+    "remote_address": "remote_address",
+    "response_to_dns": "response_to_dns",
     "routing_table": "routing_table",
+    "server_r1": "server_r1",
+    "server_r2": "server_r2",
+    "subnet": "subnet",
+    "tls_keysize": "tls_keysize",
+    "tls_reneg": "tls_reneg",
+    "unit": "unit",
 }
-SENSORS_WAN = [
-    STATUS,
-    "ip_address",
-    "ip_type",
-    "gateway",
-    "mask",
-    "dns",
-    "private_subnet",
-    "xip",
-    "xtype",
-    "xgateway",
-    "xdns",
-]
+
+SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PORT_FORWARDING = [STATE]
+SENSORS_PORTS = [LAN, WAN]
+SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
+SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
+SENSORS_WAN = {
+    "dns": "dns",
+    "expires": "expires",
+    "gateway": "gateway",
+    "ip_address": "ip_address",
+    "lease": "lease",
+    "mask": "mask",
+}
+SENSORS_WIREGUARD_CLIENT = {
+    "active": "active",
+    "address": "address",
+    "allowed_ips": "allowed_ips",
+    "endpoint_address": "endpoint_address",
+    "endpoint_port": "endpoint_port",
+    "error": "error",
+    "keep_alive": "keep_alive",
+    "login": "login",
+    "name": "name",
+    "nat": "nat",
+    "password": "password",
+    "private_key": "private_key",
+    "psk": "psk",
+    "public_key": "public_key",
+    "vpnc_id": "vpnc_id",
+    "vpnc_unit": "vpnc_unit",
+}
+SENSORS_WIREGUARD_SERVER = {
+    "address": "address",
+    "dns": "dns",
+    "keep_alive": "keep_alive",
+    "lan_access": "lan_access",
+    "nat6": "nat6",
+    "port": "port",
+    "private_key": "private_key",
+    "psk": "psk_state",
+    "public_key": "public_key",
+    "clients": "clients",
+}
 SENSORS_WLAN = {
     "auth_mode_x": "auth_method",
     "channel": "channel",
@@ -486,6 +522,7 @@ CONF_REQ_RELOAD = [
     CONF_CONFIRM,
     CONF_CONSIDER_HOME,
     CONF_ENABLE_CONTROL,
+    CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
 ]
 
@@ -686,7 +723,15 @@ SENSORS_PARAM_NETWORK: dict[str, dict[str, Any]] = {
 TO_REDACT: list[str] = [PASSWORD, CONF_UNIQUE_ID, CONF_USERNAME]
 TO_REDACT_DEV: list[str] = [ATTR_CONNECTIONS, ATTR_IDENTIFIERS]
 TO_REDACT_STATE: list[str] = ["WAN IP"]
-TO_REDACT_ATTRS: list[str] = [CONF_DEVICES, PASSWORD, IP, SSID, LIST]
+TO_REDACT_ATTRS: list[str] = [
+    CONF_DEVICES,
+    PASSWORD,
+    IP,
+    SSID,
+    LIST,
+    "private_key",
+    "psk",
+]
 
 # <-- DIAGNOSTICS
 
@@ -731,6 +776,7 @@ SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL: list[str] = [
 
 ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
+ICON_DUALWAN = "mdi:call-split"
 ICON_ETHERNET_ON = "mdi:ethernet-cable"
 ICON_ETHERNET_OFF = "mdi:ethernet-cable-off"
 ICON_IP = "mdi:ip"
@@ -748,6 +794,7 @@ ICON_UPDATE = "mdi:update"
 ICON_USB = "mdi:usb-port"
 ICON_VPN_OFF = "mdi:close-network-outline"
 ICON_VPN_ON = "mdi:check-network-outline"
+ICON_WAN_AGGREGATION = "mdi:call-merge"
 ICON_WLAN_OFF = "mdi:wifi-off"
 ICON_WLAN_ON = "mdi:wifi"
 
@@ -755,6 +802,19 @@ ICON_WLAN_ON = "mdi:wifi"
 
 # SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
+    # Dual WAN
+    ARBinarySensorDescription(
+        key="dualwan_state",
+        key_group="wan",
+        name="Dual WAN",
+        icon=ICON_DUALWAN,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "dualwan_mode": "mode",
+            "dualwan_priority": "priority",
+        },
+    ),
     # Port status / LAN
     ARBinarySensorDescription(
         key="lan",
@@ -796,29 +856,50 @@ STATIC_BINARY_SENSORS: list[AREntityDescription] = [
             "wan_list": "list",
         },
     ),
-    # WAN
+    # Internet state
     ARBinarySensorDescription(
-        key="status",
+        key="internet_link",
         key_group="wan",
-        name="WAN",
+        name="Internet",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            "dns": "dns",
-            "gateway": "gateway",
-            "ip_address": "ip_address",
-            "ip_type": "ip_type",
-            "mask": "mask",
-            "private_subnet": "private_subnet",
-            "xdns": "xdns",
-            "xgateway": "xgateway",
-            "xip": "xip",
-            "xtype": "xip_type",
-            "xmask": "xmask",
+            "internet_ip_address": "ip_address",
+            "internet_unit": "wan_unit",
+        },
+    ),
+    # WAN Aggregation
+    ARBinarySensorDescription(
+        key="aggregation_state",
+        key_group="wan",
+        name="WAN Aggregation",
+        icon=ICON_WAN_AGGREGATION,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "aggregation_ports": "ports",
         },
     ),
 ]
+STATIC_BINARY_SENSORS.extend(
+    [
+        # WAN state
+        ARBinarySensorDescription(
+            key=f"{num}_state",
+            key_group="wan",
+            name=f"WAN{label}",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_link": "link",
+                f"{num}_primary": "primary",
+            },
+        )
+        for num, label in zip((0, 1), ("", " (Secondary)"))
+    ]
+)
 STATIC_BUTTONS: list[ARButtonDescription] = [
     ARButtonDescription(
         key="reboot",
@@ -995,7 +1076,27 @@ STATIC_SENSORS.extend(
         for sensor, label in LABELS_LOAD_AVG.items()
     ]
 )
+# WAN IPs
+STATIC_SENSORS.extend(
+    [
+        ARSensorDescription(
+            key=f"{num}_{extra_key}_ip_address",
+            key_group="wan",
+            name=f"WAN IP{label}{extra_label}",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{extra_key}_{key}": attribute
+                for key, attribute in SENSORS_WAN.items()
+            },
+        )
+        for extra_key, extra_label in zip(("main", "extra"), ("", " (Extra)"))
+        for num, label in zip((0, 1), ("", " (Secondary)"))
+    ]
+)
 STATIC_SWITCHES: list[AREntityDescription] = [
+    # Parental control
     ARSwitchDescription(
         key="state",
         key_group="parental_control",
@@ -1009,14 +1110,14 @@ STATIC_SWITCHES: list[AREntityDescription] = [
         extra_state_attributes={
             "list": "list",
         },
-    ),
+    )
 ]
 STATIC_SWITCHES.extend(
     [
         # OpenVPN clients
         ARSwitchDescription(
-            key=f"client_{num}_state",
-            key_group=VPN,
+            key=f"{num}_state",
+            key_group="ovpn_client",
             name=f"OpenVPN Client {num}",
             icon_on=ICON_VPN_ON,
             state_on=AsusOVPNClient.ON,
@@ -1027,18 +1128,18 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"client_{num}_{key}": value for key, value in SENSORS_VPN.items()
+                f"{num}_{key}": value for key, value in SENSORS_OVPN_CLIENT.items()
             },
         )
-        for num in NUMERIC_OVPN_CLIENT
+        for num in range(1, 6)
     ]
 )
 STATIC_SWITCHES.extend(
     [
         # OpenVPN servers
         ARSwitchDescription(
-            key=f"server_{num}_{STATE}",
-            key_group=VPN,
+            key=f"{num}_{STATE}",
+            key_group="ovpn_server",
             name=f"OpenVPN Server {num}",
             icon_on=ICON_VPN_ON,
             state_on=AsusOVPNServer.ON,
@@ -1049,11 +1150,54 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"server_{num}_{key}": value
-                for key, value in SENSORS_VPN_SERVER.items()
+                f"{num}_{key}": value for key, value in SENSORS_OVPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
+    ]
+)
+STATIC_SWITCHES.extend(
+    [
+        # WireGuard clients
+        ARSwitchDescription(
+            key=f"{num}_state",
+            key_group="wireguard_client",
+            name=f"WireGuard Client {num}",
+            icon_on=ICON_VPN_ON,
+            state_on=AsusWireGuardClient.ON,
+            state_on_args={"id": num},
+            icon_off=ICON_VPN_OFF,
+            state_off=AsusWireGuardClient.OFF,
+            state_off_args={"id": num},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_CLIENT.items()
+            },
+        )
+        for num in range(1, 6)
+    ]
+)
+STATIC_SWITCHES.extend(
+    [
+        # WireGuard Server
+        ARSwitchDescription(
+            key=f"{num}_state",
+            key_group="wireguard_server",
+            name=f"WireGuard Server {num}",
+            icon_on=ICON_VPN_ON,
+            state_on=AsusWireGuardServer.ON,
+            state_on_args={"id": num},
+            icon_off=ICON_VPN_OFF,
+            state_off=AsusWireGuardServer.OFF,
+            state_off_args={"id": num},
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_SERVER.items()
+            },
+        )
+        for num in range(1, 2)
     ]
 )
 STATIC_SWITCHES.extend(

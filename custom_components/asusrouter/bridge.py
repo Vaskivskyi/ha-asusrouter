@@ -13,7 +13,9 @@ from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
 from asusrouter.modules.data import AsusData
 from asusrouter.modules.homeassistant import (
+    convert_to_ha_data,
     convert_to_ha_sensors,
+    convert_to_ha_sensors_list,
     convert_to_ha_state_bool,
 )
 from asusrouter.modules.identity import AsusDevice
@@ -46,7 +48,6 @@ from .const import (
     METHOD,
     MODE_SENSORS,
     NETWORK,
-    NETWORK_STAT,
     PARENTAL_CONTROL,
     PORT_FORWARDING,
     PORTS,
@@ -58,13 +59,9 @@ from .const import (
     SENSORS_PARENTAL_CONTROL,
     SENSORS_PORT_FORWARDING,
     SENSORS_RAM,
-    SENSORS_SYSINFO,
-    SENSORS_WAN,
     STATE,
     SYSINFO,
     TEMPERATURE,
-    VPN,
-    WAN,
     WLAN,
 )
 
@@ -188,7 +185,7 @@ class ARBridge:
         sensors = {
             BOOTTIME: {SENSORS: SENSORS_BOOTTIME, METHOD: self._get_data_boottime},
             CPU: {
-                SENSORS: await self._get_sensors_cpu(),
+                SENSORS: await self._get_sensors_modern(AsusData.CPU),
                 METHOD: self._get_data_cpu,
             },
             FIRMWARE: {
@@ -196,7 +193,7 @@ class ARBridge:
                 METHOD: self._get_data_firmware,
             },
             GWLAN: {
-                SENSORS: await self._get_sensors_gwlan(),
+                SENSORS: await self._get_sensors_modern(AsusData.GWLAN),
                 METHOD: self._get_data_gwlan,
             },
             LED: {
@@ -204,8 +201,16 @@ class ARBridge:
                 METHOD: self._get_data_led,
             },
             NETWORK: {
-                SENSORS: await self._get_sensors_network(),
+                SENSORS: await self._get_sensors_modern(AsusData.NETWORK),
                 METHOD: self._get_data_network,
+            },
+            "ovpn_client": {
+                SENSORS: await self._get_sensors_modern(AsusData.OPENVPN_CLIENT),
+                METHOD: self._get_data_ovpn_client,
+            },
+            "ovpn_server": {
+                SENSORS: await self._get_sensors_ovpn_server(),
+                METHOD: self._get_data_ovpn_server,
             },
             PARENTAL_CONTROL: {
                 SENSORS: SENSORS_PARENTAL_CONTROL,
@@ -221,23 +226,27 @@ class ARBridge:
             },
             RAM: {SENSORS: SENSORS_RAM, METHOD: self._get_data_ram},
             SYSINFO: {
-                SENSORS: await self._get_sensors_sysinfo(),
+                SENSORS: await self._get_sensors_modern(AsusData.SYSINFO),
                 METHOD: self._get_data_sysinfo,
             },
             TEMPERATURE: {
-                SENSORS: await self._get_sensors_temperature(),
+                SENSORS: await self._get_sensors_modern(AsusData.TEMPERATURE),
                 METHOD: self._get_data_temperature,
             },
-            VPN: {
-                SENSORS: await self._get_sensors_vpn(),
-                METHOD: self._get_data_vpn,
-            },
-            WAN: {
-                SENSORS: SENSORS_WAN,
+            "wan": {
+                SENSORS: await self._get_sensors_modern(AsusData.WAN),
                 METHOD: self._get_data_wan,
             },
+            "wireguard_client": {
+                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_CLIENT),
+                METHOD: self._get_data_wireguard_client,
+            },
+            "wireguard_server": {
+                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_SERVER),
+                METHOD: self._get_data_wireguard_server,
+            },
             WLAN: {
-                SENSORS: await self._get_sensors_wlan(),
+                SENSORS: await self._get_sensors_modern(AsusData.WLAN),
                 METHOD: self._get_data_wlan,
             },
         }
@@ -262,6 +271,19 @@ class ARBridge:
             if process is not None:
                 return process(raw)
             return self._process_data(raw)
+        except AsusRouterError as ex:
+            raise UpdateFailed(ex) from ex
+
+    async def _get_data_modern(
+        self,
+        datatype: AsusData,
+        force: bool = False,
+    ) -> dict[str, Any]:
+        """Get data from the device. This is a generic method."""
+
+        try:
+            raw = await self.api.async_get_data(datatype, force=force)
+            return self._process_data_modern(raw)
         except AsusRouterError as ex:
             raise UpdateFailed(ex) from ex
 
@@ -308,6 +330,16 @@ class ARBridge:
 
         return await self._get_data(AsusData.NETWORK)
 
+    async def _get_data_ovpn_client(self) -> dict[str, Any]:
+        """Get OpenVPN client data from the device."""
+
+        return await self._get_data_modern(AsusData.OPENVPN_CLIENT)
+
+    async def _get_data_ovpn_server(self) -> dict[str, Any]:
+        """Get OpenVPN server data from the device."""
+
+        return await self._get_data(AsusData.OPENVPN_SERVER)
+
     async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
         """Get parental control data from the device."""
 
@@ -344,15 +376,20 @@ class ARBridge:
 
         return await self._get_data(AsusData.TEMPERATURE)
 
-    async def _get_data_vpn(self) -> dict[str, Any]:
-        """Get VPN data from the device."""
-
-        return await self._get_data(AsusData.OPENVPN)
-
     async def _get_data_wan(self) -> dict[str, Any]:
         """Get WAN data from the device."""
 
-        return await self._get_data(AsusData.WAN)
+        return await self._get_data_modern(AsusData.WAN)
+
+    async def _get_data_wireguard_client(self) -> dict[str, Any]:
+        """Get WireGuard client data from the device."""
+
+        return await self._get_data_modern(AsusData.WIREGUARD_CLIENT)
+
+    async def _get_data_wireguard_server(self) -> dict[str, Any]:
+        """Get WireGuard server data from the device."""
+
+        return await self._get_data_modern(AsusData.WIREGUARD_SERVER)
 
     async def _get_data_wlan(self) -> dict[str, Any]:
         """Get WLAN data from the device."""
@@ -367,6 +404,12 @@ class ARBridge:
         """Process data received from the device. This is a generic method."""
 
         return helpers.as_dict(helpers.flatten_dict(raw))
+
+    @staticmethod
+    def _process_data_modern(raw: dict[str, Any]) -> dict[str, Any]:
+        """Process `ovpn_client` data."""
+
+        return helpers.clean_dict(convert_to_ha_data(raw))
 
     @staticmethod
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
@@ -456,31 +499,35 @@ class ARBridge:
             )
         return sensors
 
-    async def _get_sensors_cpu(self) -> list[str]:
-        """Get the available CPU sensors."""
+    async def _get_sensors_modern(self, datatype: AsusData) -> list[str]:
+        """Get the available sensors. This is a generic method."""
+
+        sensors = []
+        try:
+            data = await self.api.async_get_data(datatype)
+            _LOGGER.debug(
+                "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
+            )
+            sensors = convert_to_ha_sensors_list(data)
+            _LOGGER.debug("Available `%s` sensors: %s", datatype.value, sensors)
+        except AsusRouterError as ex:
+            if datatype.value in DEFAULT_SENSORS:
+                sensors = DEFAULT_SENSORS[datatype.value]
+            _LOGGER.debug(
+                "Cannot get available `%s` sensors with exception: %s. \
+                    Will use the following list: {sensors}",
+                datatype.value,
+                ex,
+            )
+        return sensors
+
+    async def _get_sensors_ovpn_server(self) -> list[str]:
+        """Get the available OpenVPN server sensors."""
 
         return await self._get_sensors(
-            AsusData.CPU,
-            self._process_sensors_cpu,
-            sensor_type=CPU,
-            defaults=True,
-        )
-
-    async def _get_sensors_gwlan(self) -> list[str]:
-        """Get the available GWLAN sensors."""
-
-        return await self._get_sensors(
-            AsusData.GWLAN,
-            sensor_type=GWLAN,
-        )
-
-    async def _get_sensors_network(self) -> list[str]:
-        """Get the available network stat sensors."""
-
-        return await self._get_sensors(
-            AsusData.NETWORK,
-            self._process_sensors_network,
-            sensor_type=NETWORK_STAT,
+            AsusData.OPENVPN_SERVER,
+            self._process_sensors_ovpn_server,
+            sensor_type="ovpn_server",
         )
 
     async def _get_sensors_ports(self) -> list[str]:
@@ -490,35 +537,6 @@ class ARBridge:
             AsusData.PORTS,
             self._process_sensors_ports,
             sensor_type=PORTS,
-        )
-
-    async def _get_sensors_sysinfo(self) -> list[str]:
-        """Get the available sysinfo sensors."""
-
-        return await self._get_sensors(
-            AsusData.SYSINFO,
-            self._process_sensors_sysinfo,
-            sensor_type=SYSINFO,
-        )
-
-    async def _get_sensors_temperature(self) -> list[str]:
-        """Get the available temperature sensors."""
-
-        return await self._get_sensors(AsusData.TEMPERATURE, sensor_type=TEMPERATURE)
-
-    async def _get_sensors_vpn(self) -> list[str]:
-        """Get the available VPN sensors."""
-
-        return await self._get_sensors(
-            AsusData.OPENVPN, self._process_sensors_vpn, sensor_type=VPN
-        )
-
-    async def _get_sensors_wlan(self) -> list[str]:
-        """Get the available WLAN sensors."""
-
-        return await self._get_sensors(
-            AsusData.WLAN,
-            sensor_type=WLAN,
         )
 
     # <- GET SENSORS LIST
@@ -536,18 +554,6 @@ class ARBridge:
         return helpers.list_from_dict(flat)
 
     @staticmethod
-    def _process_sensors_cpu(raw: dict[str, Any]) -> list[str]:
-        """Process CPU sensors."""
-
-        return convert_to_ha_sensors(raw, AsusData.CPU)
-
-    @staticmethod
-    def _process_sensors_network(raw: dict[str, Any]) -> list[str]:
-        """Process network sensors."""
-
-        return convert_to_ha_sensors(raw, AsusData.NETWORK)
-
-    @staticmethod
     def _process_sensors_ports(raw: dict[str, Any]) -> list[str]:
         """Process ports sensors."""
 
@@ -560,18 +566,9 @@ class ARBridge:
         return sensors
 
     @staticmethod
-    def _process_sensors_sysinfo(raw: Optional[dict[str, Any]]) -> list[str]:
-        """Process SysInfo sensors."""
+    def _process_sensors_ovpn_server(raw: dict[str, Any]) -> list[str]:
+        """Process OpenVPN server sensors."""
 
-        if raw is None or not isinstance(raw, dict):
-            return []
-
-        return SENSORS_SYSINFO
-
-    @staticmethod
-    def _process_sensors_vpn(raw: dict[str, Any]) -> list[str]:
-        """Process VPN sensors."""
-
-        return convert_to_ha_sensors(raw, AsusData.OPENVPN)
+        return convert_to_ha_sensors(raw, AsusData.OPENVPN_SERVER)
 
     # <- PROCESS SENSORS LIST
