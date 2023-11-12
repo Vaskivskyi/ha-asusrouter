@@ -785,6 +785,7 @@ ICON_UPDATE = "mdi:update"
 ICON_USB = "mdi:usb-port"
 ICON_VPN_OFF = "mdi:close-network-outline"
 ICON_VPN_ON = "mdi:check-network-outline"
+ICON_WAN_AGGREGATION = "mdi:call-merge"
 ICON_WLAN_OFF = "mdi:wifi-off"
 ICON_WLAN_ON = "mdi:wifi"
 
@@ -857,6 +858,18 @@ STATIC_BINARY_SENSORS: list[AREntityDescription] = [
         extra_state_attributes={
             "internet_ip_address": "ip_address",
             "internet_unit": "wan_unit",
+        },
+    ),
+    # WAN Aggregation
+    ARBinarySensorDescription(
+        key="aggregation_state",
+        key_group="wan",
+        name="WAN Aggregation",
+        icon=ICON_WAN_AGGREGATION,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "aggregation_ports": "ports",
         },
     ),
 ]
