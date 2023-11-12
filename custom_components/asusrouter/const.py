@@ -767,6 +767,7 @@ SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL: list[str] = [
 
 ICON_CPU = "mdi:cpu-32-bit"
 ICON_DEVICES = "mdi:devices"
+ICON_DUALWAN = "mdi:call-split"
 ICON_ETHERNET_ON = "mdi:ethernet-cable"
 ICON_ETHERNET_OFF = "mdi:ethernet-cable-off"
 ICON_IP = "mdi:ip"
@@ -791,6 +792,19 @@ ICON_WLAN_ON = "mdi:wifi"
 
 # SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
+    # Dual WAN
+    ARBinarySensorDescription(
+        key="dualwan_state",
+        key_group="wan",
+        name="Dual WAN",
+        icon=ICON_DUALWAN,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "dualwan_mode": "mode",
+            "dualwan_priority": "priority",
+        },
+    ),
     # Port status / LAN
     ARBinarySensorDescription(
         key="lan",
