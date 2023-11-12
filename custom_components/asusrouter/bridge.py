@@ -59,11 +59,9 @@ from .const import (
     SENSORS_PARENTAL_CONTROL,
     SENSORS_PORT_FORWARDING,
     SENSORS_RAM,
-    SENSORS_WAN,
     STATE,
     SYSINFO,
     TEMPERATURE,
-    WAN,
     WLAN,
 )
 
@@ -235,8 +233,8 @@ class ARBridge:
                 SENSORS: await self._get_sensors_modern(AsusData.TEMPERATURE),
                 METHOD: self._get_data_temperature,
             },
-            WAN: {
-                SENSORS: SENSORS_WAN,
+            "wan": {
+                SENSORS: await self._get_sensors_modern(AsusData.WAN),
                 METHOD: self._get_data_wan,
             },
             "wireguard_client": {
@@ -381,7 +379,7 @@ class ARBridge:
     async def _get_data_wan(self) -> dict[str, Any]:
         """Get WAN data from the device."""
 
-        return await self._get_data(AsusData.WAN)
+        return await self._get_data_modern(AsusData.WAN)
 
     async def _get_data_wireguard_client(self) -> dict[str, Any]:
         """Get WireGuard client data from the device."""

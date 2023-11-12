@@ -262,7 +262,7 @@ MODE_SENSORS[ROUTER].extend(
         PARENTAL_CONTROL,
         PORT_FORWARDING,
         VPN,
-        WAN,
+        "wan",
         "wireguard_client",
         "wireguard_server",
     ]
@@ -360,19 +360,14 @@ SENSORS_PORT_FORWARDING = [STATE]
 SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
 SENSORS_SYSINFO = [f"{LOAD_AVG}_{sensor}" for sensor in LABELS_LOAD_AVG]
-SENSORS_WAN = [
-    STATUS,
-    "ip_address",
-    "ip_type",
-    "gateway",
-    "mask",
-    "dns",
-    "private_subnet",
-    "xip",
-    "xtype",
-    "xgateway",
-    "xdns",
-]
+SENSORS_WAN = {
+    "dns": "dns",
+    "expires": "expires",
+    "gateway": "gateway",
+    "ip_address": "ip_address",
+    "lease": "lease",
+    "mask": "mask",
+}
 SENSORS_WIREGUARD_CLIENT = {
     "active": "active",
     "address": "address",
@@ -837,29 +832,38 @@ STATIC_BINARY_SENSORS: list[AREntityDescription] = [
             "wan_list": "list",
         },
     ),
-    # WAN
+    # Internet state
     ARBinarySensorDescription(
-        key="status",
+        key="internet_link",
         key_group="wan",
-        name="WAN",
+        name="Internet",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_registry_enabled_default=True,
         extra_state_attributes={
-            "dns": "dns",
-            "gateway": "gateway",
-            "ip_address": "ip_address",
-            "ip_type": "ip_type",
-            "mask": "mask",
-            "private_subnet": "private_subnet",
-            "xdns": "xdns",
-            "xgateway": "xgateway",
-            "xip": "xip",
-            "xtype": "xip_type",
-            "xmask": "xmask",
+            "internet_ip_address": "ip_address",
+            "internet_unit": "wan_unit",
         },
     ),
 ]
+STATIC_BINARY_SENSORS.extend(
+    [
+        # WAN state
+        ARBinarySensorDescription(
+            key=f"{num}_state",
+            key_group="wan",
+            name=f"WAN{label}",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_link": "link",
+                f"{num}_primary": "primary",
+            },
+        )
+        for num, label in zip((0, 1), ("", " (Secondary)"))
+    ]
+)
 STATIC_BUTTONS: list[ARButtonDescription] = [
     ARButtonDescription(
         key="reboot",
@@ -1034,6 +1038,25 @@ STATIC_SENSORS.extend(
             entity_registry_enabled_default=False,
         )
         for sensor, label in LABELS_LOAD_AVG.items()
+    ]
+)
+# WAN IPs
+STATIC_SENSORS.extend(
+    [
+        ARSensorDescription(
+            key=f"{num}_{extra_key}_ip_address",
+            key_group="wan",
+            name=f"WAN IP{label}{extra_label}",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            entity_registry_enabled_default=False,
+            extra_state_attributes={
+                f"{num}_{extra_key}_{key}": attribute
+                for key, attribute in SENSORS_WAN.items()
+            },
+        )
+        for extra_key, extra_label in zip(("main", "extra"), ("", " (Extra)"))
+        for num, label in zip((0, 1), ("", " (Secondary)"))
     ]
 )
 STATIC_SWITCHES: list[AREntityDescription] = [
