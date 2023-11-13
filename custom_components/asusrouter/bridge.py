@@ -374,7 +374,7 @@ class ARBridge:
     async def _get_data_temperature(self) -> dict[str, Any]:
         """Get temperarture data from the device."""
 
-        return await self._get_data(AsusData.TEMPERATURE)
+        return await self._get_data_modern(AsusData.TEMPERATURE)
 
     async def _get_data_wan(self) -> dict[str, Any]:
         """Get WAN data from the device."""
