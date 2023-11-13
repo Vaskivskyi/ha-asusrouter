@@ -221,10 +221,10 @@ LABELS_LOAD_AVG = {
 }
 LABELS_TEMPERATURE = {
     "cpu": "Temperature CPU",
-    str(Wlan.FREQ_2G): "Temperature 2.4 GHz",
-    str(Wlan.FREQ_5G): "Temperature 5 GHz",
-    str(Wlan.FREQ_5G2): "Temperature 5 GHz-2",
-    str(Wlan.FREQ_6G): "Temperature 6 GHz",
+    Wlan.FREQ_2G: "Temperature 2.4 GHz",
+    Wlan.FREQ_5G: "Temperature 5 GHz",
+    Wlan.FREQ_5G2: "Temperature 5 GHz-2",
+    Wlan.FREQ_6G: "Temperature 6 GHz",
 }
 LABELS_WLAN = {
     WLAN_2GHZ: LABEL_WLAN_2GHZ,
