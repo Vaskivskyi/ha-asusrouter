@@ -516,7 +516,7 @@ def _create_form_security(
 class ARFlowHandler(ConfigFlow, domain=DOMAIN):
     """Handle config flow for AsusRouter."""
 
-    VERSION = 4
+    VERSION = 5
 
     def __init__(self) -> None:
         """Initialise config flow."""

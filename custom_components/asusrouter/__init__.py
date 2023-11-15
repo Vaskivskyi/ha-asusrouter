@@ -79,3 +79,20 @@ async def update_listener(
         await hass.config_entries.async_reload(config_entry.entry_id)
 
     return
+
+
+# Example migration function
+async def async_migrate_entry(hass, config_entry: ConfigEntry):
+    """Migrate old entry."""
+    _LOGGER.debug("Migrating from version %s", config_entry.version)
+
+    if config_entry.version == 4:
+        new_options = {**config_entry.options}
+        new_options["interval_network"] = new_options.pop("interval_network_stat", 30)
+
+        config_entry.version = 5
+        hass.config_entries.async_update_entry(config_entry, options=new_options)
+
+    _LOGGER.debug("Migration to version %s successful", config_entry.version)
+
+    return True
