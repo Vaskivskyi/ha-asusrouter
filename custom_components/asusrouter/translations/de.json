@@ -42,6 +42,8 @@
         "title": "Verbundene Geräte",
         "data": {
           "track_devices": "Geräte-Tracker aktivieren",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
           "interval_devices": "Geräte / AiMesh-Update",
           "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"
@@ -149,6 +151,8 @@
         "title": "Verbundene Geräte",
         "data": {
           "track_devices": "Geräte-Tracker aktivieren",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Anzahl der zuletzt verbundenen Geräte, die gespeichert werden sollen",
           "interval_devices": "Geräte / AiMesh-Update",
           "consider_home": "Betrachten Sie das Gerät zu Hause für (nach dem letzten „Online“-Zustand)"

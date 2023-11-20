@@ -42,6 +42,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Povoliť sledovanie zariadení",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Počet najnovších pripojených zariadení pre uloženie",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)"
@@ -149,6 +151,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Povoliť sledovanie zariadení",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Počet najnovších pripojených zariadení pre uloženie",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)"

@@ -42,6 +42,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Enable device trackers",
+          "force_clients": "Force clients update",
+          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
           "latest_connected": "Number of latest connected devices to store",
           "interval_devices": "Devices / AiMesh update",
           "consider_home": "Consider device at home for (after last 'online' state)"
@@ -149,6 +151,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Enable device trackers",
+          "force_clients": "Force clients update",
+          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
           "latest_connected": "Number of latest connected devices to store",
           "interval_devices": "Devices / AiMesh update",
           "consider_home": "Consider device at home for (after last 'online' state)"
