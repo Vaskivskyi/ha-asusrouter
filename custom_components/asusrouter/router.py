@@ -36,6 +36,8 @@ from .const import (
     AIMESH,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_EVENT,
+    CONF_DEFAULT_FORCE_CLIENTS,
+    CONF_DEFAULT_FORCE_CLIENTS_WAITTIME,
     CONF_DEFAULT_INTERVALS,
     CONF_DEFAULT_LATEST_CONNECTED,
     CONF_DEFAULT_MODE,
@@ -45,6 +47,8 @@ from .const import (
     CONF_DEFAULT_SPLIT_INTERVALS,
     CONF_DEFAULT_TRACK_DEVICES,
     CONF_EVENT_NODE_CONNECTED,
+    CONF_FORCE_CLIENTS,
+    CONF_FORCE_CLIENTS_WAITTIME,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
@@ -343,6 +347,21 @@ class ARDevice:
 
             # Update clients
             await self.update_clients()
+
+            # Force clients settings
+            # This should be done after clients update so that first update is fast
+            force_clients = self._options.get(
+                CONF_FORCE_CLIENTS, CONF_DEFAULT_FORCE_CLIENTS
+            )
+            if force_clients is True:
+                force_clients_waittime = self._options.get(
+                    CONF_FORCE_CLIENTS_WAITTIME, CONF_DEFAULT_FORCE_CLIENTS_WAITTIME
+                )
+                _LOGGER.debug(
+                    "Forcing clients updates with %s s wait time",
+                    force_clients_waittime,
+                )
+                self.bridge.api.set_force_clients(force_clients, force_clients_waittime)
         else:
             _LOGGER.debug(
                 "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
