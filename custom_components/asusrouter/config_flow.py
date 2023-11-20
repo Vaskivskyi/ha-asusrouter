@@ -36,6 +36,8 @@ from .const import (
     CONF_DEFAULT_CACHE_TIME,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_EVENT,
+    CONF_DEFAULT_FORCE_CLIENTS,
+    CONF_DEFAULT_FORCE_CLIENTS_WAITTIME,
     CONF_DEFAULT_HIDE_PASSWORDS,
     CONF_DEFAULT_INTERFACES,
     CONF_DEFAULT_INTERVALS,
@@ -47,6 +49,8 @@ from .const import (
     CONF_DEFAULT_SSL,
     CONF_DEFAULT_TRACK_DEVICES,
     CONF_DEFAULT_USERNAME,
+    CONF_FORCE_CLIENTS,
+    CONF_FORCE_CLIENTS_WAITTIME,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL,
@@ -368,6 +372,16 @@ def _create_form_connected_devices(
             CONF_TRACK_DEVICES,
             default=user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES),
         ): cv.boolean,
+        vol.Required(
+            CONF_FORCE_CLIENTS,
+            default=user_input.get(CONF_FORCE_CLIENTS, CONF_DEFAULT_FORCE_CLIENTS),
+        ): cv.boolean,
+        vol.Required(
+            CONF_FORCE_CLIENTS_WAITTIME,
+            default=user_input.get(
+                CONF_FORCE_CLIENTS_WAITTIME, CONF_DEFAULT_FORCE_CLIENTS_WAITTIME
+            ),
+        ): cv.positive_float,
         vol.Required(
             CONF_LATEST_CONNECTED,
             default=user_input.get(

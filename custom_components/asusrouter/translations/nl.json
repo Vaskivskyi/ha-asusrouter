@@ -42,6 +42,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Activeer apparaat trackers",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
@@ -149,6 +151,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Activeer apparaat trackers",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
