@@ -225,6 +225,10 @@ class ARBridge:
                 METHOD: self._get_data_ports,
             },
             RAM: {SENSORS: SENSORS_RAM, METHOD: self._get_data_ram},
+            "speedtest": {
+                SENSORS: await self._get_sensors_modern(AsusData.SPEEDTEST),
+                METHOD: self._get_data_speedtest,
+            },
             SYSINFO: {
                 SENSORS: await self._get_sensors_modern(AsusData.SYSINFO),
                 METHOD: self._get_data_sysinfo,
@@ -365,6 +369,11 @@ class ARBridge:
         """Get RAM data from the device."""
 
         return await self._get_data(AsusData.RAM)
+
+    async def _get_data_speedtest(self) -> dict[str, Any]:
+        """Get Speedtest data from the device."""
+
+        return await self._get_data(AsusData.SPEEDTEST)
 
     async def _get_data_sysinfo(self) -> dict[str, Any]:
         """Get sysinfo data from the device."""

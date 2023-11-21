@@ -29,6 +29,7 @@ from homeassistant.const import (
     UnitOfDataRate,
     UnitOfInformation,
     UnitOfTemperature,
+    UnitOfTime,
 )
 
 from .dataclass import (
@@ -262,6 +263,7 @@ MODE_SENSORS[ROUTER].extend(
         "ovpn_server",
         PARENTAL_CONTROL,
         PORT_FORWARDING,
+        "speedtest",
         VPN,
         "wan",
         "wireguard_client",
@@ -799,6 +801,7 @@ ICON_PORT_FORWARDING_ON = "mdi:lan-connect"
 ICON_RAM = "mdi:memory"
 ICON_RESTART = "mdi:restart"
 ICON_ROUTER = "mdi:router-network"
+ICON_SPEEDTEST = "mdi:speedometer"
 ICON_TEMPERATURE = "mdi:thermometer"
 ICON_UPDATE = "mdi:update"
 ICON_USB = "mdi:usb-port"
@@ -1030,6 +1033,58 @@ STATIC_SENSORS: list[AREntityDescription] = [
             "free": "free",
             "total": "total",
             "used": "used",
+        },
+    ),
+    # Speedtest
+    ARSensorDescription(
+        key="download_bandwidth",
+        key_group="speedtest",
+        name="Speedtest Download",
+        icon=ICON_SPEEDTEST,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.BITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        suggested_display_precision=3,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "timestamp": "run_time",
+            "download_bytes": "downloaded_bytes",
+        },
+    ),
+    ARSensorDescription(
+        key="upload_bandwidth",
+        key_group="speedtest",
+        name="Speedtest Upload",
+        icon=ICON_SPEEDTEST,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.BITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        suggested_display_precision=3,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "timestamp": "run_time",
+            "upload_bytes": "uploaded_bytes",
+        },
+    ),
+    ARSensorDescription(
+        key="ping_latency",
+        key_group="speedtest",
+        name="Speedtest Ping",
+        icon=ICON_SPEEDTEST,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.MILLISECONDS,
+        suggested_unit_of_measurement=UnitOfTime.MILLISECONDS,
+        suggested_display_precision=3,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "ping_jitter": "jitter",
+            "ping_low": "low",
+            "ping_high": "high",
         },
     ),
     # WAN IP
