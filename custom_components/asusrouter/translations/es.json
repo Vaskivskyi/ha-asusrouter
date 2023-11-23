@@ -42,6 +42,8 @@
         "title": "Dispositivos conectados",
         "data": {
           "track_devices": "Habilitar rastreadores de dispositivo",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos más recientes a almacenar",
           "interval_devices": "Actualización del dispositivo / AiMesh",
           "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')"
@@ -149,6 +151,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Habilitar rastreadores de dispositivo",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos más recientes a almacenar",
           "interval_devices": "Actualización del dispositivo / AiMesh",
           "consider_home": "Considerar dispositivo en casa durante (tras el último estado 'online')"
