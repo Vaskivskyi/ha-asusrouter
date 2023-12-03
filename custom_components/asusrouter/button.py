@@ -78,23 +78,27 @@ class ARButton(ButtonEntity):
     ) -> None:
         """Press button."""
 
+        kwargs = self._state_args if self._state_args is not None else {}
+
         await self._set_state(
             state=self._state,
-            arguments=self._state_args,
             expect_modify=self._state_expect_modify,
+            **kwargs,
         )
 
     async def _set_state(
         self,
         state: AsusState,
-        arguments: Optional[dict[str, Any]] = None,
         expect_modify: bool = False,
+        **kwargs: Any,
     ) -> None:
         """Set switch state."""
 
         try:
             _LOGGER.debug("Pressing %s", state)
-            result = await self.api.async_set_state(state, arguments, expect_modify)
+            result = await self.api.async_set_state(
+                state=state, expect_modify=expect_modify, **kwargs
+            )
             if not result:
                 _LOGGER.debug("Didn't manage to press %s", state)
         except Exception as ex:  # pylint: disable=broad-except
