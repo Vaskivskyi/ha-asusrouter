@@ -153,14 +153,15 @@ class ARBinaryEntity(AREntity):
     async def _set_state(
         self,
         state: AsusState,
-        arguments: Optional[dict[str, Any]] = None,
         expect_modify: bool = False,
+        **kwargs: Any,
     ) -> None:
         """Set switch state."""
-
         try:
             _LOGGER.debug("Setting state to %s", state)
-            result = await self.api.async_set_state(state, arguments, expect_modify)
+            result = await self.api.async_set_state(
+                state=state, expect_modify=expect_modify, **kwargs
+            )
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("State was not set!")
