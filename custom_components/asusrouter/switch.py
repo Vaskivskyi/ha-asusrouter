@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import logging
-from typing import Any, Optional
+from typing import Any
 
-from asusrouter.modules.state import AsusState
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -16,8 +14,6 @@ from .const import CONF_DEFAULT_HIDE_PASSWORDS, CONF_HIDE_PASSWORDS, STATIC_SWIT
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
 from .router import ARDevice
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -67,10 +63,12 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     ) -> None:
         """Turn on switch."""
 
+        kwargs = self._state_on_args if self._state_on_args is not None else {}
+
         await self._set_state(
             state=self._state_on,
-            arguments=self._state_on_args,
             expect_modify=self._state_expect_modify,
+            **kwargs,
         )
 
     async def async_turn_off(
@@ -79,8 +77,10 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     ) -> None:
         """Turn off switch."""
 
+        kwargs = self._state_off_args if self._state_off_args is not None else {}
+
         await self._set_state(
             state=self._state_off,
-            arguments=self._state_off_args,
             expect_modify=self._state_expect_modify,
+            **kwargs,
         )

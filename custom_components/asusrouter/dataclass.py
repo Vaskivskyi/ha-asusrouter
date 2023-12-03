@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from asusrouter.modules.state import AsusState
+from asusrouter.modules.state import AsusState, AsusStateNone
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
@@ -59,9 +59,9 @@ class ARSwitchDescription(AREntityDescription, SwitchEntityDescription):
     icon_on: Optional[str] = None
     icon_off: Optional[str] = None
 
-    state_on: Optional[AsusState] = None
+    state_on: AsusState = AsusStateNone.NONE
     state_on_args: Optional[dict[str, Any]] = None
-    state_off: Optional[AsusState] = None
+    state_off: AsusState = AsusStateNone.NONE
     state_off_args: Optional[dict[str, Any]] = None
 
     state_expect_modify: bool = False
@@ -71,7 +71,7 @@ class ARSwitchDescription(AREntityDescription, SwitchEntityDescription):
 class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
     """Describe AsusRouter button."""
 
-    state: Optional[str] = None
+    state: AsusState = AsusStateNone.NONE
     state_args: Optional[dict[str, Any]] = None
     state_expect_modify: bool = False
 
