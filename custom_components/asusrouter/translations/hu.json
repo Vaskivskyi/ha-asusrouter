@@ -1,214 +1,218 @@
 {
-    "config": {
-        "flow_title": "{name} ({host})",
-        "step": {
-            "find": {
-                "title": "Az eszköz helye",
-                "description": "Hogyan található meg készüléke",
-                "data": {
-                    "host": "Gazdanév / IP-cím"
-                }
-            },
-            "credentials": {
-                "title": "Hitelesítő adatok",
-                "description": "Ugyanaz, mint az eszköz webes felületén",
-                "data": {
-                    "username": "Felhasználónév",
-                    "password": "Jelszó",
-                    "port": "Port (0 az alapértelmezett érték használatához)",
-                    "ssl": "SSL kapcsolat használata"
-                }
-            },
-            "operation": {
-                "title": "Üzemmód",
-                "data": {
-                    "mode": "Eszköz mód",
-                    "enable_control": "Eszközvezérlés engedélyezése",
-                    "split_intervals": "Érzékelőnkénti frissítési időközök engedélyezése"
-                }
-            },
-            "options": {
-                "title": "További beállítások",
-                "menu_options": {
-                    "connected_devices": "Csatlakoztatott eszközök",
-                    "intervals": "Frissítési időközök",
-                    "interfaces": "Interfészek a monitorozáshoz",
-                    "events": "Home Assistant események",
-                    "security": "Biztonsági beállítások",
-                    "finish": "Mentés és bezárás"
-                }
-            },
-            "connected_devices": {
-                "title": "Csatlakoztatott eszközök",
-                "data": {
-                    "track_devices": "Eszközkövetők engedélyezése",
-                    "latest_connected": "A legutóbb csatlakoztatott eszközök tárolásának maximális száma",
-                    "interval_devices": "Eszközök / AiMesh frissítés",
-                    "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
-                }
-            },
-            "intervals": {
-                "title": "Frissítési időközök",
-                "description": "Az értékek másodpercben vannak megadva",
-                "data": {
-                    "cache_time": "Gyorsítótárazási idő",
-                    "scan_interval": "Az entitások frissítése",
-                    "interval_cpu": "CPU adatok",
-                    "interval_firmware": "Firmware adatok",
-                    "interval_gwlan": "GWLAN intervallum",
-                    "interval_light": "LED adatok",
-                    "interval_misc": "Egyéb adatok",
-                    "interval_network": "Hálózati statisztikai adatok",
-                    "interval_parental_control": "Szülői felügyeleti adatok",
-                    "interval_ports": "Portok adatai",
-                    "interval_ram": "RAM adatok",
-                    "interval_sysinfo": "Rendszerinfo adatok",
-                    "interval_temperature": "Hőmérséklet adatok",
-                    "interval_vpn": "VPN adat",
-                    "interval_wan": "WAN adat",
-                    "interval_wlan": "WLAN adat"
-                }
-            },
-            "interfaces": {
-                "title": "Interfészek a monitorozáshoz",
-                "data": {
-                    "interfaces": "Válassza ki a figyelni kívánt hálózati interfészeket",
-                    "units_speed": "Sebesség mértékegységei",
-                    "units_traffic": "Egységek a forgalom számára"
-                }
-            },
-            "events": {
-                "title": "Események",
-                "description": "Milyen eseményeket kell felvetni",
-                "data": {
-                    "device_connected": "Eszköz csatlakoztatva (új eszköz)",
-                    "device_disconnected": "Az eszköz leválasztva",
-                    "device_reconnected": "Az eszköz újracsatlakozva",
-                    "node_connected": "AiMesh csomópont csatlakoztatva (új eszköz)",
-                    "node_disconnected": "Az AiMesh csomópont nem csatlakozik",
-                    "node_reconnected": "Az AiMesh csomópont újracsatlakozva"
-                }
-            },
-            "security": {
-                "title": "Biztonság",
-                "data": {
-                    "hide_passwords": "Jelszavak elrejtése az érzékelők és attribútumok elől"
-                }
-            }
-        },
-        "error": {
-            "cannot_resolve_host": "Nem lehet sikerült hálózati nevévvel. Próbálja meg IP címmel",
-            "connection_refused": "Kapcsolódás elutasítva",
-            "error": "Nem sikerült csatlakozni",
-            "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
-            "password_missing": "Hiányzó jelszó",
-            "unknown": "Ismeretlen hiba",
-            "wrong_credentials": "Nem megfelelő hitelesítő adatok"
-        },
-        "abort": {
-            "already_configured": "Az eszköz már konfigurálva van",
-            "no_serial": "Ez a készülék nem közölt sorozatszámot. A felfedezés megszakadt",
-            "not_router": "Nem Asus router, az eszköz nem konfigurálható."
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Az eszköz helye",
+        "description": "Hogyan található meg készüléke",
+        "data": {
+          "host": "Gazdanév / IP-cím"
         }
+      },
+      "credentials": {
+        "title": "Hitelesítő adatok",
+        "description": "Ugyanaz, mint az eszköz webes felületén",
+        "data": {
+          "username": "Felhasználónév",
+          "password": "Jelszó",
+          "port": "Port (0 az alapértelmezett érték használatához)",
+          "ssl": "SSL kapcsolat használata"
+        }
+      },
+      "operation": {
+        "title": "Üzemmód",
+        "data": {
+          "mode": "Eszköz mód",
+          "enable_control": "Eszközvezérlés engedélyezése",
+          "split_intervals": "Érzékelőnkénti frissítési időközök engedélyezése"
+        }
+      },
+      "options": {
+        "title": "További beállítások",
+        "menu_options": {
+          "connected_devices": "Csatlakoztatott eszközök",
+          "intervals": "Frissítési időközök",
+          "interfaces": "Interfészek a monitorozáshoz",
+          "events": "Home Assistant események",
+          "security": "Biztonsági beállítások",
+          "finish": "Mentés és bezárás"
+        }
+      },
+      "connected_devices": {
+        "title": "Csatlakoztatott eszközök",
+        "data": {
+          "track_devices": "Eszközkövetők engedélyezése",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
+          "latest_connected": "A legutóbb csatlakoztatott eszközök tárolásának maximális száma",
+          "interval_devices": "Eszközök / AiMesh frissítés",
+          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
+        }
+      },
+      "intervals": {
+        "title": "Frissítési időközök",
+        "description": "Az értékek másodpercben vannak megadva",
+        "data": {
+          "cache_time": "Gyorsítótárazási idő",
+          "scan_interval": "Az entitások frissítése",
+          "interval_cpu": "CPU adatok",
+          "interval_firmware": "Firmware adatok",
+          "interval_gwlan": "GWLAN intervallum",
+          "interval_light": "LED adatok",
+          "interval_misc": "Egyéb adatok",
+          "interval_network": "Hálózati statisztikai adatok",
+          "interval_parental_control": "Szülői felügyeleti adatok",
+          "interval_ports": "Portok adatai",
+          "interval_ram": "RAM adatok",
+          "interval_sysinfo": "Rendszerinfo adatok",
+          "interval_temperature": "Hőmérséklet adatok",
+          "interval_vpn": "VPN adat",
+          "interval_wan": "WAN adat",
+          "interval_wlan": "WLAN adat"
+        }
+      },
+      "interfaces": {
+        "title": "Interfészek a monitorozáshoz",
+        "data": {
+          "interfaces": "Válassza ki a figyelni kívánt hálózati interfészeket",
+          "units_speed": "Sebesség mértékegységei",
+          "units_traffic": "Egységek a forgalom számára"
+        }
+      },
+      "events": {
+        "title": "Események",
+        "description": "Milyen eseményeket kell felvetni",
+        "data": {
+          "device_connected": "Eszköz csatlakoztatva (új eszköz)",
+          "device_disconnected": "Az eszköz leválasztva",
+          "device_reconnected": "Az eszköz újracsatlakozva",
+          "node_connected": "AiMesh csomópont csatlakoztatva (új eszköz)",
+          "node_disconnected": "Az AiMesh csomópont nem csatlakozik",
+          "node_reconnected": "Az AiMesh csomópont újracsatlakozva"
+        }
+      },
+      "security": {
+        "title": "Biztonság",
+        "data": {
+          "hide_passwords": "Jelszavak elrejtése az érzékelők és attribútumok elől"
+        }
+      }
     },
-    "options": {
-        "step": {
-            "options": {
-                "title": "A módosítandó konfigurációk",
-                "menu_options": {
-                    "credentials": "Hitelesítési adatok és kapcsolat",
-                    "operation": "Üzemmód",
-                    "connected_devices": "Csatlakoztatott eszközök",
-                    "intervals": "Frissítési időközök",
-                    "interfaces": "Interfészek a monitorozáshoz",
-                    "events": "Home Assistant események",
-                    "security": "Biztonsági beállítások",
-                    "finish": "Mentés és bezárás"
-                }
-            },
-            "credentials": {
-                "title": "Hitelesítő adatok",
-                "description": "Ugyanaz, mint az eszköz webpaneljénél",
-                "data": {
-                    "username": "Felhasználónév",
-                    "password": "Jelszó",
-                    "port": "Port (0 az alapértelmezett érték használatához)",
-                    "ssl": "SSL kapcsolat használata"
-                }
-            },
-            "operation": {
-                "title": "Üzemmód",
-                "data": {
-                    "mode": "Eszköz mód",
-                    "enable_control": "Eszközvezérlés engedélyezése",
-                    "split_intervals": "Érzékelőnkénti frissítési időközök engedélyezése"
-                }
-            },
-            "connected_devices": {
-                "title": "Csatlakoztatott eszközök",
-                "data": {
-                    "track_devices": "Eszközkövetők engedélyezése",
-                    "latest_connected": "A legutóbb tárolandó csatlakoztatott eszközök száma",
-                    "interval_devices": "Eszközök / AiMesh frissítés",
-                    "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
-                }
-            },
-            "intervals": {
-                "title": "Frissítési időközök",
-                "description": "Az értékeket másodpercben adja meg",
-                "data": {
-                    "cache_time": "Gyorsítótárazási idő",
-                    "scan_interval": "Az entitások frissítése",
-                    "interval_cpu": "CPU adatok",
-                    "interval_firmware": "Firmware adatok",
-                    "interval_gwlan": "GWLAN intervallum",
-                    "interval_light": "LED adatok",
-                    "interval_misc": "Egyéb adatok",
-                    "interval_network": "Hálózati statisztikai adatok",
-                    "interval_parental_control": "Szülői felügyeleti adatok",
-                    "interval_ports": "Portok adatai",
-                    "interval_ram": "RAM adatok",
-                    "interval_sysinfo": "Rendszerinfó adatok",
-                    "interval_temperature": "Hőmérséklet adatok",
-                    "interval_vpn": "VPN adatok",
-                    "interval_wan": "WAN adatok",
-                    "interval_wlan": "WLAN adatok"
-                }
-            },
-            "interfaces": {
-                "title": "Interfészek a monitorozáshoz",
-                "data": {
-                    "interfaces": "Válassza ki a figyelni kívánt hálózati interfészeket",
-                    "units_speed": "Sebesség mértékegységei",
-                    "units_traffic": "Egységek a forgalom számára"
-                }
-            },
-            "events": {
-                "title": "Események",
-                "description": "Milyen eseményeket kell felvetni",
-                "data": {
-                    "device_connected": "Eszköz csatlakoztatva (új eszköz)",
-                    "device_disconnected": "Az eszköz leválasztva",
-                    "device_reconnected": "Az eszköz újracsatlakozva",
-                    "node_connected": "AiMesh csomópont csatlakoztatva (új eszköz)",
-                    "node_disconnected": "Az AiMesh csomópont nem csatlakozik",
-                    "node_reconnected": "Az AiMesh csomópont újracsatlakozva"
-                }
-            },
-            "security": {
-                "title": "Biztonság",
-                "data": {
-                    "hide_passwords": "Jelszavak elrejtése az érzékelők és attribútumok elől"
-                }
-            }
-        },
-        "error": {
-            "connection_refused": "Kapcsolódás elutasítva",
-            "error": "Nem sikerült csatlakozni",
-            "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
-            "not_confirmed": "Meg kell erősíteni",
-            "unknown": "Ismeretlen hiba",
-            "wrong_credentials": "Nem megfelelő hitelesítő adatok"
-        }
+    "error": {
+      "cannot_resolve_host": "Nem lehet sikerült hálózati nevévvel. Próbálja meg IP címmel",
+      "connection_refused": "Kapcsolódás elutasítva",
+      "error": "Nem sikerült csatlakozni",
+      "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
+      "password_missing": "Hiányzó jelszó",
+      "unknown": "Ismeretlen hiba",
+      "wrong_credentials": "Nem megfelelő hitelesítő adatok"
+    },
+    "abort": {
+      "already_configured": "Az eszköz már konfigurálva van",
+      "no_serial": "Ez a készülék nem közölt sorozatszámot. A felfedezés megszakadt",
+      "not_router": "Nem Asus router, az eszköz nem konfigurálható."
     }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "A módosítandó konfigurációk",
+        "menu_options": {
+          "credentials": "Hitelesítési adatok és kapcsolat",
+          "operation": "Üzemmód",
+          "connected_devices": "Csatlakoztatott eszközök",
+          "intervals": "Frissítési időközök",
+          "interfaces": "Interfészek a monitorozáshoz",
+          "events": "Home Assistant események",
+          "security": "Biztonsági beállítások",
+          "finish": "Mentés és bezárás"
+        }
+      },
+      "credentials": {
+        "title": "Hitelesítő adatok",
+        "description": "Ugyanaz, mint az eszköz webpaneljénél",
+        "data": {
+          "username": "Felhasználónév",
+          "password": "Jelszó",
+          "port": "Port (0 az alapértelmezett érték használatához)",
+          "ssl": "SSL kapcsolat használata"
+        }
+      },
+      "operation": {
+        "title": "Üzemmód",
+        "data": {
+          "mode": "Eszköz mód",
+          "enable_control": "Eszközvezérlés engedélyezése",
+          "split_intervals": "Érzékelőnkénti frissítési időközök engedélyezése"
+        }
+      },
+      "connected_devices": {
+        "title": "Csatlakoztatott eszközök",
+        "data": {
+          "track_devices": "Eszközkövetők engedélyezése",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
+          "latest_connected": "A legutóbb tárolandó csatlakoztatott eszközök száma",
+          "interval_devices": "Eszközök / AiMesh frissítés",
+          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
+        }
+      },
+      "intervals": {
+        "title": "Frissítési időközök",
+        "description": "Az értékeket másodpercben adja meg",
+        "data": {
+          "cache_time": "Gyorsítótárazási idő",
+          "scan_interval": "Az entitások frissítése",
+          "interval_cpu": "CPU adatok",
+          "interval_firmware": "Firmware adatok",
+          "interval_gwlan": "GWLAN intervallum",
+          "interval_light": "LED adatok",
+          "interval_misc": "Egyéb adatok",
+          "interval_network": "Hálózati statisztikai adatok",
+          "interval_parental_control": "Szülői felügyeleti adatok",
+          "interval_ports": "Portok adatai",
+          "interval_ram": "RAM adatok",
+          "interval_sysinfo": "Rendszerinfó adatok",
+          "interval_temperature": "Hőmérséklet adatok",
+          "interval_vpn": "VPN adatok",
+          "interval_wan": "WAN adatok",
+          "interval_wlan": "WLAN adatok"
+        }
+      },
+      "interfaces": {
+        "title": "Interfészek a monitorozáshoz",
+        "data": {
+          "interfaces": "Válassza ki a figyelni kívánt hálózati interfészeket",
+          "units_speed": "Sebesség mértékegységei",
+          "units_traffic": "Egységek a forgalom számára"
+        }
+      },
+      "events": {
+        "title": "Események",
+        "description": "Milyen eseményeket kell felvetni",
+        "data": {
+          "device_connected": "Eszköz csatlakoztatva (új eszköz)",
+          "device_disconnected": "Az eszköz leválasztva",
+          "device_reconnected": "Az eszköz újracsatlakozva",
+          "node_connected": "AiMesh csomópont csatlakoztatva (új eszköz)",
+          "node_disconnected": "Az AiMesh csomópont nem csatlakozik",
+          "node_reconnected": "Az AiMesh csomópont újracsatlakozva"
+        }
+      },
+      "security": {
+        "title": "Biztonság",
+        "data": {
+          "hide_passwords": "Jelszavak elrejtése az érzékelők és attribútumok elől"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "Kapcsolódás elutasítva",
+      "error": "Nem sikerült csatlakozni",
+      "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
+      "not_confirmed": "Meg kell erősíteni",
+      "unknown": "Ismeretlen hiba",
+      "wrong_credentials": "Nem megfelelő hitelesítő adatok"
+    }
+  }
 }

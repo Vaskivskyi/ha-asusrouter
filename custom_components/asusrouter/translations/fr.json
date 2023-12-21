@@ -42,6 +42,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Activer le suivis des périphériques",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nombre d'appareils connectés les plus récents à stocker",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)"
@@ -149,6 +151,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Activer le suivis des périphériques",
+          "force_clients": "[NT] Force clients update",
+          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nombre d'appareils connectés les plus récents à stocker",
           "interval_devices": "[NT] Devices / AiMesh update",
           "consider_home": "Considérez l'appareil à la maison pour (après le dernier état « en ligne »)"
