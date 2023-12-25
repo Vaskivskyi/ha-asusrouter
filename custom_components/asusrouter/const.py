@@ -239,24 +239,29 @@ LABELS_WLAN = {
 
 # MODES -->
 
-MODE_SENSORS = {
-    NODE: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-    ],
-}
-MODE_SENSORS[ACCESS_POINT] = MODE_SENSORS[NODE]
-MODE_SENSORS[ACCESS_POINT].extend([WLAN])
-MODE_SENSORS[MEDIA_BRIDGE] = MODE_SENSORS[ACCESS_POINT]
-MODE_SENSORS[ROUTER] = MODE_SENSORS[ACCESS_POINT]
-MODE_SENSORS[ROUTER].extend(
+# AiMesh Node
+MODE_NODE = [
+    BOOTTIME,
+    CPU,
+    FIRMWARE,
+    LED,
+    NETWORK,
+    PORTS,
+    RAM,
+    SYSINFO,
+    TEMPERATURE,
+]
+
+# Access Point
+MODE_ACCESS_POINT = MODE_NODE.copy()
+MODE_ACCESS_POINT.extend([WLAN])
+
+# Media Bridge
+MODE_MEDIA_BRIDGE = MODE_ACCESS_POINT.copy()
+
+# Router
+MODE_ROUTER = MODE_ACCESS_POINT.copy()
+MODE_ROUTER.extend(
     [
         GWLAN,
         "ovpn_client",
@@ -270,6 +275,13 @@ MODE_SENSORS[ROUTER].extend(
         "wireguard_server",
     ]
 )
+
+MODE_SENSORS = {
+    ACCESS_POINT: MODE_ACCESS_POINT,
+    MEDIA_BRIDGE: MODE_MEDIA_BRIDGE,
+    NODE: MODE_NODE,
+    ROUTER: MODE_ROUTER,
+}
 
 # <-- MODES
 
