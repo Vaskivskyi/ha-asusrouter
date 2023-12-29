@@ -19,7 +19,7 @@ from homeassistant.const import (
     CONF_SSL,
     Platform,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import format_mac
@@ -370,6 +370,9 @@ class ARDevice:
         # Initialize sensor coordinators
         await self._init_sensor_coordinators()
 
+        # Initialize services
+        await self._init_services()
+
         # On-close parameters
         self.async_on_close(
             async_track_time_interval(
@@ -608,6 +611,20 @@ class ARDevice:
         async_dispatcher_send(self.hass, self.signal_aimesh_update)
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
+
+    async def _init_services(self) -> None:
+        """Initialize AsusRouter services."""
+
+        # Parental control service
+        async def async_service_device_internet_access(service: ServiceCall):
+            """Adjust device internet access."""
+
+            await self.bridge.async_pc_rule(raw=service.data)
+
+        if self._mode == ROUTER:
+            self.hass.services.async_register(
+                DOMAIN, "device_internet_access", async_service_device_internet_access
+            )
 
     async def _init_sensor_coordinators(self) -> None:
         """Initialize sensor coordinators."""

@@ -1,0 +1,19 @@
+device_internet_access:
+  fields:
+    entities:
+      required: true
+      selector:
+        entity:
+          integration: asusrouter
+          domain: device_tracker
+          multiple: true
+    state:
+      required: true
+      selector:
+        select:
+          translation_key: set_pc_rule
+          mode: dropdown
+          options:
+            - value: block
+            - value: allow
+            - value: remove
