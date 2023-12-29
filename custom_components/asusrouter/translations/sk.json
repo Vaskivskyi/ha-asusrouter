@@ -215,5 +215,30 @@
       "unknown": "Neznámá chyba",
       "wrong_credentials": "Chybné prihlasovacie údaje"
     }
+  },
+  "services": {
+    "device_internet_access": {
+      "name": "Device internet access control",
+      "description": "Change device internet access using parental control feature of the router. Please, refer to the documentation for the additional possible parameters",
+      "fields": {
+        "entities": {
+          "name": "Entities",
+          "description": "Select device(s) to change internet access settings"
+        },
+        "state": {
+          "name": "State",
+          "description": "Set the state for the device(s)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "set_pc_rule": {
+      "options": {
+        "allow": "Allow access",
+        "block": "Block access",
+        "remove": "Remove rule from the list"
+      }
+    }
   }
 }
