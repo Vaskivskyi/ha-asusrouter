@@ -25,22 +25,6 @@ from .helpers import clean_dict
 class ARClient:
     """AsussRouter Client class."""
 
-    # To be recieved from the device
-    # Client description
-    description: Optional[AsusClientDescription] = None
-    # Connection description - AsusClientConnection / AsusClientConnectionWlan
-    connection: Optional[AsusClientConnection] = None
-
-    # To be generated for other parts of the integration
-    _identity: Optional[dict[str, Any]] = None
-    _extra_state_attributes: dict[str, Any] = {}
-
-    # Connection state
-    _state: ConnectionState = ConnectionState.UNKNOWN
-
-    # Device last active
-    _last_activity: Optional[datetime] = None
-
     def __init__(
         self,
         mac: str,
@@ -50,6 +34,22 @@ class ARClient:
 
         self._mac = mac
         self._name = name
+
+        # To be recieved from the device
+        # Client description
+        self.description: Optional[AsusClientDescription] = None
+        # Connection description - AsusClientConnection / AsusClientConnectionWlan
+        self.connection: Optional[AsusClientConnection] = None
+
+        # To be generated for other parts of the integration
+        self._identity: Optional[dict[str, Any]] = None
+        self._extra_state_attributes: dict[str, Any] = {}
+
+        # Connection state
+        self._state: ConnectionState = ConnectionState.UNKNOWN
+
+        # Device last active
+        self._last_activity: Optional[datetime] = None
 
     @callback
     def update(
