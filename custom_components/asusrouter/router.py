@@ -775,7 +775,6 @@ class ARDevice:
 
         # Check that data is provided
         raw = kwargs.get("raw", None)
-        _LOGGER.warning("Raw data: %s", raw)
         if raw is None:
             return
 
