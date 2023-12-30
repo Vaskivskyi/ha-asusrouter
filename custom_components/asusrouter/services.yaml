@@ -17,3 +17,16 @@ device_internet_access:
             - "block"
             - "allow"
             - "remove"
+remove_trackers:
+  name: Remove device trackers
+  description: This service allows removing device_tracker entities. Please, keep in mind, when run, the service will remove selected trackers from watching and will allow you to remove the entities manually.
+  fields:
+    entities:
+      name: Entities
+      description: Entities to remove
+      required: true
+      selector:
+        entity:
+          integration: asusrouter
+          domain: device_tracker
+          multiple: true
