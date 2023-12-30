@@ -626,6 +626,16 @@ class ARDevice:
                 DOMAIN, "device_internet_access", async_service_device_internet_access
             )
 
+        # Remove device trackers service
+        async def async_service_remove_trackers(service: ServiceCall):
+            """Remove device trackers."""
+
+            await self.remove_trackers(raw=service.data)
+
+        self.hass.services.async_register(
+            DOMAIN, "remove_trackers", async_service_remove_trackers
+        )
+
     async def _init_sensor_coordinators(self) -> None:
         """Initialize sensor coordinators."""
 
@@ -783,15 +793,15 @@ class ARDevice:
                     self._clients.pop(mac)
                     _LOGGER.debug("Found and removed")
 
-        # Update devices
-        await self.update_devices()
+        # Update clients
+        await self.update_clients()
 
         # Reload device tracker platform
         unload = await self.hass.config_entries.async_unload_platforms(
             self._config_entry, [Platform.DEVICE_TRACKER]
         )
         if unload:
-            self.hass.config_entries.async_setup_platforms(
+            await self.hass.config_entries.async_forward_entry_setups(
                 self._config_entry, [Platform.DEVICE_TRACKER]
             )
 
