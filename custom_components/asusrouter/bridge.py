@@ -342,7 +342,7 @@ class ARBridge:
 
         return await self._get_data(AsusData.OPENVPN_SERVER)
 
-    async def _get_data_parental_control(self) -> dict[str, dict[str, int]]:
+    async def _get_data_parental_control(self) -> dict[str, Any]:
         """Get parental control data from the device."""
 
         return await self._get_data(
