@@ -10,6 +10,7 @@ from typing import Any, Optional
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.identity import AsusDevice
+from asusrouter.modules.parental_control import ParentalControlRule
 from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -34,7 +35,9 @@ from .client import ARClient
 from .const import (
     ACCESS_POINT,
     AIMESH,
+    CONF_CREATE_DEVICES,
     CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
     CONF_DEFAULT_FORCE_CLIENTS,
     CONF_DEFAULT_FORCE_CLIENTS_WAITTIME,
@@ -280,6 +283,13 @@ class ARDevice:
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
 
+        # Client features
+        self.client_devices: bool = self._options.get(
+            CONF_CREATE_DEVICES,
+            CONF_DEFAULT_CREATE_DEVICES,
+        )
+        self._pc_rules: dict[str, Any] = {}
+
         # On-close parameters
         self._on_close: list[Callable] = []
 
@@ -348,6 +358,9 @@ class ARDevice:
             # Update clients
             await self.update_clients()
 
+            # Update parental control
+            await self.update_pc_rules()
+
             # Force clients settings
             # This should be done after clients update so that first update is fast
             force_clients = self._options.get(
@@ -395,6 +408,7 @@ class ARDevice:
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             await self.update_clients()
             await self.update_nodes()
+            await self.update_pc_rules()
 
     async def update_clients(self) -> None:
         """Update AsusRouter clients."""
@@ -564,7 +578,7 @@ class ARDevice:
             if not self._connect_error:
                 self._connect_error = True
                 _LOGGER.error(
-                    "Error connecting to '%s' for device update: %s",
+                    "Error connecting to '%s' for aimesh update: %s",
                     self._conf_host,
                     ex,
                 )
@@ -612,6 +626,51 @@ class ARDevice:
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
+    async def update_pc_rules(self) -> None:
+        """Update parental control rules."""
+
+        _LOGGER.debug("Updating parental control rules for '%s'", self._conf_host)
+        try:
+            pc_data = (
+                await self.bridge._get_data_parental_control()  # pylint: disable=protected-access
+            )
+        except UpdateFailed as ex:
+            if not self._connect_error:
+                self._connect_error = True
+                _LOGGER.error(
+                    "Error connecting to '%s' for pc rules update: %s",
+                    self._conf_host,
+                    ex,
+                )
+            return
+
+        new_flag = False
+
+        rules = pc_data.get("rules", {})
+
+        rules_to_save = {}
+
+        # Update existing rules
+        for mac, rule in self._pc_rules.items():
+            rule = rules.pop(mac, None)
+            if rule is None:
+                # If the rule was removed
+                new_flag = True
+                continue
+            rules_to_save[mac] = rule
+
+        # Add new rules
+        for mac, rule in rules.items():
+            new_flag = True
+            rules_to_save[mac] = rule
+
+        # Save rules
+        self._pc_rules = rules_to_save
+
+        async_dispatcher_send(self.hass, self.signal_pc_rules_update)
+        if new_flag:
+            async_dispatcher_send(self.hass, self.signal_pc_rules_new)
+
     async def _init_services(self) -> None:
         """Initialize AsusRouter services."""
 
@@ -620,6 +679,19 @@ class ARDevice:
             """Adjust device internet access."""
 
             await self.bridge.async_pc_rule(raw=service.data)
+
+            # Force PC rules update
+            await self.update_pc_rules()
+
+            # In case of removing rule(s) we need to reload the platform
+            if service.data.get("state") == "remove":
+                unload = await self.hass.config_entries.async_unload_platforms(
+                    self._config_entry, [Platform.SWITCH]
+                )
+                if unload:
+                    await self.hass.config_entries.async_forward_entry_setups(
+                        self._config_entry, [Platform.SWITCH]
+                    )
 
         if self._mode == ROUTER:
             self.hass.services.async_register(
@@ -847,6 +919,18 @@ class ARDevice:
         return f"{DOMAIN}-device-update"
 
     @property
+    def signal_pc_rules_new(self) -> str:
+        """Notify new parental control rules."""
+
+        return f"{DOMAIN}-pc-rules-new"
+
+    @property
+    def signal_pc_rules_update(self) -> str:
+        """Notify updated parental control rules."""
+
+        return f"{DOMAIN}-pc-rules-update"
+
+    @property
     def aimesh(self) -> dict[str, Any]:
         """Return AiMesh nodes."""
 
@@ -863,6 +947,12 @@ class ARDevice:
         """Router MAC address."""
 
         return self._mac
+
+    @property
+    def pc_rules(self) -> dict[str, ParentalControlRule]:
+        """Return parental control rules."""
+
+        return self._pc_rules
 
     @property
     def sensor_coordinator(self) -> dict[str, Any]:

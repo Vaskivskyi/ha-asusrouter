@@ -46,7 +46,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
           "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
+          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -155,7 +156,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Počet nejnovějších připojených zařízení k uložení",
           "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)"
+          "consider_home": "Považovat zařízení že je doma (po posledním 'online' stavu)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
