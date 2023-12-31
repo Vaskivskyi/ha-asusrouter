@@ -646,7 +646,7 @@ class ARDevice:
 
         new_flag = False
 
-        rules = pc_data.get("rules", {})
+        rules: dict[str, ParentalControlRule] = pc_data.get("rules", {})
 
         rules_to_save = {}
 
@@ -663,6 +663,13 @@ class ARDevice:
         for mac, rule in rules.items():
             new_flag = True
             rules_to_save[mac] = rule
+
+        # Check the rules for non-valid ones
+        rules_to_save = {
+            mac: rule
+            for mac, rule in rules_to_save.items()
+            if mac != "" and rule.mac is not None
+        }
 
         # Save rules
         self._pc_rules = rules_to_save
