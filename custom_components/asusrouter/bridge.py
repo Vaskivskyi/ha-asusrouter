@@ -437,6 +437,7 @@ class ARBridge:
 
         data = convert_to_ha_data(raw)
         data["list"] = rules_list.copy()
+        data["block_all"] = convert_to_ha_state_bool(raw.get("block_all"))
 
         return data
 

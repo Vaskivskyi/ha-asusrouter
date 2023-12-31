@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import AsusParentalControl
+from asusrouter.modules.parental_control import AsusBlockAll, AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
 from asusrouter.modules.wireguard import AsusWireGuardClient, AsusWireGuardServer
@@ -370,7 +370,7 @@ SENSORS_OVPN_SERVER = {
     "unit": "unit",
 }
 
-SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PARENTAL_CONTROL = ["block_all", STATE]
 SENSORS_PORT_FORWARDING = [STATE]
 SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
@@ -1178,6 +1178,18 @@ STATIC_SENSORS.extend(
     ]
 )
 STATIC_SWITCHES: list[AREntityDescription] = [
+    # Block Internet
+    ARSwitchDescription(
+        key="block_all",
+        key_group="parental_control",
+        name="Block Internet",
+        icon_on=ICON_INTERNET_ACCESS_OFF,
+        state_on=AsusBlockAll.ON,
+        icon_off=ICON_INTERNET_ACCESS_ON,
+        state_off=AsusBlockAll.OFF,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
+    ),
     # Parental control
     ARSwitchDescription(
         key="state",
@@ -1192,7 +1204,7 @@ STATIC_SWITCHES: list[AREntityDescription] = [
         extra_state_attributes={
             "list": "list",
         },
-    )
+    ),
 ]
 STATIC_SWITCHES.extend(
     [
