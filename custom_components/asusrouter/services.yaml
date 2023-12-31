@@ -1,7 +1,7 @@
 device_internet_access:
   fields:
     entities:
-      required: true
+      required: false
       selector:
         entity:
           integration: asusrouter

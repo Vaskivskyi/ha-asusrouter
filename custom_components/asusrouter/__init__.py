@@ -7,6 +7,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 
 from .const import ASUSROUTER, DOMAIN, PLATFORMS, STOP_LISTENER
 from .router import ARDevice
@@ -84,6 +85,7 @@ async def update_listener(
 # Example migration function
 async def async_migrate_entry(hass, config_entry: ConfigEntry):
     """Migrate old entry."""
+
     _LOGGER.debug("Migrating from version %s", config_entry.version)
 
     if config_entry.version == 4:
@@ -94,5 +96,17 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
         hass.config_entries.async_update_entry(config_entry, options=new_options)
 
     _LOGGER.debug("Migration to version %s successful", config_entry.version)
+
+    return True
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Remove a device."""
+
+    # This would actually work and should not provide any issues
+
+    _LOGGER.debug("Removing device")
 
     return True

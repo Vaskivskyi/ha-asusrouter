@@ -46,7 +46,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
           "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
+          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -155,7 +156,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Nummer van laatst verbonden apparaat opslaan?",
           "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)"
+          "consider_home": "Overweeg apparaat als thuis voor (na laatste 'online' staat)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {

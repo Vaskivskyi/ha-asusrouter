@@ -426,16 +426,18 @@ class ARBridge:
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `parental control` data."""
 
-        data: dict[str, Any] = {}
-        data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
-        devices = []
+        rules_list = []
         rules = raw.get("rules")
         if rules is not None:
             for rule in raw["rules"]:
                 device = dataclasses.asdict(raw["rules"][rule])
                 device.pop("timemap")
-                devices.append(device)
-        data[LIST] = devices.copy()
+                device["type"] = device["type"].name.lower()
+                rules_list.append(device)
+
+        data = convert_to_ha_data(raw)
+        data["list"] = rules_list.copy()
+
         return data
 
     @staticmethod
