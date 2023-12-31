@@ -46,7 +46,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "A legutóbb csatlakoztatott eszközök tárolásának maximális száma",
           "interval_devices": "Eszközök / AiMesh frissítés",
-          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
+          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -154,7 +155,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "A legutóbb tárolandó csatlakoztatott eszközök száma",
           "interval_devices": "Eszközök / AiMesh frissítés",
-          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)"
+          "consider_home": "Otthon van az eszköz (az utolsó „online” állapot utáni megállapítás)",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {

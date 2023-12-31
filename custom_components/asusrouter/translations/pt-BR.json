@@ -46,7 +46,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos conectatos recentemente a armazenar",
           "interval_devices": "Atualização de dispositivos / AiMesh",
-          "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')"
+          "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -155,7 +156,8 @@
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos conectatos recentemente a armazenar",
           "interval_devices": "Atualização de dispositivos / AiMesh",
-          "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')"
+          "consider_home": "Considere um dispositivo em casa após (desde o último estado 'online')",
+          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {

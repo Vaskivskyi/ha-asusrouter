@@ -446,6 +446,7 @@ CONF_CACHE_TIME = "cache_time"
 CONF_CERT_PATH = "cert_path"
 CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
+CONF_CREATE_DEVICES = "create_devices"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_EVENT_DEVICE_CONNECTED = "device_connected"
 CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
@@ -486,6 +487,7 @@ CONF_UNITS_TRAFFIC = "units_traffic"
 # Defaults
 CONF_DEFAULT_CACHE_TIME = 5
 CONF_DEFAULT_CONSIDER_HOME = 45
+CONF_DEFAULT_CREATE_DEVICES = False
 CONF_DEFAULT_ENABLE_CONTROL = False
 CONF_DEFAULT_EVENT: dict[str, bool] = {
     CONF_EVENT_DEVICE_CONNECTED: True,
@@ -538,6 +540,7 @@ CONF_REQ_RELOAD = [
     CONF_CERT_PATH,
     CONF_CONFIRM,
     CONF_CONSIDER_HOME,
+    CONF_CREATE_DEVICES,
     CONF_ENABLE_CONTROL,
     CONF_FORCE_CLIENTS,
     CONF_FORCE_CLIENTS_WAITTIME,
@@ -801,6 +804,8 @@ ICON_DEVICES = "mdi:devices"
 ICON_DUALWAN = "mdi:call-split"
 ICON_ETHERNET_ON = "mdi:ethernet-cable"
 ICON_ETHERNET_OFF = "mdi:ethernet-cable-off"
+ICON_INTERNET_ACCESS_OFF = "mdi:lock-outline"
+ICON_INTERNET_ACCESS_ON = "mdi:lock-open-variant-outline"
 ICON_IP = "mdi:ip"
 ICON_LIGHT_OFF = "mdi:led-off"
 ICON_LIGHT_ON = "mdi:led-on"
