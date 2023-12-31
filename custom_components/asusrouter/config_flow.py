@@ -33,8 +33,10 @@ from .const import (
     BASE,
     CONF_CACHE_TIME,
     CONF_CONSIDER_HOME,
+    CONF_CREATE_DEVICES,
     CONF_DEFAULT_CACHE_TIME,
     CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
     CONF_DEFAULT_FORCE_CLIENTS,
     CONF_DEFAULT_FORCE_CLIENTS_WAITTIME,
@@ -403,6 +405,18 @@ def _create_form_connected_devices(
                         CONF_CONSIDER_HOME, CONF_DEFAULT_CONSIDER_HOME
                     ),
                 ): cv.positive_int,
+            }
+        )
+
+    if mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
+        schema.update(
+            {
+                vol.Required(
+                    CONF_CREATE_DEVICES,
+                    default=user_input.get(
+                        CONF_CREATE_DEVICES, CONF_DEFAULT_CREATE_DEVICES
+                    ),
+                ): cv.boolean,
             }
         )
 

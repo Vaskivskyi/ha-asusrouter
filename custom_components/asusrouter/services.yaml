@@ -1,0 +1,32 @@
+device_internet_access:
+  fields:
+    entities:
+      required: false
+      selector:
+        entity:
+          integration: asusrouter
+          domain: device_tracker
+          multiple: true
+    state:
+      required: true
+      selector:
+        select:
+          translation_key: set_pc_rule
+          mode: dropdown
+          options:
+            - "block"
+            - "allow"
+            - "remove"
+remove_trackers:
+  name: Remove device trackers
+  description: This service allows removing device_tracker entities. Please, keep in mind, when run, the service will remove selected trackers from watching and will allow you to remove the entities manually.
+  fields:
+    entities:
+      name: Entities
+      description: Entities to remove
+      required: true
+      selector:
+        entity:
+          integration: asusrouter
+          domain: device_tracker
+          multiple: true

@@ -19,6 +19,7 @@ from asusrouter.modules.homeassistant import (
     convert_to_ha_state_bool,
 )
 from asusrouter.modules.identity import AsusDevice
+from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -27,6 +28,7 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
@@ -415,16 +417,19 @@ class ARBridge:
     def _process_data_parental_control(raw: dict[str, Any]) -> dict[str, Any]:
         """Process `parental control` data."""
 
-        data: dict[str, Any] = {}
-        data[STATE] = convert_to_ha_state_bool(raw.get(STATE))
-        devices = []
+        rules_list = []
         rules = raw.get("rules")
         if rules is not None:
             for rule in raw["rules"]:
                 device = dataclasses.asdict(raw["rules"][rule])
                 device.pop("timemap")
-                devices.append(device)
-        data[LIST] = devices.copy()
+                device["type"] = device["type"].name.lower()
+                rules_list.append(device)
+
+        data = convert_to_ha_data(raw)
+        data["list"] = rules_list.copy()
+        data["block_all"] = convert_to_ha_state_bool(raw.get("block_all"))
+
         return data
 
     @staticmethod
@@ -572,3 +577,83 @@ class ARBridge:
         return convert_to_ha_sensors(raw, AsusData.OPENVPN_SERVER)
 
     # <- PROCESS SENSORS LIST
+
+    # --------------------
+    # Services -->
+    # --------------------
+
+    def _pc_device2rule(
+        self, device: dict[str, Any], rule_type: PCRuleType
+    ) -> Optional[ParentalControlRule]:
+        """Convert device to parental control rule."""
+
+        mac = device.get("mac", None)
+
+        if mac is None:
+            return None
+
+        return ParentalControlRule(
+            mac=mac.upper(),
+            name=device.get("name", None),
+            type=rule_type,
+        )
+
+    async def async_pc_rule(self, **kwargs: Any) -> bool:
+        """Change parental control rule(s)."""
+
+        # Get the passed data
+        raw = kwargs.get("raw", None)
+
+        # Abort if no data is passed
+        if raw is None:
+            return False
+
+        # Get the state to set
+        state = raw.get("state", None)
+        match state:
+            case a if a in ("disable", "allow"):
+                rule_type = PCRuleType.DISABLE
+            case "block":
+                rule_type = PCRuleType.BLOCK
+            case "remove":
+                rule_type = PCRuleType.REMOVE
+            case _:
+                _LOGGER.warning("Unknown parental control state: %s", state)
+                return False
+
+        # Get the targets to set
+        devices = raw.get("devices", [])
+        entities = raw.get("entities", [])
+
+        # Prepare the rules list
+        rules_to_set = []
+
+        # Process entities if any
+        if len(entities) > 0:
+            entity_reg = er.async_get(self.hass)
+            for entity in entities:
+                reg_value = entity_reg.async_get(entity)
+                if not isinstance(reg_value, er.RegistryEntry):
+                    continue
+                capabilities: dict[str, Any] = helpers.as_dict(reg_value.capabilities)
+                devices.append(capabilities)
+
+        # Convert devices to rules
+        for device in devices:
+            rule = self._pc_device2rule(device, rule_type)
+            if rule is not None:
+                rules_to_set.append(rule)
+
+        # Set the rules
+        for rule in rules_to_set:
+            result = await self.api.async_set_state(rule)
+            if result is True:
+                _LOGGER.debug("Parental control rule set: %s", rule)
+            else:
+                _LOGGER.warning("Cannot set parental control rule: %s", rule)
+
+        return True
+
+    # --------------------
+    # <-- Services
+    # --------------------

@@ -8,11 +8,11 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Vaskivskyi/ha-asusrouter/issues",
   "loggers": ["asusrouter"],
-  "requirements": ["asusrouter==1.5.0"],
+  "requirements": ["asusrouter==1.6.1"],
   "ssdp": [
     {
       "manufacturer": "ASUSTeK Computer Inc."
     }
   ],
-  "version": "0.26.0"
+  "version": "0.27.0"
 }

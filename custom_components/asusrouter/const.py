@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import AsusParentalControl
+from asusrouter.modules.parental_control import AsusBlockAll, AsusParentalControl
 from asusrouter.modules.port_forwarding import AsusPortForwarding
 from asusrouter.modules.system import AsusSystem
 from asusrouter.modules.wireguard import AsusWireGuardClient, AsusWireGuardServer
@@ -238,24 +238,29 @@ LABELS_WLAN = {
 
 # MODES -->
 
-MODE_SENSORS = {
-    NODE: [
-        BOOTTIME,
-        CPU,
-        FIRMWARE,
-        LED,
-        NETWORK,
-        PORTS,
-        RAM,
-        SYSINFO,
-        TEMPERATURE,
-    ],
-}
-MODE_SENSORS[ACCESS_POINT] = MODE_SENSORS[NODE]
-MODE_SENSORS[ACCESS_POINT].extend([WLAN])
-MODE_SENSORS[MEDIA_BRIDGE] = MODE_SENSORS[ACCESS_POINT]
-MODE_SENSORS[ROUTER] = MODE_SENSORS[ACCESS_POINT]
-MODE_SENSORS[ROUTER].extend(
+# AiMesh Node
+MODE_NODE = [
+    BOOTTIME,
+    CPU,
+    FIRMWARE,
+    LED,
+    NETWORK,
+    PORTS,
+    RAM,
+    SYSINFO,
+    TEMPERATURE,
+]
+
+# Access Point
+MODE_ACCESS_POINT = MODE_NODE.copy()
+MODE_ACCESS_POINT.extend([WLAN])
+
+# Media Bridge
+MODE_MEDIA_BRIDGE = MODE_ACCESS_POINT.copy()
+
+# Router
+MODE_ROUTER = MODE_ACCESS_POINT.copy()
+MODE_ROUTER.extend(
     [
         GWLAN,
         "ovpn_client",
@@ -268,6 +273,13 @@ MODE_SENSORS[ROUTER].extend(
         "wireguard_server",
     ]
 )
+
+MODE_SENSORS = {
+    ACCESS_POINT: MODE_ACCESS_POINT,
+    MEDIA_BRIDGE: MODE_MEDIA_BRIDGE,
+    NODE: MODE_NODE,
+    ROUTER: MODE_ROUTER,
+}
 
 # <-- MODES
 
@@ -356,7 +368,7 @@ SENSORS_OVPN_SERVER = {
     "unit": "unit",
 }
 
-SENSORS_PARENTAL_CONTROL = [STATE]
+SENSORS_PARENTAL_CONTROL = ["block_all", STATE]
 SENSORS_PORT_FORWARDING = [STATE]
 SENSORS_PORTS = [LAN, WAN]
 SENSORS_RAM = [FREE, TOTAL, USAGE, USED]
@@ -434,6 +446,7 @@ CONF_CACHE_TIME = "cache_time"
 CONF_CERT_PATH = "cert_path"
 CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
+CONF_CREATE_DEVICES = "create_devices"
 CONF_ENABLE_CONTROL = "enable_control"
 CONF_EVENT_DEVICE_CONNECTED = "device_connected"
 CONF_EVENT_DEVICE_DISCONNECTED = "device_disconnected"
@@ -474,6 +487,7 @@ CONF_UNITS_TRAFFIC = "units_traffic"
 # Defaults
 CONF_DEFAULT_CACHE_TIME = 5
 CONF_DEFAULT_CONSIDER_HOME = 45
+CONF_DEFAULT_CREATE_DEVICES = False
 CONF_DEFAULT_ENABLE_CONTROL = False
 CONF_DEFAULT_EVENT: dict[str, bool] = {
     CONF_EVENT_DEVICE_CONNECTED: True,
@@ -526,12 +540,23 @@ CONF_REQ_RELOAD = [
     CONF_CERT_PATH,
     CONF_CONFIRM,
     CONF_CONSIDER_HOME,
+    CONF_CREATE_DEVICES,
     CONF_ENABLE_CONTROL,
+    CONF_EVENT_DEVICE_CONNECTED,
+    CONF_EVENT_DEVICE_DISCONNECTED,
+    CONF_EVENT_DEVICE_RECONNECTED,
+    CONF_EVENT_NODE_CONNECTED,
+    CONF_EVENT_NODE_DISCONNECTED,
+    CONF_EVENT_NODE_RECONNECTED,
     CONF_FORCE_CLIENTS,
     CONF_FORCE_CLIENTS_WAITTIME,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL_DEVICES,
+    CONF_LATEST_CONNECTED,
+    CONF_MODE,
+    CONF_SPLIT_INTERVALS,
+    CONF_TRACK_DEVICES,
     CONF_SCAN_INTERVAL,
 ]
 CONF_REQ_RELOAD.extend(CONF_INTERVALS)
@@ -789,6 +814,8 @@ ICON_DEVICES = "mdi:devices"
 ICON_DUALWAN = "mdi:call-split"
 ICON_ETHERNET_ON = "mdi:ethernet-cable"
 ICON_ETHERNET_OFF = "mdi:ethernet-cable-off"
+ICON_INTERNET_ACCESS_OFF = "mdi:lock-outline"
+ICON_INTERNET_ACCESS_ON = "mdi:lock-open-variant-outline"
 ICON_IP = "mdi:ip"
 ICON_LIGHT_OFF = "mdi:led-off"
 ICON_LIGHT_ON = "mdi:led-on"
@@ -1106,6 +1133,18 @@ STATIC_SENSORS.extend(
     ]
 )
 STATIC_SWITCHES: list[AREntityDescription] = [
+    # Block Internet
+    ARSwitchDescription(
+        key="block_all",
+        key_group="parental_control",
+        name="Block Internet",
+        icon_on=ICON_INTERNET_ACCESS_OFF,
+        state_on=AsusBlockAll.ON,
+        icon_off=ICON_INTERNET_ACCESS_ON,
+        state_off=AsusBlockAll.OFF,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
+    ),
     # Parental control
     ARSwitchDescription(
         key="state",
@@ -1120,7 +1159,7 @@ STATIC_SWITCHES: list[AREntityDescription] = [
         extra_state_attributes={
             "list": "list",
         },
-    )
+    ),
 ]
 STATIC_SWITCHES.extend(
     [
