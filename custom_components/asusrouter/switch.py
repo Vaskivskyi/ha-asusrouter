@@ -9,7 +9,7 @@ from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -150,7 +150,7 @@ class ClientInternetSwitch(SwitchEntity):
 
         self._router = router
         self._rule = rule
-        self._mac = format_mac(rule.mac)
+        self._mac = dr.format_mac(rule.mac)
         self._attr_unique_id = to_unique_id(f"{router.mac}_{self._mac}_block_internet")
         self._attr_name = f"{rule.name} Block Internet"
 
@@ -162,6 +162,7 @@ class ClientInternetSwitch(SwitchEntity):
         """Compile device info."""
 
         return DeviceInfo(
+            connections={(dr.CONNECTION_NETWORK_MAC, self._mac)},
             identifiers={
                 (DOMAIN, self._mac),
             },
