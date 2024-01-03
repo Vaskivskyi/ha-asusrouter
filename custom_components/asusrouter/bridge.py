@@ -594,7 +594,7 @@ class ARBridge:
 
         return ParentalControlRule(
             mac=mac.upper(),
-            name=device.get("name", None),
+            name=device.get("name", ""),
             type=rule_type,
         )
 
