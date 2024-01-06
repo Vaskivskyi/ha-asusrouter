@@ -524,22 +524,6 @@ class ARDevice:
         # Format clients MAC
         clients = {format_mac(mac): client for mac, client in api_clients.items()}
 
-        # Filter clients
-        # Only include the listed clients
-        if self._client_filter == "include":
-            clients = {
-                mac: client
-                for mac, client in clients.items()
-                if mac in self._client_filter_list
-            }
-        # Exclude the listed clients
-        elif self._client_filter == "exclude":
-            clients = {
-                mac: client
-                for mac, client in clients.items()
-                if mac not in self._client_filter_list
-            }
-
         # Update known clients
         for client_mac, client_state in self._clients.items():
             client_info = clients.pop(client_mac, None)
@@ -598,6 +582,22 @@ class ARDevice:
             if client.state:
                 self._clients_number += 1
                 self._clients_list.append(client.identity)
+
+        # Filter clients
+        # Only include the listed clients
+        if self._client_filter == "include":
+            self._clients = {
+                mac: client
+                for mac, client in self._clients.items()
+                if mac in self._client_filter_list
+            }
+        # Exclude the listed clients
+        elif self._client_filter == "exclude":
+            self._clients = {
+                mac: client
+                for mac, client in self._clients.items()
+                if mac not in self._client_filter_list
+            }
 
         async_dispatcher_send(self.hass, self.signal_device_update)
         if new_client:
@@ -925,6 +925,17 @@ class ARDevice:
         args: Optional[dict[str, Any]] = None,
     ):
         """Fire HA event."""
+
+        # Check for mute
+        _event_mac = args.get("mac") if isinstance(args, dict) else None
+        if _event_mac is not None:
+            match self._client_filter:
+                case "include":
+                    if _event_mac not in self._client_filter_list:
+                        return
+                case "exclude":
+                    if _event_mac in self._client_filter_list:
+                        return
 
         _event_status = self._options.get(event)
         if _event_status is None:
