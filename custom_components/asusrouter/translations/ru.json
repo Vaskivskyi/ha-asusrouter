@@ -42,6 +42,8 @@
         "title": "Подключенные устройства",
         "data": {
           "track_devices": "Включить отслеживание устройств",
+          "client_filter": "[NT] Filter clients",
+          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Количество последних подключенных устройств для сохранения",
@@ -151,6 +153,8 @@
         "title": "Подключенные устройства",
         "data": {
           "track_devices": "Включить отслеживание устройств",
+          "client_filter": "[NT] Filter clients",
+          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Количество последних подключенных устройств для сохранения",
