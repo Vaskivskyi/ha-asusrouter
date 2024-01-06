@@ -155,7 +155,7 @@ class ClientInternetSwitch(SwitchEntity):
         self._attr_name = f"{rule.name} Block Internet"
 
         # Assign device info if set up
-        if router.client_devices:
+        if router.create_devices is True:
             self._attr_device_info = self._compile_device_info()
 
     def _compile_device_info(self) -> DeviceInfo:
