@@ -42,6 +42,8 @@
         "title": "Dispositivos conectados",
         "data": {
           "track_devices": "Habilitar rastreadores de dispositivo",
+          "client_filter": "[NT] Filter clients",
+          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos más recientes a almacenar",
@@ -152,6 +154,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Habilitar rastreadores de dispositivo",
+          "client_filter": "[NT] Filter clients",
+          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
           "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
           "latest_connected": "Número de dispositivos más recientes a almacenar",

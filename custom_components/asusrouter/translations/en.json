@@ -42,6 +42,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Enable device trackers",
+          "client_filter": "Filter clients",
+          "client_filter_list": "List of clients to filter (only active if filter is enabled)",
           "force_clients": "Force clients update",
           "force_clients_waittime": "Wait time (force update -> check) (seconds)",
           "latest_connected": "Number of latest connected devices to store",
@@ -152,6 +154,8 @@
         "title": "Connected devices",
         "data": {
           "track_devices": "Enable device trackers",
+          "client_filter": "Filter clients",
+          "client_filter_list": "List of clients to filter",
           "force_clients": "Force clients update",
           "force_clients_waittime": "Wait time (force update -> check) (seconds)",
           "latest_connected": "Number of latest connected devices to store",

@@ -26,15 +26,20 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.device_registry import format_mac
 
 from .bridge import ARBridge
 from .const import (
     ACCESS_POINT,
+    ALL_CLIENTS,
     BASE,
     CONF_CACHE_TIME,
+    CONF_CLIENT_FILTER,
+    CONF_CLIENT_FILTER_LIST,
     CONF_CONSIDER_HOME,
     CONF_CREATE_DEVICES,
     CONF_DEFAULT_CACHE_TIME,
+    CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
@@ -58,6 +63,7 @@ from .const import (
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_INTERVALS,
+    CONF_LABELS_CLIENT_FILTER,
     CONF_LABELS_INTERFACES,
     CONF_LABELS_MODE,
     CONF_LATEST_CONNECTED,
@@ -121,6 +127,32 @@ def _check_errors(
         return True
 
     return False
+
+
+async def _async_get_clients(
+    hass: HomeAssistant,
+    configs: dict[str, Any],
+    options: dict[str, Any],
+) -> dict[str, Any]:
+    """Return list of all the known clients."""
+
+    bridge = ARBridge(hass, configs, options)
+
+    try:
+        if not bridge.connected:
+            await bridge.async_connect()
+        clients = await bridge.api.async_get_data(AsusData.CLIENTS)
+        await bridge.async_disconnect()
+
+        result = {
+            format_mac(mac): client.description.name
+            for mac, client in clients.items()
+            if client.description.name
+        }
+        return result
+    except Exception as ex:  # pylint: disable=broad-except
+        _LOGGER.warning("Cannot get clients for %s: %s", configs[CONF_HOST], ex)
+        return {}
 
 
 async def _async_get_network_interfaces(
@@ -363,17 +395,31 @@ def _create_form_operation(
 def _create_form_connected_devices(
     user_input: dict[str, Any] | None = None,
     mode: str = CONF_DEFAULT_MODE,
+    default: list[str] | None = None,
 ) -> vol.Schema:
     """Create a form for the `connected_devices` step."""
 
     if not user_input:
         user_input = {}
 
+    if not default:
+        default = []
+
     schema = {
         vol.Required(
             CONF_TRACK_DEVICES,
             default=user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES),
         ): cv.boolean,
+        vol.Required(
+            CONF_CLIENT_FILTER,
+            default=user_input.get(CONF_CLIENT_FILTER, CONF_DEFAULT_CLIENT_FILTER),
+        ): vol.In(CONF_LABELS_CLIENT_FILTER),
+        vol.Optional(
+            CONF_CLIENT_FILTER_LIST,
+            default=default,
+        ): cv.multi_select(
+            dict(sorted(user_input[ALL_CLIENTS].items(), key=lambda item: item[1]))
+        ),
         vol.Required(
             CONF_FORCE_CLIENTS,
             default=user_input.get(CONF_FORCE_CLIENTS, CONF_DEFAULT_FORCE_CLIENTS),
@@ -757,6 +803,9 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         if not user_input:
             user_input = self._options.copy()
+            user_input[ALL_CLIENTS] = await _async_get_clients(
+                self.hass, self._configs, self._options
+            )
             return self.async_show_form(
                 step_id=step_id,
                 data_schema=_create_form_connected_devices(user_input, self._mode),
@@ -993,9 +1042,23 @@ class AROptionsFlowHandler(OptionsFlow):
 
         if not user_input:
             user_input = self._options.copy()
+            # Get the selected clients
+            selected = user_input.get(CONF_CLIENT_FILTER_LIST, []).copy()
+            # Get all the clients
+            all_clients = await _async_get_clients(
+                self.hass, self._configs, self._options
+            )
+            # If client was in the list, but cannot be found now, still add it
+            for client in selected:
+                if client not in all_clients:
+                    all_clients[client] = client.upper()
+            # Save the clients as options
+            user_input[ALL_CLIENTS] = all_clients
             return self.async_show_form(
                 step_id=step_id,
-                data_schema=_create_form_connected_devices(user_input, self._mode),
+                data_schema=_create_form_connected_devices(
+                    user_input, self._mode, default=selected
+                ),
             )
         self._options.update(user_input)
 
