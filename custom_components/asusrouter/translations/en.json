@@ -43,6 +43,7 @@
         "data": {
           "track_devices": "Enable device trackers",
           "client_device": "Create a device when I enable device_tracker entity",
+          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
           "client_filter": "Filter clients",
           "client_filter_list": "List of clients to filter (only active if filter is enabled)",
           "force_clients": "Force clients update",
@@ -156,6 +157,7 @@
         "data": {
           "track_devices": "Enable device trackers",
           "client_device": "Create a device when I enable device_tracker entity",
+          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
           "client_filter": "Filter clients",
           "client_filter_list": "List of clients to filter",
           "force_clients": "Force clients update",
