@@ -42,6 +42,7 @@
         "title": "Подключенные устройства",
         "data": {
           "track_devices": "Включить отслеживание устройств",
+          "client_device": "[NT] Create a device when I enable device_tracker entity",
           "client_filter": "[NT] Filter clients",
           "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
@@ -153,6 +154,7 @@
         "title": "Подключенные устройства",
         "data": {
           "track_devices": "Включить отслеживание устройств",
+          "client_device": "[NT] Create a device when I enable device_tracker entity",
           "client_filter": "[NT] Filter clients",
           "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",

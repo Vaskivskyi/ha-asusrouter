@@ -22,6 +22,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -35,9 +36,11 @@ from .client import ARClient
 from .const import (
     ACCESS_POINT,
     AIMESH,
+    CONF_CLIENT_DEVICE,
     CONF_CLIENT_FILTER,
     CONF_CLIENT_FILTER_LIST,
     CONF_CREATE_DEVICES,
+    CONF_DEFAULT_CLIENT_DEVICE,
     CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
@@ -287,7 +290,11 @@ class ARDevice:
         self._connect_error: bool = False
 
         # Client features
-        self.client_devices: bool = self._options.get(
+        self.client_device: bool = self._options.get(
+            CONF_CLIENT_DEVICE,
+            CONF_DEFAULT_CLIENT_DEVICE,
+        )
+        self.create_devices: bool = self._options.get(
             CONF_CREATE_DEVICES,
             CONF_DEFAULT_CREATE_DEVICES,
         )
@@ -360,6 +367,11 @@ class ARDevice:
             if "mac" in capabilities:
                 mac = capabilities["mac"]
                 self._clients[mac] = ARClient(mac)
+
+                # Create devices when tracker was enabled
+                disabled_by = entry.disabled_by
+                if disabled_by is None:
+                    self._clients[mac].device = True
 
         # Mode-specific
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):

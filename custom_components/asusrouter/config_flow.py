@@ -34,11 +34,13 @@ from .const import (
     ALL_CLIENTS,
     BASE,
     CONF_CACHE_TIME,
+    CONF_CLIENT_DEVICE,
     CONF_CLIENT_FILTER,
     CONF_CLIENT_FILTER_LIST,
     CONF_CONSIDER_HOME,
     CONF_CREATE_DEVICES,
     CONF_DEFAULT_CACHE_TIME,
+    CONF_DEFAULT_CLIENT_DEVICE,
     CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
@@ -409,6 +411,10 @@ def _create_form_connected_devices(
         vol.Required(
             CONF_TRACK_DEVICES,
             default=user_input.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES),
+        ): cv.boolean,
+        vol.Required(
+            CONF_CLIENT_DEVICE,
+            default=user_input.get(CONF_CLIENT_DEVICE, CONF_DEFAULT_CLIENT_DEVICE),
         ): cv.boolean,
         vol.Required(
             CONF_CLIENT_FILTER,
