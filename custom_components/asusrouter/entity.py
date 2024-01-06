@@ -101,6 +101,15 @@ class AREntity(CoordinatorEntity):
         if not _attributes:
             return {}
 
+        # Mask attributes
+        attrs_to_mask = self.router.sensor_filters.get(
+            (description.key_group, description.key),
+            [],
+        )
+        for attr in attrs_to_mask:
+            if attr in _attributes:
+                _attributes.pop(attr, None)
+
         attributes = {}
 
         for attr in _attributes:

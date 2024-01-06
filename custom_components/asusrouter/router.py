@@ -39,9 +39,11 @@ from .const import (
     CONF_CLIENT_DEVICE,
     CONF_CLIENT_FILTER,
     CONF_CLIENT_FILTER_LIST,
+    CONF_CLIENTS_IN_ATTR,
     CONF_CREATE_DEVICES,
     CONF_DEFAULT_CLIENT_DEVICE,
     CONF_DEFAULT_CLIENT_FILTER,
+    CONF_DEFAULT_CLIENTS_IN_ATTR,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
@@ -112,7 +114,7 @@ class ARSensorHandler:
 
         # Sensors
         self._clients_number: int = 0
-        self._clients_list: list[dict[str, Any]] = []
+        self._clients_list: Optional[list[dict[str, Any]]] = []
         self._latest_connected: Optional[datetime] = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
@@ -142,7 +144,7 @@ class ARSensorHandler:
     def update_clients(
         self,
         clients_number: int,
-        clients_list: list[Any],
+        clients_list: Optional[list[Any]],
         latest_connected: Optional[datetime],
         latest_connected_list: list[Any],
     ) -> bool:
@@ -289,11 +291,21 @@ class ARDevice:
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
 
+        # Sensor filters
+        self.sensor_filters: dict[tuple[str, str], list[str]] = {}
+
         # Client features
         self.client_device: bool = self._options.get(
             CONF_CLIENT_DEVICE,
             CONF_DEFAULT_CLIENT_DEVICE,
         )
+        self.clients_in_attr: bool = self._options.get(
+            CONF_CLIENTS_IN_ATTR,
+            CONF_DEFAULT_CLIENTS_IN_ATTR,
+        )
+        if self.clients_in_attr is False:
+            # Mask clients in attributes
+            self.sensor_filters[(DEVICES, NUMBER)] = [DEVICES]
         self.create_devices: bool = self._options.get(
             CONF_CREATE_DEVICES,
             CONF_DEFAULT_CREATE_DEVICES,
@@ -855,9 +867,13 @@ class ARDevice:
         # Devices
         if DEVICES in self._sensor_coordinator:
             coordinator = self._sensor_coordinator[DEVICES][COORDINATOR]
+
+            # Block clients list for attributes
+            clients_list = None if self.clients_in_attr is False else self._clients_list
+
             if self._sensor_handler.update_clients(
                 self._clients_number,
-                self._clients_list,
+                clients_list,
                 self._latest_connected,
                 self._latest_connected_list,
             ):

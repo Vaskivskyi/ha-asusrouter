@@ -43,6 +43,7 @@
         "data": {
           "track_devices": "Eszközkövetők engedélyezése",
           "client_device": "[NT] Create a device when I enable device_tracker entity",
+          "clients_in_attr": "[NT] Store clients list in attributes of the connected devices sensor",
           "client_filter": "[NT] Filter clients",
           "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
@@ -155,6 +156,7 @@
         "data": {
           "track_devices": "Eszközkövetők engedélyezése",
           "client_device": "[NT] Create a device when I enable device_tracker entity",
+          "clients_in_attr": "[NT] Store clients list in attributes of the connected devices sensor",
           "client_filter": "[NT] Filter clients",
           "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
           "force_clients": "[NT] Force clients update",
