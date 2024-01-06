@@ -35,6 +35,8 @@ class ARClient:
         self._mac = mac
         self._name = name
 
+        self.device: bool = False
+
         # To be recieved from the device
         # Client description
         self.description: Optional[AsusClientDescription] = None
