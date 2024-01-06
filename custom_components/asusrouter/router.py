@@ -35,7 +35,10 @@ from .client import ARClient
 from .const import (
     ACCESS_POINT,
     AIMESH,
+    CONF_CLIENT_FILTER,
+    CONF_CLIENT_FILTER_LIST,
     CONF_CREATE_DEVICES,
+    CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
@@ -290,6 +293,14 @@ class ARDevice:
         )
         self._pc_rules: dict[str, Any] = {}
 
+        # Client filter
+        self._client_filter: str = self._options.get(
+            CONF_CLIENT_FILTER, CONF_DEFAULT_CLIENT_FILTER
+        )
+        self._client_filter_list: list[str] = self._options.get(
+            CONF_CLIENT_FILTER_LIST, []
+        )
+
         # On-close parameters
         self._on_close: list[Callable] = []
 
@@ -317,7 +328,7 @@ class ARDevice:
             self._conf_name = self._identity.model
 
         # Migrate from 0.21.x and below
-        # To be removed in 0.25.0
+        # To be removed in 0.30.0
         # Tracked entities
         entity_reg = er.async_get(self.hass)
         tracked_entries = er.async_entries_for_config_entry(
@@ -379,6 +390,25 @@ class ARDevice:
             _LOGGER.debug(
                 "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
             )
+
+        # Clients filter
+        match self._client_filter:
+            case "include":
+                _LOGGER.debug("Setting clients filter: `include`")
+                self._clients = {
+                    mac: client
+                    for mac, client in self._clients.items()
+                    if mac in self._client_filter_list
+                }
+            case "exclude":
+                _LOGGER.debug("Setting clients filter: `exclude`")
+                self._clients = {
+                    mac: client
+                    for mac, client in self._clients.items()
+                    if mac not in self._client_filter_list
+                }
+            case _:
+                _LOGGER.debug("Setting clients filter: `no_filter`")
 
         # Initialize sensor coordinators
         await self._init_sensor_coordinators()
@@ -453,6 +483,22 @@ class ARDevice:
 
         # Format clients MAC
         clients = {format_mac(mac): client for mac, client in api_clients.items()}
+
+        # Filter clients
+        # Only include the listed clients
+        if self._client_filter == "include":
+            clients = {
+                mac: client
+                for mac, client in clients.items()
+                if mac in self._client_filter_list
+            }
+        # Exclude the listed clients
+        elif self._client_filter == "exclude":
+            clients = {
+                mac: client
+                for mac, client in clients.items()
+                if mac not in self._client_filter_list
+            }
 
         # Update known clients
         for client_mac, client_state in self._clients.items():

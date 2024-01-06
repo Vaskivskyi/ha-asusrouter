@@ -75,8 +75,9 @@ NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
 ACCESS_POINT = "access_point"
 ACTION = "action"
 ACTION_MODE = "action_mode"
-ALIAS = "alias"
 AIMESH = "aimesh"
+ALIAS = "alias"
+ALL_CLIENTS = "all_clients"
 API_ID = "api_id"
 API_TYPE = "api_type"
 APPLY = "apply"
@@ -446,6 +447,8 @@ DEFAULT_SENSORS: dict[str, list[str]] = {CPU: [TOTAL]}
 # Keys
 CONF_CACHE_TIME = "cache_time"
 CONF_CERT_PATH = "cert_path"
+CONF_CLIENT_FILTER = "client_filter"
+CONF_CLIENT_FILTER_LIST = "client_filter_list"
 CONF_CONFIRM = "confirm"
 CONF_CONSIDER_HOME = "consider_home"
 CONF_CREATE_DEVICES = "create_devices"
@@ -488,6 +491,7 @@ CONF_UNITS_TRAFFIC = "units_traffic"
 
 # Defaults
 CONF_DEFAULT_CACHE_TIME = 5
+CONF_DEFAULT_CLIENT_FILTER = "no_filter"
 CONF_DEFAULT_CONSIDER_HOME = 45
 CONF_DEFAULT_CREATE_DEVICES = False
 CONF_DEFAULT_ENABLE_CONTROL = False
@@ -517,6 +521,11 @@ CONF_DEFAULT_UNITS_TRAFFIC = UnitOfInformation.GIGABYTES
 CONF_DEFAULT_USERNAME = "admin"
 
 # Labels
+CONF_LABELS_CLIENT_FILTER = {
+    "no_filter": "No filter / All clients",
+    "include": "Include only",
+    "exclude": "Exclude devices",
+}
 CONF_LABELS_INTERFACES = {
     BRIDGE: "Bridge",
     f"{LACP}1": "LACP1",
