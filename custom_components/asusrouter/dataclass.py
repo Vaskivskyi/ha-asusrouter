@@ -21,7 +21,7 @@ class AREntityDescription(EntityDescription):
     """Describe AsusRouter entity."""
 
     capabilities: Optional[dict[str, Any]] = None
-    key_group: Optional[str] = None
+    key_group: str = ""
     value: Callable[[Any], Any] = lambda val: val
     extra_state_attributes: Optional[dict[str, Any]] = None
 
