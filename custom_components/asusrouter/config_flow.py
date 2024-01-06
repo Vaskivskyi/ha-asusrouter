@@ -964,7 +964,6 @@ class AROptionsFlowHandler(OptionsFlow):
             STEP_INTERFACES,
             STEP_EVENTS,
             STEP_SECURITY,
-            STEP_OPTIONS,
             STEP_FINISH,
         ]
 
