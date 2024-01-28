@@ -965,6 +965,12 @@ STATIC_BUTTONS: list[ARButtonDescription] = [
         entity_registry_enabled_default=False,
     ),
     ARButtonDescription(
+        key="restart_wired",
+        name="Restart wired",
+        icon=ICON_ETHERNET_ON,
+        state=AsusSystem.RESTART_NET,
+    ),
+    ARButtonDescription(
         key="restart_wireless",
         name="Restart wireless",
         icon=ICON_RESTART,
@@ -986,7 +992,7 @@ STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
         icon=ICON_DEVICES,
         state=AsusSystem.UPDATE_CLIENTS,
         entity_registry_enabled_default=True,
-    )
+    ),
 ]
 STATIC_LIGHTS: list[AREntityDescription] = [
     ARLightDescription(
