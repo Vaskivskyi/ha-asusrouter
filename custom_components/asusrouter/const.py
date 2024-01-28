@@ -14,6 +14,7 @@ from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.update import UpdateDeviceClass
 from homeassistant.const import (
     ATTR_CONNECTIONS,
     ATTR_IDENTIFIERS,
@@ -1422,9 +1423,11 @@ STATIC_UPDATES: list[AREntityDescription] = [
         key_group="firmware",
         name="Firmware update",
         icon=ICON_UPDATE,
+        device_class=UpdateDeviceClass.FIRMWARE,
         extra_state_attributes={
             "current": "current",
             "available": "available",
+            "release_note": "release_note",
         },
     )
 ]
