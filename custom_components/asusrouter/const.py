@@ -983,6 +983,13 @@ STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
         state=AsusSystem.RESTART_FIREWALL,
         entity_registry_enabled_default=False,
     ),
+    ARButtonDescription(
+        key="refresh_clients",
+        name="Refresh clients",
+        icon=ICON_DEVICES,
+        state=AsusSystem.UPDATE_CLIENTS,
+        entity_registry_enabled_default=True,
+    )
 ]
 STATIC_LIGHTS: list[AREntityDescription] = [
     ARLightDescription(
