@@ -42,5 +42,6 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         super().__init__(coordinator, router, description)
         self.entity_description: ARUpdateDescription = description
 
-        self._attr_installed_version = self.extra_state_attributes["current"]
-        self._attr_latest_version = self.extra_state_attributes["available"]
+        self._attr_installed_version = self.extra_state_attributes.get("current")
+        self._attr_latest_version = self.extra_state_attributes.get("available")
+        self._attr_release_summary = self.extra_state_attributes.get("release_note")
