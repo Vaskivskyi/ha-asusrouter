@@ -388,7 +388,11 @@ class ARDevice:
             if entry.domain != "device_tracker":
                 continue
             capabilities = entry.capabilities
-            if "mac" in capabilities:
+            # Check that capabilities is a dictionary and that it has the MAC address
+            # I actually don't know how this can be possible, but the issue #785
+            # https://github.com/Vaskivskyi/ha-asusrouter/issues/785
+            # shows that device_tracker entry can exist without a MAC address
+            if isinstance(capabilities, dict) and "mac" in capabilities:
                 mac = capabilities["mac"]
                 self._clients[mac] = ARClient(mac)
 
