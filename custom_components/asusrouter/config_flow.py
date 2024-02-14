@@ -12,7 +12,6 @@ from asusrouter import AsusData
 from asusrouter.error import AsusRouterAccessError
 from asusrouter.modules.endpoint.error import AccessError
 from asusrouter.modules.homeassistant import convert_to_ha_sensors_group
-from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_HOST,
@@ -86,7 +85,6 @@ from .const import (
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
-    SSDP_SERVER,
     STEP_CONNECTED_DEVICES,
     STEP_CREDENTIALS,
     STEP_EVENTS,
@@ -97,7 +95,6 @@ from .const import (
     STEP_OPERATION,
     STEP_OPTIONS,
     STEP_SECURITY,
-    STEP_SSDP,
     UNIQUE_ID,
 )
 
@@ -602,7 +599,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         # Steps description
         self._steps: dict[str, dict[str, Any]] = {
             STEP_FIND: {METHOD: self.async_step_find, NEXT: STEP_CREDENTIALS},
-            STEP_SSDP: {NEXT: STEP_CREDENTIALS},
             STEP_CREDENTIALS: {
                 METHOD: self.async_step_credentials,
                 NEXT: STEP_OPERATION,
@@ -613,54 +609,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             },
             STEP_OPTIONS: {METHOD: self.async_step_options},
         }
-
-    # SSDP
-    async def async_step_ssdp(
-        self,
-        discovery_info: ssdp.SsdpServiceInfo,
-    ) -> FlowResult:
-        """Flow initiated by SSDP discovery."""
-
-        step_id = STEP_SSDP
-
-        # Get the serial number
-        serial_number = discovery_info.upnp.get(ssdp.ATTR_UPNP_SERIAL)
-
-        # Abort if no serial number provided
-        if not serial_number or serial_number == "":
-            return self.async_abort(reason="no_serial")
-
-        # Check if configured already
-        await self.async_set_unique_id(serial_number)
-        self._abort_if_unique_id_configured()
-
-        _LOGGER.debug("Discovered SSDP device with serial number: %s", serial_number)
-        _LOGGER.debug("Discovered SSDP device: %s", discovery_info)
-
-        # Make sure, this is actually an AsusWRT-powered device
-        if (
-            not discovery_info.ssdp_server
-            or SSDP_SERVER not in discovery_info.ssdp_server
-        ):
-            return self.async_abort(reason="not_router")
-
-        # Save host
-        assert discovery_info.ssdp_location is not None
-        host = urlparse(discovery_info.ssdp_location).hostname
-        self._configs[CONF_HOST] = host
-
-        # Friendly name
-        name = discovery_info.upnp[ssdp.ATTR_UPNP_FRIENDLY_NAME]
-
-        # Set the title placeholder
-        self.description_placeholders = {
-            CONF_NAME: name,
-            CONF_HOST: host,
-        }
-        self.context["title_placeholders"] = self.description_placeholders
-
-        # Process to setup
-        return await _async_process_step(self._steps, step_id)
 
     # User setup
     async def async_step_user(
