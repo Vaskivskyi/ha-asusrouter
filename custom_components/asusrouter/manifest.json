@@ -9,10 +9,5 @@
   "issue_tracker": "https://github.com/Vaskivskyi/ha-asusrouter/issues",
   "loggers": ["asusrouter"],
   "requirements": ["asusrouter==1.6.1"],
-  "ssdp": [
-    {
-      "manufacturer": "ASUSTeK Computer Inc."
-    }
-  ],
   "version": "0.28.0"
 }
