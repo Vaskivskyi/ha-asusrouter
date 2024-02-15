@@ -47,8 +47,6 @@ from .const import (
     CONF_DEFAULT_CONSIDER_HOME,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
-    CONF_DEFAULT_FORCE_CLIENTS,
-    CONF_DEFAULT_FORCE_CLIENTS_WAITTIME,
     CONF_DEFAULT_INTERVALS,
     CONF_DEFAULT_LATEST_CONNECTED,
     CONF_DEFAULT_MODE,
@@ -58,8 +56,6 @@ from .const import (
     CONF_DEFAULT_SPLIT_INTERVALS,
     CONF_DEFAULT_TRACK_DEVICES,
     CONF_EVENT_NODE_CONNECTED,
-    CONF_FORCE_CLIENTS,
-    CONF_FORCE_CLIENTS_WAITTIME,
     CONF_INTERVAL,
     CONF_INTERVAL_DEVICES,
     CONF_LATEST_CONNECTED,
@@ -392,7 +388,11 @@ class ARDevice:
             if entry.domain != "device_tracker":
                 continue
             capabilities = entry.capabilities
-            if "mac" in capabilities:
+            # Check that capabilities is a dictionary and that it has the MAC address
+            # I actually don't know how this can be possible, but the issue #785
+            # https://github.com/Vaskivskyi/ha-asusrouter/issues/785
+            # shows that device_tracker entry can exist without a MAC address
+            if isinstance(capabilities, dict) and "mac" in capabilities:
                 mac = capabilities["mac"]
                 self._clients[mac] = ARClient(mac)
 
@@ -411,21 +411,6 @@ class ARDevice:
 
             # Update parental control
             await self.update_pc_rules()
-
-            # Force clients settings
-            # This should be done after clients update so that first update is fast
-            force_clients = self._options.get(
-                CONF_FORCE_CLIENTS, CONF_DEFAULT_FORCE_CLIENTS
-            )
-            if force_clients is True:
-                force_clients_waittime = self._options.get(
-                    CONF_FORCE_CLIENTS_WAITTIME, CONF_DEFAULT_FORCE_CLIENTS_WAITTIME
-                )
-                _LOGGER.debug(
-                    "Forcing clients updates with %s s wait time",
-                    force_clients_waittime,
-                )
-                self.bridge.api.set_force_clients(force_clients, force_clients_waittime)
         else:
             _LOGGER.debug(
                 "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"

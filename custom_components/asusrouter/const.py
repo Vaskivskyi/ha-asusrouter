@@ -14,6 +14,7 @@ from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.update import UpdateDeviceClass
 from homeassistant.const import (
     ATTR_CONNECTIONS,
     ATTR_IDENTIFIERS,
@@ -459,8 +460,6 @@ CONF_EVENT_DEVICE_RECONNECTED = "device_reconnected"
 CONF_EVENT_NODE_CONNECTED = "node_connected"
 CONF_EVENT_NODE_DISCONNECTED = "node_disconnected"
 CONF_EVENT_NODE_RECONNECTED = "node_reconnected"
-CONF_FORCE_CLIENTS = "force_clients"
-CONF_FORCE_CLIENTS_WAITTIME = "force_clients_waittime"
 CONF_HIDE_PASSWORDS = "hide_passwords"
 CONF_INTERFACES = "interfaces"
 CONF_INTERVAL = "interval_"
@@ -505,8 +504,6 @@ CONF_DEFAULT_EVENT: dict[str, bool] = {
     CONF_EVENT_NODE_DISCONNECTED: True,
     CONF_EVENT_NODE_RECONNECTED: True,
 }
-CONF_DEFAULT_FORCE_CLIENTS = True
-CONF_DEFAULT_FORCE_CLIENTS_WAITTIME = 5.0
 CONF_DEFAULT_HIDE_PASSWORDS = False
 CONF_DEFAULT_INTERFACES = [WAN.upper()]
 CONF_DEFAULT_INTERVALS = {CONF_INTERVAL + FIRMWARE: 21600}
@@ -565,8 +562,6 @@ CONF_REQ_RELOAD = [
     CONF_EVENT_NODE_CONNECTED,
     CONF_EVENT_NODE_DISCONNECTED,
     CONF_EVENT_NODE_RECONNECTED,
-    CONF_FORCE_CLIENTS,
-    CONF_FORCE_CLIENTS_WAITTIME,
     CONF_HIDE_PASSWORDS,
     CONF_INTERFACES,
     CONF_INTERVAL_DEVICES,
@@ -971,6 +966,12 @@ STATIC_BUTTONS: list[ARButtonDescription] = [
         entity_registry_enabled_default=False,
     ),
     ARButtonDescription(
+        key="restart_wired",
+        name="Restart wired",
+        icon=ICON_ETHERNET_ON,
+        state=AsusSystem.RESTART_NET,
+    ),
+    ARButtonDescription(
         key="restart_wireless",
         name="Restart wireless",
         icon=ICON_RESTART,
@@ -980,11 +981,26 @@ STATIC_BUTTONS: list[ARButtonDescription] = [
 ]
 STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
     ARButtonDescription(
+        key="rebuild_aimesh",
+        name="Rebuild AiMesh",
+        icon=ICON_DEVICES,
+        state=AsusSystem.REBUILD_AIMESH,
+        device_class=ButtonDeviceClass.RESTART,
+        entity_registry_enabled_default=True,
+    ),
+    ARButtonDescription(
         key="restart_firewall",
         name="Restart firewall",
         icon=ICON_RESTART,
         state=AsusSystem.RESTART_FIREWALL,
         entity_registry_enabled_default=False,
+    ),
+    ARButtonDescription(
+        key="refresh_clients",
+        name="Refresh clients",
+        icon=ICON_DEVICES,
+        state=AsusSystem.UPDATE_CLIENTS,
+        entity_registry_enabled_default=True,
     ),
 ]
 STATIC_LIGHTS: list[AREntityDescription] = [
@@ -1360,9 +1376,11 @@ STATIC_UPDATES: list[AREntityDescription] = [
         key_group="firmware",
         name="Firmware update",
         icon=ICON_UPDATE,
+        device_class=UpdateDeviceClass.FIRMWARE,
         extra_state_attributes={
             "current": "current",
             "available": "available",
+            "release_note": "release_note",
         },
     )
 ]
@@ -1399,6 +1417,3 @@ STEP_NAME = "name"
 STEP_OPERATION = "operation"
 STEP_OPTIONS = "options"
 STEP_SECURITY = "security"
-STEP_SSDP = "ssdp"
-
-SSDP_SERVER = "AsusWRT"

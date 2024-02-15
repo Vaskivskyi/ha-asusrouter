@@ -72,6 +72,9 @@ class ARButton(ButtonEntity):
         self._state_args = description.state_args
         self._state_expect_modify = description.state_expect_modify
 
+        if description.icon:
+            self._attr_icon = description.icon
+
     async def async_press(
         self,
         **kwargs: Any,
