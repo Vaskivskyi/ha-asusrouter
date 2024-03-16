@@ -37,6 +37,7 @@ async def async_setup_entry(
 class ARLightLED(ARBinaryEntity, LightEntity):
     """AsusRouter LED light."""
 
+    _attr_color_mode = ColorMode.ONOFF
     _attr_supported_color_modes = {ColorMode.ONOFF}
 
     def __init__(
