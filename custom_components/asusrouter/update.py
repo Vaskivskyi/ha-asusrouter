@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from homeassistant.components.update import UpdateEntity
+from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -45,3 +45,10 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         self._attr_installed_version = self.extra_state_attributes.get("current")
         self._attr_latest_version = self.extra_state_attributes.get("available")
         self._attr_release_summary = self.extra_state_attributes.get("release_note")
+
+        self._attr_supported_features = UpdateEntityFeature.RELEASE_NOTES
+
+    def release_notes(self) -> str | None:
+        """Return the release notes."""
+
+        return self.extra_state_attributes.get("release_note")
