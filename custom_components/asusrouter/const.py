@@ -954,6 +954,13 @@ STATIC_BINARY_SENSORS.extend(
 )
 STATIC_BUTTONS: list[ARButtonDescription] = [
     ARButtonDescription(
+        key="check_update",
+        name="Check for updates",
+        icon=ICON_UPDATE,
+        state=AsusSystem.FIRMWARE_CHECK,
+        entity_registry_enabled_default=True,
+    ),
+    ARButtonDescription(
         key="reboot",
         name="Reboot",
         icon=ICON_RESTART,
