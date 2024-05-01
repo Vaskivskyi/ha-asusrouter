@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/Vaskivskyi/ha-asusrouter/issues",
   "loggers": ["asusrouter"],
   "requirements": ["asusrouter==1.9.0"],
-  "version": "0.30.0"
+  "version": "0.31.0"
 }
