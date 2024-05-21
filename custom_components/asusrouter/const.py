@@ -988,10 +988,18 @@ STATIC_BUTTONS: list[ARButtonDescription] = [
 ]
 STATIC_BUTTONS_OPTIONAL: list[ARButtonDescription] = [
     ARButtonDescription(
+        key="reboot_aimesh",
+        name="Reboot AiMesh",
+        icon=ICON_RESTART,
+        state=AsusSystem.AIMESH_REBOOT,
+        device_class=ButtonDeviceClass.RESTART,
+        entity_registry_enabled_default=True,
+    ),
+    ARButtonDescription(
         key="rebuild_aimesh",
         name="Rebuild AiMesh",
         icon=ICON_DEVICES,
-        state=AsusSystem.REBUILD_AIMESH,
+        state=AsusSystem.AIMESH_REBUILD,
         device_class=ButtonDeviceClass.RESTART,
         entity_registry_enabled_default=True,
     ),
