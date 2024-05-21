@@ -270,6 +270,8 @@ class ARBridge:
 
         try:
             raw = await self.api.async_get_data(datatype, force=force)
+            if raw is None:
+                raw = {}
             if process is not None:
                 return process(raw)
             return self._process_data(raw)
