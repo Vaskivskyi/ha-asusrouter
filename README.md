@@ -8,9 +8,17 @@
 
 The integration uses the native HTTP(S) API (the same way as WebUI) and relies on direct communication with your device.
 
-## Full documentation
+## Documentation and tips
 
 You can find the full documentation on the [official webpage](https://asusrouter.vaskivskyi.com/).
+
+### Use HTTPS connection
+
+It is recommended to use an HTTPS connection to your router (SSL). While both the SSL and non-SSL connections are fully supported, some devices might have issues with disconnects on HTTP. In order to use SSL, you need to enable it in the router settings: `Administration -> System -> Local Access Config -> Authentication Method`. Put it to `BOTH` (recommended) or `HTTPS`. Make note of the port number (default is `8443`).
+
+### Connected devices number
+
+The integration might show a different number of connected devices compared to the WebUI network map. In this case, refer to the number of devices shown in the `AiMesh` section of the WebUI. Those two are different regardless of the actual use of AiMesh.
 
 ## :loudspeaker: Do you want to add AsusRouter to the default HA Core integrations?
 
@@ -20,7 +28,7 @@ You can find the full documentation on the [official webpage](https://asusrouter
 
 ## Firmware limitations
 
-Firmware versions `3.0.0.4.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` for the stock or `386.7` for Merlin FW.
+Firmware versions `3.0.0.4.x` and `3.0.0.6.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` or `106.xxxxx` for the stock or `386.7` for Merlin FW.
 
 Firmware `5.x.x` (some DSL models) is **NOT supported** (not AsusWRT).
 
@@ -49,7 +57,7 @@ To connect to the device you need to provide the following data:
 - Password
 - Whether to use an SSL connection
 
-Almost all the integration settings can be reconfigured later via the `Configure` button on the Integrations page without the need to remove your device and add it again.
+Almost all the integration settings can be reconfigured later via the `Configure` button on the Integrations' page without the need to remove your device and add it again.
 
 [![Open your Home Assistant instance and show your integrations.](https://my.home-assistant.io/badges/integrations.svg)](https://my.home-assistant.io/redirect/integrations/)
 
@@ -59,9 +67,9 @@ AsusRouter supports 14+ groups of features, including monitoring of:
 - connected device, CPU, guest WLAN, LED, load average, network, OpenVPN, parental control, ports, RAM, temperature, WAN, WLAN.
 
 and control of:
-- gues WLAN, LED, OpenVPN, parental control, WLAN.
+- guest WLAN, LED, OpenVPN, parental control, WLAN.
 
- as well as the following HA platrorms:
+ as well as the following HA platforms:
 - `binary_sensor`, `button`, `device_tracker`, `light`, `sensor`, `switch`, `update`
 
 and HA events and services.
@@ -70,7 +78,7 @@ and HA events and services.
 
 ## Supported devices
 
-AsusRouter supports virtually every AsusWRT-powered device.
+AsusRouter supports virtually every AsusWRT-powered device. This list is purely based on the reports from the users. Other devices with the compatible firmware should work as well.
 
 ### WiFi 7 | 802.11be
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
@@ -200,6 +208,8 @@ You are also welcome to submit [pull requests](https://github.com/Vaskivskyi/ha-
 This integration is a free-time project. If you like it, you can support me by buying a coffee.
 
 <a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://asusrouter.vaskivskyi.com/BuyMeACoffee.png" alt="Buy Me A Coffee" style="height: 60px !important;"></a>
+
+Moreover, you can support the integration by using the Amazon links provided in the device lists. Any purchase (even not related to the exact product) might bring a small commission to the project.
 
 ## Thanks to
 
