@@ -8,9 +8,17 @@
 
 The integration uses the native HTTP(S) API (the same way as WebUI) and relies on direct communication with your device.
 
-## Full documentation
+## Documentation and tips
 
 You can find the full documentation on the [official webpage](https://asusrouter.vaskivskyi.com/).
+
+### Use HTTPS connection
+
+It is recommended to use an HTTPS connection to your router (SSL). While both the SSL and non-SSL connections are fully supported, some devices might have issues with disconnects on HTTP. In order to use SSL, you need to enable it in the router settings: `Administration -> System -> Local Access Config -> Authentication Method`. Put it to `BOTH` (recommended) or `HTTPS`. Make note of the port number (default is `8443`).
+
+### Connected devices number
+
+The integration might show a different number of connected devices compared to the WebUI network map. In this case, refer to the number of devices shown in the `AiMesh` section of the WebUI. Those two are different regardless of the actual use of AiMesh.
 
 ## :loudspeaker: Do you want to add AsusRouter to the default HA Core integrations?
 
@@ -20,7 +28,7 @@ You can find the full documentation on the [official webpage](https://asusrouter
 
 ## Firmware limitations
 
-Firmware versions `3.0.0.4.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` for the stock or `386.7` for Merlin FW.
+Firmware versions `3.0.0.4.x` and `3.0.0.6.x` are fully supported (older versions might have a limited amount of sensors available). When talking about the FW, `3.0.0.4` might be missed since it is the same all the time. Important is only the last part, e.g. `386.48631` or `106.xxxxx` for the stock or `386.7` for Merlin FW.
 
 Firmware `5.x.x` (some DSL models) is **NOT supported** (not AsusWRT).
 
@@ -49,7 +57,7 @@ To connect to the device you need to provide the following data:
 - Password
 - Whether to use an SSL connection
 
-Almost all the integration settings can be reconfigured later via the `Configure` button on the Integrations page without the need to remove your device and add it again.
+Almost all the integration settings can be reconfigured later via the `Configure` button on the Integrations' page without the need to remove your device and add it again.
 
 [![Open your Home Assistant instance and show your integrations.](https://my.home-assistant.io/badges/integrations.svg)](https://my.home-assistant.io/redirect/integrations/)
 
@@ -59,9 +67,9 @@ AsusRouter supports 14+ groups of features, including monitoring of:
 - connected device, CPU, guest WLAN, LED, load average, network, OpenVPN, parental control, ports, RAM, temperature, WAN, WLAN.
 
 and control of:
-- gues WLAN, LED, OpenVPN, parental control, WLAN.
+- guest WLAN, LED, OpenVPN, parental control, WLAN.
 
- as well as the following HA platrorms:
+ as well as the following HA platforms:
 - `binary_sensor`, `button`, `device_tracker`, `light`, `sensor`, `switch`, `update`
 
 and HA events and services.
@@ -70,15 +78,21 @@ and HA events and services.
 
 ## Supported devices
 
-AsusRouter supports virtually every AsusWRT-powered device.
+AsusRouter supports virtually every AsusWRT-powered device. This list is purely based on the reports from the users. Other devices with the compatible firmware should work as well.
 
 ### WiFi 7 | 802.11be
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
 |---|---|---|---|
 |[GT-BE98](https://asusrouter.vaskivskyi.com/devices/GT-BE98.html)|💛 Expected to work||<a href="https://amzn.to/3vGztgz" rel="nofollow sponsored" target="_blank">find it</a>|
 |[GT-BE98 Pro](https://asusrouter.vaskivskyi.com/devices/GT-BE98Pro.html)|💛 Expected to work||<a href="https://amzn.to/3uoSjeR" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-BE88U](https://asusrouter.vaskivskyi.com/devices/RT-BE88U.html)|💛 Expected to work||<a href="https://amzn.to/3TAGCKY" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-BE96U](https://asusrouter.vaskivskyi.com/devices/RT-BE96U.html)|💛 Expected to work||<a href="https://amzn.to/3vJu8oD" rel="nofollow sponsored" target="_blank">find it</a>|
+|[TUF-BE3600](https://asusrouter.vaskivskyi.com/devices/TUF-BE3600.html)|💛 Expected to work||<a href="https://amzn.to/3VhHoyt" rel="nofollow sponsored" target="_blank">find it</a>|
+|[TUF-BE6500](https://asusrouter.vaskivskyi.com/devices/TUF-BE6500.html)|💛 Expected to work||<a href="https://amzn.to/3X3Xltv" rel="nofollow sponsored" target="_blank">find it</a>|
+|[ZenWiFi BD4](https://asusrouter.vaskivskyi.com/devices/ZenWiFiBD4.html)|💛 Expected to work||<a href="https://amzn.to/3Kfulr1" rel="nofollow sponsored" target="_blank">find it</a>|
+|[ZenWiFi BQ16](https://asusrouter.vaskivskyi.com/devices/ZenWiFiBQ16.html)|💛 Expected to work||<a href="https://amzn.to/4bgVvdo" rel="nofollow sponsored" target="_blank">find it</a>|
 |[ZenWiFi BQ16 Pro](https://asusrouter.vaskivskyi.com/devices/ZenWiFiBQ16Pro.html)|💛 Expected to work||<a href="https://amzn.to/3MNcw48" rel="nofollow sponsored" target="_blank">find it</a>|
+|[ZenWiFi BT10](https://asusrouter.vaskivskyi.com/devices/ZenWiFiBT10.html)|💛 Expected to work||<a href="https://amzn.to/48F5wiB" rel="nofollow sponsored" target="_blank">find it</a>|
 
 ### WiFi 6e | 802.11axe
 |Model|Status|Tested firmware|Find it on Amazon[^amazon]|
@@ -97,20 +111,23 @@ AsusRouter supports virtually every AsusWRT-powered device.
 |[GT-AX11000 Pro](https://asusrouter.vaskivskyi.com/devices/GT-AX11000Pro.html)|💚 Confirmed|Stock:<li>`388.24198`</li>|<a href="https://amzn.to/3VUNbHl" rel="nofollow sponsored" target="_blank">find it</a>|
 |[GT-AX6000](https://asusrouter.vaskivskyi.com/devices/GT-AX6000.html)|💛 Expected to work||<a href="https://amzn.to/3GrKHKG" rel="nofollow sponsored" target="_blank">find it</a>|
 |[GT6](https://asusrouter.vaskivskyi.com/devices/GT6.html)|💛 Expected to work||<a href="https://amzn.to/3GmPCfR" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX3000P](https://asusrouter.vaskivskyi.com/devices/RT-AX3000P.html)|💛 Expected to work||<a href="https://amzn.to/3RPa2UO" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX52](https://asusrouter.vaskivskyi.com/devices/RT-AX52.html)|💛 Expected to work||<a href="https://amzn.to/40Ph3sO" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX53U](https://asusrouter.vaskivskyi.com/devices/RT-AX53U.html)|💚 Confirmed|Stock:<li>`386.69061`</li>|<a href="https://amzn.to/49jEgqO" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX5400](https://asusrouter.vaskivskyi.com/devices/RT-AX5400.html)|💛 Expected to work||<a href="https://amzn.to/4aCdvyu" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX55](https://asusrouter.vaskivskyi.com/devices/RT-AX55.html)|💚 Confirmed|Stock:<li>`386.50410`</li><li>`386.52041`</li>|<a href="https://amzn.to/3Z2ath5" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX56U](https://asusrouter.vaskivskyi.com/devices/RT-AX56U.html)|💚 Confirmed|Merlin:<li>`386.7_2`</li><li>`388.1_0`</li><li>`388.2_2`</li>|<a href="https://amzn.to/3vrIeuz" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX57](https://asusrouter.vaskivskyi.com/devices/RT-AX57.html)|💛 Expected to work||<a href="https://amzn.to/3IWnZNx" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX57 Go](https://asusrouter.vaskivskyi.com/devices/RT-AX57Go.html)|💛 Expected to work||<a href="https://amzn.to/47kE9db" rel="nofollow sponsored" target="_blank">find it</a>|
-|[RT-AX58U](https://asusrouter.vaskivskyi.com/devices/RT-AX58U.html)|💚 Confirmed|Stock:<li>`386.49674`</li><li>`388.22237`</li>Merlin:<li>`386.7_2`</li><li>`388.1_0`</li><li>`388.4_0`</li>|<a href="https://amzn.to/3jHri0L" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX57M](https://asusrouter.vaskivskyi.com/devices/RT-AX57M.html)|💛 Expected to work||<a href="https://amzn.to/3vbVl6k" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX58U](https://asusrouter.vaskivskyi.com/devices/RT-AX58U.html)|💚 Confirmed|Stock:<li>`386.49674`</li><li>`388.22237`</li>Merlin:<li>`386.7_2`</li><li>`388.1_0`</li><li>`388.4_0`</li><li>`388.7.0`</li>|<a href="https://amzn.to/3jHri0L" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX59U](https://asusrouter.vaskivskyi.com/devices/RT-AX59U.html)|💛 Expected to work||<a href="https://amzn.to/3CVCVYO" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX68U](https://asusrouter.vaskivskyi.com/devices/RT-AX68U.html)|💚 Confirmed|Stock:<li>`388.21732`</li>|<a href="https://amzn.to/3WzRwk5" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX82U](https://asusrouter.vaskivskyi.com/devices/RT-AX82U.html)|💚 Confirmed|Stock:<li>`386.48664`</li><li>`386.49674`</li>|<a href="https://amzn.to/3Gv2Bxi" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX86S](https://asusrouter.vaskivskyi.com/devices/RT-AX86S.html)|💚 Confirmed|Stock:<li>`386.46061`</li><li>`386.48260`</li><li>`386.49447`</li><li>`388.22525`</li>Merlin:<li>`386.7_2`</li>|<a href="https://amzn.to/3GuKac5" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX86U](https://asusrouter.vaskivskyi.com/devices/RT-AX86U.html)|💚 Confirmed|Stock:<li>`386.46061`</li><li>`386.48260`</li><li>`386.49447`</li><li>`388.22525`</li>Merlin:<li>`386.7_2`</li><li>`388.4_0`</li>|<a href="https://amzn.to/3WCBcPO" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX86U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX86UPro.html)|💚 Confirmed|Stock:<li>`388.23565`</li>|<a href="https://amzn.to/3ZDM41T" rel="nofollow sponsored" target="_blank">find it</a>|
-|[RT-AX88U](https://asusrouter.vaskivskyi.com/devices/RT-AX88U.html)|💚 Confirmed|Stock:<li>`386.45934`</li><li>`386.48631`</li><li>`388.24198`</li>Merlin:<li>`386.5_2`</li><li>`386.8_0`</li><li>`388.1_0`</li><li>`388.2_0`</li><li>`388.4_0`</li>|<a href="https://amzn.to/3i2VfYu" rel="nofollow sponsored" target="_blank">find it</a>|
+|[RT-AX88U](https://asusrouter.vaskivskyi.com/devices/RT-AX88U.html)|💚 Confirmed|Stock:<li>`386.45934`</li><li>`386.48631`</li><li>`388.24198`</li>Merlin:<li>`386.5_2`</li><li>`386.8_0`</li><li>`388.1_0`</li><li>`388.2_0`</li><li>`388.4_0`</li><li>`388.7_0`</li>|<a href="https://amzn.to/3i2VfYu" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX88U Pro](https://asusrouter.vaskivskyi.com/devices/RT-AX88UPro.html)|💚 Confirmed|Merlin:<li>`388.4_0`</li>|<a href="https://amzn.to/3QNDpFZ" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX89X](https://asusrouter.vaskivskyi.com/devices/RT-AX89X.html)|💚 Confirmed||<a href="https://amzn.to/3i55b3S" rel="nofollow sponsored" target="_blank">find it</a>|
 |[RT-AX92U](https://asusrouter.vaskivskyi.com/devices/RT-AX92U.html)|💚 Confirmed|Stock:<li>`386.46061`</li>|<a href="https://amzn.to/3jJJgzt" rel="nofollow sponsored" target="_blank">find it</a>|
@@ -191,6 +208,8 @@ You are also welcome to submit [pull requests](https://github.com/Vaskivskyi/ha-
 This integration is a free-time project. If you like it, you can support me by buying a coffee.
 
 <a href="https://www.buymeacoffee.com/vaskivskyi" target="_blank"><img src="https://asusrouter.vaskivskyi.com/BuyMeACoffee.png" alt="Buy Me A Coffee" style="height: 60px !important;"></a>
+
+Moreover, you can support the integration by using the Amazon links provided in the device lists. Any purchase (even not related to the exact product) might bring a small commission to the project.
 
 ## Thanks to
 
