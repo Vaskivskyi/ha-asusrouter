@@ -113,7 +113,7 @@ class ARDeviceEntity(ScannerEntity):
             identifiers={
                 (DOMAIN, mac_address),
             },
-            name=name,
+            default_name=name,
             via_device=(DOMAIN, self._router.mac),
         )
 
