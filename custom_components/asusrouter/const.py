@@ -290,7 +290,7 @@ MODE_SENSORS = {
 SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_BOOTTIME = ["datetime"]
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = [NUMBER, DEVICES, "latest", "latest_time"]
+SENSORS_CONNECTED_DEVICES = [NUMBER, DEVICES, "latest", "latest_time", "gn_number"]
 SENSORS_CPU = [TOTAL, USED, USAGE]
 SENSORS_FIRMWARE = [STATE]
 SENSORS_GWLAN = {
@@ -1065,6 +1065,17 @@ STATIC_SENSORS: list[AREntityDescription] = [
         extra_state_attributes={
             "devices": "devices",
         },
+    ),
+    # Connected GuestNetwork devices
+    ARSensorDescription(
+        key="gn_number",
+        key_group="devices",
+        name="Connected GuestNetwork Devices",
+        icon=ICON_ROUTER,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={},
     ),
     # CPU
     ARSensorDescription(
