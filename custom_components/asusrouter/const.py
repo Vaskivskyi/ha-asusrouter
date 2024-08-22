@@ -1078,9 +1078,7 @@ STATIC_SENSORS: list[AREntityDescription] = [
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
-        extra_state_attributes={
-            "devices": "devices",
-        },
+        extra_state_attributes={},
     ),
     # CPU
     ARSensorDescription(
