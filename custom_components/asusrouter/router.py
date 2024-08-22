@@ -570,15 +570,14 @@ class ARDevice:
         self._clients_number = 0
         self._clients_list = []
 
+        # Connected GuestNetwork clients sensor
+        self._gn_clients_number = 0
+
         for client_mac, client in self._clients.items():
             if client.state:
                 self._clients_number += 1
                 self._clients_list.append(client.identity)
 
-        # Connected GuestNetwork clients sensor
-        self._gn_clients_number = 0
-
-        for client_mac, client in self._clients.items():
             if isinstance(client.connection, AsusClientConnectionWlan) and client.connection.guest:
                 self._gn_clients_number += 1
 
