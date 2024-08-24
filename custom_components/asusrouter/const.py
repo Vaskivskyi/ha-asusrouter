@@ -4,13 +4,6 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import AsusBlockAll, AsusParentalControl
-from asusrouter.modules.port_forwarding import AsusPortForwarding
-from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wireguard import AsusWireGuardClient, AsusWireGuardServer
-from asusrouter.modules.wlan import AsusWLAN, Wlan
-from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -31,6 +24,20 @@ from homeassistant.const import (
     UnitOfInformation,
     UnitOfTemperature,
 )
+
+from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
+from asusrouter.modules.parental_control import (
+    AsusBlockAll,
+    AsusParentalControl,
+)
+from asusrouter.modules.port_forwarding import AsusPortForwarding
+from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import (
+    AsusWireGuardClient,
+    AsusWireGuardServer,
+)
+from asusrouter.modules.wlan import AsusWLAN, Wlan
+from asusrouter.tools import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
@@ -81,6 +88,7 @@ ALL_CLIENTS = "all_clients"
 API_ID = "api_id"
 API_TYPE = "api_type"
 APPLY = "apply"
+AURA = "aura"
 BITS_PER_SECOND = "bits/s"
 BOOTTIME = "boottime"
 BRIDGE = "bridge"
@@ -255,7 +263,7 @@ MODE_NODE = [
 
 # Access Point
 MODE_ACCESS_POINT = MODE_NODE.copy()
-MODE_ACCESS_POINT.extend([WLAN])
+MODE_ACCESS_POINT.extend([WLAN, AURA])
 
 # Media Bridge
 MODE_MEDIA_BRIDGE = MODE_ACCESS_POINT.copy()
@@ -1029,6 +1037,22 @@ STATIC_LIGHTS: list[AREntityDescription] = [
         entity_registry_enabled_default=True,
     ),
 ]
+STATIC_AURA: list[AREntityDescription] = [
+    ARLightDescription(
+        key="state",
+        key_group="aura",
+        name="AURA",
+        icon_on=ICON_LIGHT_ON,
+        icon_off=ICON_LIGHT_OFF,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            "brightness": "brightness",
+            "rgb_color": "rgb_color",
+            "zones": "zones",
+        },
+    ),
+]
 STATIC_SENSORS: list[AREntityDescription] = [
     # AiMesh
     ARSensorDescription(
@@ -1087,7 +1111,9 @@ STATIC_SENSORS: list[AREntityDescription] = [
         native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        extra_state_attributes={f"{num}_usage": f"core_{num}" for num in NUMERIC_CORES},
+        extra_state_attributes={
+            f"{num}_usage": f"core_{num}" for num in NUMERIC_CORES
+        },
     ),
     # Latest connected
     ARSensorDescription(
@@ -1236,7 +1262,8 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{num}_{key}": value for key, value in SENSORS_OVPN_CLIENT.items()
+                f"{num}_{key}": value
+                for key, value in SENSORS_OVPN_CLIENT.items()
             },
         )
         for num in range(1, 6)
@@ -1258,7 +1285,8 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{num}_{key}": value for key, value in SENSORS_OVPN_SERVER.items()
+                f"{num}_{key}": value
+                for key, value in SENSORS_OVPN_SERVER.items()
             },
         )
         for num in NUMERIC_OVPN_SERVER
@@ -1280,7 +1308,8 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_CLIENT.items()
+                f"{num}_{key}": value
+                for key, value in SENSORS_WIREGUARD_CLIENT.items()
             },
         )
         for num in range(1, 6)
@@ -1302,7 +1331,8 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{num}_{key}": value for key, value in SENSORS_WIREGUARD_SERVER.items()
+                f"{num}_{key}": value
+                for key, value in SENSORS_WIREGUARD_SERVER.items()
             },
         )
         for num in range(1, 2)
@@ -1370,7 +1400,8 @@ STATIC_SWITCHES.extend(
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             extra_state_attributes={
-                f"{wlan}_{gwlan}_{key}": value for key, value in SENSORS_GWLAN.items()
+                f"{wlan}_{gwlan}_{key}": value
+                for key, value in SENSORS_GWLAN.items()
             },
         )
         for gwlan in NUMERIC_GWLAN
