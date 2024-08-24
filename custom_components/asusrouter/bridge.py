@@ -10,6 +10,7 @@ import aiohttp
 from asusrouter import AsusRouter
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
+from asusrouter.modules.aura import AsusAura
 from asusrouter.modules.client import AsusClient
 from asusrouter.modules.data import AsusData
 from asusrouter.modules.homeassistant import (
@@ -34,6 +35,7 @@ from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
 from .const import (
+    AURA,
     BOOTTIME,
     CONF_CACHE_TIME,
     CONF_DEFAULT_CACHE_TIME,
@@ -66,6 +68,7 @@ from .const import (
     TEMPERATURE,
     WLAN,
 )
+from .modules.aura import aura_to_ha
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -185,6 +188,10 @@ class ARBridge:
         """Get available sensors."""
 
         sensors = {
+            AURA: {
+                SENSORS: await self._get_sensors_modern(AsusData.AURA),
+                METHOD: self._get_data_aura,
+            },
             BOOTTIME: {SENSORS: SENSORS_BOOTTIME, METHOD: self._get_data_boottime},
             CPU: {
                 SENSORS: await self._get_sensors_modern(AsusData.CPU),
@@ -308,6 +315,13 @@ class ARBridge:
         return await self._get_data(AsusData.CLIENTS, force=True)
 
     # Sensor-specific methods
+    async def _get_data_aura(self) -> dict[str, Any]:
+        """Get Aura data from the device."""
+
+        data = await self._get_data_modern(AsusData.AURA)
+
+        return aura_to_ha(data)
+
     async def _get_data_boottime(self) -> dict[str, Any]:
         """Get `boottime` data from the device."""
 
