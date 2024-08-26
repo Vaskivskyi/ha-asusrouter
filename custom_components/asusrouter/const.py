@@ -300,7 +300,13 @@ MODE_SENSORS = {
 SENSORS_AIMESH = [NUMBER, LIST]
 SENSORS_BOOTTIME = ["datetime"]
 SENSORS_CHANGE = ["change"]
-SENSORS_CONNECTED_DEVICES = [NUMBER, DEVICES, "latest", "latest_time", "gn_number"]
+SENSORS_CONNECTED_DEVICES = [
+    NUMBER,
+    DEVICES,
+    "latest",
+    "latest_time",
+    "gn_number",
+]
 SENSORS_CPU = [TOTAL, USED, USAGE]
 SENSORS_FIRMWARE = [STATE]
 SENSORS_GWLAN = {
@@ -1491,7 +1497,8 @@ STATIC_UPDATES: list[AREntityDescription] = [
         device_class=UpdateDeviceClass.FIRMWARE,
         extra_state_attributes={
             "current": "current",
-            "available": "available",
+            "latest": "latest",
+            "latest_beta": "latest_beta",
             "release_note": "release_note",
         },
     )
