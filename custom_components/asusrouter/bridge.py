@@ -7,20 +7,6 @@ import logging
 from typing import Any, Callable, Optional
 
 import aiohttp
-from asusrouter import AsusRouter
-from asusrouter.error import AsusRouterError
-from asusrouter.modules.aimesh import AiMeshDevice
-from asusrouter.modules.aura import AsusAura
-from asusrouter.modules.client import AsusClient
-from asusrouter.modules.data import AsusData
-from asusrouter.modules.homeassistant import (
-    convert_to_ha_data,
-    convert_to_ha_sensors,
-    convert_to_ha_sensors_list,
-    convert_to_ha_state_bool,
-)
-from asusrouter.modules.identity import AsusDevice
-from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -32,6 +18,20 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import UpdateFailed
+
+from asusrouter import AsusRouter
+from asusrouter.error import AsusRouterError
+from asusrouter.modules.aimesh import AiMeshDevice
+from asusrouter.modules.client import AsusClient
+from asusrouter.modules.data import AsusData
+from asusrouter.modules.homeassistant import (
+    convert_to_ha_data,
+    convert_to_ha_sensors,
+    convert_to_ha_sensors_list,
+    convert_to_ha_state_bool,
+)
+from asusrouter.modules.identity import AsusDevice
+from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 
 from . import helpers
 from .const import (
@@ -69,6 +69,7 @@ from .const import (
     WLAN,
 )
 from .modules.aura import aura_to_ha
+from .modules.firmware import to_ha as firmware_to_ha
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -103,7 +104,9 @@ class ARBridge:
         self._active: bool = False
 
     @staticmethod
-    def _get_api(configs: dict[str, Any], session: aiohttp.ClientSession) -> AsusRouter:
+    def _get_api(
+        configs: dict[str, Any], session: aiohttp.ClientSession
+    ) -> AsusRouter:
         """Get AsusRouter API."""
 
         return AsusRouter(
@@ -172,14 +175,18 @@ class ARBridge:
     # <-- Connection
     # --------------------
 
-    async def async_cleanup_sensors(self, sensors: dict[str, Any]) -> dict[str, Any]:
+    async def async_cleanup_sensors(
+        self, sensors: dict[str, Any]
+    ) -> dict[str, Any]:
         """Cleanup sensors depending on the device mode."""
 
         mode = self._configs.get(CONF_MODE, CONF_DEFAULT_MODE)
         available = MODE_SENSORS[mode]
         _LOGGER.debug("Available sensors for mode=`%s`: %s", mode, available)
         sensors = {
-            group: details for group, details in sensors.items() if group in available
+            group: details
+            for group, details in sensors.items()
+            if group in available
         }
 
         return sensors
@@ -192,7 +199,10 @@ class ARBridge:
                 SENSORS: await self._get_sensors_modern(AsusData.AURA),
                 METHOD: self._get_data_aura,
             },
-            BOOTTIME: {SENSORS: SENSORS_BOOTTIME, METHOD: self._get_data_boottime},
+            BOOTTIME: {
+                SENSORS: SENSORS_BOOTTIME,
+                METHOD: self._get_data_boottime,
+            },
             CPU: {
                 SENSORS: await self._get_sensors_modern(AsusData.CPU),
                 METHOD: self._get_data_cpu,
@@ -214,7 +224,9 @@ class ARBridge:
                 METHOD: self._get_data_network,
             },
             "ovpn_client": {
-                SENSORS: await self._get_sensors_modern(AsusData.OPENVPN_CLIENT),
+                SENSORS: await self._get_sensors_modern(
+                    AsusData.OPENVPN_CLIENT
+                ),
                 METHOD: self._get_data_ovpn_client,
             },
             "ovpn_server": {
@@ -247,11 +259,15 @@ class ARBridge:
                 METHOD: self._get_data_wan,
             },
             "wireguard_client": {
-                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_CLIENT),
+                SENSORS: await self._get_sensors_modern(
+                    AsusData.WIREGUARD_CLIENT
+                ),
                 METHOD: self._get_data_wireguard_client,
             },
             "wireguard_server": {
-                SENSORS: await self._get_sensors_modern(AsusData.WIREGUARD_SERVER),
+                SENSORS: await self._get_sensors_modern(
+                    AsusData.WIREGUARD_SERVER
+                ),
                 METHOD: self._get_data_wireguard_server,
             },
             WLAN: {
@@ -331,7 +347,9 @@ class ARBridge:
     async def _get_data_firmware(self) -> dict[str, Any]:
         """Get firmware data from the device."""
 
-        return await self._get_data(AsusData.FIRMWARE)
+        data = await self._get_data_modern(AsusData.FIRMWARE)
+
+        return firmware_to_ha(data)
 
     async def _get_data_gwlan(self) -> dict[str, Any]:
         """Get GWLAN data from the device."""
@@ -506,7 +524,9 @@ class ARBridge:
                 "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
             )
             sensors = (
-                process(data) if process is not None else self._process_sensors(data)
+                process(data)
+                if process is not None
+                else self._process_sensors(data)
             )
             _LOGGER.debug("Available `%s` sensors: %s", sensor_type, sensors)
         except AsusRouterError as ex:
@@ -530,7 +550,9 @@ class ARBridge:
                 "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
             )
             sensors = convert_to_ha_sensors_list(data)
-            _LOGGER.debug("Available `%s` sensors: %s", datatype.value, sensors)
+            _LOGGER.debug(
+                "Available `%s` sensors: %s", datatype.value, sensors
+            )
         except AsusRouterError as ex:
             if datatype.value in DEFAULT_SENSORS:
                 sensors = DEFAULT_SENSORS[datatype.value]
@@ -651,7 +673,9 @@ class ARBridge:
                 reg_value = entity_reg.async_get(entity)
                 if not isinstance(reg_value, er.RegistryEntry):
                     continue
-                capabilities: dict[str, Any] = helpers.as_dict(reg_value.capabilities)
+                capabilities: dict[str, Any] = helpers.as_dict(
+                    reg_value.capabilities
+                )
                 devices.append(capabilities)
 
         # Convert devices to rules

@@ -6,12 +6,13 @@ import asyncio
 import logging
 from typing import Any
 
-from asusrouter.modules.system import AsusSystem
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+
+from asusrouter.modules.system import AsusSystem
 
 from .const import STATIC_UPDATES
 from .dataclass import ARUpdateDescription
@@ -49,9 +50,13 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         super().__init__(coordinator, router, description)
         self.entity_description: ARUpdateDescription = description
 
-        self._attr_installed_version = self.extra_state_attributes.get("current")
-        self._attr_latest_version = self.extra_state_attributes.get("available")
-        self._attr_release_summary = self.extra_state_attributes.get("release_note")
+        self._attr_installed_version = self.extra_state_attributes.get(
+            "current"
+        )
+        self._attr_latest_version = self.extra_state_attributes.get("latest")
+        self._attr_release_summary = self.extra_state_attributes.get(
+            "release_note"
+        )
         self._attr_in_progress = False
 
         self._attr_supported_features = (
@@ -87,5 +92,6 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
 
         except Exception as ex:  # pylint: disable=broad-except
             _LOGGER.error(
-                "An exception occurred while trying to install the update: %s", ex
+                "An exception occurred while trying to install the update: %s",
+                ex,
             )
