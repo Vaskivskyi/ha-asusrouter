@@ -306,7 +306,7 @@ SENSORS_CONNECTED_DEVICES = [
     "gn_number",
 ]
 SENSORS_CPU = [TOTAL, USED, USAGE]
-SENSORS_FIRMWARE = [STATE]
+SENSORS_FIRMWARE = [STATE, "state_beta"]
 SENSORS_GWLAN = {
     "sync_node": "aimesh_sync",
     "auth_mode_x": "auth_method",
@@ -1440,13 +1440,26 @@ STATIC_UPDATES: list[AREntityDescription] = [
         name="Firmware update",
         icon=ICON_UPDATE,
         device_class=UpdateDeviceClass.FIRMWARE,
+        entity_registry_enabled_default=True,
         extra_state_attributes={
             "current": "current",
             "latest": "latest",
-            "latest_beta": "latest_beta",
             "release_note": "release_note",
         },
-    )
+    ),
+    ARUpdateDescription(
+        key="state_beta",
+        key_group="firmware",
+        name="Firmware update (Beta)",
+        icon=ICON_UPDATE,
+        device_class=UpdateDeviceClass.FIRMWARE,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "current": "current",
+            "latest_beta": "latest",
+            "release_note": "release_note",
+        },
+    ),
 ]
 
 # <-- SENSORS
