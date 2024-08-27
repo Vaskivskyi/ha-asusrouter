@@ -5,19 +5,17 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Callable, Optional
 
+from homeassistant.core import callback
+from homeassistant.helpers.device_registry import format_mac
+
 from asusrouter.modules.client import (
     AsusClient,
     AsusClientConnection,
     AsusClientConnectionWlan,
     AsusClientDescription,
 )
-from asusrouter.modules.connection import ConnectionState
-from asusrouter.modules.homeassistant import (
-    convert_to_ha_state_bool,
-    convert_to_ha_string,
-)
-from homeassistant.core import callback
-from homeassistant.helpers.device_registry import format_mac
+from asusrouter.modules.connection import ConnectionState, ConnectionType
+from asusrouter.modules.homeassistant import convert_to_ha_state_bool
 
 from .helpers import clean_dict
 
@@ -49,6 +47,9 @@ class ARClient:
 
         # Connection state
         self._state: ConnectionState = ConnectionState.UNKNOWN
+        self._connection_type: ConnectionType = ConnectionType.DISCONNECTED
+        self._guest: bool = False
+        self._guest_id: int = 0
 
         # Device last active
         self._last_activity: Optional[datetime] = None
@@ -58,7 +59,9 @@ class ARClient:
         self,
         client_info: Optional[AsusClient] = None,
         consider_home: int = 0,
-        event_call: Optional[Callable[[str, Optional[dict[str, Any]]], None]] = None,
+        event_call: Optional[
+            Callable[[str, Optional[dict[str, Any]]], None]
+        ] = None,
     ):
         """Update client information."""
 
@@ -77,7 +80,7 @@ class ARClient:
             # Connected state
             state = client_info.state
 
-        self._identity = self.generate_identity()
+        self._identity = self.generate_identity(state)
         self._extra_state_attributes = self.generate_extra_state_attributes()
 
         # If is connected
@@ -111,7 +114,9 @@ class ARClient:
                     self.identity,
                 )
 
-    def generate_identity(self) -> dict[str, Any]:
+    def generate_identity(
+        self, state: Optional[ConnectionState]
+    ) -> dict[str, Any]:
         """Generate client identity."""
 
         identity: dict[str, Any] = {
@@ -121,14 +126,22 @@ class ARClient:
         }
 
         if isinstance(self.connection, AsusClientConnection):
-            identity["connection_type"] = convert_to_ha_string(self.connection.type)
+            # Rewrite guest from last known state if needed
+            if state == ConnectionState.DISCONNECTED:
+                identity["guest"] = self._guest
+                identity["guest_id"] = self._guest_id
+            if self.connection.type != ConnectionType.DISCONNECTED:
+                self._connection_type = self.connection.type
+            identity["connection_type"] = self._connection_type
             identity["node"] = (
-                format_mac(self.connection.node) if self.connection.node else None
+                format_mac(self.connection.node)
+                if self.connection.node
+                else None
             )
 
         if isinstance(self.connection, AsusClientConnectionWlan):
-            identity["guest"] = self.connection.guest
-            identity["guest_id"] = self.connection.guest_id
+            identity["guest"] = self._guest = self.connection.guest
+            identity["guest_id"] = self._guest_id = self.connection.guest_id
             identity["connected"] = self.connection.since
 
         return clean_dict(identity)
@@ -136,7 +149,9 @@ class ARClient:
     def generate_extra_state_attributes(self) -> dict[str, Any]:
         """Generate extra state attributes."""
 
-        attributes: dict[str, Any] = self._identity.copy() if self._identity else {}
+        attributes: dict[str, Any] = (
+            self._identity.copy() if self._identity else {}
+        )
 
         attributes["last_activity"] = self._last_activity
 
@@ -165,7 +180,9 @@ class ARClient:
     def ip_address(self) -> Optional[str]:
         """Return IP address."""
 
-        return self.connection.ip_address if self.connection is not None else None
+        return (
+            self.connection.ip_address if self.connection is not None else None
+        )
 
     @property
     def mac_address(self) -> str:
@@ -177,7 +194,11 @@ class ARClient:
     def name(self) -> Optional[str]:
         """Return name."""
 
-        return self.description.name if self.description is not None else self._name
+        return (
+            self.description.name
+            if self.description is not None
+            else self._name
+        )
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
