@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from asusrouter.error import AsusRouterError
+from asusrouter.modules.client import AsusClientConnectionWlan
 from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.identity import AsusDevice
 from asusrouter.modules.parental_control import ParentalControlRule
@@ -115,6 +116,7 @@ class ARSensorHandler:
         self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
+        self._gn_clients_number: int = 0
 
     async def _get_clients(self) -> dict[str, Any]:
         """Return clients sensors."""
@@ -124,6 +126,7 @@ class ARSensorHandler:
             SENSORS_CONNECTED_DEVICES[1]: self._clients_list,
             SENSORS_CONNECTED_DEVICES[2]: self._latest_connected_list,
             SENSORS_CONNECTED_DEVICES[3]: self._latest_connected,
+            SENSORS_CONNECTED_DEVICES[4]: self._gn_clients_number,
         }
 
     async def _get_aimesh(self) -> dict[str, Any]:
@@ -143,6 +146,7 @@ class ARSensorHandler:
         clients_list: Optional[list[Any]],
         latest_connected: Optional[datetime],
         latest_connected_list: list[Any],
+        gn_clients_number: int,
     ) -> bool:
         """Update connected devices attribute."""
 
@@ -151,12 +155,14 @@ class ARSensorHandler:
             and self._clients_list == clients_list
             and self._latest_connected == latest_connected
             and self._latest_connected_list == latest_connected_list
+            and self._gn_clients_number == gn_clients_number
         ):
             return False
         self._clients_number = clients_number
         self._clients_list = clients_list
         self._latest_connected = latest_connected
         self._latest_connected_list = latest_connected_list
+        self._gn_clients_number = gn_clients_number
         return True
 
     def update_aimesh(
@@ -286,6 +292,7 @@ class ARDevice:
         self._latest_connected: Optional[datetime] = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
+        self._gn_clients_number: int = 0
 
         # Sensor filters
         self.sensor_filters: dict[tuple[str, str], list[str]] = {}
@@ -563,10 +570,17 @@ class ARDevice:
         self._clients_number = 0
         self._clients_list = []
 
+        # Connected GuestNetwork clients sensor
+        self._gn_clients_number = 0
+
         for client_mac, client in self._clients.items():
             if client.state:
                 self._clients_number += 1
                 self._clients_list.append(client.identity)
+
+            if isinstance(client.connection, AsusClientConnectionWlan) and client.connection.guest:
+                self._gn_clients_number += 1
+
 
         # Filter clients
         # Only include the listed clients
@@ -802,6 +816,7 @@ class ARDevice:
             self._clients_list,
             self._latest_connected,
             self._latest_connected_list,
+            self._gn_clients_number,
         )
         self._sensor_handler.update_aimesh(
             self._aimesh_number,
@@ -861,6 +876,7 @@ class ARDevice:
                 clients_list,
                 self._latest_connected,
                 self._latest_connected_list,
+                self._gn_clients_number,
             ):
                 await coordinator.async_refresh()
 
