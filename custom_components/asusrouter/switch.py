@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -14,6 +13,8 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+
+from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 
 from .const import (
     ASUSROUTER,
@@ -42,7 +43,9 @@ async def async_setup_entry(
     switches = STATIC_SWITCHES.copy()
 
     hide = []
-    if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
+    if config_entry.options.get(
+        CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS
+    ):
         hide.extend(["password", "private_key", "psk"])
 
     await async_setup_ar_entry(
@@ -59,7 +62,9 @@ async def async_setup_entry(
         add_entities(router, async_add_entities, tracked)
 
     router.async_on_close(
-        async_dispatcher_connect(hass, router.signal_pc_rules_new, update_router)
+        async_dispatcher_connect(
+            hass, router.signal_pc_rules_new, update_router
+        )
     )
 
     update_router()
@@ -129,7 +134,9 @@ class ARSwitch(ARBinaryEntity, SwitchEntity):
     ) -> None:
         """Turn off switch."""
 
-        kwargs = self._state_off_args if self._state_off_args is not None else {}
+        kwargs = (
+            self._state_off_args if self._state_off_args is not None else {}
+        )
 
         await self._set_state(
             state=self._state_off,
@@ -151,7 +158,9 @@ class ClientInternetSwitch(SwitchEntity):
         self._router = router
         self._rule = rule
         self._mac = dr.format_mac(rule.mac)
-        self._attr_unique_id = to_unique_id(f"{router.mac}_{self._mac}_block_internet")
+        self._attr_unique_id = to_unique_id(
+            f"{router.mac}_{self._mac}_block_internet"
+        )
         self._attr_name = f"{rule.name} Block Internet"
 
         # Assign device info if set up
@@ -163,10 +172,7 @@ class ClientInternetSwitch(SwitchEntity):
 
         return DeviceInfo(
             connections={(dr.CONNECTION_NETWORK_MAC, self._mac)},
-            identifiers={
-                (DOMAIN, self._mac),
-            },
-            name=self._rule.name,
+            default_name=self._rule.name,
             via_device=(DOMAIN, self._router.mac),
         )
 

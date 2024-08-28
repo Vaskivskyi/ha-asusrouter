@@ -36,7 +36,9 @@ async def async_setup_entry(
 
     # If device tracking is disabled
     if (
-        config_entry.options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES)
+        config_entry.options.get(
+            CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES
+        )
         is False
     ):
         return
@@ -105,14 +107,13 @@ class ARDeviceEntity(ScannerEntity):
                 client.mac_address, client.name
             )
 
-    def _compile_device_info(self, mac_address: str, name: Optional[str]) -> DeviceInfo:
+    def _compile_device_info(
+        self, mac_address: str, name: Optional[str]
+    ) -> DeviceInfo:
         """Compile device info."""
 
         return DeviceInfo(
             connections={(dr.CONNECTION_NETWORK_MAC, mac_address)},
-            identifiers={
-                (DOMAIN, mac_address),
-            },
             default_name=name,
             via_device=(DOMAIN, self._router.mac),
         )
@@ -157,7 +158,9 @@ class ARDeviceEntity(ScannerEntity):
     def icon(self) -> str:
         """Device icon."""
 
-        return "mdi:lan-connect" if self._client.state else "mdi:lan-disconnect"
+        return (
+            "mdi:lan-connect" if self._client.state else "mdi:lan-disconnect"
+        )
 
     @property
     def unique_id(self) -> Optional[str]:
