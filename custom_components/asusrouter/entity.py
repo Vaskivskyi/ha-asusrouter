@@ -5,8 +5,6 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from asusrouter.modules.homeassistant import convert_to_ha_state_bool
-from asusrouter.modules.state import AsusState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -15,8 +13,15 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
+from asusrouter.modules.homeassistant import convert_to_ha_state_bool
+from asusrouter.modules.state import AsusState
+
 from .const import ASUSROUTER, COORDINATOR, DOMAIN
-from .dataclass import ARBinaryDescription, AREntityDescription, ARSwitchDescription
+from .dataclass import (
+    ARBinaryDescription,
+    AREntityDescription,
+    ARSwitchDescription,
+)
 from .helpers import to_unique_id
 from .router import ARDevice
 
@@ -59,10 +64,17 @@ async def async_setup_ar_entry(
                         }
 
                         entities.append(
-                            sensor_class(coordinator, router, sensor_description)
+                            sensor_class(
+                                coordinator, router, sensor_description
+                            )
                         )
             except Exception as ex:  # pylint: disable=broad-except
-                _LOGGER.warning(ex)
+                _LOGGER.warning(
+                    "Got an exception when creating entities: %s. Please, report this."
+                    + "Sensor description: %s",
+                    ex,
+                    sensor_description,
+                )
 
     async_add_entities(entities)
 
@@ -132,7 +144,9 @@ class ARBinaryEntity(AREntity):
 
         super().__init__(coordinator, router, description)
         if isinstance(description, (ARBinaryDescription, ARSwitchDescription)):
-            self._icon_onoff = bool(description.icon_on and description.icon_off)
+            self._icon_onoff = bool(
+                description.icon_on and description.icon_off
+            )
 
     @property
     def is_on(self) -> Optional[bool]:
@@ -148,7 +162,8 @@ class ARBinaryEntity(AREntity):
 
         if (
             isinstance(
-                self.entity_description, (ARBinaryDescription, ARSwitchDescription)
+                self.entity_description,
+                (ARBinaryDescription, ARSwitchDescription),
             )
             and self._icon_onoff
         ):
