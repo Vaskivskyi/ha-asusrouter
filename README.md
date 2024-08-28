@@ -68,11 +68,11 @@ Almost all the integration settings can be reconfigured later via the `Configure
 
 AsusRouter supports 14+ groups of features, including monitoring of:
 
-- connected device, CPU, guest WLAN, LED, load average, network, OpenVPN, parental control, ports, RAM, temperature, WAN, WLAN.
+- connected device, CPU, guest WLAN, LED, Aura RGB, load average, network, OpenVPN, parental control, ports, RAM, temperature, WAN, WLAN.
 
 and control of:
 
-- guest WLAN, LED, OpenVPN, parental control, WLAN.
+- guest WLAN, LED, Aura RGB, OpenVPN, parental control, WLAN.
 
 as well as the following HA platforms:
 
@@ -195,12 +195,6 @@ Here is the list of features being in process of development or considered for t
 <table>
 
 <tr><th>Group</th><th>Feature</th><th>Status</th></tr>
-
-<tr><td>Aura RGB</td><td><ol>
-<li>Full support (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/82">#82</a>)</li>
-</ol></td><td>
-<b>on hold</b><br/>(a device with Aura RGB support is required for development and testing)
-</td></tr>
 
 <tr><td>Connected device</td><td><ol>
 <li>Per-device traffic monitoring (<a href="https://github.com/Vaskivskyi/ha-asusrouter/issues/220">#220</a>)</li>
