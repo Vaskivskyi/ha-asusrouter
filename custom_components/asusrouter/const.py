@@ -1194,6 +1194,7 @@ STATIC_SENSORS: list[AREntityDescription] = [
         name="Speedtest Ping",
         icon=ICON_SPEEDTEST,
         state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         suggested_unit_of_measurement=UnitOfTime.MILLISECONDS,
         suggested_display_precision=3,
