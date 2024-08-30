@@ -190,6 +190,10 @@ class ARBridge:
                 SENSORS: await self._get_sensors_modern(AsusData.CPU),
                 METHOD: self._get_data_cpu,
             },
+            "dsl": {
+                SENSORS: await self._get_sensors_modern(AsusData.DSL),
+                METHOD: self._get_data_dsl,
+            },
             FIRMWARE: {
                 SENSORS: SENSORS_FIRMWARE,
                 METHOD: self._get_data_firmware,
@@ -317,6 +321,11 @@ class ARBridge:
         """Get CPU data from the device."""
 
         return await self._get_data(AsusData.CPU)
+    
+    async def _get_data_dsl(self) -> dict[str, Any]:
+        """Get DSL data from the device."""
+
+        return await self._get_data_modern(AsusData.DSL)
 
     async def _get_data_firmware(self) -> dict[str, Any]:
         """Get firmware data from the device."""

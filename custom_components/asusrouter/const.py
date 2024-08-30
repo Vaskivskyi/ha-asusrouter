@@ -1183,6 +1183,24 @@ STATIC_SENSORS: list[AREntityDescription] = [
             "xmask": "xmask",
         },
     ),
+    # DSL
+    ARSensorDescription(
+        key="datarate",
+        key_group="dsl",
+        name="DSL",
+        icon=ICON_ROUTER,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.BITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        suggested_display_precision=3,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "down": "down",
+            "up": "up",
+        },
+    ),
 ]
 # Temperature sensors
 STATIC_SENSORS.extend(
