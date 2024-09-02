@@ -93,6 +93,7 @@ CORE = "core"
 CPU = "cpu"
 DEVICES = "devices"
 DNS = "dns"
+DSL = "dsl"
 FIRMWARE = "firmware"
 FREE = "free"
 GWLAN = "gwlan"
@@ -265,6 +266,7 @@ MODE_MEDIA_BRIDGE = MODE_ACCESS_POINT.copy()
 MODE_ROUTER = MODE_ACCESS_POINT.copy()
 MODE_ROUTER.extend(
     [
+        DSL,
         GWLAN,
         "ovpn_client",
         "ovpn_server",
@@ -1081,6 +1083,31 @@ STATIC_SENSORS: list[AREntityDescription] = [
         entity_registry_enabled_default=False,
         extra_state_attributes={f"{num}_usage": f"core_{num}" for num in NUMERIC_CORES},
     ),
+    # DSL
+    ARSensorDescription(
+        key="datarate_up",
+        key_group=DSL,
+        name="DSL Datarate Up",
+        icon="mdi:upload-network-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND, 
+        suggested_display_precision=0,
+        entity_registry_enabled_default=True,
+    ),
+    ARSensorDescription(
+        key="datarate_down",
+        key_group=DSL,
+        name="DSL Datarate Down",
+        icon="mdi:download-network-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
+        native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
+        suggested_display_precision=0,
+        entity_registry_enabled_default=True,
+    ),
     # Latest connected
     ARSensorDescription(
         key="latest_time",
@@ -1181,24 +1208,6 @@ STATIC_SENSORS: list[AREntityDescription] = [
             "xip": "xip",
             "xtype": "xip_type",
             "xmask": "xmask",
-        },
-    ),
-    # DSL
-    ARSensorDescription(
-        key="datarate",
-        key_group="dsl",
-        name="DSL",
-        icon=ICON_ROUTER,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.DATA_RATE,
-        native_unit_of_measurement=UnitOfDataRate.BITS_PER_SECOND,
-        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
-        suggested_display_precision=3,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-        extra_state_attributes={
-            "down": "down",
-            "up": "up",
         },
     ),
 ]

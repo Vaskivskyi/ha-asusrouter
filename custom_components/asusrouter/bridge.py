@@ -42,6 +42,7 @@ from .const import (
     CONF_MODE,
     CPU,
     DEFAULT_SENSORS,
+    DSL,
     FIRMWARE,
     GWLAN,
     LED,
@@ -190,7 +191,7 @@ class ARBridge:
                 SENSORS: await self._get_sensors_modern(AsusData.CPU),
                 METHOD: self._get_data_cpu,
             },
-            "dsl": {
+            DSL: {
                 SENSORS: await self._get_sensors_modern(AsusData.DSL),
                 METHOD: self._get_data_dsl,
             },
