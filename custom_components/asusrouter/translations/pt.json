@@ -1,0 +1,264 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "find": {
+        "title": "Device location",
+        "description": "How to find your device",
+        "data": {
+          "host": "Hostname / IP address"
+        }
+      },
+      "credentials": {
+        "title": "Credentials",
+        "description": "The same as for the device web panel",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "port": "Port (0 to use default value)",
+          "ssl": "Use SSL connection"
+        }
+      },
+      "operation": {
+        "title": "Operation mode",
+        "data": {
+          "mode": "Device mode",
+          "enable_control": "Enable device control",
+          "split_intervals": "Enable per-sensor update intervals"
+        }
+      },
+      "options": {
+        "title": "Additional options",
+        "menu_options": {
+          "connected_devices": "Connected devices",
+          "intervals": "Update intervals",
+          "interfaces": "Interfaces to monitor",
+          "events": "Home Assistant events",
+          "security": "Security options",
+          "finish": "Save and finish"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Enable device trackers",
+          "client_device": "Create a device when I enable device_tracker entity",
+          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
+          "client_filter": "Filter clients",
+          "client_filter_list": "List of clients to filter (only active if filter is enabled)",
+          "force_clients": "Force clients update",
+          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
+          "latest_connected": "Number of latest connected devices to store",
+          "interval_devices": "Devices / AiMesh update",
+          "consider_home": "Consider device at home for (after last 'online' state)",
+          "create_devices": "Create HA devices when creating clients entities"
+        }
+      },
+      "intervals": {
+        "title": "Update intervals",
+        "description": "Values are in seconds",
+        "data": {
+          "cache_time": "Caching time",
+          "scan_interval": "Entities update",
+          "interval_cpu": "CPU data",
+          "interval_firmware": "Firmware data",
+          "interval_gwlan": "GWLAN interval",
+          "interval_light": "Light data",
+          "interval_misc": "Misc data",
+          "interval_network": "Network stat data",
+          "interval_parental_control": "Parental control data",
+          "interval_ports": "Ports data",
+          "interval_ram": "RAM data",
+          "interval_sysinfo": "Sysinfo data",
+          "interval_temperature": "Temperature data",
+          "interval_vpn": "VPN data",
+          "interval_wan": "WAN data",
+          "interval_wlan": "WLAN data"
+        }
+      },
+      "interfaces": {
+        "title": "Interfaces to monitor",
+        "data": {
+          "interfaces": "Select network interfaces to monitor",
+          "units_speed": "Units for speed",
+          "units_traffic": "Units for traffic"
+        }
+      },
+      "events": {
+        "title": "Events",
+        "description": "Which events should be raised",
+        "data": {
+          "device_connected": "Device connected (the device was not tracked before)",
+          "device_disconnected": "Device disconnected",
+          "device_reconnected": "Device reconnected (this device was already tracked before)",
+          "node_connected": "AiMesh node connected (not seen before)",
+          "node_disconnected": "AiMesh node disconnected",
+          "node_reconnected": "AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "data": {
+          "hide_passwords": "Hide passwords from sensors and attributes"
+        }
+      }
+    },
+    "error": {
+      "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address",
+      "connection_refused": "Connection refused",
+      "error": "Failed to connect",
+      "login_blocked": "Login is blocked by the device. Please, wait",
+      "password_missing": "Password is missing",
+      "unknown": "Unknown error",
+      "wrong_credentials": "Wrong credentials"
+    },
+    "abort": {
+      "already_configured": "Device is already configured",
+      "no_serial": "This device does not provide serial number. Discovery aborted",
+      "not_router": "Not an Asus router. Cannot be configured"
+    }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "title": "Configurations to change",
+        "menu_options": {
+          "credentials": "Credentials and connection",
+          "operation": "Operation mode",
+          "connected_devices": "Connected devices",
+          "intervals": "Update intervals",
+          "interfaces": "Interfaces to monitor",
+          "events": "Home Assistant events",
+          "security": "Security options",
+          "finish": "Save and finish",
+          "device": "Identification and connection parameters"
+        }
+      },
+      "credentials": {
+        "title": "Credentials",
+        "description": "The same as for the device web panel",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "port": "Port (0 to use default value)",
+          "ssl": "Use SSL connection"
+        }
+      },
+      "operation": {
+        "title": "Operation mode",
+        "data": {
+          "mode": "Device mode",
+          "enable_control": "Enable device control",
+          "split_intervals": "Enable per-sensor update intervals"
+        }
+      },
+      "connected_devices": {
+        "title": "Connected devices",
+        "data": {
+          "track_devices": "Enable device trackers",
+          "client_device": "Create a device when I enable device_tracker entity",
+          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
+          "client_filter": "Filter clients",
+          "client_filter_list": "List of clients to filter",
+          "force_clients": "Force clients update",
+          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
+          "latest_connected": "Number of latest connected devices to store",
+          "interval_devices": "Devices / AiMesh update",
+          "consider_home": "Consider device at home for (after last 'online' state)",
+          "create_devices": "Create HA devices when creating clients entities"
+        }
+      },
+      "intervals": {
+        "title": "Update intervals",
+        "description": "Values are in seconds",
+        "data": {
+          "cache_time": "Caching time",
+          "scan_interval": "Entities update",
+          "interval_cpu": "CPU data",
+          "interval_firmware": "Firmware data",
+          "interval_gwlan": "GWLAN interval",
+          "interval_light": "Light data",
+          "interval_misc": "Misc data",
+          "interval_network": "Network stat data",
+          "interval_parental_control": "Parental control data",
+          "interval_ports": "Ports data",
+          "interval_ram": "RAM data",
+          "interval_sysinfo": "Sysinfo data",
+          "interval_temperature": "Temperature data",
+          "interval_vpn": "VPN data",
+          "interval_wan": "WAN data",
+          "interval_wlan": "WLAN data"
+        }
+      },
+      "interfaces": {
+        "title": "Interfaces to monitor",
+        "data": {
+          "interfaces": "Select network interfaces to monitor",
+          "units_speed": "Units for speed",
+          "units_traffic": "Units for traffic"
+        }
+      },
+      "events": {
+        "title": "Events",
+        "description": "Which events should be raised",
+        "data": {
+          "device_connected": "Device connected (the device was not tracked before)",
+          "device_disconnected": "Device disconnected",
+          "device_reconnected": "Device reconnected (this device was already tracked before)",
+          "node_connected": "AiMesh node connected (not seen before)",
+          "node_disconnected": "AiMesh node disconnected",
+          "node_reconnected": "AiMesh node reconnected"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "data": {
+          "hide_passwords": "Hide passwords from sensors and attributes"
+        }
+      }
+    },
+    "error": {
+      "connection_refused": "Connection refused",
+      "error": "Failed to connect",
+      "login_blocked": "Login is blocked by the device. Please, wait",
+      "not_confirmed": "You have to confirm",
+      "unknown": "Unknown error",
+      "wrong_credentials": "Wrong credentials"
+    }
+  },
+  "services": {
+    "device_internet_access": {
+      "name": "Device internet access control",
+      "description": "Change device internet access using parental control feature of the router. Please, refer to the documentation for the additional possible parameters",
+      "fields": {
+        "entities": {
+          "name": "Entities",
+          "description": "Select device(s) to change internet access settings"
+        },
+        "state": {
+          "name": "State",
+          "description": "Set the state for the device(s)"
+        }
+      }
+    },
+    "remove_trackers": {
+      "name": "Remove device trackers",
+      "description": "Remove device trackers from the device registry. Please, keep in mind, when run, the service will remove selected trackers from watching and will allow you to remove the entities manually.",
+      "fields": {
+        "entities": {
+          "name": "Entities",
+          "description": "Select device(s) to remove from the device registry"
+        }
+      }
+    }
+  },
+  "selector": {
+    "set_pc_rule": {
+      "options": {
+        "allow": "Allow access",
+        "block": "Block access",
+        "remove": "Remove rule from the list"
+      }
+    }
+  }
+}
