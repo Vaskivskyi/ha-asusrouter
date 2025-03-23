@@ -1,0 +1,192 @@
+{
+    "config": {
+        "flow_title": "{name} ({host})",
+        "step": {
+            "find": {
+                "title": "Localização do dispositivo",
+                "description": "Como encontrar o seu dispositivo",
+                "data": {
+                    "host": "Nome do host / Endereço IP"
+                }
+            },
+            "credentials": {
+                "title": "Credenciais",
+                "description": "As mesmas utilizadas no painel web do dispositivo",
+                "data": {
+                    "username": "Nome de utilizador",
+                    "password": "Palavra-passe",
+                    "port": "Porta (0 para usar o valor padrão)",
+                    "ssl": "Usar ligação SSL"
+                }
+            },
+            "operation": {
+                "title": "Modo de operação",
+                "data": {
+                    "mode": "Modo do dispositivo",
+                    "enable_control": "Ativar controlo do dispositivo",
+                    "split_intervals": "Ativar intervalos de atualização por sensor"
+                }
+            },
+            "options": {
+                "title": "Opções adicionais",
+                "menu_options": {
+                    "connected_devices": "Dispositivos ligados",
+                    "intervals": "Intervalos de atualização",
+                    "interfaces": "Interfaces a monitorizar",
+                    "events": "Eventos do Home Assistant",
+                    "security": "Opções de segurança",
+                    "finish": "Guardar e finalizar"
+                }
+            },
+            "connected_devices": {
+                "title": "Dispositivos ligados",
+                "data": {
+                    "track_devices": "Ativar rastreadores de dispositivos",
+                    "client_device": "Criar um dispositivo quando ativar a entidade device_tracker",
+                    "clients_in_attr": "Guardar a lista de clientes nos atributos do sensor de dispositivos ligados",
+                    "client_filter": "Filtrar clientes",
+                    "client_filter_list": "Lista de clientes a filtrar (ativo apenas se o filtro estiver ativado)",
+                    "force_clients": "Forçar atualização de clientes",
+                    "force_clients_waittime": "Tempo de espera (forçar atualização -> verificar) (segundos)",
+                    "latest_connected": "Número de últimos dispositivos ligados a guardar",
+                    "interval_devices": "Atualização de dispositivos / AiMesh",
+                    "consider_home": "Considerar dispositivo em casa durante (após o último estado 'online')",
+                    "create_devices": "Criar dispositivos no HA ao criar entidades de clientes"
+                }
+            },
+            "intervals": {
+                "title": "Intervalos de atualização",
+                "description": "Valores em segundos",
+                "data": {
+                    "cache_time": "Tempo de cache",
+                    "scan_interval": "Atualização de entidades",
+                    "interval_cpu": "Dados da CPU",
+                    "interval_firmware": "Dados de firmware",
+                    "interval_gwlan": "Intervalo GWLAN",
+                    "interval_light": "Dados de luz",
+                    "interval_misc": "Dados diversos",
+                    "interval_network": "Dados de estatísticas de rede",
+                    "interval_parental_control": "Dados de controlo parental",
+                    "interval_ports": "Dados de portas",
+                    "interval_ram": "Dados de RAM",
+                    "interval_sysinfo": "Dados de informações do sistema",
+                    "interval_temperature": "Dados de temperatura",
+                    "interval_vpn": "Dados de VPN",
+                    "interval_wan": "Dados de WAN",
+                    "interval_wlan": "Dados de WLAN"
+                }
+            },
+            "interfaces": {
+                "title": "Interfaces a monitorizar",
+                "data": {
+                    "interfaces": "Selecione as interfaces de rede a monitorizar",
+                    "units_speed": "Unidades para velocidade",
+                    "units_traffic": "Unidades para tráfego"
+                }
+            },
+            "events": {
+                "title": "Eventos",
+                "description": "Que eventos devem ser gerados",
+                "data": {
+                    "device_connected": "Dispositivo ligado (o dispositivo não era rastreado anteriormente)",
+                    "device_disconnected": "Dispositivo desligado",
+                    "device_reconnected": "Dispositivo reconectado (este dispositivo já estava a ser rastreado anteriormente)",
+                    "node_connected": "Nó AiMesh ligado (não visto antes)",
+                    "node_disconnected": "Nó AiMesh desligado",
+                    "node_reconnected": "Nó AiMesh reconectado"
+                }
+            },
+            "security": {
+                "title": "Segurança",
+                "data": {
+                    "hide_passwords": "Ocultar palavras-passe de sensores e atributos"
+                }
+            }
+        },
+        "error": {
+            "cannot_resolve_host": "Não foi possível resolver o nome do host. Experimente com o endereço IP",
+            "connection_refused": "Ligação recusada",
+            "error": "Falha ao ligar",
+            "login_blocked": "A autenticação foi bloqueada pelo dispositivo. Aguarde, por favor",
+            "password_missing": "Palavra-passe em falta",
+            "unknown": "Erro desconhecido",
+            "wrong_credentials": "Credenciais incorretas"
+        },
+        "abort": {
+            "already_configured": "O dispositivo já está configurado",
+            "no_serial": "Este dispositivo não fornece número de série. A descoberta foi abortada",
+            "not_router": "Não é um router Asus. Não pode ser configurado"
+        }
+    },
+    "options": {
+        "step": {
+            "options": {
+                "title": "Configurações a alterar",
+                "menu_options": {
+                    "credentials": "Credenciais e ligação",
+                    "operation": "Modo de operação",
+                    "connected_devices": "Dispositivos ligados",
+                    "intervals": "Intervalos de atualização",
+                    "interfaces": "Interfaces a monitorizar",
+                    "events": "Eventos do Home Assistant",
+                    "security": "Opções de segurança",
+                    "finish": "Guardar e finalizar",
+                    "device": "Identificação e parâmetros de ligação"
+                }
+            },
+            "credentials": {
+                "title": "Credenciais",
+                "description": "As mesmas utilizadas no painel web do dispositivo",
+                "data": {
+                    "username": "Nome de utilizador",
+                    "password": "Palavra-passe",
+                    "port": "Porta (0 para usar o valor padrão)",
+                    "ssl": "Usar ligação SSL"
+                }
+            },
+            "operation": {
+                "title": "Modo de operação",
+                "data": {
+                    "mode": "Modo do dispositivo",
+                    "enable_control": "Ativar controlo do dispositivo",
+                    "split_intervals": "Ativar intervalos de atualização por sensor"
+                }
+            }
+        }
+    },
+    "services": {
+        "device_internet_access": {
+            "name": "Controlo de acesso à Internet do dispositivo",
+            "description": "Alterar o acesso à Internet do dispositivo utilizando a funcionalidade de controlo parental do router. Consulte a documentação para obter mais parâmetros possíveis",
+            "fields": {
+                "entities": {
+                    "name": "Entidades",
+                    "description": "Selecione os dispositivos para alterar as definições de acesso à Internet"
+                },
+                "state": {
+                    "name": "Estado",
+                    "description": "Defina o estado para os dispositivos"
+                }
+            }
+        },
+        "remove_trackers": {
+            "name": "Remover rastreadores de dispositivos",
+            "description": "Remover rastreadores de dispositivos do registo do dispositivo. Note que, ao executar, o serviço removerá os rastreadores selecionados e permitirá remover manualmente as entidades.",
+            "fields": {
+                "entities": {
+                    "name": "Entidades",
+                    "description": "Selecione os dispositivos para remover do registo do dispositivo"
+                }
+            }
+        }
+    },
+    "selector": {
+        "set_pc_rule": {
+            "options": {
+                "allow": "Permitir acesso",
+                "block": "Bloquear acesso",
+                "remove": "Remover regra da lista"
+            }
+        }
+    }
+}
