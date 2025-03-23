@@ -7,18 +7,6 @@ import logging
 from typing import Any, Callable, Optional
 
 import aiohttp
-from homeassistant.const import (
-    CONF_HOST,
-    CONF_PASSWORD,
-    CONF_PORT,
-    CONF_SSL,
-    CONF_USERNAME,
-)
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.update_coordinator import UpdateFailed
-
 from asusrouter import AsusRouter
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
@@ -32,6 +20,17 @@ from asusrouter.modules.homeassistant import (
 )
 from asusrouter.modules.identity import AsusDevice
 from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_PORT,
+    CONF_SSL,
+    CONF_USERNAME,
+)
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
 from .const import (
@@ -94,7 +93,12 @@ class ARBridge:
             self._configs.update(options)
 
         # Get session from HA
-        session = async_create_clientsession(hass)
+        # By default, don't verify SSL <- this is a temp solution
+        # which should be done properly in the future
+        session = async_create_clientsession(
+            hass,
+            verify_ssl=False,
+        )
 
         # Initialize API
         self._api = self._get_api(self._configs, session)
@@ -348,7 +352,7 @@ class ARBridge:
         """Get CPU data from the device."""
 
         return await self._get_data(AsusData.CPU)
-    
+
     async def _get_data_dsl(self) -> dict[str, Any]:
         """Get DSL data from the device."""
 
