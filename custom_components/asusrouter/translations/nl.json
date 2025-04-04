@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Kan hostnaam niet herleiden. Probeer met IP adres",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Connectie afgewezen",
       "error": "Problemen met connectie",
       "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
       "password_missing": "Wachtwoord mist",
+      "timeout": "[NT] Timeout error",
       "unknown": "Onbekende fout",
       "wrong_credentials": "Verkeerde login gegevens"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Connectie afgewezen",
       "error": "Problemen met connectie",
       "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
       "not_confirmed": "U dient te bevestigen",
+      "timeout": "[NT] Timeout error",
       "unknown": "Onbekende fout",
       "wrong_credentials": "Verkeerde login gegevens"
     }

@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Не удается разрешить имя хоста. Попробуйте использовать IP-адрес",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Отказ в подключении",
       "error": "Не удалось подключиться",
       "login_blocked": "Вход заблокирован устройством. Пожалуйста, подождите",
       "password_missing": "Отсутствует пароль",
+      "timeout": "[NT] Timeout error",
       "unknown": "Неизвестная ошибка",
       "wrong_credentials": "Неверные учетные данные"
     },
@@ -217,10 +220,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Отказ в подключении",
       "error": "Не удалось подключиться",
       "login_blocked": "Вход заблокирован устройством. Пожалуйста, подождите",
       "not_confirmed": "Подтвердите",
+      "timeout": "[NT] Timeout error",
       "unknown": "Неизвестная ошибка",
       "wrong_credentials": "Неверные учетные данные"
     }
