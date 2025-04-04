@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Nelze přeložit název hostitele. Zkuste použít IP adresu",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Připojení odmítnuto",
       "error": "Nepodařilo se připojit",
       "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
       "password_missing": "Chybí heslo",
+      "timeout": "[NT] Timeout error",
       "unknown": "Neznámá chyba",
       "wrong_credentials": "Chybné přihlašovací údaje"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Připojení odmítnuto",
       "error": "Nepodařilo se připojit",
       "login_blocked": "Přihlášení je blokováno zařízením. Čekejte prosím",
       "not_confirmed": "Nepotvrzeno",
+      "timeout": "[NT] Timeout error",
       "unknown": "Neznámá chyba",
       "wrong_credentials": "Chybné přihlašovací údaje"
     }

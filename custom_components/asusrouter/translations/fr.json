@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Impossible de résoudre le nom d'hôte. Essayez avec l'adresse IP",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Connexion rejetée",
       "error": "Échec de connexion",
       "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
       "password_missing": "Mot de passe manquant",
+      "timeout": "[NT] Timeout error",
       "unknown": "Erreur inconnue",
       "wrong_credentials": "Identifiants erronés"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Connexion rejetée",
       "error": "Échec de connexion",
       "login_blocked": "La connexion est bloquée par le routeur, merci de patienter",
       "not_confirmed": "Vous devez confirmer",
+      "timeout": "[NT] Timeout error",
       "unknown": "Erreur inconnue",
       "wrong_credentials": "Identifiants erronés"
     }
