@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "Access error. Refer to the log for details",
       "cannot_resolve_host": "Cannot resolve hostname. Try with the IP address",
+      "connection_error": "Connection error. Refer to the log for details",
       "connection_refused": "Connection refused",
       "error": "Failed to connect",
       "login_blocked": "Login is blocked by the device. Please, wait",
       "password_missing": "Password is missing",
+      "timeout": "Timeout error",
       "unknown": "Unknown error",
       "wrong_credentials": "Wrong credentials"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "Access error. Refer to the log for details",
+      "connection_error": "Connection error. Refer to the log for details",
       "connection_refused": "Connection refused",
       "error": "Failed to connect",
       "login_blocked": "Login is blocked by the device. Please, wait",
       "not_confirmed": "You have to confirm",
+      "timeout": "Timeout error",
       "unknown": "Unknown error",
       "wrong_credentials": "Wrong credentials"
     }

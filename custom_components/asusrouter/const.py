@@ -1132,7 +1132,7 @@ STATIC_SENSORS: list[AREntityDescription] = [
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DATA_RATE,
         native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
-        suggested_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND, 
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
         suggested_display_precision=0,
         entity_registry_enabled_default=True,
     ),
@@ -1502,11 +1502,14 @@ CONFIGS = "configs"
 ERRORS = "errors"
 INTERFACES = "interfaces"
 
+RESULT_ACCESS_ERROR = "access_error"
 RESULT_CANNOT_RESOLVE = "cannot_resolve"
+RESULT_CONNECTION_ERROR = "connection_error"
 RESULT_CONNECTION_REFUSED = "connection_refused"
 RESULT_ERROR = "error"
 RESULT_LOGIN_BLOCKED = "login_blocked"
 RESULT_SUCCESS = "success"
+RESULT_TIMEOUT = "timeout"
 RESULT_UNKNOWN = "unknown"
 RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 

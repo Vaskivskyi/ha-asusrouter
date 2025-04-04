@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Kann den Hostnamen nicht auflösen. Versuchen Sie es mit der IP-Adresse",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Verbindung abgelehnt",
       "error": "Verbindung nicht möglich",
       "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie",
       "password_missing": "Passwort fehlt",
+      "timeout": "[NT] Timeout error",
       "unknown": "Unbekannter Fehler",
       "wrong_credentials": "Falsche Anmeldeinformationen"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Verbindung abgelehnt",
       "error": "Verbindung nicht möglich",
       "login_blocked": "Die Anmeldung wird vom Gerät blockiert. Warten Sie mal",
-      "not_confirmed": "Sie müssen bestätigen"
+      "not_confirmed": "Sie müssen bestätigen",
+      "timeout": "[NT] Timeout error"
     }
   },
   "services": {

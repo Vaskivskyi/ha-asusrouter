@@ -22,7 +22,11 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import format_mac
 
 from asusrouter import AsusData
-from asusrouter.error import AsusRouterAccessError
+from asusrouter.error import (
+    AsusRouterAccessError,
+    AsusRouterConnectionError,
+    AsusRouterTimeoutError,
+)
 from asusrouter.modules.endpoint.error import AccessError
 from asusrouter.modules.homeassistant import convert_to_ha_sensors_group
 
@@ -77,10 +81,13 @@ from .const import (
     MEDIA_BRIDGE,
     METHOD,
     NEXT,
+    RESULT_ACCESS_ERROR,
     RESULT_CANNOT_RESOLVE,
+    RESULT_CONNECTION_ERROR,
     RESULT_ERROR,
     RESULT_LOGIN_BLOCKED,
     RESULT_SUCCESS,
+    RESULT_TIMEOUT,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     ROUTER,
@@ -209,6 +216,7 @@ async def _async_check_connection(
     # Connect
     try:
         await bridge.async_connect()
+    # Access error
     except AsusRouterAccessError as ex:
         args = ex.args
         # Wrong credentials
@@ -270,7 +278,29 @@ async def _async_check_connection(
             "Error during connection to `%s`. Original exception: %s", host, ex
         )
         return {
-            ERRORS: RESULT_UNKNOWN,
+            ERRORS: RESULT_ACCESS_ERROR,
+        }
+
+    # Timeout error
+    except AsusRouterTimeoutError as ex:
+        _LOGGER.error(
+            "Timeout error during connection to `%s`: Original exception: %s",
+            host,
+            ex,
+        )
+        return {
+            ERRORS: RESULT_TIMEOUT,
+        }
+
+    # Connection error
+    except AsusRouterConnectionError as ex:
+        _LOGGER.error(
+            "Connection error during connection to `%s`: Original exception: %s",
+            host,
+            ex,
+        )
+        return {
+            ERRORS: RESULT_CONNECTION_ERROR,
         }
 
     # Anything else
