@@ -20,6 +20,7 @@ from asusrouter.modules.homeassistant import (
 )
 from asusrouter.modules.identity import AsusDevice
 from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
+from asusrouter.tools.connection import get_cookie_jar
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -98,6 +99,7 @@ class ARBridge:
         session = async_create_clientsession(
             hass,
             verify_ssl=False,
+            cookie_jar=get_cookie_jar(),
         )
 
         # Initialize API
