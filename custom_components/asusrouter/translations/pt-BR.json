@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Não foi possível resolver o nome do host. Tente usar o endereço IP",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Conexão recusada",
       "error": "Falhou ao conectar",
       "login_blocked": "O login foi bloqueado pelo dispositivo. Por favor, espere",
       "password_missing": "Falta a senha",
+      "timeout": "[NT] Timeout error",
       "unknown": "Erro desconhecido",
       "wrong_credentials": "Credenciais inválidas"
     },
@@ -218,10 +221,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Conexão recusada",
       "error": "Falha ao conectar",
       "login_blocked": "O login foi bloqueado pelo dispositivo. Por favor, espere",
       "not_confirmed": "Você tem que confirmar",
+      "timeout": "[NT] Timeout error",
       "unknown": "Erro desconhecido",
       "wrong_credentials": "Credenciais erradas"
     }

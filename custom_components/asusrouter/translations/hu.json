@@ -104,11 +104,14 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
       "cannot_resolve_host": "Nem lehet sikerült hálózati nevévvel. Próbálja meg IP címmel",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Kapcsolódás elutasítva",
       "error": "Nem sikerült csatlakozni",
       "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
       "password_missing": "Hiányzó jelszó",
+      "timeout": "[NT] Timeout error",
       "unknown": "Ismeretlen hiba",
       "wrong_credentials": "Nem megfelelő hitelesítő adatok"
     },
@@ -217,10 +220,13 @@
       }
     },
     "error": {
+      "access_error": "[NT] Access error. Refer to the log for details",
+      "connection_error": "[NT] Connection error. Refer to the log for details",
       "connection_refused": "Kapcsolódás elutasítva",
       "error": "Nem sikerült csatlakozni",
       "login_blocked": "A bejelentkezést az eszköz blokkolja. Kérlek várjon",
       "not_confirmed": "Meg kell erősíteni",
+      "timeout": "[NT] Timeout error",
       "unknown": "Ismeretlen hiba",
       "wrong_credentials": "Nem megfelelő hitelesítő adatok"
     }
