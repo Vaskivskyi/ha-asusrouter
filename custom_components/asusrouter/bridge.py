@@ -107,7 +107,7 @@ class ARBridge:
         self._api = self._get_api(self._configs, session)
 
         # Switch API to optimistic
-        # Optimistic temperature to avoid scalling issues from some devices
+        # Optimistic temperature to avoid scaling issues from some devices
         ARConfig.set("optimistic_temperature", True)
 
         self._host = self._configs[CONF_HOST]
