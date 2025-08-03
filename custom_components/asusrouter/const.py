@@ -4,6 +4,19 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
+from asusrouter.modules.parental_control import (
+    AsusBlockAll,
+    AsusParentalControl,
+)
+from asusrouter.modules.port_forwarding import AsusPortForwarding
+from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import (
+    AsusWireGuardClient,
+    AsusWireGuardServer,
+)
+from asusrouter.modules.wlan import AsusWLAN, Wlan
+from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -23,21 +36,8 @@ from homeassistant.const import (
     UnitOfDataRate,
     UnitOfInformation,
     UnitOfTemperature,
+    UnitOfTime,
 )
-
-from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import (
-    AsusBlockAll,
-    AsusParentalControl,
-)
-from asusrouter.modules.port_forwarding import AsusPortForwarding
-from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wireguard import (
-    AsusWireGuardClient,
-    AsusWireGuardServer,
-)
-from asusrouter.modules.wlan import AsusWLAN, Wlan
-from asusrouter.tools import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
@@ -298,7 +298,7 @@ MODE_SENSORS = {
 # SENSORS LIST -->
 
 SENSORS_AIMESH = [NUMBER, LIST]
-SENSORS_BOOTTIME = ["datetime"]
+SENSORS_BOOTTIME = ["datetime", "uptime"]
 SENSORS_CHANGE = ["change"]
 SENSORS_CONNECTED_DEVICES = [
     NUMBER,
@@ -1082,6 +1082,17 @@ STATIC_SENSORS: list[AREntityDescription] = [
         name="Boot Time",
         icon=ICON_RESTART,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
+    ARSensorDescription(
+        key="uptime",
+        key_group="boottime",
+        name="Uptime",
+        icon=ICON_RESTART,
+        state_class=SensorStateClass.TOTAL,
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
