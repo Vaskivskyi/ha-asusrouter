@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional
 
 import aiohttp
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfig
+from asusrouter.config import ARConfig, ARConfigKey
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
@@ -108,7 +108,7 @@ class ARBridge:
 
         # Switch API to optimistic
         # Optimistic temperature to avoid scaling issues from some devices
-        ARConfig.set("optimistic_temperature", True)
+        ARConfig.set(ARConfigKey.OPTIMISTIC_TEMPERATURE, True)
 
         self._host = self._configs[CONF_HOST]
         self._identity: Optional[AsusDevice] = None
