@@ -106,9 +106,15 @@ class ARBridge:
         # Initialize API
         self._api = self._get_api(self._configs, session)
 
-        # Switch API to optimistic
+        # Switch API to optimistic mode
         # Optimistic temperature to avoid scaling issues from some devices
         ARConfig.set(ARConfigKey.OPTIMISTIC_TEMPERATURE, True)
+        # Switch API to robust mode
+        # Robust boottime will avoid 1 second jitter due to the raw data
+        # uncertainty. This can provide up to 1 second overestimation
+        # of the boottime, but will avoid saving extra data when the
+        # integration restarts and loses the previous boottime data.
+        ARConfig.set(ARConfigKey.ROBUST_BOOTTIME, True)
 
         self._host = self._configs[CONF_HOST]
         self._identity: Optional[AsusDevice] = None
