@@ -21,7 +21,12 @@ from homeassistant.const import (
     CONF_SSL,
     Platform,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, ServiceCall, callback
+from homeassistant.core import (
+    CALLBACK_TYPE,
+    HomeAssistant,
+    ServiceCall,
+    callback,
+)
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -29,7 +34,10 @@ from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.update_coordinator import (
+    DataUpdateCoordinator,
+    UpdateFailed,
+)
 
 from .aimesh import AiMeshNode
 from .bridge import ARBridge
@@ -172,7 +180,10 @@ class ARSensorHandler:
     ) -> bool:
         """Update aimesh sensors."""
 
-        if self._aimesh_number == nodes_number and self._aimesh_list == nodes_list:
+        if (
+            self._aimesh_number == nodes_number
+            and self._aimesh_list == nodes_list
+        ):
             return False
 
         self._aimesh_number = nodes_number
@@ -182,7 +193,9 @@ class ARSensorHandler:
     async def get_coordinator(
         self,
         sensor_type: str,
-        update_method: Optional[Callable[[], Awaitable[dict[str, Any]]]] = None,
+        update_method: Optional[
+            Callable[[], Awaitable[dict[str, Any]]]
+        ] = None,
     ) -> DataUpdateCoordinator:
         """Find coordinator for the sensor type."""
 
@@ -217,10 +230,16 @@ class ARSensorHandler:
             update_interval = timedelta(
                 seconds=self._options.get(
                     CONF_INTERVAL + sensor_type,
-                    self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL),
+                    self._options.get(
+                        CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL
+                    ),
                 )
-                if self._options.get(CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS)
-                else self._options.get(CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL)
+                if self._options.get(
+                    CONF_SPLIT_INTERVALS, CONF_DEFAULT_SPLIT_INTERVALS
+                )
+                else self._options.get(
+                    CONF_SCAN_INTERVAL, CONF_DEFAULT_SCAN_INTERVAL
+                )
             )
 
         # Coordinator
@@ -365,7 +384,8 @@ class ARDevice:
             # No entities for the device
             if len(entries) == 0:
                 _LOGGER.debug(
-                    "Removing device `%s` since it has no entities", device_entry.name
+                    "Removing device `%s` since it has no entities",
+                    device_entry.name,
                 )
                 device_registry.async_remove_device(device_entry.id)
 
@@ -384,11 +404,15 @@ class ARDevice:
                     entity_reg.async_remove(entry.entity_id)
                     continue
 
-                entity_reg.async_update_entity(entry.entity_id, new_unique_id=new_uid)
+                entity_reg.async_update_entity(
+                    entry.entity_id, new_unique_id=new_uid
+                )
 
             # Migrate from 0.21.x and below
             # To be removed in 0.30.0
-            if any(id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")):
+            if any(
+                id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")
+            ):
                 entity_reg.async_remove(entry.entity_id)
 
             # Clients already tracked
@@ -476,13 +500,18 @@ class ARDevice:
         """Update AsusRouter clients."""
 
         # Check clients tracking settings
-        if self._options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES) is False:
+        if (
+            self._options.get(CONF_TRACK_DEVICES, CONF_DEFAULT_TRACK_DEVICES)
+            is False
+        ):
             _LOGGER.debug("Device tracking is disabled")
         else:
             _LOGGER.debug("Device tracking is enabled")
 
         # Get client list
-        _LOGGER.debug("Updating AsusRouter device list for '%s'", self._conf_host)
+        _LOGGER.debug(
+            "Updating AsusRouter device list for '%s'", self._conf_host
+        )
         try:
             api_clients = await self.bridge.async_get_clients()
             # For Media bridge mode only leave wired devices
@@ -514,7 +543,9 @@ class ARDevice:
         )
 
         # Format clients MAC
-        clients = {format_mac(mac): client for mac, client in api_clients.items()}
+        clients = {
+            format_mac(mac): client for mac, client in api_clients.items()
+        }
 
         # Update known clients
         for client_mac, client_state in self._clients.items():
@@ -543,7 +574,9 @@ class ARDevice:
 
             # Create new client and process it
             client_name = (
-                client_info.description.name if client_info.description else None
+                client_info.description.name
+                if client_info.description
+                else None
             )
             client = ARClient(client_mac, client_name)
             client.update(
@@ -578,9 +611,11 @@ class ARDevice:
                 self._clients_number += 1
                 self._clients_list.append(client.identity)
 
-            if isinstance(client.connection, AsusClientConnectionWlan) and client.connection.guest:
+            if (
+                isinstance(client.connection, AsusClientConnectionWlan)
+                and client.connection.guest
+            ):
                 self._gn_clients_number += 1
-
 
         # Filter clients
         # Only include the listed clients
@@ -672,7 +707,9 @@ class ARDevice:
         new_node = False
 
         # Update existing nodes
-        nodes = {format_mac(mac): description for mac, description in aimesh.items()}
+        nodes = {
+            format_mac(mac): description for mac, description in aimesh.items()
+        }
         for node_mac, node in self._aimesh.items():
             node_info = nodes.pop(node_mac, None)
             node.update(
@@ -714,7 +751,9 @@ class ARDevice:
     async def update_pc_rules(self) -> None:
         """Update parental control rules."""
 
-        _LOGGER.debug("Updating parental control rules for '%s'", self._conf_host)
+        _LOGGER.debug(
+            "Updating parental control rules for '%s'", self._conf_host
+        )
         try:
             pc_data = (
                 await self.bridge._get_data_parental_control()  # pylint: disable=protected-access
@@ -787,7 +826,9 @@ class ARDevice:
 
         if self._mode == ROUTER:
             self.hass.services.async_register(
-                DOMAIN, "device_internet_access", async_service_device_internet_access
+                DOMAIN,
+                "device_internet_access",
+                async_service_device_internet_access,
             )
 
         # Remove device trackers service
@@ -808,7 +849,9 @@ class ARDevice:
             return
 
         # Initialize sensor handler
-        self._sensor_handler = ARSensorHandler(self.hass, self.bridge, self._options)
+        self._sensor_handler = ARSensorHandler(
+            self.hass, self.bridge, self._options
+        )
 
         # Update devices
         self._sensor_handler.update_clients(
@@ -869,7 +912,9 @@ class ARDevice:
             coordinator = self._sensor_coordinator[DEVICES][COORDINATOR]
 
             # Block clients list for attributes
-            clients_list = None if self.clients_in_attr is False else self._clients_list
+            clients_list = (
+                None if self.clients_in_attr is False else self._clients_list
+            )
 
             if self._sensor_handler.update_clients(
                 self._clients_number,
@@ -943,7 +988,9 @@ class ARDevice:
             _event_status = CONF_DEFAULT_EVENT.get(event, False)
         if _event_status is True:
             event_name = f"{DOMAIN}_{event}"
-            _LOGGER.debug("Firing event `%s` with arguments: %s", event_name, args)
+            _LOGGER.debug(
+                "Firing event `%s` with arguments: %s", event_name, args
+            )
             self.hass.bus.fire(
                 event_name,
                 args,

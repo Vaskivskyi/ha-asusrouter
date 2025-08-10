@@ -37,11 +37,17 @@ def list_sensors_network(
                     icon=data["icon"] or None,
                     state_class=data["state_class"] or None,
                     device_class=data["device_class"] or None,
-                    native_unit_of_measurement=data["native_unit_of_measurement"]
+                    native_unit_of_measurement=data[
+                        "native_unit_of_measurement"
+                    ]
                     or None,
-                    suggested_unit_of_measurement=data["suggested_unit_of_measurement"]
+                    suggested_unit_of_measurement=data[
+                        "suggested_unit_of_measurement"
+                    ]
                     or None,
-                    suggested_display_precision=data["suggested_display_precision"]
+                    suggested_display_precision=data[
+                        "suggested_display_precision"
+                    ]
                     or None,
                     entity_registry_enabled_default=data[
                         "entity_registry_enabled_default"

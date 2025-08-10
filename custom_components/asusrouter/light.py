@@ -5,6 +5,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from asusrouter.modules.aura import AsusAura
+from asusrouter.modules.color import ColorRGB, scale_value_int
+from asusrouter.modules.led import AsusLED
 from homeassistant.components.light import (
     ColorMode,
     LightEntity,
@@ -14,10 +17,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-
-from asusrouter.modules.aura import AsusAura
-from asusrouter.modules.color import ColorRGB, scale_value_int
-from asusrouter.modules.led import AsusLED
 
 from .const import ASUSROUTER, DOMAIN, STATIC_AURA, STATIC_LIGHTS
 from .dataclass import ARLightDescription

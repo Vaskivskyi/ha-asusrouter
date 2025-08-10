@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
+from asusrouter.modules.homeassistant import convert_to_ha_state_bool
+from asusrouter.modules.state import AsusState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -12,9 +14,6 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-
-from asusrouter.modules.homeassistant import convert_to_ha_state_bool
-from asusrouter.modules.state import AsusState
 
 from .const import ASUSROUTER, COORDINATOR, DOMAIN
 from .dataclass import (
