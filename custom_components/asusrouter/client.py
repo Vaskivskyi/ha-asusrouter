@@ -5,9 +5,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Callable, Optional
 
-from homeassistant.core import callback
-from homeassistant.helpers.device_registry import format_mac
-
 from asusrouter.modules.client import (
     AsusClient,
     AsusClientConnection,
@@ -16,6 +13,8 @@ from asusrouter.modules.client import (
 )
 from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.homeassistant import convert_to_ha_state_bool
+from homeassistant.core import callback
+from homeassistant.helpers.device_registry import format_mac
 
 from .helpers import clean_dict
 

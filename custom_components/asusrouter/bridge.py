@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional
 
 import aiohttp
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfig
+from asusrouter.config import ARConfig, ARConfigKey
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
@@ -44,6 +44,7 @@ from .const import (
     CONF_DEFAULT_PORT,
     CONF_MODE,
     CPU,
+    DDNS,
     DEFAULT_SENSORS,
     DSL,
     FIRMWARE,
@@ -106,9 +107,15 @@ class ARBridge:
         # Initialize API
         self._api = self._get_api(self._configs, session)
 
-        # Switch API to optimistic
+        # Switch API to optimistic mode
         # Optimistic temperature to avoid scaling issues from some devices
-        ARConfig.set("optimistic_temperature", True)
+        ARConfig.set(ARConfigKey.OPTIMISTIC_TEMPERATURE, True)
+        # Switch API to robust mode
+        # Robust boottime will avoid 1 second jitter due to the raw data
+        # uncertainty. This can provide up to 1 second overestimation
+        # of the boottime, but will avoid saving extra data when the
+        # integration restarts and loses the previous boottime data.
+        ARConfig.set(ARConfigKey.ROBUST_BOOTTIME, True)
 
         self._host = self._configs[CONF_HOST]
         self._identity: Optional[AsusDevice] = None
@@ -218,6 +225,10 @@ class ARBridge:
             CPU: {
                 SENSORS: await self._get_sensors_modern(AsusData.CPU),
                 METHOD: self._get_data_cpu,
+            },
+            DDNS: {
+                SENSORS: await self._get_sensors_modern(AsusData.DDNS),
+                METHOD: self._get_data_ddns,
             },
             DSL: {
                 SENSORS: await self._get_sensors_modern(AsusData.DSL),
@@ -359,6 +370,11 @@ class ARBridge:
         """Get CPU data from the device."""
 
         return await self._get_data(AsusData.CPU)
+
+    async def _get_data_ddns(self) -> dict[str, Any]:
+        """Get DDNS data from the device."""
+
+        return await self._get_data_modern(AsusData.DDNS)
 
     async def _get_data_dsl(self) -> dict[str, Any]:
         """Get DSL data from the device."""
