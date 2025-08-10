@@ -4,6 +4,19 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
+from asusrouter.modules.parental_control import (
+    AsusBlockAll,
+    AsusParentalControl,
+)
+from asusrouter.modules.port_forwarding import AsusPortForwarding
+from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import (
+    AsusWireGuardClient,
+    AsusWireGuardServer,
+)
+from asusrouter.modules.wlan import AsusWLAN, Wlan
+from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -25,20 +38,6 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
-
-from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import (
-    AsusBlockAll,
-    AsusParentalControl,
-)
-from asusrouter.modules.port_forwarding import AsusPortForwarding
-from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wireguard import (
-    AsusWireGuardClient,
-    AsusWireGuardServer,
-)
-from asusrouter.modules.wlan import AsusWLAN, Wlan
-from asusrouter.tools import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
