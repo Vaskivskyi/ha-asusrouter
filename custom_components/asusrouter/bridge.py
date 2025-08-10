@@ -16,7 +16,6 @@ from asusrouter.modules.data import AsusData
 from asusrouter.modules.homeassistant import (
     convert_to_ha_data,
     convert_to_ha_sensors,
-    convert_to_ha_sensors_list,
     convert_to_ha_state_bool,
 )
 from asusrouter.modules.identity import AsusDevice
@@ -586,7 +585,7 @@ class ARBridge:
             _LOGGER.debug(
                 "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
             )
-            sensors = convert_to_ha_sensors_list(data)
+            sensors = convert_to_ha_sensors(data, datatype)
             _LOGGER.debug(
                 "Available `%s` sensors: %s", datatype.value, sensors
             )
