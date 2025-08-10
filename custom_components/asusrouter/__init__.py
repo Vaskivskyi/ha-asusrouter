@@ -42,7 +42,9 @@ async def async_setup_entry(
         STOP_LISTENER: stop_listener,
     }
 
-    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(
+        config_entry, PLATFORMS
+    )
 
     return True
 
@@ -55,7 +57,9 @@ async def async_unload_entry(
 
     _LOGGER.debug("Unloading entry")
 
-    unload = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    unload = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
 
     if unload:
         # Close connection
@@ -90,10 +94,14 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
 
     if config_entry.version == 4:
         new_options = {**config_entry.options}
-        new_options["interval_network"] = new_options.pop("interval_network_stat", 30)
+        new_options["interval_network"] = new_options.pop(
+            "interval_network_stat", 30
+        )
 
         config_entry.version = 5
-        hass.config_entries.async_update_entry(config_entry, options=new_options)
+        hass.config_entries.async_update_entry(
+            config_entry, options=new_options
+        )
 
     _LOGGER.debug("Migration to version %s successful", config_entry.version)
 

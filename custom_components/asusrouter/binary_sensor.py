@@ -41,11 +41,18 @@ async def async_setup_entry(
     binary_sensors = STATIC_BINARY_SENSORS.copy()
 
     hide = []
-    if config_entry.options.get(CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS):
+    if config_entry.options.get(
+        CONF_HIDE_PASSWORDS, CONF_DEFAULT_HIDE_PASSWORDS
+    ):
         hide.append(PASSWORD)
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, binary_sensors, ARBinarySensor, hide
+        hass,
+        config_entry,
+        async_add_entities,
+        binary_sensors,
+        ARBinarySensor,
+        hide,
     )
 
     router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
@@ -112,7 +119,9 @@ class AMBinarySensor(BinarySensorEntity):
 
         self._router = router
         self._node = node
-        self._attr_unique_id = to_unique_id(f"{router.mac}_{AIMESH}_{node.mac}")
+        self._attr_unique_id = to_unique_id(
+            f"{router.mac}_{AIMESH}_{node.mac}"
+        )
         self._attr_name = f"AiMesh {node.native.model} ({node.native.mac})"
 
     @property

@@ -6,13 +6,12 @@ import asyncio
 import logging
 from typing import Any
 
+from asusrouter.modules.system import AsusSystem
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-
-from asusrouter.modules.system import AsusSystem
 
 from .const import STATIC_UPDATES
 from .dataclass import ARUpdateDescription

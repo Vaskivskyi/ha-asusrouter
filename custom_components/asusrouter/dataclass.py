@@ -7,7 +7,9 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from asusrouter.modules.state import AsusState, AsusStateNone
-from homeassistant.components.binary_sensor import BinarySensorEntityDescription
+from homeassistant.components.binary_sensor import (
+    BinarySensorEntityDescription,
+)
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
@@ -43,7 +45,9 @@ class ARSensorDescription(AREntityDescription, SensorEntityDescription):
 
 
 @dataclass
-class ARBinarySensorDescription(ARBinaryDescription, BinarySensorEntityDescription):
+class ARBinarySensorDescription(
+    ARBinaryDescription, BinarySensorEntityDescription
+):
     """Describe AsusRouter sensor."""
 
 

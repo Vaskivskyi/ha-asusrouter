@@ -9,11 +9,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.light import ColorMode
-from homeassistant.const import EntityCategory
-
 from asusrouter.modules.color import ColorRGBB
 from asusrouter.tools.converters import scale_value_int
+from homeassistant.components.light import ColorMode
+from homeassistant.const import EntityCategory
 
 from ..const import ICON_LIGHT_OFF, ICON_LIGHT_ON
 from ..dataclass import AREntityDescription, ARLightDescription
@@ -117,7 +116,7 @@ def per_zone_light(zones: int = 3) -> list[AREntityDescription]:
         ARLightDescription(
             key=STATE,
             key_group="aura",
-            name=f"AURA Zone {i+1}",
+            name=f"AURA Zone {i + 1}",
             icon_on=ICON_LIGHT_ON,
             icon_off=ICON_LIGHT_OFF,
             capabilities={"zone_id": i},
