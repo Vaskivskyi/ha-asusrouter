@@ -4,19 +4,6 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
-from asusrouter.modules.parental_control import (
-    AsusBlockAll,
-    AsusParentalControl,
-)
-from asusrouter.modules.port_forwarding import AsusPortForwarding
-from asusrouter.modules.system import AsusSystem
-from asusrouter.modules.wireguard import (
-    AsusWireGuardClient,
-    AsusWireGuardServer,
-)
-from asusrouter.modules.wlan import AsusWLAN, Wlan
-from asusrouter.tools import converters
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -38,6 +25,20 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
+
+from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
+from asusrouter.modules.parental_control import (
+    AsusBlockAll,
+    AsusParentalControl,
+)
+from asusrouter.modules.port_forwarding import AsusPortForwarding
+from asusrouter.modules.system import AsusSystem
+from asusrouter.modules.wireguard import (
+    AsusWireGuardClient,
+    AsusWireGuardServer,
+)
+from asusrouter.modules.wlan import AsusWLAN, Wlan
+from asusrouter.tools import converters
 
 from .dataclass import (
     ARBinarySensorDescription,
@@ -98,6 +99,7 @@ CONNECTION = "connection"
 COORDINATOR = "coordinator"
 CORE = "core"
 CPU = "cpu"
+DDNS = "ddns"
 DEVICES = "devices"
 DNS = "dns"
 DSL = "dsl"
@@ -273,6 +275,7 @@ MODE_MEDIA_BRIDGE = MODE_ACCESS_POINT.copy()
 MODE_ROUTER = MODE_ACCESS_POINT.copy()
 MODE_ROUTER.extend(
     [
+        DDNS,
         DSL,
         GWLAN,
         "ovpn_client",
@@ -839,6 +842,7 @@ SERVICE_ALLOWED_PORT_FORWARDING_PROTOCOL: list[str] = [
 # ICONS -->
 
 ICON_CPU = "mdi:cpu-32-bit"
+ICON_DDNS = "mdi:dns-outline"
 ICON_DEVICES = "mdi:devices"
 ICON_DUALWAN = "mdi:call-split"
 ICON_ETHERNET_ON = "mdi:ethernet-cable"
@@ -869,6 +873,27 @@ ICON_WLAN_ON = "mdi:wifi"
 
 # SENSORS -->
 STATIC_BINARY_SENSORS: list[AREntityDescription] = [
+    # DDNS
+    ARBinarySensorDescription(
+        key="state",
+        key_group="ddns",
+        name="DDNS",
+        icon=ICON_DDNS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        extra_state_attributes={
+            "enabled": "enabled",
+            "hostname": "hostname",
+            "ip_address": "ip_address",
+            "old_name": "old_name",
+            "replace_status": "replace_status",
+            "return_code": "return_code",
+            "server": "server",
+            "status": "status",
+            "status_hint": "status_hint",
+            "updated": "updated",
+        },
+    ),
     # Dual WAN
     ARBinarySensorDescription(
         key="dualwan_state",
