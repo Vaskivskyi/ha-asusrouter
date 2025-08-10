@@ -6,7 +6,14 @@ import logging
 import socket
 from typing import Any
 
-import voluptuous as vol
+from asusrouter import AsusData
+from asusrouter.error import (
+    AsusRouterAccessError,
+    AsusRouterConnectionError,
+    AsusRouterTimeoutError,
+)
+from asusrouter.modules.endpoint.error import AccessError
+from asusrouter.modules.homeassistant import convert_to_ha_sensors_group
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import (
     CONF_HOST,
@@ -20,15 +27,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import format_mac
-
-from asusrouter import AsusData
-from asusrouter.error import (
-    AsusRouterAccessError,
-    AsusRouterConnectionError,
-    AsusRouterTimeoutError,
-)
-from asusrouter.modules.endpoint.error import AccessError
-from asusrouter.modules.homeassistant import convert_to_ha_sensors_group
+import voluptuous as vol
 
 from .bridge import ARBridge
 from .const import (
