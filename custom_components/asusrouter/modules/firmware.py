@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 
-def to_ha(data: Optional[dict[str, Any]]) -> dict[str, Any]:
+def to_ha(data: dict[str, Any] | None) -> dict[str, Any]:
     """Convert AsusRouter firmware data to Home Assistant format."""
 
     if not data:

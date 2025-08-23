@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+import logging
+from typing import Any
 
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.client import AsusClientConnectionWlan
@@ -28,8 +28,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import DeviceInfo
@@ -119,8 +118,8 @@ class ARSensorHandler:
 
         # Sensors
         self._clients_number: int = 0
-        self._clients_list: Optional[list[dict[str, Any]]] = []
-        self._latest_connected: Optional[datetime] = None
+        self._clients_list: list[dict[str, Any]] | None = []
+        self._latest_connected: datetime | None = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
@@ -151,8 +150,8 @@ class ARSensorHandler:
     def update_clients(
         self,
         clients_number: int,
-        clients_list: Optional[list[Any]],
-        latest_connected: Optional[datetime],
+        clients_list: list[Any] | None,
+        latest_connected: datetime | None,
         latest_connected_list: list[Any],
         gn_clients_number: int,
     ) -> bool:
@@ -193,9 +192,7 @@ class ARSensorHandler:
     async def get_coordinator(
         self,
         sensor_type: str,
-        update_method: Optional[
-            Callable[[], Awaitable[dict[str, Any]]]
-        ] = None,
+        update_method: Callable[[], Awaitable[dict[str, Any]]] | None = None,
     ) -> DataUpdateCoordinator:
         """Find coordinator for the sensor type."""
 
@@ -299,7 +296,7 @@ class ARDevice:
         self._mac: str = ""
 
         # Device sensors
-        self._sensor_handler: Optional[ARSensorHandler] = None
+        self._sensor_handler: ARSensorHandler | None = None
         self._sensor_coordinator: dict[str, Any] = {}
 
         self._aimesh: dict[str, Any] = {}
@@ -308,7 +305,7 @@ class ARDevice:
         self._clients_list: list[dict[str, Any]] = []
         self._aimesh_number: int = 0
         self._aimesh_list: list[dict[str, Any]] = []
-        self._latest_connected: Optional[datetime] = None
+        self._latest_connected: datetime | None = None
         self._latest_connected_list: list[dict[str, Any]] = []
         self._connect_error: bool = False
         self._gn_clients_number: int = 0
@@ -345,7 +342,7 @@ class ARDevice:
         # On-close parameters
         self._on_close: list[Callable] = []
 
-    async def setup(self) -> None:
+    async def setup(self) -> None:  # noqa: C901, PLR0912, PLR0915
         """Set up an AsusRouter."""
 
         _LOGGER.debug("Setting up router")
@@ -419,9 +416,9 @@ class ARDevice:
             if entry.domain != "device_tracker":
                 continue
             capabilities = entry.capabilities
-            # Check that capabilities is a dictionary and that it has the MAC address
-            # I actually don't know how this can be possible, but the issue #785
-            # https://github.com/Vaskivskyi/ha-asusrouter/issues/785
+            # Check that capabilities is a dictionary and that it has
+            # the MAC address. I actually don't know how this can be possible,
+            # but the issue https://github.com/Vaskivskyi/ha-asusrouter/issues/785
             # shows that device_tracker entry can exist without a MAC address
             if isinstance(capabilities, dict) and "mac" in capabilities:
                 mac = capabilities["mac"]
@@ -444,7 +441,8 @@ class ARDevice:
             await self.update_pc_rules()
         else:
             _LOGGER.debug(
-                "Device is in AiMesh node mode. Device tracking and AiMesh monitoring is disabled"
+                "Device is in AiMesh node mode. Device tracking and "
+                "AiMesh monitoring is disabled"
             )
 
         # Clients filter
@@ -487,7 +485,7 @@ class ARDevice:
 
     async def update_all(
         self,
-        now: Optional[datetime] = None,
+        now: datetime | None = None,
     ) -> None:
         """Update all AsusRouter platforms."""
 
@@ -496,7 +494,7 @@ class ARDevice:
             await self.update_nodes()
             await self.update_pc_rules()
 
-    async def update_clients(self) -> None:
+    async def update_clients(self) -> None:  # noqa: C901, PLR0912, PLR0915
         """Update AsusRouter clients."""
 
         # Check clients tracking settings
@@ -653,21 +651,20 @@ class ARDevice:
                 return connected
             # If not connected, return the current time
             # This is just a fallback, since the device should be connected
-            return datetime.now(timezone.utc)
+            return datetime.now(UTC)
 
         # New list
-        new_list = []
+        # We take all the clients currently connected from the
+        # self._clients_list which have the connected time set
+        new_list = [
+            client for client in self._clients_list if client.get("connected")
+        ]
 
-        # We take all the clients currently connected from the self._clients_list
-        # which have the connected time set
-        for client in self._clients_list:
-            if client.get("connected"):
-                new_list.append(client)
-
-        # Append any client which was already in the list self._latest_connected_list
-        # but is not in the new list. This means that the client has disconnected,
-        # but the sensor should be showing all the connections made
-        # Since client itself might have changed, we should compare MAC addresses
+        # Append any client which was already in the list
+        # self._latest_connected_list but is not in the new list.
+        # This means that the client has disconnected, but the sensor
+        # should be showing all the connections made. Since client
+        # itself might have changed, we should compare MAC addresses
         for client in self._latest_connected_list:
             if client["mac"] not in [x["mac"] for x in new_list]:
                 new_list.append(client)
@@ -683,7 +680,8 @@ class ARDevice:
             new_list.pop(0)
 
         # Update the self._latest_connected and self._latest_connected_list
-        # Check that list has at least one element so that we don't get an error
+        # Check that list has at least one element so that we
+        # don't get an error
         if len(new_list) > 0:
             self._latest_connected = new_list[-1].get(CONNECTED)
             self._latest_connected_list = new_list
@@ -739,7 +737,7 @@ class ARDevice:
         # AiMesh sensors
         self._aimesh_number = 0
         self._aimesh_list = []
-        for mac, node in self._aimesh.items():
+        for node in self._aimesh.values():
             if node.identity[CONNECTED]:
                 self._aimesh_number += 1
             self._aimesh_list.append(node.identity)
@@ -775,13 +773,13 @@ class ARDevice:
         rules_to_save = {}
 
         # Update existing rules
-        for mac, rule in self._pc_rules.items():
-            rule = rules.pop(mac, None)
-            if rule is None:
+        for mac in self._pc_rules:
+            incoming_rule = rules.pop(mac, None)
+            if incoming_rule is None:
                 # If the rule was removed
                 new_flag = True
                 continue
-            rules_to_save[mac] = rule
+            rules_to_save[mac] = incoming_rule
 
         # Add new rules
         for mac, rule in rules.items():
@@ -968,7 +966,7 @@ class ARDevice:
     def fire_event(
         self,
         event: str,
-        args: Optional[dict[str, Any]] = None,
+        args: dict[str, Any] | None = None,
     ):
         """Fire HA event."""
 
@@ -1002,7 +1000,7 @@ class ARDevice:
         _LOGGER.debug("Removing trackers")
 
         # Check that data is provided
-        raw = kwargs.get("raw", None)
+        raw = kwargs.get("raw")
         if raw is None:
             return
 
@@ -1038,16 +1036,20 @@ class ARDevice:
         """Device information."""
 
         return DeviceInfo(
+            configuration_url=(
+                f"{HTTPS if self._options[CONF_SSL] else HTTP}://"
+                f"{self._conf_host}:{self._conf_port}"
+            ),
             identifiers={
                 (DOMAIN, self.mac),
                 (DOMAIN, self._identity.serial),
             },
-            name=self._conf_name,
-            model=self._identity.model,
             manufacturer=self._identity.brand,
+            model=self._identity.model,
+            model_id=self._identity.product_id,
+            name=self._conf_name,
+            serial_number=self._identity.serial,
             sw_version=str(self._identity.firmware),
-            configuration_url=f"{HTTPS if self._options[CONF_SSL] else HTTP}://\
-{self._conf_host}:{self._conf_port}",
         )
 
     @property

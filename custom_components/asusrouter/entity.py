@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from asusrouter.modules.homeassistant import convert_to_ha_state_bool
 from asusrouter.modules.state import AsusState
@@ -27,13 +27,13 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_ar_entry(
+async def async_setup_ar_entry(  # noqa: PLR0913
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
     sensors: list[AREntityDescription],
     sensor_class: type[AREntity],
-    hide: Optional[list[str]] = None,
+    hide: list[str] | None = None,
 ) -> None:
     """Set up AsusRouter entities."""
 
@@ -53,24 +53,24 @@ async def async_setup_ar_entry(
                 if not sensor_description.extra_state_attributes:
                     sensor_description.extra_state_attributes = {}
 
-                if sensor_type in sensor_data:
-                    if sensor_description.key in sensor_data[sensor_type]:
-                        # Hide protected values
-                        sensor_description.extra_state_attributes = {
-                            key: value
-                            for key, value in sensor_description.extra_state_attributes.items()
-                            if value not in hide
-                        }
+                if (
+                    sensor_type in sensor_data
+                    and sensor_description.key in sensor_data[sensor_type]
+                ):
+                    # Hide protected values
+                    sensor_description.extra_state_attributes = {
+                        key: value
+                        for key, value in sensor_description.extra_state_attributes.items()  # noqa: E501
+                        if value not in hide
+                    }
 
-                        entities.append(
-                            sensor_class(
-                                coordinator, router, sensor_description
-                            )
-                        )
-            except Exception as ex:  # pylint: disable=broad-except
+                    entities.append(
+                        sensor_class(coordinator, router, sensor_description)
+                    )
+            except Exception as ex:  # noqa: BLE001
                 _LOGGER.warning(
-                    "Got an exception when creating entities: %s. Please, report this."
-                    + "Sensor description: %s",
+                    "Got an exception when creating entities: %s. "
+                    "Please, report this. Sensor description: %s",
                     ex,
                     sensor_description,
                 )
@@ -142,13 +142,13 @@ class ARBinaryEntity(AREntity):
         """Initialize AsusRouter binary entity."""
 
         super().__init__(coordinator, router, description)
-        if isinstance(description, (ARBinaryDescription, ARSwitchDescription)):
+        if isinstance(description, ARBinaryDescription | ARSwitchDescription):
             self._icon_onoff = bool(
                 description.icon_on and description.icon_off
             )
 
     @property
-    def is_on(self) -> Optional[bool]:
+    def is_on(self) -> bool | None:
         """Get the state."""
 
         return convert_to_ha_state_bool(
@@ -156,13 +156,13 @@ class ARBinaryEntity(AREntity):
         )
 
     @property
-    def icon(self) -> Optional[str]:
+    def icon(self) -> str | None:
         """Get the icon."""
 
         if (
             isinstance(
                 self.entity_description,
-                (ARBinaryDescription, ARSwitchDescription),
+                ARBinaryDescription | ARSwitchDescription,
             )
             and self._icon_onoff
         ):
@@ -188,5 +188,5 @@ class ARBinaryEntity(AREntity):
             await self.coordinator.async_request_refresh()
             if not result:
                 _LOGGER.debug("State was not set!")
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:  # noqa: BLE001
             _LOGGER.error("Unable to set state with an exception: %s", ex)

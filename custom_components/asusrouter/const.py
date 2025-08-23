@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from asusrouter.modules.openvpn import AsusOVPNClient, AsusOVPNServer
 from asusrouter.modules.parental_control import (
@@ -72,8 +73,8 @@ NUMERIC_CORES = range(1, 9)  # maximum of 8 cores from 1 to 8
 NUMERIC_GWLAN = range(1, 4)  # maximum of 4 guest WLANs from 1 to 3
 NUMERIC_LAN = range(1, 9)  # maximum of 8 LAN ports from 1 to 8
 NUMERIC_OVPN_SERVER = range(1, 3)  # maximum of 2 OVPN servers from 1 to 2
-NUMERIC_WAN = range(0, 4)  # maximum of 4 WAN ports from 0 to 3
-NUMERIC_WLAN = range(0, 4)  # maximum of 4 WLANs from 0 to 3
+NUMERIC_WAN = range(4)  # maximum of 4 WAN ports from 0 to 3
+NUMERIC_WLAN = range(4)  # maximum of 4 WLANs from 0 to 3
 
 # <-- NUMERIC
 
@@ -132,7 +133,7 @@ NO_SSL = "no_ssl"
 NUMBER = "number"
 PARENT = "parent"
 PARENTAL_CONTROL = "parental_control"
-PASSWORD = "password"
+PASSWORD = "password"  # noqa: S105
 PORT = "port"
 PORT_EXTERNAL = "port_external"
 PORT_FORWARDING = "port_forwarding"

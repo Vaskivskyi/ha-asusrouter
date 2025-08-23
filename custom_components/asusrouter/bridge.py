@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import dataclasses
 import logging
-from typing import Any, Callable, Optional
+from typing import Any
 
 import aiohttp
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfig, ARConfigKey
+from asusrouter.config import ARConfig, ARConfigKey as ARConfKey
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
@@ -16,7 +17,6 @@ from asusrouter.modules.data import AsusData
 from asusrouter.modules.homeassistant import (
     convert_to_ha_data,
     convert_to_ha_sensors,
-    convert_to_ha_sensors_list,
     convert_to_ha_state_bool,
 )
 from asusrouter.modules.identity import AsusDevice
@@ -84,7 +84,7 @@ class ARBridge:
         self,
         hass: HomeAssistant,
         configs: dict[str, Any],
-        options: Optional[dict[str, Any]] = None,
+        options: dict[str, Any] | None = None,
     ) -> None:
         """Initialize bridge to the library."""
 
@@ -104,27 +104,29 @@ class ARBridge:
             cookie_jar=get_cookie_jar(),
         )
 
-        # Initialize API
-        self._api = self._get_api(self._configs, session)
+        # Prepare configs
+        config = self._get_api_config()
 
-        # Switch API to optimistic mode
-        # Optimistic temperature to avoid scaling issues from some devices
-        ARConfig.set(ARConfigKey.OPTIMISTIC_TEMPERATURE, True)
+        # Initialize API
+        self._api = self._get_api(self._configs, session, config)
+
         # Switch API to robust mode
         # Robust boottime will avoid 1 second jitter due to the raw data
         # uncertainty. This can provide up to 1 second overestimation
         # of the boottime, but will avoid saving extra data when the
         # integration restarts and loses the previous boottime data.
-        ARConfig.set(ARConfigKey.ROBUST_BOOTTIME, True)
+        ARConfig.set(ARConfKey.ROBUST_BOOTTIME, True)
 
         self._host = self._configs[CONF_HOST]
-        self._identity: Optional[AsusDevice] = None
+        self._identity: AsusDevice | None = None
 
         self._active: bool = False
 
     @staticmethod
     def _get_api(
-        configs: dict[str, Any], session: aiohttp.ClientSession
+        configs: dict[str, Any],
+        session: aiohttp.ClientSession,
+        config: dict[ARConfKey, Any],
     ) -> AsusRouter:
         """Get AsusRouter API."""
 
@@ -136,7 +138,18 @@ class ARBridge:
             use_ssl=configs[CONF_SSL],
             cache_time=configs.get(CONF_CACHE_TIME, CONF_DEFAULT_CACHE_TIME),
             session=session,
+            config=config,
         )
+
+    def _get_api_config(self) -> dict[ARConfKey, Any]:
+        """Get configuration for AsusRouter instance."""
+
+        return {
+            # Enable automatic temperature fix
+            ARConfKey.OPTIMISTIC_TEMPERATURE: True,
+            # Disable log warning message
+            ARConfKey.NOTIFIED_OPTIMISTIC_TEMPERATURE: True,
+        }
 
     @property
     def active(self) -> bool:
@@ -157,7 +170,7 @@ class ARBridge:
         return self.api.connected
 
     @property
-    def identity(self) -> Optional[AsusDevice]:
+    def identity(self) -> AsusDevice | None:
         """Return device identity."""
 
         return self._identity
@@ -202,13 +215,11 @@ class ARBridge:
         mode = self._configs.get(CONF_MODE, CONF_DEFAULT_MODE)
         available = MODE_SENSORS[mode]
         _LOGGER.debug("Available sensors for mode=`%s`: %s", mode, available)
-        sensors = {
+        return {
             group: details
             for group, details in sensors.items()
             if group in available
         }
-
-        return sensors
 
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
         """Get available sensors."""
@@ -304,9 +315,7 @@ class ARBridge:
         }
 
         # Cleanup sensors if needed
-        sensors = await self.async_cleanup_sensors(sensors)
-
-        return sensors
+        return await self.async_cleanup_sensors(sensors)
 
     # GET DATA FROM DEVICE ->
     # General method
@@ -586,7 +595,7 @@ class ARBridge:
             _LOGGER.debug(
                 "Raw `%s` sensors of type (%s): %s", datatype, type(data), data
             )
-            sensors = convert_to_ha_sensors_list(data)
+            sensors = convert_to_ha_sensors(data, datatype)
             _LOGGER.debug(
                 "Available `%s` sensors: %s", datatype.value, sensors
             )
@@ -659,10 +668,10 @@ class ARBridge:
 
     def _pc_device2rule(
         self, device: dict[str, Any], rule_type: PCRuleType
-    ) -> Optional[ParentalControlRule]:
+    ) -> ParentalControlRule | None:
         """Convert device to parental control rule."""
 
-        mac = device.get("mac", None)
+        mac = device.get("mac")
 
         if mac is None:
             return None
@@ -673,11 +682,11 @@ class ARBridge:
             type=rule_type,
         )
 
-    async def async_pc_rule(self, **kwargs: Any) -> bool:
+    async def async_pc_rule(self, **kwargs: Any) -> bool:  # noqa: C901, PLR0912
         """Change parental control rule(s)."""
 
         # Get the passed data
-        raw = kwargs.get("raw", None)
+        raw = kwargs.get("raw")
 
         # Abort if no data is passed
         if raw is None:
@@ -733,4 +742,5 @@ class ARBridge:
 
     # --------------------
     # <-- Services
+    # --------------------
     # --------------------

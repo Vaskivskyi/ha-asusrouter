@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from asusrouter.modules.aimesh import AiMeshDevice
 from homeassistant.core import callback
@@ -33,10 +34,8 @@ class AiMeshNode:
     @callback
     def update(
         self,
-        node_info: Optional[AiMeshDevice] = None,
-        event_call: Optional[
-            Callable[[str, Optional[dict[str, Any]]], None]
-        ] = None,
+        node_info: AiMeshDevice | None = None,
+        event_call: Callable[[str, dict[str, Any] | None], None] | None = None,
     ) -> None:
         """Update AiMesh device."""
 
