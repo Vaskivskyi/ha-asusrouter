@@ -1036,19 +1036,20 @@ class ARDevice:
         """Device information."""
 
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self.mac),
-                (DOMAIN, self._identity.serial),
-            },
-            name=self._conf_name,
-            model=self._identity.model,
-            model_id=self._identity.product_id,
-            manufacturer=self._identity.brand,
-            sw_version=str(self._identity.firmware),
             configuration_url=(
                 f"{HTTPS if self._options[CONF_SSL] else HTTP}://"
                 f"{self._conf_host}:{self._conf_port}"
             ),
+            identifiers={
+                (DOMAIN, self.mac),
+                (DOMAIN, self._identity.serial),
+            },
+            manufacturer=self._identity.brand,
+            model=self._identity.model,
+            model_id=self._identity.product_id,
+            name=self._conf_name,
+            serial_number=self._identity.serial,
+            sw_version=str(self._identity.firmware),
         )
 
     @property
