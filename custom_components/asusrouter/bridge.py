@@ -9,7 +9,7 @@ from typing import Any
 
 import aiohttp
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfig, ARConfigKey
+from asusrouter.config import ARConfig, ARConfigKey as ARConfKey
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
@@ -104,18 +104,18 @@ class ARBridge:
             cookie_jar=get_cookie_jar(),
         )
 
-        # Initialize API
-        self._api = self._get_api(self._configs, session)
+        # Prepare configs
+        config = self._get_api_config()
 
-        # Switch API to optimistic mode
-        # Optimistic temperature to avoid scaling issues from some devices
-        ARConfig.set(ARConfigKey.OPTIMISTIC_TEMPERATURE, True)
+        # Initialize API
+        self._api = self._get_api(self._configs, session, config)
+
         # Switch API to robust mode
         # Robust boottime will avoid 1 second jitter due to the raw data
         # uncertainty. This can provide up to 1 second overestimation
         # of the boottime, but will avoid saving extra data when the
         # integration restarts and loses the previous boottime data.
-        ARConfig.set(ARConfigKey.ROBUST_BOOTTIME, True)
+        ARConfig.set(ARConfKey.ROBUST_BOOTTIME, True)
 
         self._host = self._configs[CONF_HOST]
         self._identity: AsusDevice | None = None
@@ -124,7 +124,9 @@ class ARBridge:
 
     @staticmethod
     def _get_api(
-        configs: dict[str, Any], session: aiohttp.ClientSession
+        configs: dict[str, Any],
+        session: aiohttp.ClientSession,
+        config: dict[ARConfKey, Any],
     ) -> AsusRouter:
         """Get AsusRouter API."""
 
@@ -136,7 +138,18 @@ class ARBridge:
             use_ssl=configs[CONF_SSL],
             cache_time=configs.get(CONF_CACHE_TIME, CONF_DEFAULT_CACHE_TIME),
             session=session,
+            config=config,
         )
+
+    def _get_api_config(self) -> dict[ARConfKey, Any]:
+        """Get configuration for AsusRouter instance."""
+
+        return {
+            # Enable automatic temperature fix
+            ARConfKey.OPTIMISTIC_TEMPERATURE: True,
+            # Disable log warning message
+            ARConfKey.NOTIFIED_OPTIMISTIC_TEMPERATURE: True,
+        }
 
     @property
     def active(self) -> bool:
