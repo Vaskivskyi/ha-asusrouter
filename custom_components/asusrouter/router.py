@@ -1042,10 +1042,13 @@ class ARDevice:
             },
             name=self._conf_name,
             model=self._identity.model,
+            model_id=self._identity.product_id,
             manufacturer=self._identity.brand,
             sw_version=str(self._identity.firmware),
-            configuration_url=f"{HTTPS if self._options[CONF_SSL] else HTTP}://\
-{self._conf_host}:{self._conf_port}",
+            configuration_url=(
+                f"{HTTPS if self._options[CONF_SSL] else HTTP}://"
+                f"{self._conf_host}:{self._conf_port}"
+            ),
         )
 
     @property
