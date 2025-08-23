@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "**/*.py"
+      - ".github/workflows/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - "**/*.py"
+      - "tests/**/*.py"
+      - "pyproject.toml"
+      - "uv.lock"
+  schedule:
+    - cron: "0 0 * * *"
+
+env:
+  DEFAULT_PYTHON_VERSION: 3.13
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Preparation
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up UV and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-groups
+
+  ruff-format:
+    name: Ruff Format
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up UV and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-groups
+
+      - name: Run Ruff Format
+        run: uv run pre-commit run --hook-stage manual ruff-format --all-files --show-diff-on-failure
+
+  ruff-check:
+    name: Ruff Check
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up UV and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-groups
+
+      - name: Run Ruff Check
+        run: uv run pre-commit run --hook-stage manual ruff-check --all-files --show-diff-on-failure

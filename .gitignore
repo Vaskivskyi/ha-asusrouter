@@ -1,7 +1,13 @@
 ### Python
 
 __pycache__/
+.python-version
+.venv*
+venv*
 
+# Pytest
+.coverage
+pytest/
 
 ### Other
 # Test
@@ -9,5 +15,4 @@ test.py
 local/
 
 # VS Code
-.vscode
-
+.vscode/launch.json

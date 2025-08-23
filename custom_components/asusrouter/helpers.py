@@ -7,7 +7,7 @@ from typing import Any
 
 
 def clean_dict(raw: dict[str, Any]) -> dict[str, Any]:
-    """Cleans dictionary from None values."""
+    """Clean dictionary from None values."""
 
     return {
         k: v for k, v in raw.items() if v is not None or k.endswith("state")

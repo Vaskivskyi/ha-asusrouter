@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import dataclasses
 import logging
-from typing import Any, Callable, Optional
+from typing import Any
 
 import aiohttp
 from asusrouter import AsusRouter
@@ -83,7 +84,7 @@ class ARBridge:
         self,
         hass: HomeAssistant,
         configs: dict[str, Any],
-        options: Optional[dict[str, Any]] = None,
+        options: dict[str, Any] | None = None,
     ) -> None:
         """Initialize bridge to the library."""
 
@@ -117,7 +118,7 @@ class ARBridge:
         ARConfig.set(ARConfigKey.ROBUST_BOOTTIME, True)
 
         self._host = self._configs[CONF_HOST]
-        self._identity: Optional[AsusDevice] = None
+        self._identity: AsusDevice | None = None
 
         self._active: bool = False
 
@@ -156,7 +157,7 @@ class ARBridge:
         return self.api.connected
 
     @property
-    def identity(self) -> Optional[AsusDevice]:
+    def identity(self) -> AsusDevice | None:
         """Return device identity."""
 
         return self._identity
@@ -201,13 +202,11 @@ class ARBridge:
         mode = self._configs.get(CONF_MODE, CONF_DEFAULT_MODE)
         available = MODE_SENSORS[mode]
         _LOGGER.debug("Available sensors for mode=`%s`: %s", mode, available)
-        sensors = {
+        return {
             group: details
             for group, details in sensors.items()
             if group in available
         }
-
-        return sensors
 
     async def async_get_available_sensors(self) -> dict[str, dict[str, Any]]:
         """Get available sensors."""
@@ -303,9 +302,7 @@ class ARBridge:
         }
 
         # Cleanup sensors if needed
-        sensors = await self.async_cleanup_sensors(sensors)
-
-        return sensors
+        return await self.async_cleanup_sensors(sensors)
 
     # GET DATA FROM DEVICE ->
     # General method
@@ -658,10 +655,10 @@ class ARBridge:
 
     def _pc_device2rule(
         self, device: dict[str, Any], rule_type: PCRuleType
-    ) -> Optional[ParentalControlRule]:
+    ) -> ParentalControlRule | None:
         """Convert device to parental control rule."""
 
-        mac = device.get("mac", None)
+        mac = device.get("mac")
 
         if mac is None:
             return None
@@ -672,11 +669,11 @@ class ARBridge:
             type=rule_type,
         )
 
-    async def async_pc_rule(self, **kwargs: Any) -> bool:
+    async def async_pc_rule(self, **kwargs: Any) -> bool:  # noqa: C901, PLR0912
         """Change parental control rule(s)."""
 
         # Get the passed data
-        raw = kwargs.get("raw", None)
+        raw = kwargs.get("raw")
 
         # Abort if no data is passed
         if raw is None:
@@ -732,4 +729,5 @@ class ARBridge:
 
     # --------------------
     # <-- Services
+    # --------------------
     # --------------------
