@@ -83,12 +83,9 @@ async def async_get_config_entry_diagnostics(
             {
                 "name": device.name,
                 "ip_address": device.ip_address,
-                "last_activity": device.extra_state_attributes[
-                    DEVICE_ATTRIBUTE_LAST_ACTIVITY
-                ]
-                if DEVICE_ATTRIBUTE_LAST_ACTIVITY
-                in device.extra_state_attributes
-                else None,
+                "last_activity": device.extra_state_attributes.get(
+                    DEVICE_ATTRIBUTE_LAST_ACTIVITY, None
+                ),
             }
         )
 

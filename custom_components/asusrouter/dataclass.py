@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from asusrouter.modules.state import AsusState, AsusStateNone
 from homeassistant.components.binary_sensor import (
@@ -22,25 +22,25 @@ from homeassistant.helpers.entity import EntityDescription
 class AREntityDescription(EntityDescription):
     """Describe AsusRouter entity."""
 
-    capabilities: Optional[dict[str, Any]] = None
+    capabilities: dict[str, Any] | None = None
     key_group: str = ""
     value: Callable[[Any], Any] = lambda val: val
-    extra_state_attributes: Optional[dict[str, Any]] = None
+    extra_state_attributes: dict[str, Any] | None = None
 
 
 @dataclass
 class ARBinaryDescription(AREntityDescription, BinarySensorEntityDescription):
     """Describe AsusRouter binary entity."""
 
-    icon_on: Optional[str] = None
-    icon_off: Optional[str] = None
+    icon_on: str | None = None
+    icon_off: str | None = None
 
 
 @dataclass
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """Describe AsusRouter sensor."""
 
-    factor: Optional[int] = None
+    factor: int | None = None
     precision: int = 3
 
 
@@ -60,13 +60,13 @@ class ARLightDescription(ARBinaryDescription, LightEntityDescription):
 class ARSwitchDescription(AREntityDescription, SwitchEntityDescription):
     """Describe AsusRouter switch."""
 
-    icon_on: Optional[str] = None
-    icon_off: Optional[str] = None
+    icon_on: str | None = None
+    icon_off: str | None = None
 
     state_on: AsusState = AsusStateNone.NONE
-    state_on_args: Optional[dict[str, Any]] = None
+    state_on_args: dict[str, Any] | None = None
     state_off: AsusState = AsusStateNone.NONE
-    state_off_args: Optional[dict[str, Any]] = None
+    state_off_args: dict[str, Any] | None = None
 
     state_expect_modify: bool = False
 
@@ -76,7 +76,7 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
     """Describe AsusRouter button."""
 
     state: AsusState = AsusStateNone.NONE
-    state_args: Optional[dict[str, Any]] = None
+    state_args: dict[str, Any] | None = None
     state_expect_modify: bool = False
 
 

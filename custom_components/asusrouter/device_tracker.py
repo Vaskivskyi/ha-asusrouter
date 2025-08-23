@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
@@ -108,7 +108,7 @@ class ARDeviceEntity(ScannerEntity):
             )
 
     def _compile_device_info(
-        self, mac_address: str, name: Optional[str]
+        self, mac_address: str, name: str | None
     ) -> DeviceInfo:
         """Compile device info."""
 
@@ -131,13 +131,13 @@ class ARDeviceEntity(ScannerEntity):
         return SourceType.ROUTER
 
     @property
-    def is_connected(self) -> Optional[bool]:
+    def is_connected(self) -> bool | None:
         """Device status."""
 
         return self._client.state
 
     @property
-    def ip_address(self) -> Optional[str]:
+    def ip_address(self) -> str | None:
         """Device IP address."""
 
         return self._client.ip_address
@@ -149,7 +149,7 @@ class ARDeviceEntity(ScannerEntity):
         return self._client.mac_address
 
     @property
-    def hostname(self) -> Optional[str]:
+    def hostname(self) -> str | None:
         """Device hostname."""
 
         return self._client.name
@@ -163,7 +163,7 @@ class ARDeviceEntity(ScannerEntity):
         )
 
     @property
-    def unique_id(self) -> Optional[str]:
+    def unique_id(self) -> str | None:
         """Return unique ID of the entity."""
 
         return self._attr_unique_id

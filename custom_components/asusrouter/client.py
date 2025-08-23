@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from asusrouter.modules.client import (
     AsusClient,
@@ -25,7 +26,7 @@ class ARClient:
     def __init__(
         self,
         mac: str,
-        name: Optional[str] = None,
+        name: str | None = None,
     ):
         """Initialize the client."""
 
@@ -36,12 +37,13 @@ class ARClient:
 
         # To be recieved from the device
         # Client description
-        self.description: Optional[AsusClientDescription] = None
-        # Connection description - AsusClientConnection / AsusClientConnectionWlan
-        self.connection: Optional[AsusClientConnection] = None
+        self.description: AsusClientDescription | None = None
+        # Connection description -
+        # AsusClientConnection / AsusClientConnectionWlan
+        self.connection: AsusClientConnection | None = None
 
         # To be generated for other parts of the integration
-        self._identity: Optional[dict[str, Any]] = None
+        self._identity: dict[str, Any] | None = None
         self._extra_state_attributes: dict[str, Any] = {}
 
         # Connection state
@@ -51,22 +53,20 @@ class ARClient:
         self._guest_id: int = 0
 
         # Device last active
-        self._last_activity: Optional[datetime] = None
+        self._last_activity: datetime | None = None
 
     @callback
     def update(
         self,
-        client_info: Optional[AsusClient] = None,
+        client_info: AsusClient | None = None,
         consider_home: int = 0,
-        event_call: Optional[
-            Callable[[str, Optional[dict[str, Any]]], None]
-        ] = None,
-    ):
+        event_call: Callable[[str, dict[str, Any] | None], None] | None = None,
+    ) -> None:
         """Update client information."""
 
-        utc_now: datetime = datetime.now(timezone.utc)
+        utc_now: datetime = datetime.now(UTC)
 
-        state: Optional[ConnectionState] = None
+        state: ConnectionState | None = None
 
         # If client information is provided
         if client_info is not None:
@@ -89,9 +89,11 @@ class ARClient:
 
             # Device was disconnected, now it has reconnected
             # Fire event and connected callback
-            if self._state is ConnectionState.DISCONNECTED:
-                if event_call is not None:
-                    event_call("device_reconnected", self.identity)
+            if (
+                self._state is ConnectionState.DISCONNECTED
+                and event_call is not None
+            ):
+                event_call("device_reconnected", self.identity)
 
             # Update connection status
             self._state = ConnectionState.CONNECTED
@@ -114,7 +116,7 @@ class ARClient:
                 )
 
     def generate_identity(
-        self, state: Optional[ConnectionState]
+        self, state: ConnectionState | None
     ) -> dict[str, Any]:
         """Generate client identity."""
 
@@ -170,13 +172,13 @@ class ARClient:
         return clean_dict(attributes)
 
     @property
-    def state(self) -> Optional[bool]:
+    def state(self) -> bool | None:
         """Return if the device is connected."""
 
         return convert_to_ha_state_bool(self._state)
 
     @property
-    def ip_address(self) -> Optional[str]:
+    def ip_address(self) -> str | None:
         """Return IP address."""
 
         return (
@@ -190,7 +192,7 @@ class ARClient:
         return self._mac
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Return name."""
 
         return (
@@ -206,7 +208,7 @@ class ARClient:
         return self._extra_state_attributes
 
     @property
-    def identity(self) -> Optional[dict[str, Any]]:
+    def identity(self) -> dict[str, Any] | None:
         """Return identity."""
 
         return self._identity

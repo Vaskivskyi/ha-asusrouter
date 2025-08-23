@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from .const import (
     CONF_LABELS_INTERFACES,
     MAP_NETWORK_TEMP,
@@ -15,7 +13,7 @@ from .dataclass import ARSensorDescription
 
 
 def list_sensors_network(
-    interfaces: Optional[list[str]] = None,
+    interfaces: list[str] | None = None,
 ) -> list[ARSensorDescription]:
     """Compile a list of network sensors."""
 
@@ -32,7 +30,8 @@ def list_sensors_network(
                 ARSensorDescription(
                     key=key,
                     key_group=NETWORK,
-                    name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} {data[NAME]}"
+                    name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} "
+                    f"{data[NAME]}"
                     or None,
                     icon=data["icon"] or None,
                     state_class=data["state_class"] or None,

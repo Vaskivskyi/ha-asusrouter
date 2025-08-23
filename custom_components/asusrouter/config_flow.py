@@ -125,14 +125,11 @@ def _check_errors(
     if errors is None:
         return False
 
-    if (
+    return bool(
         BASE in errors
         and errors[BASE] != RESULT_SUCCESS
         and errors[BASE] != ""
-    ):
-        return True
-
-    return False
+    )
 
 
 async def _async_get_clients(
@@ -150,13 +147,12 @@ async def _async_get_clients(
         clients = await bridge.api.async_get_data(AsusData.CLIENTS)
         await bridge.async_disconnect()
 
-        result = {
+        return {
             format_mac(mac): client.description.name
             for mac, client in clients.items()
             if client.description.name
         }
-        return result
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # noqa: BLE001
         _LOGGER.warning(
             "Cannot get clients for %s: %s", configs[CONF_HOST], ex
         )
@@ -181,7 +177,7 @@ async def _async_get_network_interfaces(
         await bridge.async_disconnect()
         _LOGGER.debug("Found network interfaces: %s", labels)
         return labels
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # noqa: BLE001
         _LOGGER.warning(
             "Cannot get available network interfaces for %s: %s",
             configs[CONF_HOST],
@@ -190,7 +186,7 @@ async def _async_get_network_interfaces(
         return CONF_DEFAULT_INTERFACES
 
 
-async def _async_check_connection(
+async def _async_check_connection(  # noqa: C901, PLR0911, PLR0912
     hass: HomeAssistant,
     configs: dict[str, Any],
     options: dict[str, Any] | None = None,
@@ -230,8 +226,9 @@ async def _async_check_connection(
         if args[1] == AccessError.TRY_AGAIN:
             timeout = args[2].get("timeout")
             _LOGGER.error(
-                "Device `%s` has reported block for the login (to many wrong attempts were made). \
-                    Please try again in `%s` seconds",
+                "Device `%s` has reported block for the login "
+                "(to many wrong attempts were made). Please try again "
+                "in `%s` seconds",
                 host,
                 timeout,
             )
@@ -241,8 +238,9 @@ async def _async_check_connection(
         # Reset required
         if args[1] == AccessError.RESET_REQUIRED:
             _LOGGER.error(
-                "Device `%s` requires a reset. Please reset the device. You won't be able to \
-                    login to the device until the reset is done.",
+                "Device `%s` requires a reset. Please reset the device. "
+                "You won't be able to login to the device until the reset "
+                "is done.",
                 host,
             )
             return {
@@ -251,10 +249,12 @@ async def _async_check_connection(
         # Captcha required
         if args[1] == AccessError.CAPTCHA:
             _LOGGER.error(
-                "Device `%s` requires a captcha. Please login to the device and complete the captcha. \
-                    Integration cannot proceed with the captcha request. You need either to disable \
-                    captcha or login via Web UI from the HA IP address, complete it and try again. \
-                    Sometimes, you can also reboot the device to fix this issue.",
+                "Device `%s` requires a captcha. Please login to the device "
+                "and complete the captcha. Integration cannot proceed with "
+                "the captcha request. You need either to disable captcha or "
+                "login via Web UI from the HA IP address, complete it and try "
+                "again. Sometimes, you can also reboot the device to fix this "
+                "issue.",
                 host,
             )
             return {
@@ -294,7 +294,8 @@ async def _async_check_connection(
     # Connection error
     except AsusRouterConnectionError as ex:
         _LOGGER.error(
-            "Connection error during connection to `%s`: Original exception: %s",
+            "Connection error during connection to `%s`: "
+            "Original exception: %s",
             host,
             ex,
         )
@@ -303,7 +304,7 @@ async def _async_check_connection(
         }
 
     # Anything else
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # noqa: BLE001
         _LOGGER.error(
             "Unknown error of type '%s' during connection to `%s`: %s",
             type(ex),
