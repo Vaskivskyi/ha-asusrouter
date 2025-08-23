@@ -16,7 +16,7 @@ classifiers     = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies    = [
-    "asusrouter @ git+https://github.com/Vaskivskyi/asusrouter.git@dev",
+    "asusrouter >=1.20.1",
     "homeassistant >=2025.3.0",
 ]
 
