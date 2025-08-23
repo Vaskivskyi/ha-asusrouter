@@ -1,5 +1,111 @@
+[project]
+name            = "ha-asusrouter"
+version         = "1.0.0.dev0"
+license         = "Apache-2.0"
+requires-python = ">=3.13.0"
+readme          = "README.md"
+description     = "A custom Home Assistant integration from the AsusRouter project"
+authors         = [
+    { name="Yevhenii Vaskivskyi", email="yevhenii@vaskivskyi.com" },
+]
+classifiers     = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies    = [
+    "asusrouter @ git+https://github.com/Vaskivskyi/asusrouter.git@dev",
+    "homeassistant >=2025.3.0",
+]
+
+[project.urls]
+"Homepage"      = "https://asusrouter.vaskivskyi.com/"
+"Source Code"   = "https://github.com/Vaskivskyi/ha-asusrouter"
+"Bug Reports"   = "https://github.com/Vaskivskyi/ha-asusrouter/issues"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pydantic>=2.10.6",
+    "ruff>=0.12.8",
+    "pre-commit>=4.3.0",
+]
+test = [
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.25.3",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+show_error_codes = true
+exclude = "tests/.*"
+
+[tool.ruff]
+line-length = 79
+required-version = ">=0.12.8"
+src = ["asusrouter"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "A001",   # Variable {name} is shadowing a Python builtin
+    "ASYNC",  # flake8-async
+    "BLE",    # flake8-blind-except
+    "C",      # complexity
+    "D",      # docstrings
+    "E",      # pycodestyle / error
+    "F",      # pyflakes
+    "I",      # isort
+    "ICN001", # {name} should be imported as {asname}
+    "INP",    # flake8-no-pep420
+    "ISC",    # flake8-implicit-str-concat
+    "LOG",    # flake8-logging
+    "N",      # pep8-naming
+    "PERF",   # Perflint
+    "PGH",    # pygrep-hooks
+    "PIE",    # flake8-pie
+    "PL",     # pylint
+    "PT",     # flake8-pytest-style
+    "PTH",    # flake8-pathlib
+    "PYI",    # flake8-pyi
+    "RET",    # flake8-return
+    "RSE",    # flake8-raise
+    "S",      # flake8-bandit
+    "SIM",    # flake8-simplify
+    "T20",    # flake8-print
+    "UP",     # pyupgrade
+    "W",      # pycodestyle / warning
+]
+
+ignore = [
+    "D202",   # No blank lines allowed after function docstring (found {num_lines})
+    "D203",   # 1 blank line required before class docstring
+    "D213",   # Multi-line docstring summary should start at the second line
+]
+
 [tool.ruff.lint.isort]
-combine-as-imports = true
 force-sort-within-sections = true
 known-third-party = ["homeassistant", "asusrouter"]
+combine-as-imports = true
 split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101",    # Use of `assert` detected
+    "S105",    # Possible hardcoded password assigned to: "{}"
+    "S106",    # Possible hardcoded password assigned to argument: "{}"
+    "PLR0913", # Too many arguments in function definition ({c_args} > {max_args})
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"

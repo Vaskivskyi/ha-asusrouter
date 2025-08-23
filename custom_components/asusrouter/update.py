@@ -75,7 +75,8 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         """Install the update."""
         try:
             _LOGGER.debug(
-                "Trying to install Firmware update. This might take several minutes."
+                "Trying to install Firmware update. "
+                "This might take several minutes."
             )
             result = await self.api.async_set_state(
                 state=AsusSystem.FIRMWARE_UPGRADE,
@@ -89,7 +90,7 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
                 await asyncio.sleep(120)
                 self._attr_in_progress = False
 
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:  # noqa: BLE001
             _LOGGER.error(
                 "An exception occurred while trying to install the update: %s",
                 ex,

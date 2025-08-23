@@ -44,7 +44,7 @@ async def async_setup_entry(
     for button in buttons:
         try:
             entities.append(ARButton(router, button))
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:  # noqa: BLE001
             _LOGGER.warning(ex)
 
     async_add_entities(entities)
@@ -104,5 +104,5 @@ class ARButton(ButtonEntity):
             )
             if not result:
                 _LOGGER.debug("Didn't manage to press %s", state)
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:  # noqa: BLE001
             _LOGGER.error("Pressing %s caused an exception: %s", state, ex)

@@ -65,5 +65,4 @@ class ARSensor(AREntity, SensorEntity):
         """Return state."""
 
         description = self.entity_description
-        state = self.coordinator.data.get(description.key)
-        return state
+        return self.coordinator.data.get(description.key)
