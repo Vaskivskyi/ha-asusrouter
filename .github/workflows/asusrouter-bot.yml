@@ -104,16 +104,16 @@ jobs:
                 correctTitle = '[Bug] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
               }
               expectedLabels.push('bug');
-            } else if (issueTitle.toLowerCase().includes('device support') || issueBody.toLowerCase().includes('support details')) {
+            } else if (issueTitle.toLowerCase().includes('support') || issueBody.toLowerCase().includes('support details')) {
               issueType = 'device_support';
-              if (!issueTitle.startsWith('[Device Support]')) {
-                correctTitle = '[Device Support] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
+              if (!issueTitle.startsWith('[Support]')) {
+                correctTitle = '[Support] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
               }
               expectedLabels.push('documentation');
             } else if (issueTitle.toLowerCase().includes('feature') || issueBody.toLowerCase().includes('feature request details')) {
               issueType = 'feature_request';
-              if (!issueTitle.startsWith('[Feature Request]')) {
-                correctTitle = '[Feature Request] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
+              if (!issueTitle.startsWith('[Feature]')) {
+                correctTitle = '[Feature] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
               }
               expectedLabels.push('enhancement');
             }
