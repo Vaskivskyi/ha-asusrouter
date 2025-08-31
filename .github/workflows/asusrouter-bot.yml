@@ -159,13 +159,7 @@ jobs:
             
             // Comment if missing required information
             if (missingInfo.length > 0) {
-              const commentBody = `👋 Hello! Thank you for opening this issue.
-
-I noticed that some required information is missing from your issue. To help us assist you better, please provide the following:
-
-${missingInfo.map(item => `- ${item}`).join('\n')}
-
-Please edit your issue to include this information. Thank you! 🤖`;
+              const commentBody = '👋 Hello! Thank you for opening this issue.\n\nI noticed that some required information is missing from your issue. To help us assist you better, please provide the following:\n\n' + missingInfo.map(item => '- ' + item).join('\n') + '\n\nPlease edit your issue to include this information. Thank you! 🤖';
 
               console.log('Adding comment for missing info:', missingInfo);
               await github.rest.issues.createComment({
