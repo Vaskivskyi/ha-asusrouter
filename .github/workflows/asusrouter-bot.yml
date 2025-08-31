@@ -30,6 +30,7 @@ jobs:
             // Extract device model from issue body
             function extractDeviceModel(body) {
               const patterns = [
+                /### Device model\s*\n\s*([^\n\#]+)/i,
                 /Device model[^:]*:?\s*([^\r\n]+)/i,
                 /Your device model[^:]*:?\s*([^\r\n]+)/i,
                 /Model[^:]*:?\s*([^\r\n]+)/i
@@ -37,8 +38,13 @@ jobs:
               
               for (const pattern of patterns) {
                 const match = body.match(pattern);
-                if (match && match[1] && match[1].trim() !== '' && !match[1].includes('RT-')) {
-                  return match[1].trim();
+                if (match && match[1] && match[1].trim() !== '' && match[1].trim() !== '_No response_') {
+                  const value = match[1].trim();
+                  // Skip placeholder values and check if it looks like a valid device model
+                  if (value === 'RT-' || value.length < 2 || value.startsWith('###')) {
+                    continue;
+                  }
+                  return value;
                 }
               }
               return null;
@@ -47,14 +53,20 @@ jobs:
             // Extract firmware version from issue body
             function extractFirmwareVersion(body) {
               const patterns = [
+                /### Firmware version\s*\n\s*([^\n\#]+)/i,
                 /Firmware version[^:]*:?\s*([^\r\n]+)/i,
                 /Version[^:]*:?\s*([^\r\n]+)/i
               ];
               
               for (const pattern of patterns) {
                 const match = body.match(pattern);
-                if (match && match[1] && match[1].trim() !== '' && !match[1].includes('3.0.0.4.')) {
-                  return match[1].trim();
+                if (match && match[1] && match[1].trim() !== '' && match[1].trim() !== '_No response_') {
+                  const value = match[1].trim();
+                  // Skip placeholder values and check if it looks like a valid firmware version
+                  if (value === '3.0.0.4.' || value.length < 3 || value.startsWith('###')) {
+                    continue;
+                  }
+                  return value;
                 }
               }
               return null;
@@ -63,6 +75,9 @@ jobs:
             // Check if required details are provided
             function hasRequiredDetails(body) {
               const detailsPatterns = [
+                /### Bug details\s*\n\s*([^\n]+)/i,
+                /### Support details\s*\n\s*([^\n]+)/i,
+                /### Feature request details\s*\n\s*([^\n]+)/i,
                 /Bug details[^:]*:?\s*([^\r\n]+)/i,
                 /Support details[^:]*:?\s*([^\r\n]+)/i,
                 /Feature request details[^:]*:?\s*([^\r\n]+)/i,
@@ -71,7 +86,7 @@ jobs:
               
               for (const pattern of detailsPatterns) {
                 const match = body.match(pattern);
-                if (match && match[1] && match[1].trim() !== '') {
+                if (match && match[1] && match[1].trim() !== '' && match[1].trim() !== '_No response_') {
                   return true;
                 }
               }
