@@ -1,6 +1,6 @@
 name: Device support
 description: Does your device work well with the integration? Or not? Report it
-title: "[Device support] "
+title: "[Device Support] "
 labels: ["documentation"]
 assignees:
   - vaskivskyi
@@ -12,35 +12,15 @@ body:
         To submit a feature request, use the [feature request][forms] form.
 
         [forms]: https://github.com/Vaskivskyi/ha-asusrouter/issues/new/choose
-  - type: textarea
-    attributes:
-      label: Anything you want to mention?
-      description: >
-        Use this field for a short description if you would like.
-  - type: markdown
-    attributes:
-      value: >
-        # Environment and device
   - type: input
-    id: device
+    id: device_model
     validations:
       required: true
     attributes:
-      label: Your device model
+      label: Device model
       description: >
         Please, put in the full model of your device, as stated in the web panel of your router (or on the Asus webpage), e.g. `RT-AX88U`.
       placeholder: RT-
-  - type: dropdown
-    id: firmware_type
-    validations:
-      required: true
-    attributes:
-      label: Firmware type
-      description: >
-        What kind of firmware you are using? Is it a stock AsusWRT or AsusWRT-Merlin?
-      options:
-        - Stock
-        - Merlin
   - type: input
     id: firmware_version
     validations:
@@ -48,17 +28,13 @@ body:
     attributes:
       label: Firmware version
       description: >
-        Please, provide the full version of the firrmware, e.g. `3.0.0.4.386.5_2` or `3.0.0.4.386_48631-g10d88e5`
+        Please, provide the full version of the firmware, e.g. `3.0.0.4.386.5_2` or `3.0.0.4.386_48631-g10d88e5`
       placeholder: 3.0.0.4.
-  - type: dropdown
+  - type: textarea
+    id: support_details
     validations:
       required: true
     attributes:
-      label: Does everything work well?
+      label: Support details
       description: >
-        Do all the features work well for your device?
-      options:
-        - "Yes"
-        - "No"
-
-
+        Please describe how well your device works with the integration. Does everything work as expected? Are there any specific features that don't work? Any other relevant information.
