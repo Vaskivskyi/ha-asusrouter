@@ -366,7 +366,7 @@ wheels = [
 
 [[package]]
 name = "asusrouter"
-version = "1.20.1"
+version = "1.21.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", version = "3.11.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
@@ -375,9 +375,9 @@ dependencies = [
     { name = "urllib3", version = "2.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/a1/2f4b1dfc5148591b4a678ed346100b77acf158e3af71049b78df07ce8c39/asusrouter-1.20.1.tar.gz", hash = "sha256:e3d51f9096bf330318bf2025c0190e9a5c704b15e5809960590adec56168cc7a", size = 121183, upload-time = "2025-08-23T17:17:30.097Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/d6/2fc9f5c825a167f462a918f18ab3c7360345dced8adc491e68587d69ca97/asusrouter-1.21.0.tar.gz", hash = "sha256:bf4c6ecdf572240ab6384786cf243ebaeca7bbda8a9709d7aaa0a00503fa5e7c", size = 129828, upload-time = "2025-09-03T06:57:02.456Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/08/1e5e29211ad8eaf471b60e7bfbd231ddad522371747d80274d1dbb952acb/asusrouter-1.20.1-py3-none-any.whl", hash = "sha256:1d2149c09e964462ef5868c5cc65e965dc15534cfa9a1e3daf74e87b1ad764f3", size = 123455, upload-time = "2025-08-23T17:17:28.808Z" },
+    { url = "https://files.pythonhosted.org/packages/36/72/67454bf4f403092d12529d067143951e10dc11e9c826bfa587b010cf6bdd/asusrouter-1.21.0-py3-none-any.whl", hash = "sha256:edec890b05a29288d6aef8721ccf574bd7a25637651a1ee2e27236fb52f0d227", size = 131911, upload-time = "2025-09-03T06:57:00.371Z" },
 ]
 
 [[package]]
@@ -1139,7 +1139,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "asusrouter", specifier = ">=1.20.1" },
+    { name = "asusrouter", specifier = ">=1.21.0" },
     { name = "homeassistant", specifier = ">=2025.3.0" },
 ]
 
