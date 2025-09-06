@@ -93,6 +93,7 @@ ignore = [
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
 known-third-party = ["homeassistant", "asusrouter"]
+known-first-party = ["custom_components"]
 combine-as-imports = true
 split-on-trailing-comma = false
 

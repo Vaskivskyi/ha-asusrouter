@@ -4,9 +4,9 @@ from collections.abc import Generator
 from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
-from custom_components.asusrouter import bridge as bridge_module
 import pytest
 
+from custom_components.asusrouter import bridge as bridge_module
 from tests.helpers import SyncPatch
 
 

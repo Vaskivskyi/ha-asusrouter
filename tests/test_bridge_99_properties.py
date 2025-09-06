@@ -3,9 +3,6 @@
 from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
-from custom_components.asusrouter import bridge as bridge_module
-from custom_components.asusrouter.bridge import ARBridge
-from custom_components.asusrouter.const import DOMAIN
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -15,11 +12,14 @@ from homeassistant.const import (
 )
 import pytest
 
+from custom_components.asusrouter import bridge as bridge_module
+from custom_components.asusrouter.bridge import ARBridge
+from custom_components.asusrouter.const import DOMAIN
+from custom_components.asusrouter.const_v1 import (
+    DEFAULT_IDENTITY_BRAND,
+    DEFAULT_IDENTITY_NAME,
+)
 from tests.helpers import AsyncPatch, SyncPatch
-
-DEFAULT_BRAND = "ASUSTek"
-DEFAULT_NAME = "AsusRouter"
-
 
 FAKE_HOSTNAME = "hostname"
 FAKE_USERNAME = "username"
@@ -179,10 +179,10 @@ async def test_before_connect(
 
         assert bridge.configuration_url == expected_configuration_url
         assert bridge.identity is None
-        assert bridge.manufacturer == DEFAULT_BRAND
+        assert bridge.manufacturer == DEFAULT_IDENTITY_BRAND
         assert bridge.model is None
         assert bridge.model_id is None
-        assert bridge.name == DEFAULT_NAME
+        assert bridge.name == DEFAULT_IDENTITY_NAME
         assert bridge.serial_number is None
         assert bridge.sw_version is None
 

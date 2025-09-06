@@ -74,6 +74,7 @@ from .const import (
     TEMPERATURE,
     WLAN,
 )
+from .const_v1 import DEFAULT_IDENTITY_BRAND, DEFAULT_IDENTITY_NAME
 from .modules.aura import aura_to_ha
 from .modules.firmware import to_ha as firmware_to_ha
 
@@ -136,10 +137,10 @@ class ARBridge:
             f"://{self._host}:{port}"
         )
         self._identifiers: set[tuple[str, str]] = set()
-        self._manufacturer = "ASUSTek"
+        self._manufacturer = DEFAULT_IDENTITY_BRAND
         self._model: str | None = None
         self._model_id: str | None = None
-        self._name: str = "AsusRouter"
+        self._name: str = DEFAULT_IDENTITY_NAME
         self._serial_number: str | None = None
         self._sw_version: str | None = None
 
@@ -261,7 +262,7 @@ class ARBridge:
         self._manufacturer = identity.brand
         self._model = identity.model
         self._model_id = identity.product_id
-        self._name = identity.model or "AsusRouter"
+        self._name = identity.model or DEFAULT_IDENTITY_NAME
         self._serial_number = identity.serial
         self._sw_version = (
             str(identity.firmware) if identity.firmware else None
