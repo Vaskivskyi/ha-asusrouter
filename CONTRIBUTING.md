@@ -56,7 +56,7 @@ Please follow these guidelines for a smooth development experience.
 
    - The `.vscode` folder is versioned and contains:
      - **Recommended extensions** (`extensions.json`)
-     - **Editor settings** (`settings.json`)
+     - **Editor settings example** (`settings.example.json`)
      - **Common tasks** (`tasks.json`)
    - VS Code should prompt you to install recommended extensions on open.
 
@@ -74,23 +74,35 @@ These are listed in `.vscode/extensions.json` and will be suggested automaticall
 
 ## Recommended VS Code Settings
 
-These are already included in `.vscode/settings.json`:
+These are already included in `.vscode/settings.example.json`:
 
 ```jsonc
 {
   "editor.formatOnSave": true,
   "[python]": {
-    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     },
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": null
   },
   "python.analysis.typeCheckingMode": "basic",
-  "mypy-type-checker.args": ["--config-file=pyproject.toml"]
+  "mypy-type-checker.args": ["--config-file=${workspaceFolder}/mypy.ini"],
+  "mypy-type-checker.interpreter": [
+    "${workspaceFolder}/.venv/Scripts/python.exe", // Windows path
+    "${workspaceFolder}/.venv/bin/python" // Unix-like path
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.pythonProjects": [],
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "ruff.path": [
+    "${workspaceFolder}/.venv/Scripts/ruff.exe", // Windows path
+    "${workspaceFolder}/.venv/bin/ruff" // Unix-like path
+  ]
 }
 ```
+
+**You need to use ONLY a single mypy interpreter path and single ruff path depending on your OS.**
 
 ---
 
