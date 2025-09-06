@@ -391,7 +391,7 @@ class ARDevice:
             # No entities for the device
             if len(entries) == 0:
                 _LOGGER.debug(
-                    "Removing device `%s` since it has no entries",
+                    "Removing device `%s` since it has no entities",
                     device_entry.name,
                 )
                 device_registry.async_remove_device(device_entry.id)
