@@ -88,13 +88,21 @@ These are already included in `.vscode/settings.example.json`:
   },
   "python.analysis.typeCheckingMode": "basic",
   "mypy-type-checker.args": ["--config-file=${workspaceFolder}/mypy.ini"],
-  "mypy-type-checker.interpreter": ["${workspaceFolder}/.venv/Scripts/python"],
+  "mypy-type-checker.interpreter": [
+    "${workspaceFolder}/.venv/Scripts/python.exe", // Windows path
+    "${workspaceFolder}/.venv/bin/python" // Unix-like path
+  ],
   "python-envs.defaultEnvManager": "ms-python.python:venv",
   "python-envs.pythonProjects": [],
   "ruff.configuration": "${workspaceFolder}/pyproject.toml",
-  "ruff.path": ["${workspaceFolder}/.venv/Scripts/ruff"]
+  "ruff.path": [
+    "${workspaceFolder}/.venv/Scripts/ruff.exe", // Windows path
+    "${workspaceFolder}/.venv/bin/ruff" // Unix-like path
+  ]
 }
 ```
+
+**You need to use ONLY a single mypy interpreter path and single ruff path depending on your OS.**
 
 ---
 
