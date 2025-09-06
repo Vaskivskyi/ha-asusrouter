@@ -3,9 +3,10 @@ name: Build
 on:
   push:
     branches:
+      - dev
       - main
   pull_request:
-    types: [edited, labeled, opened, reopened, synchronize]
+    types: [edited, opened, reopened, synchronize]
   schedule:
     - cron: '0 0 * * *'
 
