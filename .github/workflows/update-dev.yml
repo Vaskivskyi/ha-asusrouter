@@ -1,0 +1,87 @@
+name: Bump AsusRouter from dev
+
+on:
+  repository_dispatch:
+    types: [ar_dev_push]
+
+env:
+  DEFAULT_PYTHON_VERSION: 3.13
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upgrade-asusrouter:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: upgrade-asusrouter
+      cancel-in-progress: true
+    env:
+      ASUS_SHA: ${{ github.event.client_payload.sha || github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python and uv
+        uses: astral-sh/setup-uv@v6.6.1
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+
+      - name: Upgrade asusrouter package in lockfile
+        run: uv lock --upgrade-package asusrouter
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git status --porcelain | grep -q .; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit lockfile changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "asusrouter-bot"
+          git config user.email "asusrouter-bot@users.noreply.github.com"
+          git add uv.lock
+          git commit -m "🤖 Autoupdate: bump asusrouter @ ${ASUS_SHA}" || echo "no changes to commit"
+
+      - name: Create GitHub App token
+        id: app_token
+        uses: tibdex/github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.AR_APP_ID }}
+          private_key: ${{ secrets.AR_APP_KEY }}
+
+      - name: Create (update) Pull Request if changes
+        id: create-pr
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          sign-commits: true
+          commit-message: "🤖 Autoupdate AsusRouter"
+          branch: "bot-ar-upgrade"
+          title: "Bump asusrouter to ${{ env.ASUS_SHA }}"
+          body: |
+            # 🤖 Automated update of asusrouter on the dev branch
+            This PR was created automatically by a bot to keep the `asusrouter` dependency up to date
+            for the development branch purposes. If the CI and actions pass successfully, it will be
+            merged automatically.
+          author: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          committer: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          labels: dependencies, bot
+          delete-branch: true
+
+      - name: Enable Pull Request Automerge
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/enable-pull-request-automerge@v3.0.0
+        with:
+            token: ${{ steps.app_token.outputs.token }}
+            pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+            merge-method: squash
