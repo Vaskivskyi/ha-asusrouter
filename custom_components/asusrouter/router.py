@@ -29,9 +29,8 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -76,8 +75,6 @@ from .const import (
     DEVICES,
     DOMAIN,
     FIRMWARE,
-    HTTP,
-    HTTPS,
     LIST,
     MAC,
     MEDIA_BRIDGE,
@@ -927,7 +924,7 @@ class ARDevice:
         """Close the connection."""
 
         # Disconnect the bridge
-        if self.bridge.active:
+        if self.bridge.connected:
             await self.bridge.async_disconnect()
 
         # Run on-close methods
@@ -1036,20 +1033,14 @@ class ARDevice:
         """Device information."""
 
         return DeviceInfo(
-            configuration_url=(
-                f"{HTTPS if self._options[CONF_SSL] else HTTP}://"
-                f"{self._conf_host}:{self._conf_port}"
-            ),
-            identifiers={
-                (DOMAIN, self.mac),
-                (DOMAIN, self._identity.serial),
-            },
-            manufacturer=self._identity.brand,
-            model=self._identity.model,
-            model_id=self._identity.product_id,
-            name=self._conf_name,
-            serial_number=self._identity.serial,
-            sw_version=str(self._identity.firmware),
+            configuration_url=self.bridge.configuration_url,
+            identifiers=self.bridge.identifiers,
+            manufacturer=self.bridge.manufacturer,
+            model=self.bridge.model,
+            model_id=self.bridge.model_id,
+            name=self.bridge.name,
+            serial_number=self.bridge.serial_number,
+            sw_version=self.bridge.sw_version,
         )
 
     @property

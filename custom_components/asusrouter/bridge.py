@@ -10,6 +10,7 @@ from typing import Any
 import aiohttp
 from asusrouter import AsusRouter
 from asusrouter.config import ARConfig, ARConfigKey as ARConfKey
+from asusrouter.const import DEFAULT_PORT_HTTP, DEFAULT_PORT_HTTPS
 from asusrouter.error import AsusRouterError
 from asusrouter.modules.aimesh import AiMeshDevice
 from asusrouter.modules.client import AsusClient
@@ -32,6 +33,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from . import helpers
@@ -46,6 +48,7 @@ from .const import (
     CPU,
     DDNS,
     DEFAULT_SENSORS,
+    DOMAIN,
     DSL,
     FIRMWARE,
     GWLAN,
@@ -71,6 +74,7 @@ from .const import (
     TEMPERATURE,
     WLAN,
 )
+from .const_v1 import DEFAULT_IDENTITY_BRAND, DEFAULT_IDENTITY_NAME
 from .modules.aura import aura_to_ha
 from .modules.firmware import to_ha as firmware_to_ha
 
@@ -120,7 +124,25 @@ class ARBridge:
         self._host = self._configs[CONF_HOST]
         self._identity: AsusDevice | None = None
 
-        self._active: bool = False
+        # Define properties
+        port = self._configs.get(CONF_PORT, None)
+        if not port:
+            port = (
+                DEFAULT_PORT_HTTPS
+                if self._configs.get(CONF_SSL, False)
+                else DEFAULT_PORT_HTTP
+            )
+        self._configuration_url = (
+            f"http{'s' if self._configs.get(CONF_SSL, False) else ''}"
+            f"://{self._host}:{port}"
+        )
+        self._identifiers: set[tuple[str, str]] = set()
+        self._manufacturer = DEFAULT_IDENTITY_BRAND
+        self._model: str | None = None
+        self._model_id: str | None = None
+        self._name: str = DEFAULT_IDENTITY_NAME
+        self._serial_number: str | None = None
+        self._sw_version: str | None = None
 
     @staticmethod
     def _get_api(
@@ -152,28 +174,70 @@ class ARBridge:
         }
 
     @property
-    def active(self) -> bool:
-        """Return activity state of the bridge."""
-
-        return self._active
-
-    @property
     def api(self) -> AsusRouter:
         """Return API."""
 
         return self._api
 
     @property
+    def configuration_url(self) -> str:
+        """Return device configuration URL."""
+
+        return self._configuration_url
+
+    @property
     def connected(self) -> bool:
         """Return connection state."""
 
-        return self.api.connected
+        return self._api.connected
+
+    @property
+    def identifiers(self) -> set[tuple[str, str]]:
+        """Return device identifiers."""
+
+        return self._identifiers
 
     @property
     def identity(self) -> AsusDevice | None:
         """Return device identity."""
 
         return self._identity
+
+    @property
+    def manufacturer(self) -> str:
+        """Return device manufacturer."""
+
+        return self._manufacturer
+
+    @property
+    def model(self) -> str | None:
+        """Return device model."""
+
+        return self._model
+
+    @property
+    def model_id(self) -> str | None:
+        """Return device model ID."""
+
+        return self._model_id
+
+    @property
+    def name(self) -> str:
+        """Return device name."""
+
+        return self._name
+
+    @property
+    def serial_number(self) -> str | None:
+        """Return device serial number."""
+
+        return self._serial_number
+
+    @property
+    def sw_version(self) -> str | None:
+        """Return device software version."""
+
+        return self._sw_version
 
     # --------------------
     # Connection -->
@@ -185,8 +249,24 @@ class ARBridge:
         _LOGGER.debug("Connecting to the API")
 
         await self.api.async_connect()
-        self._identity = await self.api.async_get_identity()
-        self._active = True
+        identity = await self.api.async_get_identity()
+        self._identity = identity
+
+        # Set properties
+        self._configuration_url = self.api.webpanel
+        self._identifiers = set()
+        if identity.mac is not None:
+            self._identifiers.add((DOMAIN, format_mac(identity.mac)))
+        if identity.serial is not None:
+            self._identifiers.add((DOMAIN, identity.serial))
+        self._manufacturer = identity.brand
+        self._model = identity.model
+        self._model_id = identity.product_id
+        self._name = identity.model or DEFAULT_IDENTITY_NAME
+        self._serial_number = identity.serial
+        self._sw_version = (
+            str(identity.firmware) if identity.firmware else None
+        )
 
     async def async_disconnect(self) -> None:
         """Disconnect from the device."""
@@ -194,7 +274,6 @@ class ARBridge:
         _LOGGER.debug("Disconnecting from the API")
 
         await self.api.async_disconnect()
-        self._active = False
 
     async def async_clean(self) -> None:
         """Cleanup."""
