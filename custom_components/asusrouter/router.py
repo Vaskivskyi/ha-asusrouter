@@ -397,31 +397,6 @@ class ARDevice:
                 device_registry.async_remove_device(device_entry.id)
 
         for entry in tracked_entries:
-            # Migrate from 0.21.x and below
-            # To be removed in 0.30.0
-            uid: str = entry.unique_id
-            if DOMAIN in uid:
-                new_uid = uid.replace(f"{DOMAIN}_", "")
-
-                # Check whether UID has duplicate
-                conflict_entity_id = entity_reg.async_get_entity_id(
-                    entry.domain, DOMAIN, new_uid
-                )
-                if conflict_entity_id:
-                    entity_reg.async_remove(entry.entity_id)
-                    continue
-
-                entity_reg.async_update_entity(
-                    entry.entity_id, new_unique_id=new_uid
-                )
-
-            # Migrate from 0.21.x and below
-            # To be removed in 0.30.0
-            if any(
-                id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")
-            ):
-                entity_reg.async_remove(entry.entity_id)
-
             # Clients already tracked
             if entry.domain != "device_tracker":
                 continue
