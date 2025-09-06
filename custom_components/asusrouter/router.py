@@ -29,9 +29,8 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -76,8 +75,6 @@ from .const import (
     DEVICES,
     DOMAIN,
     FIRMWARE,
-    HTTP,
-    HTTPS,
     LIST,
     MAC,
     MEDIA_BRIDGE,
@@ -376,7 +373,20 @@ class ARDevice:
         devices = dr.async_entries_for_config_entry(
             dr.async_get(self.hass), self._config_entry.entry_id
         )
+
         for device_entry in devices:
+            identifiers = device_entry.identifiers
+            if (DOMAIN, None) in identifiers:
+                device_registry.async_remove_device(device_entry.id)
+                _LOGGER.warning(
+                    "A device with merge bug was detected and removed. "
+                    "No worries, we fixed it and it should be recreated "
+                    "properly now. This warning is a single time notice. "
+                    "If not sure or something does not work as expected, "
+                    "reload the integration before creating an issue report."
+                )
+                raise ConfigEntryNotReady("A bugged device was removed")
+
             entries = er.async_entries_for_device(entity_reg, device_entry.id)
             # No entities for the device
             if len(entries) == 0:
@@ -387,31 +397,6 @@ class ARDevice:
                 device_registry.async_remove_device(device_entry.id)
 
         for entry in tracked_entries:
-            # Migrate from 0.21.x and below
-            # To be removed in 0.30.0
-            uid: str = entry.unique_id
-            if DOMAIN in uid:
-                new_uid = uid.replace(f"{DOMAIN}_", "")
-
-                # Check whether UID has duplicate
-                conflict_entity_id = entity_reg.async_get_entity_id(
-                    entry.domain, DOMAIN, new_uid
-                )
-                if conflict_entity_id:
-                    entity_reg.async_remove(entry.entity_id)
-                    continue
-
-                entity_reg.async_update_entity(
-                    entry.entity_id, new_unique_id=new_uid
-                )
-
-            # Migrate from 0.21.x and below
-            # To be removed in 0.30.0
-            if any(
-                id_to_find in uid for id_to_find in ("lan_speed", "wan_speed")
-            ):
-                entity_reg.async_remove(entry.entity_id)
-
             # Clients already tracked
             if entry.domain != "device_tracker":
                 continue
@@ -927,7 +912,7 @@ class ARDevice:
         """Close the connection."""
 
         # Disconnect the bridge
-        if self.bridge.active:
+        if self.bridge.connected:
             await self.bridge.async_disconnect()
 
         # Run on-close methods
@@ -1036,20 +1021,14 @@ class ARDevice:
         """Device information."""
 
         return DeviceInfo(
-            configuration_url=(
-                f"{HTTPS if self._options[CONF_SSL] else HTTP}://"
-                f"{self._conf_host}:{self._conf_port}"
-            ),
-            identifiers={
-                (DOMAIN, self.mac),
-                (DOMAIN, self._identity.serial),
-            },
-            manufacturer=self._identity.brand,
-            model=self._identity.model,
-            model_id=self._identity.product_id,
-            name=self._conf_name,
-            serial_number=self._identity.serial,
-            sw_version=str(self._identity.firmware),
+            configuration_url=self.bridge.configuration_url,
+            identifiers=self.bridge.identifiers,
+            manufacturer=self.bridge.manufacturer,
+            model=self.bridge.model,
+            model_id=self.bridge.model_id,
+            name=self.bridge.name,
+            serial_number=self.bridge.serial_number,
+            sw_version=self.bridge.sw_version,
         )
 
     @property

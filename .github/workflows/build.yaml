@@ -3,18 +3,22 @@ name: Build
 on:
   push:
     branches:
+      - dev
       - main
   pull_request:
-    types: [edited, labeled, opened, reopened, synchronize]
+    types: [edited, opened, reopened, synchronize]
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   hacs:
-    if: |
-      github.event.pull_request.label.name != 'documentation' &&
-      github.event.pull_request.label.name != 'github'
     name: HACS
+    permissions:
+      contents: read
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v5"
@@ -24,12 +28,10 @@ jobs:
           category: "integration"
 
   hassfest:
-    if: |
-      github.event.pull_request.label.name != 'documentation' &&
-      github.event.pull_request.label.name != 'github'
     name: hassfest
+    permissions:
+      contents: read
     runs-on: "ubuntu-latest"
     steps:
-        - uses: "actions/checkout@v5"
-        - uses: "home-assistant/actions/hassfest@master"
-
+      - uses: "actions/checkout@v5"
+      - uses: "home-assistant/actions/hassfest@master"

@@ -1,6 +1,6 @@
 [project]
 name            = "ha-asusrouter"
-version         = "0.39.0"
+version         = "0.40.0"
 license         = "Apache-2.0"
 requires-python = ">=3.13.0"
 readme          = "README.md"
@@ -42,19 +42,16 @@ test = [
 testpaths = [
     "tests",
 ]
-
-[tool.mypy]
-python_version = "3.13"
-strict = true
-ignore_missing_imports = true
-show_error_codes = true
-exclude = "tests/.*"
+filterwarnings = [
+  # ignore that specific HA DeprecationWarning coming from http component
+  "ignore:Inheritance class HomeAssistantApplication from web.Application is discouraged:DeprecationWarning:homeassistant\\.components\\.http",
+]
 
 [tool.ruff]
 line-length = 79
 required-version = ">=0.12.8"
 src = ["asusrouter"]
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -96,6 +93,7 @@ ignore = [
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
 known-third-party = ["homeassistant", "asusrouter"]
+known-first-party = ["custom_components"]
 combine-as-imports = true
 split-on-trailing-comma = false
 
