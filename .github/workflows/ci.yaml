@@ -13,7 +13,7 @@ on:
   pull_request:
     paths:
       - "**/*.py"
-      - "tests/**/*.py"
+      - ".github/workflows/**"
       - "pyproject.toml"
       - "uv.lock"
   schedule:
@@ -97,3 +97,69 @@ jobs:
 
       - name: Run Ruff Check
         run: uv run pre-commit run --hook-stage manual ruff-check --all-files --show-diff-on-failure
+
+  unit-tests:
+    name: Unit Tests
+    needs:
+      - ruff-format
+      - ruff-check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up UV and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-groups
+
+      - name: Run unit tests
+        run: |
+          uv run pytest --cov=asusrouter --cov-report=xml:unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
+
+      - name: Upload coverage to artifacts
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}
+          path: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
+
+  codecov:
+    name: Codecov
+    needs: [unit-tests]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+
+      - name: Download unit-tests coverage from artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}
+          path: .
+
+      - name: Download real-data-tests coverage from artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: real-data-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}
+          path: .
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5.5.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          files: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
