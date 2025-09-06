@@ -1,0 +1,107 @@
+name: Bump AsusRouter from dev
+
+on:
+  repository_dispatch:
+    types: [ar_dev_push]
+
+env:
+  DEFAULT_PYTHON_VERSION: 3.13
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upgrade-asusrouter:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: upgrade-asusrouter
+      cancel-in-progress: true
+    env:
+      ASUS_SHA: ${{ github.event.client_payload.sha || github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python and uv
+        uses: astral-sh/setup-uv@v6.6.1
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+
+      - name: Upgrade asusrouter package in lockfile
+        run: uv lock --upgrade-package asusrouter
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git status --porcelain | grep -q .; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit lockfile changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "asusrouter-bot"
+          git config user.email "asusrouter-bot@users.noreply.github.com"
+          git add uv.lock
+          git commit -m "🤖 Autoupdate: bump asusrouter @ ${ASUS_SHA}" || echo "no changes to commit"
+
+      - name: Create GitHub App token
+        id: app_token
+        uses: tibdex/github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.AR_APP_ID }}
+          private_key: ${{ secrets.AR_APP_KEY }}
+
+      - name: Close previous asusrouter bump PRs
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          TOKEN: ${{ steps.app_token.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request
+          token = os.environ["TOKEN"]
+          repo = os.environ["REPO"]
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "User-Agent": "github-actions/auto-pr-cleaner"
+          }
+          pulls_url = f"https://api.github.com/repos/{repo}/pulls?state=open&per_page=100"
+          req = urllib.request.Request(pulls_url, headers=headers)
+          pulls = json.load(urllib.request.urlopen(req))
+          for pr in pulls:
+              title = pr.get("title", "")
+              number = pr["number"]
+              user = pr.get("user", {}).get("login", "")
+              labels = [lbl.get("name","") for lbl in pr.get("labels", [])]
+              # only close PRs we created for this bump (adjust prefix if you change title)
+              if title.startswith("Bump asusrouter") and user == "asusrouter-bot":
+                  print("Closing PR", number, title)
+                  patch_url = f"https://api.github.com/repos/{repo}/pulls/{number}"
+                  data = json.dumps({"state": "closed"}).encode()
+                  req2 = urllib.request.Request(patch_url, data=data, headers=headers, method="PATCH")
+                  urllib.request.urlopen(req2)
+          PY
+
+      - name: Create Pull Request if changes
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          sign-commits: true
+          commit-message: "🤖 Autoupdate AsusRouter"
+          branch: "asusrouter-${{ env.ASUS_SHA }}"
+          title: "Bump asusrouter to ${{ env.ASUS_SHA }}"
+          body: |
+            Automated update of uv.lock and dependency references after a push to AsusRouter dev.
+          author: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          committer: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          labels: dependencies, bot
+          delete-branch: true
