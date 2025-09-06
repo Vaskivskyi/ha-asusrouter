@@ -373,12 +373,25 @@ class ARDevice:
         devices = dr.async_entries_for_config_entry(
             dr.async_get(self.hass), self._config_entry.entry_id
         )
+
         for device_entry in devices:
+            identifiers = device_entry.identifiers
+            if (DOMAIN, None) in identifiers:
+                device_registry.async_remove_device(device_entry.id)
+                _LOGGER.warning(
+                    "A device with merge bug was detected and removed. "
+                    "No worries, we fixed it and it should be recreated "
+                    "properly now. This warning is a single time notice. "
+                    "If not sure or something does not work as expected, "
+                    "reload the integration before creating an issue report."
+                )
+                raise ConfigEntryNotReady("A bugged device was removed")
+
             entries = er.async_entries_for_device(entity_reg, device_entry.id)
             # No entities for the device
             if len(entries) == 0:
                 _LOGGER.debug(
-                    "Removing device `%s` since it has no entities",
+                    "Removing device `%s` since it has no entries",
                     device_entry.name,
                 )
                 device_registry.async_remove_device(device_entry.id)
