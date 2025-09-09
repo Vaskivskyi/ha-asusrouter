@@ -127,7 +127,7 @@ jobs:
           uv run pytest --cov=asusrouter --cov-report=xml:unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
 
       - name: Upload coverage to artifacts
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}
           path: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
