@@ -253,7 +253,6 @@ class ARBridge:
         self._identity = identity
 
         # Set properties
-        self._configuration_url = self.api.webpanel
         self._identifiers = set()
         if identity.mac is not None:
             self._identifiers.add((DOMAIN, format_mac(identity.mac)))
