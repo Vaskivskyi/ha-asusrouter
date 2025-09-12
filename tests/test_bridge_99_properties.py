@@ -224,7 +224,11 @@ async def test_after_connect(
         )
         await bridge.async_connect()
 
-        assert bridge.configuration_url == webpanel
+        expected_configuration_url = (
+            f"http{'s' if FAKE_SSL else ''}://{FAKE_HOSTNAME}:{FAKE_PORT}"
+        )
+
+        assert bridge.configuration_url == expected_configuration_url
         assert bridge.identity == identity
         assert bridge.manufacturer == FAKE_BRAND
         assert bridge.model == FAKE_MODEL
