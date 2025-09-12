@@ -253,17 +253,6 @@ class ARBridge:
         self._identity = identity
 
         # Set properties
-        _cfg_url_port = self._configs.get(CONF_PORT, None)
-        if not _cfg_url_port:
-            _cfg_url_port = (
-                DEFAULT_PORT_HTTPS
-                if self._configs[CONF_SSL]
-                else DEFAULT_PORT_HTTP
-            )
-        self._configuration_url = (
-            f"{"https" if self._configs[CONF_SSL] else "http"}://"
-            f"{self._host}:{_cfg_url_port}"
-        )
         self._identifiers = set()
         if identity.mac is not None:
             self._identifiers.add((DOMAIN, format_mac(identity.mac)))
