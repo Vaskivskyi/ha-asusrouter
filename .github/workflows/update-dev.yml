@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python and uv
-        uses: astral-sh/setup-uv@v6.6.1
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
 
