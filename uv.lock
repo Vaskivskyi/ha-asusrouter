@@ -442,7 +442,7 @@ wheels = [
 [[package]]
 name = "asusrouter"
 version = "2.0.0.dev0"
-source = { git = "https://github.com/Vaskivskyi/asusrouter.git?rev=dev#97d7a5726142a8bf7c064eee8e2aa91241d3967b" }
+source = { git = "https://github.com/Vaskivskyi/asusrouter.git?rev=dev#48954a4607de8f61cd0915b4befb1d7711fdc85c" }
 dependencies = [
     { name = "aiohttp", version = "3.11.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
     { name = "aiohttp", version = "3.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
