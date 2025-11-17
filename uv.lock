@@ -1023,9 +1023,23 @@ wheels = [
 name = "cronsim"
 version = "2.6"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.13.2'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/5b/d8/cfb8d51a51f6076ffa09902c02978c7db9764cca78f4ee832e691d20f44b/cronsim-2.6.tar.gz", hash = "sha256:5aab98716ef90ab5ac6be294b2c3965dbf76dc869f048846a0af74ebb506c10d", size = 20315, upload-time = "2024-11-02T14:34:02.475Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8c/dd/9c40c4e0f4d3cb6cf52eb335e9cc1fa140c1f3a87146fb6987f465b069da/cronsim-2.6-py3-none-any.whl", hash = "sha256:5e153ff8ed64da7ee8d5caac470dbeda8024ab052c3010b1be149772b4801835", size = 13500, upload-time = "2024-12-04T12:53:57.443Z" },
+]
+
+[[package]]
+name = "cronsim"
+version = "2.7"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13.2'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/1a/02f105147f7f2e06ed4f734ff5a6439590bb275a53dd91fc73df6312298a/cronsim-2.7-py3-none-any.whl", hash = "sha256:1e1431fa08c51dc7f72e67e571c7c7a09af26420169b607badd4ca9677ffad1e", size = 14213, upload-time = "2025-10-21T16:38:20.431Z" },
 ]
 
 [[package]]
@@ -1328,7 +1342,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "asusrouter" },
     { name = "homeassistant", version = "2025.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
-    { name = "homeassistant", version = "2025.11.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
+    { name = "homeassistant", version = "2025.11.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
 ]
 
 [package.dev-dependencies]
@@ -1533,7 +1547,7 @@ dependencies = [
     { name = "bcrypt", version = "4.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
     { name = "certifi", marker = "python_full_version < '3.13.2'" },
     { name = "ciso8601", version = "2.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
-    { name = "cronsim", marker = "python_full_version < '3.13.2'" },
+    { name = "cronsim", version = "2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
     { name = "cryptography", version = "44.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
     { name = "fnv-hash-fast", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13.2'" },
     { name = "ha-ffmpeg", marker = "python_full_version < '3.13.2'" },
@@ -1582,7 +1596,7 @@ wheels = [
 
 [[package]]
 name = "homeassistant"
-version = "2025.11.1"
+version = "2025.11.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.13.2'",
@@ -1605,7 +1619,7 @@ dependencies = [
     { name = "bcrypt", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "certifi", marker = "python_full_version >= '3.13.2'" },
     { name = "ciso8601", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
-    { name = "cronsim", marker = "python_full_version >= '3.13.2'" },
+    { name = "cronsim", version = "2.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "cryptography", version = "46.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "fnv-hash-fast", version = "1.6.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "hass-nabucasa", version = "1.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
@@ -1639,9 +1653,9 @@ dependencies = [
     { name = "yarl", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "zeroconf", version = "0.148.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/14/da/4c85cca8ff0ef02acf7c8324127ebef1b7e84f60cb435ce1945949b0711d/homeassistant-2025.11.1.tar.gz", hash = "sha256:5bdc6e59fcfd94241768f83e3b7d779b3331bc17d8eb80ab53bbf0363adaff79", size = 28740335, upload-time = "2025-11-07T21:46:31.744Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/81/36/d0facce7b5416e0b39d9be35cef8df4fd67a8a1e10f406bd1b84cdd2b01f/homeassistant-2025.11.2.tar.gz", hash = "sha256:8f5d1ad864a715abba29832916b142ac24eab26cbf0f9a7a07040cbe53847bec", size = 28770006, upload-time = "2025-11-14T22:26:30.17Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/cc/decb99efecb42cbd322612ccf163c3038e065bd44b602de517e18cdde3b7/homeassistant-2025.11.1-py3-none-any.whl", hash = "sha256:414718321b0bf8f1a8697253c3fabe36742d7e77b8873873e6aab2b5ec1b584e", size = 48189711, upload-time = "2025-11-07T21:46:25.792Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/8d/5cda6acb2478e442572499477b8e540f26203904c2d74569e8abd2d8e195/homeassistant-2025.11.2-py3-none-any.whl", hash = "sha256:823395b05b9da96d94bd11c789c957b8f91c46ac54f5d7def9c766acd5eb44d7", size = 48250894, upload-time = "2025-11-14T22:26:25.306Z" },
 ]
 
 [[package]]
