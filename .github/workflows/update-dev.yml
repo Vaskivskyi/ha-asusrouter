@@ -3,6 +3,7 @@ name: Bump AsusRouter from dev
 on:
   repository_dispatch:
     types: [ar_dev_push]
+  workflow_dispatch:
 
 env:
   DEFAULT_PYTHON_VERSION: 3.13
