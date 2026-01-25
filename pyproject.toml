@@ -2,7 +2,7 @@
 name            = "ha-asusrouter"
 version         = "1.0.0.dev0"
 license         = "Apache-2.0"
-requires-python = ">=3.13.0"
+requires-python = ">=3.13.2"
 readme          = "README.md"
 description     = "A custom Home Assistant integration from the AsusRouter project"
 authors         = [
@@ -17,7 +17,7 @@ classifiers     = [
 ]
 dependencies    = [
     "asusrouter @ git+https://github.com/Vaskivskyi/asusrouter.git@dev",
-    "homeassistant >=2025.3.0",
+    "homeassistant >=2026.1.0",
 ]
 
 [project.urls]
