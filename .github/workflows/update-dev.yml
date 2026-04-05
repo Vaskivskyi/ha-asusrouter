@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  DEFAULT_PYTHON_VERSION: 3.13
+  DEFAULT_PYTHON_VERSION: 3.14
 
 permissions:
   contents: write
@@ -84,6 +84,6 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/enable-pull-request-automerge@v3.0.0
         with:
-            token: ${{ steps.app_token.outputs.token }}
-            pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
-            merge-method: squash
+          token: ${{ steps.app_token.outputs.token }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash
