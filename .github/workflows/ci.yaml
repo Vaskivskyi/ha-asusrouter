@@ -36,10 +36,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Set up UV and Python
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           enable-cache: true
@@ -58,10 +58,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Set up UV and Python
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           enable-cache: true
@@ -83,10 +83,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Set up UV and Python
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           enable-cache: true
@@ -110,10 +110,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Set up UV and Python
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
           enable-cache: true
@@ -127,7 +127,7 @@ jobs:
           uv run pytest --cov=asusrouter --cov-report=xml:unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
 
       - name: Upload coverage to artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}
           path: unit-tests-cov-${{ env.DEFAULT_PYTHON_VERSION }}.xml
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Download unit-tests coverage from artifacts
         uses: actions/download-artifact@v8
@@ -152,7 +152,7 @@ jobs:
           path: .
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6.0.0
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

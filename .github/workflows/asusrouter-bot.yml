@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Process Issue
         uses: actions/github-script@v9
@@ -23,10 +23,10 @@ jobs:
             const issue = context.payload.issue;
             const issueBody = issue.body || '';
             const issueTitle = issue.title || '';
-            
+
             console.log('Processing issue:', issue.number);
             console.log('Title:', issueTitle);
-            
+
             // Extract device model from issue body
             function extractDeviceModel(body) {
               const patterns = [
@@ -49,7 +49,7 @@ jobs:
               }
               return null;
             }
-            
+
             // Extract firmware version from issue body
             function extractFirmwareVersion(body) {
               const patterns = [
@@ -71,7 +71,7 @@ jobs:
               }
               return null;
             }
-            
+
             // Check if required details are provided
             function hasRequiredDetails(body) {
               const detailsPatterns = [
@@ -92,12 +92,12 @@ jobs:
               }
               return false;
             }
-            
+
             // Determine issue type and correct title prefix
             let issueType = null;
             let correctTitle = issueTitle;
             let expectedLabels = [];
-            
+
             if (issueTitle.toLowerCase().includes('bug') || issueBody.toLowerCase().includes('bug details')) {
               issueType = 'bug';
               if (!issueTitle.startsWith('[Bug]')) {
@@ -117,19 +117,19 @@ jobs:
               }
               expectedLabels.push('enhancement');
             }
-            
+
             // Extract information
             const deviceModel = extractDeviceModel(issueBody);
             const firmwareVersion = extractFirmwareVersion(issueBody);
             const hasDetails = hasRequiredDetails(issueBody);
-            
+
             console.log('Extracted info:', { issueType, deviceModel, firmwareVersion, hasDetails });
-            
+
             // Add device model label if found
             if (deviceModel) {
               expectedLabels.push(`device: ${deviceModel}`);
             }
-            
+
             // Check for missing required information
             const missingInfo = [];
             if (issueType === 'bug' || issueType === 'device_support') {
@@ -149,7 +149,7 @@ jobs:
                 missingInfo.push('**Feature request details**');
               }
             }
-            
+
             // Update title if needed
             if (correctTitle !== issueTitle) {
               console.log('Updating title from:', issueTitle, 'to:', correctTitle);
@@ -160,7 +160,7 @@ jobs:
                 title: correctTitle
               });
             }
-            
+
             // Add labels
             if (expectedLabels.length > 0) {
               console.log('Adding labels:', expectedLabels);
@@ -171,7 +171,7 @@ jobs:
                 labels: expectedLabels
               });
             }
-            
+
             // Comment if missing required information
             if (missingInfo.length > 0) {
               const commentBody = '👋 Hello! Thank you for opening this issue.\n\nI noticed that some required information is missing from your issue. To help us assist you better, please provide the following:\n\n' + missingInfo.map(item => '- ' + item).join('\n') + '\n\nPlease edit your issue to include this information. Thank you! 🤖';
