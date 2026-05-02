@@ -29,7 +29,7 @@ dependencies    = [
 dev = [
     "mypy>=1.19.1",
     "pydantic>=2.12.5",
-    "ruff>=0.14.4",
+    "ruff>=0.15.12",
     "pre-commit>=4.5.1",
 ]
 test = [
