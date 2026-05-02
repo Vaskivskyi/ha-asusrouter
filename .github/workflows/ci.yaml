@@ -71,7 +71,7 @@ jobs:
         run: uv sync --all-groups
 
       - name: Run Ruff Format
-        run: uv run pre-commit run --hook-stage manual ruff-format --all-files --show-diff-on-failure
+        run: uv run prek run --hook-stage manual ruff-format --all-files --show-diff-on-failure
 
   ruff-check:
     name: Ruff Check
@@ -96,7 +96,7 @@ jobs:
         run: uv sync --all-groups
 
       - name: Run Ruff Check
-        run: uv run pre-commit run --hook-stage manual ruff-check --all-files --show-diff-on-failure
+        run: uv run prek run --hook-stage manual ruff-check --all-files --show-diff-on-failure
 
   unit-tests:
     name: Unit Tests
