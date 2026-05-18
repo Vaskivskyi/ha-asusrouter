@@ -17,7 +17,7 @@ classifiers     = [
 ]
 dependencies    = [
     "asusrouter @ git+https://github.com/Vaskivskyi/asusrouter.git@dev",
-    "homeassistant>=2026.5.1",
+    "homeassistant>=2026.5.2",
 ]
 
 [project.urls]
