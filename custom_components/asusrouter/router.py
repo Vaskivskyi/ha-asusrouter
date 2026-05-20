@@ -731,15 +731,20 @@ class ARDevice:
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
-    async def update_pc_rules(self) -> None:
-        """Update parental control rules."""
+    async def update_pc_rules(self, force: bool = False) -> None:
+        """Update parental control rules.
+
+        Pass force=True after a write to bypass the asusrouter cache_time
+        window and ensure the just-changed state is reflected.
+        """
 
         _LOGGER.debug(
-            "Updating parental control rules for '%s'", self._conf_host
+            "Updating parental control rules for '%s' (force=%s)",
+            self._conf_host, force,
         )
         try:
             pc_data = (
-                await self.bridge._get_data_parental_control()  # pylint: disable=protected-access
+                await self.bridge._get_data_parental_control(force=force)  # pylint: disable=protected-access
             )
         except UpdateFailed as ex:
             if not self._connect_error:
@@ -794,8 +799,9 @@ class ARDevice:
 
             await self.bridge.async_pc_rule(raw=service.data)
 
-            # Force PC rules update
-            await self.update_pc_rules()
+            # Force PC rules update (bypass asusrouter cache_time window
+            # so the just-written state is reflected before any platform reload)
+            await self.update_pc_rules(force=True)
 
             # In case of removing rule(s) we need to reload the platform
             if service.data.get("state") == "remove":

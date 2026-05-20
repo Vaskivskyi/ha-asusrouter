@@ -504,12 +504,19 @@ class ARBridge:
 
         return await self._get_data(AsusData.OPENVPN_SERVER)
 
-    async def _get_data_parental_control(self) -> dict[str, Any]:
-        """Get parental control data from the device."""
+    async def _get_data_parental_control(
+        self, force: bool = False
+    ) -> dict[str, Any]:
+        """Get parental control data from the device.
+
+        Pass force=True to bypass the asusrouter cache_time window
+        (used after writes to ensure fresh post-action state).
+        """
 
         return await self._get_data(
             AsusData.PARENTAL_CONTROL,
             self._process_data_parental_control,
+            force=force,
         )
 
     async def _get_data_port_forwarding(self) -> dict[str, Any]:

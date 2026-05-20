@@ -253,10 +253,21 @@ class ClientInternetSwitch(SwitchEntity):
 
     @callback
     def async_on_demand_update(self) -> None:
-        """Update the state."""
+        """Update the state.
+
+        If the rule is still present, refresh from pc_rules. If the rule
+        has been removed (out-of-band: BT8 UI, ASUS app, 64-rule eviction,
+        or async cache catch-up after a service-triggered remove), mark
+        the entity unavailable so consumers see correct state until the
+        next platform reload removes it entirely.
+        """
 
         if self._rule.mac in self._router.pc_rules:
             self._rule = self._router.pc_rules[self._rule.mac]
+            self._attr_available = True
+            self.async_write_ha_state()
+        else:
+            self._attr_available = False
             self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
