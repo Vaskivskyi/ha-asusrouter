@@ -206,18 +206,16 @@ class ClientInternetSwitch(SwitchEntity):
     async def _set_state(
         self,
         state: ParentalControlRule,
-        **kwargs: Any,
+        **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Set state."""
 
         try:
             _LOGGER.debug("Changing PC rule to %s", state)
-            result = await self._router.bridge.api.async_set_state(
-                state=state, **kwargs
-            )
+            result = await self._router.async_set_pc_rule_with_retry(state)
             self._rule = state
             if not result:
-                _LOGGER.debug("State was not set!")
+                _LOGGER.warning("State was not set after retry: %s", state)
         except Exception as ex:  # noqa: BLE001
             _LOGGER.error("Unable to set state with an exception: %s", ex)
 

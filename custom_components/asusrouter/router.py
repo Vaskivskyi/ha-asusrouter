@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 import logging
@@ -11,7 +12,7 @@ from asusrouter.error import AsusRouterError
 from asusrouter.modules.client import AsusClientConnectionWlan
 from asusrouter.modules.connection import ConnectionState, ConnectionType
 from asusrouter.modules.identity import AsusDevice
-from asusrouter.modules.parental_control import ParentalControlRule
+from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
 from homeassistant.components.device_tracker import CONF_CONSIDER_HOME
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -785,6 +786,72 @@ class ARDevice:
         if new_flag:
             async_dispatcher_send(self.hass, self.signal_pc_rules_new)
 
+    async def async_set_pc_rule_with_retry(
+        self,
+        rule: ParentalControlRule,
+        *,
+        settle_seconds: float = 60.0,
+    ) -> bool:
+        """Set a PC rule with one auto-retry after the firewall settle window.
+
+        BT8 (and likely other AsusWRT-based firmware) returns
+        ``restart_needed_time`` (typically 53s) on every PC rule write,
+        indicating how long the firewall daemon needs to apply the change.
+        Writes that arrive inside that window are accepted at the NVRAM layer
+        but rejected at the firewall enforcement layer -- the library's
+        ``async_set_state(rule)`` returns ``False``.
+
+        On rejection, this helper:
+          1. Sleeps ``settle_seconds``.
+          2. Forces a fresh ``update_pc_rules()`` (the 5s library cache is long
+             expired after the sleep).
+          3. Checks whether the cache now reflects the requested state --
+             BT8 may have applied the rule late. If so, declares success
+             without retry.
+          4. Otherwise retries the write once. A second failure is treated as
+             genuine and returns ``False``.
+        """
+        result = await self.bridge.api.async_set_state(rule)
+        if result is True:
+            return True
+
+        _LOGGER.info(
+            "PC rule write rejected by router "
+            "(likely firewall settle window); "
+            "waiting %.0fs then retrying: %s",
+            settle_seconds,
+            rule,
+        )
+        await asyncio.sleep(settle_seconds)
+
+        try:
+            await self.update_pc_rules()
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("update_pc_rules during retry raised; continuing")
+
+        current = self._pc_rules.get(rule.mac)
+        if rule.type == PCRuleType.REMOVE:
+            if current is None:
+                _LOGGER.info(
+                    "PC rule removal already applied during settle window: %s",
+                    rule.mac,
+                )
+                return True
+        elif current is not None and current.type == rule.type:
+            _LOGGER.info(
+                "PC rule already in desired state during settle window: %s",
+                rule.mac,
+            )
+            return True
+
+        result = await self.bridge.api.async_set_state(rule)
+        if result is True:
+            _LOGGER.info("PC rule set on retry: %s", rule)
+            return True
+
+        _LOGGER.warning("PC rule write still failed after retry: %s", rule)
+        return False
+
     async def _init_services(self) -> None:
         """Initialize AsusRouter services."""
 
@@ -792,7 +859,7 @@ class ARDevice:
         async def async_service_device_internet_access(service: ServiceCall):
             """Adjust device internet access."""
 
-            await self.bridge.async_pc_rule(raw=service.data)
+            await self.bridge.async_pc_rule(raw=service.data, router=self)
 
             # Force PC rules update
             await self.update_pc_rules()

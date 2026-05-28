@@ -775,6 +775,11 @@ class ARBridge:
         # Get the passed data
         raw = kwargs.get("raw")
 
+        # Optional router context. When provided, each rule write is routed
+        # through ``ARDevice.async_set_pc_rule_with_retry`` to absorb the
+        # firewall settle window. Without it, behaviour is unchanged.
+        router = kwargs.get("router")
+
         # Abort if no data is passed
         if raw is None:
             return False
@@ -819,11 +824,18 @@ class ARBridge:
 
         # Set the rules
         for rule in rules_to_set:
-            result = await self.api.async_set_state(rule)
+            if router is not None:
+                result = await router.async_set_pc_rule_with_retry(rule)
+            else:
+                result = await self.api.async_set_state(rule)
             if result is True:
                 _LOGGER.debug("Parental control rule set: %s", rule)
             else:
-                _LOGGER.warning("Cannot set parental control rule: %s", rule)
+                _LOGGER.warning(
+                    "Cannot set parental control rule%s: %s",
+                    " (after retry)" if router is not None else "",
+                    rule,
+                )
 
         return True
 
