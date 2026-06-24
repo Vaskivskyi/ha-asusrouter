@@ -1,0 +1,199 @@
+# This workflow is partially AI-generated
+name: Sync ruff version
+
+on:
+  workflow_run:
+    workflows: ["Detect ruff bump"]
+    types: [completed]
+  workflow_dispatch:
+  schedule:
+    - cron: "23 4 * * *"
+  push:
+    branches: [dev]
+    paths:
+      - ".github/workflows/sync-ruff.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+
+concurrency:
+  group: sync-ruff
+  cancel-in-progress: true
+
+jobs:
+  sync-ruff:
+    name: Sync ruff version
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+
+    steps:
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v3.2.0
+        with:
+          client-id: ${{ secrets.AR_APP_ID }}
+          private-key: ${{ secrets.AR_APP_KEY }}
+
+      # --- workflow_run path: Dependabot PR detected, metadata in artifact ---
+
+      - name: Download ruff-bump metadata
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v8
+        with:
+          name: ruff-bump-meta
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ steps.app_token.outputs.token }}
+          path: .meta
+
+      - name: Load from artifact
+        if: github.event_name == 'workflow_run'
+        id: from_run
+        run: |
+          echo "pr_number=$(cat .meta/pr-number)" >> "$GITHUB_OUTPUT"
+          echo "ruff_version=$(cat .meta/ruff-version)" >> "$GITHUB_OUTPUT"
+
+      # --- schedule / push / dispatch path: find open Dependabot ruff PR ---
+
+      - name: Resolve dependabot ruff PR
+        if: github.event_name != 'workflow_run'
+        id: dep_pr
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          JSON=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --author "dependabot[bot]" \
+            --base dev \
+            --json number,headRefName,title \
+            --jq '[.[] | select(.title | contains("ruff"))] | .[0] // empty')
+          if [ -z "$JSON" ]; then
+            echo "No open dependabot ruff PR — skipping"
+            exit 0
+          fi
+          echo "number=$(echo "$JSON" | jq -r '.number')" >> "$GITHUB_OUTPUT"
+          echo "head_ref=$(echo "$JSON" | jq -r '.headRefName')" >> "$GITHUB_OUTPUT"
+
+      - name: Extract ruff version
+        if: github.event_name != 'workflow_run' && steps.dep_pr.outputs.number != ''
+        id: ruff_ver
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          HEAD_REF: ${{ steps.dep_pr.outputs.head_ref }}
+        run: |
+          VERSION=$(gh api "repos/${{ github.repository }}/contents/uv.lock?ref=$HEAD_REF" \
+            --jq '.content' | base64 -d | grep -A1 '^name = "ruff"$' | grep -oP 'version = "\K[^"]+')
+          if [ -z "$VERSION" ]; then
+            echo "::error::ruff not found in uv.lock"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      # --- Unify both paths ---
+
+      - name: Resolve final values
+        id: resolved
+        env:
+          RUN_PR: ${{ steps.from_run.outputs.pr_number }}
+          RUN_VERSION: ${{ steps.from_run.outputs.ruff_version }}
+          DEP_PR: ${{ steps.dep_pr.outputs.number }}
+          DEP_VERSION: ${{ steps.ruff_ver.outputs.version }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            PR_NUMBER="$RUN_PR"
+            VERSION="$RUN_VERSION"
+          else
+            PR_NUMBER="$DEP_PR"
+            VERSION="$DEP_VERSION"
+          fi
+          if [ -z "$PR_NUMBER" ] || [ -z "$VERSION" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "branch=bot/bump-ruff-$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing bot PR
+        if: steps.resolved.outputs.skip == 'false'
+        id: existing
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          BRANCH: ${{ steps.resolved.outputs.branch }}
+        run: |
+          URL=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --head "$BRANCH" \
+            --json url \
+            --jq '.[0].url // ""')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout dev
+        if: steps.resolved.outputs.skip == 'false' && steps.existing.outputs.url == ''
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          token: ${{ steps.app_token.outputs.token }}
+
+      - name: Set up uv
+        if: steps.resolved.outputs.skip == 'false' && steps.existing.outputs.url == ''
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Patch version pins and regenerate lock
+        if: steps.resolved.outputs.skip == 'false' && steps.existing.outputs.url == ''
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          sed -i 's/"ruff==[^"]*"/"ruff=='"$VERSION"'"/' pyproject.toml
+          sed -i '\|astral-sh/ruff-pre-commit|{n; s/rev: .*/rev: v'"$VERSION"'/}' .pre-commit-config.yaml
+          uv lock --upgrade-package ruff
+
+      - name: Commit and push
+        if: steps.resolved.outputs.skip == 'false' && steps.existing.outputs.url == ''
+        env:
+          BRANCH: ${{ steps.resolved.outputs.branch }}
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          git config user.name "asusrouter-bot[bot]"
+          git config user.email "asusrouter-bot[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add pyproject.toml .pre-commit-config.yaml uv.lock
+          git commit -m "Bump ruff to $VERSION"
+          git push origin "$BRANCH" --force-with-lease
+
+      - name: Create bot PR
+        if: steps.resolved.outputs.skip == 'false' && steps.existing.outputs.url == ''
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          VERSION: ${{ steps.resolved.outputs.version }}
+          BRANCH: ${{ steps.resolved.outputs.branch }}
+        run: |
+          URL=$(gh pr create \
+            --title "Bump ruff to $VERSION" \
+            --body "Bumps \`ruff\` to \`$VERSION\` in \`pyproject.toml\`, \`.pre-commit-config.yaml\`, and \`uv.lock\`." \
+            --base dev \
+            --head "$BRANCH")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Close dependabot PR
+        if: steps.resolved.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+          PR_NUMBER: ${{ steps.resolved.outputs.pr_number }}
+          CREATE_URL: ${{ steps.create_pr.outputs.url }}
+          EXISTING_URL: ${{ steps.existing.outputs.url }}
+        run: |
+          BOT_PR="${CREATE_URL:-$EXISTING_URL}"
+          gh pr close "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --comment "Superseded by $BOT_PR which also updates \`pyproject.toml\` and \`.pre-commit-config.yaml\`." \
+            || true

@@ -1,0 +1,48 @@
+name: Detect ruff bump
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [dev]
+    paths:
+      - "uv.lock"
+
+jobs:
+  detect:
+    name: Detect ruff bump
+    runs-on: ubuntu-latest
+    if: >
+      github.actor == 'dependabot[bot]' &&
+      contains(github.event.pull_request.title, 'ruff')
+
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: uv.lock
+          sparse-checkout-cone-mode: false
+
+      - name: Extract ruff version
+        id: ruff
+        run: |
+          VERSION=$(grep -A1 '^name = "ruff"$' uv.lock | grep -oP 'version = "\K[^"]+')
+          [ -n "$VERSION" ] || { echo "::error::ruff not found in uv.lock"; exit 1; }
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Save metadata
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUFF_VERSION: ${{ steps.ruff.outputs.version }}
+        run: |
+          mkdir meta
+          printf '%s' "$PR_NUMBER" > meta/pr-number
+          printf '%s' "$RUFF_VERSION" > meta/ruff-version
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ruff-bump-meta
+          path: meta/
+          retention-days: 1
