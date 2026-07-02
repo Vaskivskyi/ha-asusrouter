@@ -17,7 +17,7 @@ from asusrouter.modules.wireguard import (
     AsusWireGuardServer,
 )
 from asusrouter.modules.wlan import AsusWLAN, Wlan
-from asusrouter.tools import converters
+from asusrouter.tools.converters_v2.raw import raw_to_int
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.button import ButtonDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -805,18 +805,18 @@ TO_REDACT_ATTRS: list[str] = [
 # SERVICES -->
 
 SERVICE_ALLOWED_ADJUST_GWLAN: dict[str, Callable | None] = {
-    "sync_node": converters.safe_int,
-    "bw_enabled": converters.safe_int,
+    "sync_node": raw_to_int,
+    "bw_enabled": raw_to_int,
     "bw_dl": None,
     "bw_ul": None,
     "expire": None,
-    "closed": converters.safe_int,
-    "lanaccess": converters.safe_int,
+    "closed": raw_to_int,
+    "lanaccess": raw_to_int,
     SSID: None,
 }
 
 SERVICE_ALLOWED_ADJUST_WLAN: dict[str, Callable | None] = {
-    "closed": converters.safe_int,
+    "closed": raw_to_int,
     SSID: None,
 }
 
