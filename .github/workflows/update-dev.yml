@@ -80,10 +80,10 @@ jobs:
           labels: dependencies, bot
           delete-branch: true
 
-      - name: Enable Pull Request Automerge
-        if: steps.changes.outputs.changed == 'true'
-        uses: peter-evans/enable-pull-request-automerge@v3.0.0
-        with:
-          token: ${{ steps.app_token.outputs.token }}
-          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
-          merge-method: squash
+      # - name: Enable Pull Request Automerge
+      #   if: steps.changes.outputs.changed == 'true'
+      #   uses: peter-evans/enable-pull-request-automerge@v3.0.0
+      #   with:
+      #     token: ${{ steps.app_token.outputs.token }}
+      #     pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+      #     merge-method: squash
