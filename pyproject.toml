@@ -27,7 +27,7 @@ dependencies    = [
 
 [dependency-groups]
 dev = [
-    "mypy==2.1.0",
+    "mypy==2.2.0",
     "pydantic==2.13.4",
     "ruff==0.15.18",
     "prek==0.4.8",
