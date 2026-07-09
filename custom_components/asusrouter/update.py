@@ -10,12 +10,18 @@ from asusrouter.modules.system import AsusSystem
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import STATIC_UPDATES
 from .dataclass import ARUpdateDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
+from .merlin_update import (
+    MerlinUpdateError,
+    install_merlin_update,
+    is_merlin_firmware,
+)
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -73,6 +79,15 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
         self, version: str | None, backup: bool, **kwargs: Any
     ) -> None:
         """Install the update."""
+        target_version = version or self.latest_version
+
+        if (
+            is_merlin_firmware(self.installed_version)
+            or is_merlin_firmware(target_version)
+        ):
+            await self._async_install_merlin(target_version)
+            return
+
         try:
             _LOGGER.debug(
                 "Trying to install Firmware update. "
@@ -95,3 +110,69 @@ class ARUpdate(ARBinaryEntity, UpdateEntity):
                 "An exception occurred while trying to install the update: %s",
                 ex,
             )
+
+    async def _async_install_merlin(self, target_version: str | None) -> None:
+        """Install an Asuswrt-Merlin firmware update."""
+
+        if target_version != self.latest_version:
+            raise HomeAssistantError(
+                "Installing a specific Merlin firmware version is not "
+                "supported. Use the detected latest version."
+            )
+
+        if not target_version:
+            raise HomeAssistantError("No Merlin firmware version is available")
+
+        model = (
+            self.router._identity.product_id
+            if self.router._identity is not None
+            else None
+        )
+        if not model:
+            raise HomeAssistantError(
+                "The router model is not available; cannot select a Merlin "
+                "firmware image."
+            )
+
+        try:
+            _LOGGER.info(
+                "Trying to install Merlin firmware update `%s`",
+                target_version,
+            )
+            self._attr_in_progress = 1
+            self.async_write_ha_state()
+
+            def _set_progress(progress: int) -> None:
+                self._attr_in_progress = progress
+                self.async_write_ha_state()
+
+            await install_merlin_update(
+                api=self.api,
+                model=model,
+                latest_version=target_version,
+                progress=_set_progress,
+            )
+            await asyncio.sleep(120)
+            try:
+                await self.coordinator.async_request_refresh()
+            except Exception as ex:  # noqa: BLE001
+                _LOGGER.debug(
+                    "Could not refresh firmware data after Merlin upload: %s",
+                    ex,
+                )
+
+        except MerlinUpdateError as ex:
+            raise HomeAssistantError(str(ex)) from ex
+        except Exception as ex:
+            _LOGGER.error(
+                "An exception occurred while trying to install the Merlin "
+                "firmware update: %s",
+                ex,
+            )
+            raise HomeAssistantError(
+                "An exception occurred while trying to install the Merlin "
+                "firmware update."
+            ) from ex
+        finally:
+            self._attr_in_progress = False
+            self.async_write_ha_state()
