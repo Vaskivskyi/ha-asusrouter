@@ -29,7 +29,7 @@ dependencies    = [
 dev = [
     "mypy==2.3.0",
     "pydantic==2.13.4",
-    "ruff==0.15.21",
+    "ruff==0.15.22",
     "prek==0.4.10",
 ]
 test = [
