@@ -97,6 +97,7 @@ class ARDeviceEntity(ScannerEntity):
         self._attr_unique_id = f"{router.mac}_{client.mac_address}"
         self._attr_name = client.name or DEFAULT_DEVICE_NAME
         self._attr_capability_attributes = {
+            **(self._attr_capability_attributes or {}),
             "mac": client.mac_address,
             "name": self._attr_name,
         }
