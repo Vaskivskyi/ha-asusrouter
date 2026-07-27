@@ -5,8 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.device_tracker import SourceType
-from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.components.device_tracker import ScannerEntity, SourceType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
@@ -131,10 +130,10 @@ class ARDeviceEntity(ScannerEntity):
         return SourceType.ROUTER
 
     @property
-    def is_connected(self) -> bool | None:
+    def is_connected(self) -> bool:
         """Device status."""
 
-        return self._client.state
+        return self._client.state or False
 
     @property
     def ip_address(self) -> str | None:
