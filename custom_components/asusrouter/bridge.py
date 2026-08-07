@@ -31,7 +31,6 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import format_mac
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -835,18 +834,14 @@ class ARBridge:
             type=rule_type,
         )
 
-    async def async_pc_rule(self, **kwargs: Any) -> bool:  # noqa: C901, PLR0912
+    async def async_pc_rule(
+        self,
+        *,
+        state: str,
+        devices: list[dict[str, Any]],
+    ) -> bool:
         """Change parental control rule(s)."""
 
-        # Get the passed data
-        raw = kwargs.get("raw")
-
-        # Abort if no data is passed
-        if raw is None:
-            return False
-
-        # Get the state to set
-        state = raw.get("state", None)
         match state:
             case a if a in ("disable", "allow"):
                 rule_type = PCRuleType.DISABLE
@@ -858,40 +853,25 @@ class ARBridge:
                 _LOGGER.warning("Unknown parental control state: %s", state)
                 return False
 
-        # Get the targets to set
-        devices = raw.get("devices", [])
-        entities = raw.get("entities", [])
+        rules_to_set = [
+            rule
+            for device in devices
+            if (rule := self._pc_device2rule(device, rule_type)) is not None
+        ]
+        if not rules_to_set:
+            _LOGGER.warning("No valid parental control targets were provided")
+            return False
 
-        # Prepare the rules list
-        rules_to_set = []
-
-        # Process entities if any
-        if len(entities) > 0:
-            entity_reg = er.async_get(self.hass)
-            for entity in entities:
-                reg_value = entity_reg.async_get(entity)
-                if not isinstance(reg_value, er.RegistryEntry):
-                    continue
-                capabilities: dict[str, Any] = helpers.as_dict(
-                    reg_value.capabilities
-                )
-                devices.append(capabilities)
-
-        # Convert devices to rules
-        for device in devices:
-            rule = self._pc_device2rule(device, rule_type)
-            if rule is not None:
-                rules_to_set.append(rule)
-
-        # Set the rules
+        success = True
         for rule in rules_to_set:
             result = await self.api.async_set_state(rule)
             if result is True:
                 _LOGGER.debug("Parental control rule set: %s", rule)
             else:
                 _LOGGER.warning("Cannot set parental control rule: %s", rule)
+                success = False
 
-        return True
+        return success
 
     # --------------------
     # <-- Services

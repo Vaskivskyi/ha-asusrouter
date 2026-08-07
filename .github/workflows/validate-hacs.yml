@@ -1,0 +1,20 @@
+name: Validate HACS
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  validate-hacs:
+    name: HACS repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate integration repository
+        uses: hacs/action@main
+        with:
+          category: integration

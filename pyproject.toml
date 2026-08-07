@@ -1,6 +1,6 @@
 [project]
 name            = "ha-asusrouter"
-version         = "1.0.0.dev0"
+version         = "1.0.0-jgassens.1"
 license         = "Apache-2.0"
 requires-python = ">=3.14.2"
 readme          = "README.md"
@@ -22,9 +22,9 @@ dependencies    = [
 ]
 
 [project.urls]
-"Homepage"      = "https://asusrouter.vaskivskyi.com/"
-"Source Code"   = "https://github.com/Vaskivskyi/ha-asusrouter"
-"Bug Reports"   = "https://github.com/Vaskivskyi/ha-asusrouter/issues"
+"Homepage"      = "https://github.com/jgassens/ha-asusrouter"
+"Source Code"   = "https://github.com/jgassens/ha-asusrouter"
+"Bug Reports"   = "https://github.com/jgassens/ha-asusrouter/issues"
 
 [dependency-groups]
 dev = [

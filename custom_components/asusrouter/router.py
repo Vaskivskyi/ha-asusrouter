@@ -743,7 +743,7 @@ class ARDevice:
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
-    async def update_pc_rules(self) -> None:
+    async def update_pc_rules(self) -> bool:
         """Update parental control rules."""
 
         _LOGGER.debug(
@@ -761,7 +761,7 @@ class ARDevice:
                     self._conf_host,
                     ex,
                 )
-            return
+            return False
 
         new_flag = False
 
@@ -796,6 +796,8 @@ class ARDevice:
         async_dispatcher_send(self.hass, self.signal_pc_rules_update)
         if new_flag:
             async_dispatcher_send(self.hass, self.signal_pc_rules_new)
+
+        return True
 
     @staticmethod
     def _static_dhcp_optional(value: Any) -> str:
@@ -1117,32 +1119,6 @@ class ARDevice:
 
     async def _init_services(self) -> None:
         """Initialize AsusRouter services."""
-
-        # Parental control service
-        async def async_service_device_internet_access(service: ServiceCall):
-            """Adjust device internet access."""
-
-            await self.bridge.async_pc_rule(raw=service.data)
-
-            # Force PC rules update
-            await self.update_pc_rules()
-
-            # In case of removing rule(s) we need to reload the platform
-            if service.data.get("state") == "remove":
-                unload = await self.hass.config_entries.async_unload_platforms(
-                    self._config_entry, [Platform.SWITCH]
-                )
-                if unload:
-                    await self.hass.config_entries.async_forward_entry_setups(
-                        self._config_entry, [Platform.SWITCH]
-                    )
-
-        if self._mode == ROUTER:
-            self.hass.services.async_register(
-                DOMAIN,
-                "device_internet_access",
-                async_service_device_internet_access,
-            )
 
         # Remove device trackers service
         async def async_service_remove_trackers(service: ServiceCall):
