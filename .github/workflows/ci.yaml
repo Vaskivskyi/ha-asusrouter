@@ -135,6 +135,7 @@ jobs:
   codecov:
     name: Codecov
     needs: [unit-tests]
+    if: github.repository == 'Vaskivskyi/ha-asusrouter'
     runs-on: ubuntu-latest
 
     permissions:
