@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
+from ipaddress import IPv4Address
 import logging
 from typing import Any
 
@@ -27,7 +29,11 @@ from homeassistant.core import (
     ServiceCall,
     callback,
 )
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import (
+    ConfigEntryNotReady,
+    HomeAssistantError,
+    ServiceValidationError,
+)
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -73,8 +79,10 @@ from .const import (
     CONNECTED,
     COORDINATOR,
     DEVICES,
+    DNS,
     DOMAIN,
     FIRMWARE,
+    IP,
     LIST,
     MAC,
     MEDIA_BRIDGE,
@@ -85,7 +93,9 @@ from .const import (
     SENSORS,
     SENSORS_AIMESH,
     SENSORS_CONNECTED_DEVICES,
+    SENSORS_STATIC_DHCP,
     SSL,
+    STATIC_DHCP,
 )
 from .helpers import as_dict
 
@@ -327,6 +337,8 @@ class ARDevice:
             CONF_DEFAULT_CREATE_DEVICES,
         )
         self._pc_rules: dict[str, Any] = {}
+        self._static_dhcp_lock = asyncio.Lock()
+        self._static_dhcp_leases: list[dict[str, str]] = []
 
         # Client filter
         self._client_filter: str = self._options.get(
@@ -731,7 +743,7 @@ class ARDevice:
         if new_node:
             async_dispatcher_send(self.hass, self.signal_aimesh_new)
 
-    async def update_pc_rules(self) -> None:
+    async def update_pc_rules(self) -> bool:
         """Update parental control rules."""
 
         _LOGGER.debug(
@@ -749,7 +761,7 @@ class ARDevice:
                     self._conf_host,
                     ex,
                 )
-            return
+            return False
 
         new_flag = False
 
@@ -785,34 +797,328 @@ class ARDevice:
         if new_flag:
             async_dispatcher_send(self.hass, self.signal_pc_rules_new)
 
+        return True
+
+    @staticmethod
+    def _static_dhcp_optional(value: Any) -> str:
+        """Return optional static DHCP values as strings."""
+
+        if value is None:
+            return ""
+        return str(value)
+
+    @staticmethod
+    def _static_dhcp_ip(value: Any) -> str:
+        """Normalize a static DHCP IPv4 address for comparisons."""
+
+        try:
+            return str(IPv4Address(str(value)))
+        except ValueError as ex:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="invalid_static_dhcp_ip",
+                translation_placeholders={"ip": str(value)},
+            ) from ex
+
+    @staticmethod
+    def _static_dhcp_mac(value: Any) -> str:
+        """Normalize a static DHCP MAC address for comparisons."""
+
+        try:
+            return format_mac(str(value))
+        except ValueError as ex:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="invalid_static_dhcp_mac",
+                translation_placeholders={"mac": str(value)},
+            ) from ex
+
+    def _static_dhcp_lease_to_dict(self, lease: Any) -> dict[str, str]:
+        """Convert a library static DHCP lease to HA attributes."""
+
+        return {
+            MAC: self._static_dhcp_mac(getattr(lease, MAC)),
+            IP: self._static_dhcp_optional(getattr(lease, IP)),
+            DNS: self._static_dhcp_optional(getattr(lease, DNS, "")),
+            "hostname": self._static_dhcp_optional(
+                getattr(lease, "hostname", "")
+            ),
+        }
+
+    def _static_dhcp_payload(
+        self,
+        leases: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        """Compile static DHCP coordinator data."""
+
+        self._static_dhcp_leases = leases
+        return {
+            NUMBER: len(leases),
+            LIST: leases,
+        }
+
+    def _update_static_dhcp_data(
+        self,
+        leases: list[dict[str, str]],
+        update_coordinator: bool = False,
+    ) -> dict[str, Any]:
+        """Update static DHCP state and notify dependent entities."""
+
+        payload = self._static_dhcp_payload(leases)
+        if update_coordinator and STATIC_DHCP in self._sensor_coordinator:
+            coordinator = self._sensor_coordinator[STATIC_DHCP][COORDINATOR]
+            coordinator.async_set_updated_data(payload)
+
+        async_dispatcher_send(self.hass, self.signal_static_dhcp_update)
+        return payload
+
+    async def _async_read_static_dhcp_leases(
+        self,
+    ) -> list[dict[str, str]]:
+        """Read and cache static DHCP leases from the router."""
+
+        leases = await self.bridge.async_get_static_dhcp_leases()
+        return [self._static_dhcp_lease_to_dict(lease) for lease in leases]
+
+    async def async_get_static_dhcp_sensor_data(self) -> dict[str, Any]:
+        """Get static DHCP leases for the router-level sensor."""
+
+        if self._mode != ROUTER:
+            return self._static_dhcp_payload([])
+
+        async with self._static_dhcp_lock:
+            leases = await self._async_read_static_dhcp_leases()
+            return self._update_static_dhcp_data(leases)
+
+    def _check_static_dhcp_mode(self) -> None:
+        """Check whether static DHCP writes are allowed."""
+
+        if self._mode != ROUTER:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="static_dhcp_router_mode_required",
+            )
+
+    def static_dhcp_reservation(
+        self,
+        mac: str,
+    ) -> dict[str, str] | None:
+        """Return a static DHCP reservation for a MAC address."""
+
+        target_mac = self._static_dhcp_mac(mac)
+        for lease in self._static_dhcp_leases:
+            if lease[MAC] == target_mac:
+                return lease
+        return None
+
+    def static_dhcp_ip_conflict(
+        self,
+        mac: str,
+        ip: str,
+    ) -> dict[str, str] | None:
+        """Return a static DHCP reservation using this IP on another MAC."""
+
+        target_mac = self._static_dhcp_mac(mac)
+        target_ip = self._static_dhcp_ip(ip)
+        return self._find_static_dhcp_ip_conflict(
+            self._static_dhcp_leases,
+            target_mac,
+            target_ip,
+        )
+
+    def _find_static_dhcp_ip_conflict(
+        self,
+        leases: list[dict[str, str]],
+        mac: str,
+        ip: str,
+    ) -> dict[str, str] | None:
+        """Find a reservation with the requested IP on another MAC."""
+
+        for lease in leases:
+            if lease[MAC] != mac and lease[IP] == ip:
+                return lease
+        return None
+
+    async def _async_set_static_dhcp_lease_locked(
+        self,
+        mac: str,
+        ip: str,
+        hostname: str | None = None,
+        dns: str | None = None,
+        allow_existing_ip_change: bool = True,
+    ) -> dict[str, str]:
+        """Set a static DHCP lease while the write lock is held."""
+
+        expected_mac = self._static_dhcp_mac(mac)
+        expected_ip = self._static_dhcp_ip(ip)
+        expected_dns = self._static_dhcp_optional(dns)
+        if expected_dns:
+            expected_dns = self._static_dhcp_ip(expected_dns)
+        expected_hostname = self._static_dhcp_optional(hostname)
+
+        current_leases = await self._async_read_static_dhcp_leases()
+        existing = next(
+            (lease for lease in current_leases if lease[MAC] == expected_mac),
+            None,
+        )
+
+        if (
+            existing is not None
+            and existing[IP] != expected_ip
+            and not allow_existing_ip_change
+        ):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="static_dhcp_existing_reservation",
+                translation_placeholders={
+                    "mac": expected_mac,
+                    "ip": existing[IP],
+                },
+            )
+
+        ip_conflict = self._find_static_dhcp_ip_conflict(
+            current_leases,
+            expected_mac,
+            expected_ip,
+        )
+        if ip_conflict is not None:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="static_dhcp_duplicate_ip",
+                translation_placeholders={
+                    "ip": expected_ip,
+                    "mac": ip_conflict[MAC],
+                },
+            )
+
+        if (
+            existing is not None
+            and existing[IP] == expected_ip
+            and not allow_existing_ip_change
+        ):
+            self._update_static_dhcp_data(
+                current_leases,
+                update_coordinator=True,
+            )
+            return existing
+
+        try:
+            await self.bridge.async_set_static_dhcp_lease(
+                mac=expected_mac,
+                ip=expected_ip,
+                hostname=expected_hostname,
+                dns=expected_dns,
+            )
+            leases = await self._async_read_static_dhcp_leases()
+        except ValueError as ex:
+            raise ServiceValidationError(str(ex)) from ex
+        except (AsusRouterError, UpdateFailed, OSError) as ex:
+            raise HomeAssistantError(
+                f"Unable to set static DHCP lease: {ex}"
+            ) from ex
+
+        self._update_static_dhcp_data(
+            leases,
+            update_coordinator=True,
+        )
+        verified = next(
+            (
+                lease
+                for lease in leases
+                if lease[MAC] == expected_mac
+                and lease[IP] == expected_ip
+                and lease[DNS] == expected_dns
+                and lease["hostname"] == expected_hostname
+            ),
+            None,
+        )
+        if verified is None:
+            raise HomeAssistantError(
+                "Static DHCP lease did not match after router apply"
+            )
+
+        return verified
+
+    async def async_set_static_dhcp_lease(
+        self,
+        mac: str,
+        ip: str,
+        hostname: str | None = None,
+        dns: str | None = None,
+    ) -> dict[str, str]:
+        """Set or replace a static DHCP lease."""
+
+        self._check_static_dhcp_mode()
+        async with self._static_dhcp_lock:
+            return await self._async_set_static_dhcp_lease_locked(
+                mac=mac,
+                ip=ip,
+                hostname=hostname,
+                dns=dns,
+                allow_existing_ip_change=True,
+            )
+
+    async def async_reserve_current_ip(
+        self,
+        mac: str,
+        ip: str,
+        hostname: str | None = None,
+    ) -> dict[str, str]:
+        """Reserve a client's current IP without moving existing leases."""
+
+        self._check_static_dhcp_mode()
+        async with self._static_dhcp_lock:
+            return await self._async_set_static_dhcp_lease_locked(
+                mac=mac,
+                ip=ip,
+                hostname=hostname,
+                allow_existing_ip_change=False,
+            )
+
+    async def async_remove_static_dhcp_lease(
+        self,
+        mac: str,
+    ) -> None:
+        """Remove a static DHCP lease and verify it is gone."""
+
+        self._check_static_dhcp_mode()
+        expected_mac = self._static_dhcp_mac(mac)
+
+        async with self._static_dhcp_lock:
+            try:
+                await self.bridge.async_remove_static_dhcp_lease(
+                    expected_mac,
+                    apply=True,
+                )
+                leases = await self._async_read_static_dhcp_leases()
+            except ValueError as ex:
+                raise ServiceValidationError(str(ex)) from ex
+            except (AsusRouterError, UpdateFailed, OSError) as ex:
+                raise HomeAssistantError(
+                    f"Unable to remove static DHCP lease: {ex}"
+                ) from ex
+
+            payload = self._update_static_dhcp_data(
+                leases,
+                update_coordinator=True,
+            )
+            if any(lease[MAC] == expected_mac for lease in payload[LIST]):
+                raise HomeAssistantError(
+                    "Static DHCP lease still exists after router apply"
+                )
+
+    async def async_refresh_static_dhcp_leases(self) -> None:
+        """Refresh static DHCP leases."""
+
+        if self._mode != ROUTER:
+            return
+
+        async with self._static_dhcp_lock:
+            leases = await self._async_read_static_dhcp_leases()
+            self._update_static_dhcp_data(leases, update_coordinator=True)
+
     async def _init_services(self) -> None:
         """Initialize AsusRouter services."""
-
-        # Parental control service
-        async def async_service_device_internet_access(service: ServiceCall):
-            """Adjust device internet access."""
-
-            await self.bridge.async_pc_rule(raw=service.data)
-
-            # Force PC rules update
-            await self.update_pc_rules()
-
-            # In case of removing rule(s) we need to reload the platform
-            if service.data.get("state") == "remove":
-                unload = await self.hass.config_entries.async_unload_platforms(
-                    self._config_entry, [Platform.SWITCH]
-                )
-                if unload:
-                    await self.hass.config_entries.async_forward_entry_setups(
-                        self._config_entry, [Platform.SWITCH]
-                    )
-
-        if self._mode == ROUTER:
-            self.hass.services.async_register(
-                DOMAIN,
-                "device_internet_access",
-                async_service_device_internet_access,
-            )
 
         # Remove device trackers service
         async def async_service_remove_trackers(service: ServiceCall):
@@ -856,6 +1162,11 @@ class ARDevice:
         if self._mode in (ACCESS_POINT, MEDIA_BRIDGE, ROUTER):
             available_sensors[DEVICES] = {SENSORS: SENSORS_CONNECTED_DEVICES}
             available_sensors[AIMESH] = {SENSORS: SENSORS_AIMESH}
+        if self._mode == ROUTER:
+            available_sensors[STATIC_DHCP] = {
+                SENSORS: SENSORS_STATIC_DHCP,
+                METHOD: self.async_get_static_dhcp_sensor_data,
+            }
 
         # Process available sensors
         for sensor_type, sensor_definition in available_sensors.items():
@@ -1068,6 +1379,12 @@ class ARDevice:
         return f"{DOMAIN}-pc-rules-update"
 
     @property
+    def signal_static_dhcp_update(self) -> str:
+        """Notify updated static DHCP leases."""
+
+        return f"{DOMAIN}-static-dhcp-update"
+
+    @property
     def aimesh(self) -> dict[str, Any]:
         """Return AiMesh nodes."""
 
@@ -1086,10 +1403,22 @@ class ARDevice:
         return self._mac
 
     @property
+    def mode(self) -> str:
+        """Router operation mode."""
+
+        return self._mode
+
+    @property
     def pc_rules(self) -> dict[str, ParentalControlRule]:
         """Return parental control rules."""
 
         return self._pc_rules
+
+    @property
+    def static_dhcp_leases(self) -> list[dict[str, str]]:
+        """Return cached static DHCP leases."""
+
+        return self._static_dhcp_leases
 
     @property
     def sensor_coordinator(self) -> dict[str, Any]:

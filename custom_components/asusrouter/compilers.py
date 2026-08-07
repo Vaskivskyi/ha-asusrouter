@@ -31,8 +31,7 @@ def list_sensors_network(
                     key=key,
                     key_group=NETWORK,
                     name=f"{CONF_LABELS_INTERFACES.get(interface, interface)} "
-                    f"{data[NAME]}"
-                    or None,
+                    f"{data[NAME]}",
                     icon=data["icon"] or None,
                     state_class=data["state_class"] or None,
                     device_class=data["device_class"] or None,

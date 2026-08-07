@@ -148,6 +148,7 @@ SENSORS = "sensors"
 SSID = "ssid"
 SSL = "ssl"
 STATE = "state"
+STATIC_DHCP = "static_dhcp"
 STATUS = "status"
 SYSINFO = "sysinfo"
 TEMPERATURE = "temperature"
@@ -311,6 +312,7 @@ SENSORS_CONNECTED_DEVICES = [
     "latest_time",
     "gn_number",
 ]
+SENSORS_STATIC_DHCP = [NUMBER]
 SENSORS_CPU = [TOTAL, USED, USAGE]
 SENSORS_FIRMWARE = [STATE, "state_beta"]
 SENSORS_GWLAN = {
@@ -1146,6 +1148,19 @@ STATIC_SENSORS: list[AREntityDescription] = [
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=True,
         extra_state_attributes={},
+    ),
+    # Static DHCP leases
+    ARSensorDescription(
+        key=NUMBER,
+        key_group=STATIC_DHCP,
+        name="Static DHCP Leases",
+        icon=ICON_IP,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        extra_state_attributes={
+            LIST: "leases",
+        },
     ),
     # CPU
     ARSensorDescription(

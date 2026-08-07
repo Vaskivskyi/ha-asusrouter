@@ -287,16 +287,12 @@ wheels = [
 
 [[package]]
 name = "asusrouter"
-version = "1.21.3"
-source = { registry = "https://pypi.org/simple" }
+version = "2.0.0.dev0"
+source = { git = "https://github.com/jgassens/asusrouter.git?rev=0d471818f60c588b78625bed50b45c7162be5e3a#0d471818f60c588b78625bed50b45c7162be5e3a" }
 dependencies = [
     { name = "aiohttp" },
     { name = "urllib3" },
     { name = "xmltodict" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4b/f6/008706e00edb15697f3ac810f991d8791eeea21bd51deab4b41dc735326f/asusrouter-1.21.3.tar.gz", hash = "sha256:584063b48f2e2da2b0bb1f6bcf61abf4d77aa3450a8895ad64223babe6b21140", size = 130245, upload-time = "2025-12-09T20:15:05.107Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/50/64f14c7baa4b72bc8a01889a12d44f32a759f730ed460b48b6375dae5efa/asusrouter-1.21.3-py3-none-any.whl", hash = "sha256:d08f302e64e9585a2c14ba1f7df06b730d8bd99a59663a0f36a16f5743f9d5f0", size = 132090, upload-time = "2025-12-09T20:15:03.827Z" },
 ]
 
 [[package]]
@@ -938,7 +934,7 @@ wheels = [
 
 [[package]]
 name = "ha-asusrouter"
-version = "1.0.0.dev0"
+version = "1.0.0+jgassens.2"
 source = { virtual = "." }
 dependencies = [
     { name = "asusrouter" },
@@ -960,7 +956,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "asusrouter", specifier = "==1.21.3" },
+    { name = "asusrouter", git = "https://github.com/jgassens/asusrouter.git?rev=0d471818f60c588b78625bed50b45c7162be5e3a" },
     { name = "homeassistant", specifier = "==2026.7.4" },
 ]
 
