@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 import dataclasses
 import logging
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 from asusrouter import AsusRouter
@@ -443,6 +443,72 @@ class ARBridge:
         """Get clients."""
 
         return await self._get_data(AsusData.CLIENTS, force=True)
+
+    # Static DHCP leases
+    async def async_get_static_dhcp_leases(self) -> list[Any]:
+        """Get static DHCP leases."""
+
+        try:
+            return cast(
+                list[Any], await self.api.async_get_static_dhcp_leases()
+            )
+        except AttributeError as ex:
+            raise UpdateFailed(
+                "Installed asusrouter package does not support "
+                "static DHCP leases"
+            ) from ex
+        except AsusRouterError as ex:
+            raise UpdateFailed(ex) from ex
+
+    async def async_set_static_dhcp_lease(
+        self,
+        mac: str,
+        ip: str,
+        hostname: str | None = None,
+        dns: str | None = None,
+    ) -> bool:
+        """Set a static DHCP lease."""
+
+        try:
+            return cast(
+                bool,
+                await self.api.async_set_static_dhcp_lease(
+                    mac=mac,
+                    ip=ip,
+                    hostname=hostname,
+                    dns=dns,
+                ),
+            )
+        except AttributeError as ex:
+            raise UpdateFailed(
+                "Installed asusrouter package does not support "
+                "static DHCP leases"
+            ) from ex
+        except AsusRouterError as ex:
+            raise UpdateFailed(ex) from ex
+
+    async def async_remove_static_dhcp_lease(
+        self,
+        mac: str,
+        apply: bool = True,
+    ) -> list[Any]:
+        """Remove a static DHCP lease."""
+
+        try:
+            return cast(
+                list[Any],
+                await self.api.async_remove_static_dhcp_lease(
+                    mac=mac,
+                    apply=apply,
+                ),
+            )
+        except AttributeError as ex:
+            raise UpdateFailed(
+                "Installed asusrouter package does not support "
+                "static DHCP leases"
+            ) from ex
+        except AsusRouterError as ex:
+            raise UpdateFailed(ex) from ex
 
     # Sensor-specific methods
     async def _get_data_aura(self) -> dict[str, Any]:

@@ -8,6 +8,8 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Vaskivskyi/ha-asusrouter/issues",
   "loggers": ["asusrouter"],
-  "requirements": ["asusrouter==2.0.0.dev0"],
+  "requirements": [
+    "asusrouter @ git+https://github.com/jgassens/asusrouter.git@0d471818f60c588b78625bed50b45c7162be5e3a"
+  ],
   "version": "1.0.0.dev0"
 }

@@ -16,7 +16,8 @@ classifiers     = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies    = [
-    "asusrouter==1.21.3",
+    # The integration still uses the legacy API removed from current AsusRouter dev.
+    "asusrouter @ git+https://github.com/jgassens/asusrouter.git@0d471818f60c588b78625bed50b45c7162be5e3a",
     "homeassistant==2026.7.4",
 ]
 

@@ -30,3 +30,49 @@ remove_trackers:
           integration: asusrouter
           domain: device_tracker
           multiple: true
+set_static_dhcp_lease:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: asusrouter
+    mac:
+      required: true
+      selector:
+        text:
+    ip:
+      required: true
+      selector:
+        text:
+    hostname:
+      required: false
+      selector:
+        text:
+    dns:
+      required: false
+      selector:
+        text:
+remove_static_dhcp_lease:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: asusrouter
+    mac:
+      required: true
+      selector:
+        text:
+reserve_current_ip:
+  target:
+    entity:
+      integration: asusrouter
+      domain: device_tracker
+refresh_static_dhcp_leases:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: asusrouter
