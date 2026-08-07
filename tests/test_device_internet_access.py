@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, Mock, patch
 
-from asusrouter.modules.parental_control import PCRuleType
+from asusrouter.modules.parental_control import ParentalControlRule, PCRuleType
+from homeassistant.const import Platform
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 import pytest
 import voluptuous as vol
@@ -14,6 +15,7 @@ from custom_components.asusrouter.const import ASUSROUTER, DOMAIN, ROUTER
 from custom_components.asusrouter.services import (
     DEVICE_INTERNET_ACCESS_SCHEMA,
     SERVICE_DEVICE_INTERNET_ACCESS,
+    _reload_parental_control_switches,
     async_setup_services,
 )
 
@@ -107,7 +109,27 @@ def _router() -> Mock:
 
     router = Mock()
     router.mode = ROUTER
-    router.bridge.async_pc_rule = AsyncMock(return_value=True)
+    router.mac = "24:4b:fe:f5:ee:20"
+    router.pc_rules = {}
+    router._static_dhcp_mac.side_effect = lambda mac: str(mac).lower()
+
+    async def apply_rule(*, state: str, devices: list[dict[str, str]]) -> bool:
+        for device in devices:
+            mac = str(device["mac"]).lower()
+            if state == "remove":
+                router.pc_rules.pop(mac, None)
+                continue
+            router.pc_rules[mac] = ParentalControlRule(
+                mac=mac,
+                name=device.get("name", ""),
+                type={
+                    "allow": PCRuleType.DISABLE,
+                    "block": PCRuleType.BLOCK,
+                }[state],
+            )
+        return True
+
+    router.bridge.async_pc_rule = AsyncMock(side_effect=apply_rule)
     router.update_pc_rules = AsyncMock(return_value=True)
     return router
 
@@ -206,10 +228,12 @@ async def test_direct_devices_require_router_for_multiple_entries() -> None:
 
 
 @pytest.mark.asyncio
-async def test_remove_reloads_parental_control_switches() -> None:
-    """Removing a rule should reload switch entities after confirmation."""
+async def test_confirmed_idempotent_remove_reloads_switches() -> None:
+    """An already-removed rule should still clean up switch entities."""
 
     router = _router()
+    router.bridge.async_pc_rule.side_effect = None
+    router.bridge.async_pc_rule.return_value = False
     hass, handlers = _service_hass(router)
     await async_setup_services(hass)
     handler = handlers[SERVICE_DEVICE_INTERNET_ACCESS]
@@ -234,7 +258,51 @@ async def test_remove_reloads_parental_control_switches() -> None:
     ):
         await handler(call)
 
-    reload_switches.assert_awaited_once_with(router)
+    reload_switches.assert_awaited_once_with(router, call.data["devices"])
+
+
+@pytest.mark.asyncio
+async def test_remove_deletes_matching_switch_registry_entry() -> None:
+    """Removing a rule should not leave an unavailable GUI entity."""
+
+    router = _router()
+    router._config_entry = Mock(entry_id="router-1")
+    router.hass.config_entries.async_unload_platforms = AsyncMock(
+        return_value=True
+    )
+    router.hass.config_entries.async_forward_entry_setups = AsyncMock()
+    registry = Mock()
+    matching = Mock(
+        domain=Platform.SWITCH,
+        platform=DOMAIN,
+        unique_id=("24:4b:fe:f5:ee:20_aa:bb:cc:dd:ee:ff_block_internet"),
+        entity_id="switch.console_block_internet",
+    )
+    unrelated = Mock(
+        domain=Platform.SWITCH,
+        platform=DOMAIN,
+        unique_id="24:4b:fe:f5:ee:20_block_internet",
+        entity_id="switch.router_block_internet",
+    )
+
+    with (
+        patch(
+            "custom_components.asusrouter.services.er.async_get",
+            return_value=registry,
+        ),
+        patch(
+            "custom_components.asusrouter.services.er."
+            "async_entries_for_config_entry",
+            return_value=[matching, unrelated],
+        ),
+    ):
+        await _reload_parental_control_switches(
+            router, [{"mac": "AA:BB:CC:DD:EE:FF"}]
+        )
+
+    registry.async_remove.assert_called_once_with(
+        "switch.console_block_internet"
+    )
 
 
 @pytest.mark.asyncio
@@ -242,6 +310,7 @@ async def test_service_surfaces_unconfirmed_router_write() -> None:
     """A failed router write must become a visible Home Assistant error."""
 
     router = _router()
+    router.bridge.async_pc_rule.side_effect = None
     router.bridge.async_pc_rule.return_value = False
     hass, handlers = _service_hass(router)
     await async_setup_services(hass)
@@ -259,6 +328,6 @@ async def test_service_surfaces_unconfirmed_router_write() -> None:
             "custom_components.asusrouter.services._get_entity_ids",
             return_value=[],
         ),
-        pytest.raises(HomeAssistantError, match="did not accept"),
+        pytest.raises(HomeAssistantError, match="could not be confirmed"),
     ):
         await handler(call)

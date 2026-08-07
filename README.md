@@ -5,7 +5,7 @@ This is a focused Home Assistant fork of
 It exists to add reliable fixed-IP management for ASUS routers while keeping
 the upstream integration's monitoring and control features.
 
-Current fork release: **v1.0.0+jgassens.1**.
+Current fork release: **v1.0.0+jgassens.2**.
 
 ## Problem
 
@@ -47,8 +47,9 @@ more AsusRouter device trackers and choose:
 - **remove** to delete the parental-control rule.
 
 The action now validates its targets, routes each target through its owning
-router entry, and raises a visible Home Assistant error when the router does
-not accept the write or its state cannot be refreshed. Direct API callers may
+router entry, and confirms the requested state after refreshing the router.
+Already-achieved states are accepted, and removed rules no longer leave stale
+switch entities in Home Assistant. Direct API callers may
 also provide **devices** containing **mac** and optional **name**; when more
 than one router entry is loaded, they must also provide **config_entry_id**.
 
@@ -62,7 +63,7 @@ domain, so install only one of them.
    AsusRouter integration configuration or entities.
 3. In HACS, open **Custom repositories**.
 4. Add **https://github.com/jgassens/ha-asusrouter** as an **Integration**.
-5. Download **v1.0.0+jgassens.1** and restart Home Assistant.
+5. Download **v1.0.0+jgassens.2** and restart Home Assistant.
 
 Existing AsusRouter config entries and entity IDs remain in place because the
 domain is still **asusrouter**.

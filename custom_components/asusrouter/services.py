@@ -7,6 +7,7 @@ import re
 from typing import Any, cast
 
 from asusrouter.error import AsusRouterError
+from asusrouter.modules.parental_control import PCRuleType
 from homeassistant.const import ATTR_ENTITY_ID, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
@@ -19,6 +20,7 @@ import voluptuous as vol
 
 from .client import ARClient
 from .const import ASUSROUTER, DOMAIN, IP, MAC, ROUTER
+from .helpers import to_unique_id
 from .router import ARDevice
 
 ATTR_CONFIG_ENTRY_ID = "config_entry_id"
@@ -286,8 +288,39 @@ def _direct_device_router(
     return routers[0]
 
 
-async def _reload_parental_control_switches(router: ARDevice) -> None:
-    """Reload parental-control switches after removing rules."""
+def _internet_access_state_matches(
+    router: ARDevice,
+    state: str,
+    devices: list[dict[str, Any]],
+) -> bool:
+    """Return whether the refreshed rules match the requested state."""
+
+    rules_by_mac = {
+        router._static_dhcp_mac(rule.mac): rule
+        for rule in router.pc_rules.values()
+        if rule.mac is not None
+    }
+    target_macs = {router._static_dhcp_mac(device[MAC]) for device in devices}
+
+    if state == "remove":
+        return target_macs.isdisjoint(rules_by_mac)
+
+    expected_type = {
+        "allow": PCRuleType.DISABLE,
+        "block": PCRuleType.BLOCK,
+    }.get(state)
+    return expected_type is not None and all(
+        (rule := rules_by_mac.get(mac)) is not None
+        and rule.type == expected_type
+        for mac in target_macs
+    )
+
+
+async def _reload_parental_control_switches(
+    router: ARDevice,
+    removed_devices: list[dict[str, Any]],
+) -> None:
+    """Remove stale rule entities and reload parental-control switches."""
 
     unload = await router.hass.config_entries.async_unload_platforms(
         router._config_entry, [Platform.SWITCH]
@@ -296,6 +329,25 @@ async def _reload_parental_control_switches(router: ARDevice) -> None:
         raise HomeAssistantError(
             "Unable to reload AsusRouter parental-control switches"
         )
+
+    removed_unique_ids = {
+        to_unique_id(
+            f"{router.mac}_{router._static_dhcp_mac(device[MAC])}"
+            "_block_internet"
+        )
+        for device in removed_devices
+    }
+    registry = er.async_get(router.hass)
+    for entry in er.async_entries_for_config_entry(
+        registry, router._config_entry.entry_id
+    ):
+        if (
+            entry.domain == Platform.SWITCH
+            and entry.platform == DOMAIN
+            and entry.unique_id in removed_unique_ids
+        ):
+            registry.async_remove(entry.entity_id)
+
     await router.hass.config_entries.async_forward_entry_setups(
         router._config_entry, [Platform.SWITCH]
     )
@@ -396,7 +448,7 @@ async def _async_device_internet_access(
 
     for router, devices in router_devices.items():
         try:
-            applied = await router.bridge.async_pc_rule(
+            await router.bridge.async_pc_rule(
                 state=call.data[ATTR_STATE],
                 devices=devices,
             )
@@ -406,14 +458,15 @@ async def _async_device_internet_access(
             ) from ex
 
         refreshed = await router.update_pc_rules()
-        if not applied or not refreshed:
+        if not refreshed or not _internet_access_state_matches(
+            router, call.data[ATTR_STATE], devices
+        ):
             raise HomeAssistantError(
-                "The router did not accept the internet-access change "
-                "or the integration could not refresh its state"
+                "The router's internet-access state could not be confirmed"
             )
 
         if call.data[ATTR_STATE] == "remove":
-            await _reload_parental_control_switches(router)
+            await _reload_parental_control_switches(router, devices)
 
 
 async def async_setup_services(hass: HomeAssistant) -> None:
