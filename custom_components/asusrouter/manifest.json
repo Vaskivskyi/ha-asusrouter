@@ -11,5 +11,5 @@
   "requirements": [
     "asusrouter @ git+https://github.com/jgassens/asusrouter.git@0d471818f60c588b78625bed50b45c7162be5e3a"
   ],
-  "version": "1.0.0-jgassens.1"
+  "version": "1.0.0+jgassens.1"
 }

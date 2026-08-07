@@ -5,7 +5,7 @@ This is a focused Home Assistant fork of
 It exists to add reliable fixed-IP management for ASUS routers while keeping
 the upstream integration's monitoring and control features.
 
-Current fork release: **v1.0.0-jgassens.1**.
+Current fork release: **v1.0.0+jgassens.1**.
 
 ## Problem
 
@@ -62,7 +62,7 @@ domain, so install only one of them.
    AsusRouter integration configuration or entities.
 3. In HACS, open **Custom repositories**.
 4. Add **https://github.com/jgassens/ha-asusrouter** as an **Integration**.
-5. Download **v1.0.0-jgassens.1** and restart Home Assistant.
+5. Download **v1.0.0+jgassens.1** and restart Home Assistant.
 
 Existing AsusRouter config entries and entity IDs remain in place because the
 domain is still **asusrouter**.
