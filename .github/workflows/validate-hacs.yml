@@ -3,6 +3,8 @@ name: Validate HACS
 on:
   push:
   pull_request:
+  release:
+    types: [published]
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
