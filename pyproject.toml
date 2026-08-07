@@ -103,6 +103,7 @@ split-on-trailing-comma = false
     "S105",    # Possible hardcoded password assigned to: "{}"
     "S106",    # Possible hardcoded password assigned to argument: "{}"
     "PLR0913", # Too many arguments in function definition ({c_args} > {max_args})
+    "PLR0917", # Too many positional arguments in function definition
 ]
 
 [tool.ruff.lint.pydocstyle]

@@ -27,7 +27,7 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_ar_entry(  # noqa: PLR0913
+async def async_setup_ar_entry(  # noqa: PLR0913, PLR0917
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
