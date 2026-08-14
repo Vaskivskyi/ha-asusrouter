@@ -47,11 +47,13 @@ from .const import (
     CONF_CLIENT_FILTER,
     CONF_CLIENT_FILTER_LIST,
     CONF_CLIENTS_IN_ATTR,
+    CONF_CREATE_BLOCK_SWITCHES,
     CONF_CREATE_DEVICES,
     CONF_DEFAULT_CLIENT_DEVICE,
     CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CLIENTS_IN_ATTR,
     CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_CREATE_BLOCK_SWITCHES,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
     CONF_DEFAULT_INTERVALS,
@@ -326,7 +328,13 @@ class ARDevice:
             CONF_CREATE_DEVICES,
             CONF_DEFAULT_CREATE_DEVICES,
         )
-        self._pc_rules: dict[str, Any] = {}
+        # Create a `Block Internet` switch for every tracked client,
+        # not only for the clients which already have a rule set
+        self.create_block_switches: bool = self._options.get(
+            CONF_CREATE_BLOCK_SWITCHES,
+            CONF_DEFAULT_CREATE_BLOCK_SWITCHES,
+        )
+        self._pc_rules: dict[str, ParentalControlRule] = {}
 
         # Client filter
         self._client_filter: str = self._options.get(
@@ -753,9 +761,17 @@ class ARDevice:
 
         new_flag = False
 
-        rules: dict[str, ParentalControlRule] = pc_data.get("rules", {})
+        # Normalize the MAC addresses of the incoming rules. The library
+        # reports them in the device format, while clients are stored using
+        # the HA `format_mac`. Without this the same device would end up
+        # being tracked under two different keys
+        rules: dict[str, ParentalControlRule] = {
+            format_mac(mac): rule
+            for mac, rule in pc_data.get("rules", {}).items()
+            if mac
+        }
 
-        rules_to_save = {}
+        rules_to_save: dict[str, ParentalControlRule] = {}
 
         # Update existing rules
         for mac in self._pc_rules:

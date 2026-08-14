@@ -65,6 +65,11 @@ async def async_setup_entry(
             hass, router.signal_pc_rules_new, update_router
         )
     )
+    # New clients can also require a switch when `create_block_switches`
+    # is enabled, so we have to listen for them as well
+    router.async_on_close(
+        async_dispatcher_connect(hass, router.signal_device_new, update_router)
+    )
 
     update_router()
 
@@ -79,12 +84,23 @@ def add_entities(
 
     new_tracked = []
 
+    # Clients which already have a parental control rule on the device
     for mac, rule in router.pc_rules.items():
         if mac in tracked:
             continue
 
-        new_tracked.append(ClientInternetSwitch(router, rule))
+        new_tracked.append(ClientInternetSwitch(router, mac, rule.name, rule))
         tracked.add(mac)
+
+    # Every other tracked client. No rule exists for them yet - it will be
+    # created on the device as soon as the switch is turned on
+    if router.create_block_switches is True:
+        for mac, client in router.devices.items():
+            if mac in tracked:
+                continue
+
+            new_tracked.append(ClientInternetSwitch(router, mac, client.name))
+            tracked.add(mac)
 
     if new_tracked:
         async_add_entities(new_tracked)
@@ -150,17 +166,20 @@ class ClientInternetSwitch(SwitchEntity):
     def __init__(
         self,
         router: ARDevice,
-        rule: ParentalControlRule,
+        mac: str,
+        name: str | None = None,
+        rule: ParentalControlRule | None = None,
     ):
         """Initialize client switch."""
 
         self._router = router
         self._rule = rule
-        self._mac = dr.format_mac(rule.mac)
+        self._mac = dr.format_mac(mac)
+        self._client_name = name or self._mac
         self._attr_unique_id = to_unique_id(
             f"{router.mac}_{self._mac}_block_internet"
         )
-        self._attr_name = f"{rule.name} Block Internet"
+        self._attr_name = f"{self._client_name} Block Internet"
 
         # Assign device info if set up
         if router.create_devices is True:
@@ -171,13 +190,17 @@ class ClientInternetSwitch(SwitchEntity):
 
         return DeviceInfo(
             connections={(dr.CONNECTION_NETWORK_MAC, self._mac)},
-            default_name=self._rule.name,
+            default_name=self._client_name,
             via_device=(DOMAIN, self._router.mac),
         )
 
     @property
     def is_on(self) -> bool | None:
         """Get the state."""
+
+        # No rule on the device means the client is not blocked
+        if self._rule is None:
+            return False
 
         match self._rule.type:
             case PCRuleType.BLOCK:
@@ -221,6 +244,15 @@ class ClientInternetSwitch(SwitchEntity):
         except Exception as ex:  # noqa: BLE001
             _LOGGER.error("Unable to set state with an exception: %s", ex)
 
+    def _new_rule(self, rule_type: PCRuleType) -> ParentalControlRule:
+        """Compile a rule for this client."""
+
+        return ParentalControlRule(
+            mac=self._rule.mac if self._rule else self._mac.upper(),
+            name=self._rule.name if self._rule else self._client_name,
+            type=rule_type,
+        )
+
     async def async_turn_on(
         self,
         **kwargs: Any,
@@ -228,11 +260,7 @@ class ClientInternetSwitch(SwitchEntity):
         """Turn on block."""
 
         await self._set_state(
-            state=ParentalControlRule(
-                mac=self._rule.mac,
-                name=self._rule.name,
-                type=PCRuleType.BLOCK,
-            ),
+            state=self._new_rule(PCRuleType.BLOCK),
             **kwargs,
         )
 
@@ -243,11 +271,7 @@ class ClientInternetSwitch(SwitchEntity):
         """Turn off block."""
 
         await self._set_state(
-            state=ParentalControlRule(
-                mac=self._rule.mac,
-                name=self._rule.name,
-                type=PCRuleType.DISABLE,
-            ),
+            state=self._new_rule(PCRuleType.DISABLE),
             **kwargs,
         )
 
@@ -255,9 +279,10 @@ class ClientInternetSwitch(SwitchEntity):
     def async_on_demand_update(self) -> None:
         """Update the state."""
 
-        if self._rule.mac in self._router.pc_rules:
-            self._rule = self._router.pc_rules[self._rule.mac]
-            self.async_write_ha_state()
+        # The rule can also disappear - when it was removed on the device
+        # or via the `device_internet_access` action
+        self._rule = self._router.pc_rules.get(self._mac)
+        self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
         """Register state update callback."""
