@@ -17,7 +17,7 @@ classifiers     = [
 ]
 dependencies    = [
     "asusrouter==1.21.3",
-    "homeassistant==2026.8.2",
+    "homeassistant==2026.8.3",
 ]
 
 [project.urls]
