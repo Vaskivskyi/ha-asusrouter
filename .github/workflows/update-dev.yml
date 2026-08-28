@@ -9,8 +9,7 @@ env:
   DEFAULT_PYTHON_VERSION: 3.14
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   upgrade-asusrouter:
@@ -36,6 +35,16 @@ jobs:
       - name: Upgrade asusrouter package in lockfile
         run: uv lock --upgrade-package asusrouter
 
+      - name: Sync manifest requirement to the locked version
+        run: |
+          VERSION=$(grep -A1 '^name = "asusrouter"$' uv.lock | grep -oP 'version = "\K[^"]+')
+          [ -n "$VERSION" ] || { echo "::error::asusrouter not found in uv.lock"; exit 1; }
+          MANIFEST=custom_components/asusrouter/manifest.json
+          jq --arg v "$VERSION" \
+            '.requirements = [.requirements[] | if startswith("asusrouter") then "asusrouter==\($v)" else . end]' \
+            "$MANIFEST" > "$MANIFEST.tmp"
+          mv "$MANIFEST.tmp" "$MANIFEST"
+
       - name: Check for changes
         id: changes
         run: |
@@ -45,20 +54,12 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit lockfile changes
-        if: steps.changes.outputs.changed == 'true'
-        run: |
-          git config user.name "asusrouter-bot"
-          git config user.email "asusrouter-bot@users.noreply.github.com"
-          git add uv.lock
-          git commit -m "🤖 Autoupdate: bump asusrouter @ ${ASUS_SHA}" || echo "no changes to commit"
-
       - name: Create GitHub App token
         id: app_token
-        uses: tibdex/github-app-token@v2.1.0
+        uses: actions/create-github-app-token@v3.2.0
         with:
-          app_id: ${{ secrets.AR_APP_ID }}
-          private_key: ${{ secrets.AR_APP_KEY }}
+          client-id: ${{ secrets.AR_APP_ID }}
+          private-key: ${{ secrets.AR_APP_KEY }}
 
       - name: Create (update) Pull Request if changes
         id: create-pr
@@ -67,8 +68,11 @@ jobs:
         with:
           token: ${{ steps.app_token.outputs.token }}
           sign-commits: true
-          commit-message: "🤖 Autoupdate AsusRouter"
+          commit-message: "🤖 Autoupdate: bump asusrouter @ ${{ env.ASUS_SHA }}"
           branch: "bot-ar-upgrade"
+          add-paths: |
+            uv.lock
+            custom_components/asusrouter/manifest.json
           title: "Bump asusrouter to ${{ env.ASUS_SHA }}"
           body: |
             # 🤖 Automated update of asusrouter on the dev branch
@@ -80,10 +84,10 @@ jobs:
           labels: dependencies, bot
           delete-branch: true
 
-      # - name: Enable Pull Request Automerge
-      #   if: steps.changes.outputs.changed == 'true'
-      #   uses: peter-evans/enable-pull-request-automerge@v3.0.0
-      #   with:
-      #     token: ${{ steps.app_token.outputs.token }}
-      #     pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
-      #     merge-method: squash
+      - name: Enable Pull Request Automerge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3.0.0
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash
