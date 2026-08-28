@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -23,8 +22,6 @@ from .const import (
     DOMAIN,
 )
 from .router import ARDevice
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
