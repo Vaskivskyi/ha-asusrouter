@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .dataclass import AREntityDescription
+
 
 def clean_dict(raw: dict[str, Any]) -> dict[str, Any]:
     """Clean dictionary from None values."""
@@ -29,6 +31,24 @@ def as_dict(pyobj):
     """Return generator object as dictionary."""
 
     return dict(pyobj)
+
+
+def hide_attributes(
+    descriptions: list[AREntityDescription], hide: list[str]
+) -> list[AREntityDescription]:
+    """Drop the protected values from the extra state attributes."""
+
+    for description in descriptions:
+        if not description.extra_state_attributes:
+            description.extra_state_attributes = {}
+            continue
+        description.extra_state_attributes = {
+            key: value
+            for key, value in description.extra_state_attributes.items()
+            if value not in hide
+        }
+
+    return descriptions
 
 
 def list_from_dict(raw: dict[str, Any]) -> list[str]:

@@ -27,21 +27,17 @@ from .router import ARDevice
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_ar_entry(  # noqa: PLR0913
+async def async_setup_ar_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
     sensors: list[AREntityDescription],
     sensor_class: type[AREntity],
-    hide: list[str] | None = None,
 ) -> None:
     """Set up AsusRouter entities."""
 
     router: ARDevice = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
     entities = []
-
-    if not hide:
-        hide = []
 
     for sensor_data in router.sensor_coordinator.values():
         coordinator = sensor_data[COORDINATOR]
@@ -57,13 +53,6 @@ async def async_setup_ar_entry(  # noqa: PLR0913
                     sensor_type in sensor_data
                     and sensor_description.key in sensor_data[sensor_type]
                 ):
-                    # Hide protected values
-                    sensor_description.extra_state_attributes = {
-                        key: value
-                        for key, value in sensor_description.extra_state_attributes.items()  # noqa: E501
-                        if value not in hide
-                    }
-
                     entities.append(
                         sensor_class(coordinator, router, sensor_description)
                     )

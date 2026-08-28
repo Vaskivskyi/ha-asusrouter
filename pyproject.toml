@@ -16,7 +16,7 @@ classifiers     = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies    = [
-    "asusrouter @ git+https://github.com/Vaskivskyi/asusrouter.git@dev",
+    "asusrouter==1.21.3",
     "homeassistant==2026.8.3",
 ]
 
@@ -112,6 +112,7 @@ split-on-trailing-comma = false
     "S105",    # Possible hardcoded password assigned to: "{}"
     "S106",    # Possible hardcoded password assigned to argument: "{}"
     "PLR0913", # Too many arguments in function definition ({c_args} > {max_args})
+    "PLR0917", # Too many positional arguments ({c_pos} > {max_pos})
 ]
 
 [tool.ruff.lint.pydocstyle]
