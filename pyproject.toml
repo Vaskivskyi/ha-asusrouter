@@ -47,10 +47,15 @@ filterwarnings = [
   "ignore:Inheritance class HomeAssistantApplication from web.Application is discouraged:DeprecationWarning:homeassistant\\.components\\.http",
 ]
 
+[tool.coverage.run]
+source = [
+    "custom_components/asusrouter",
+]
+
 [tool.ruff]
 line-length = 79
 src = ["asusrouter"]
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -85,8 +90,6 @@ select = [
 
 ignore = [
     "D202",   # No blank lines allowed after function docstring (found {num_lines})
-    "D203",   # 1 blank line required before class docstring
-    "D213",   # Multi-line docstring summary should start at the second line
 ]
 
 [tool.ruff.lint.isort]
@@ -97,8 +100,9 @@ combine-as-imports = true
 split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
+# standalone maintenance CLIs, not an importable package
 "scripts/*" = [
-    "INP001", # Standalone scripts, not an importable package
+    "INP001", # File {filename} is part of an implicit namespace package
     "T201",   # `print` found
 ]
 "tests/*" = [
@@ -106,6 +110,7 @@ split-on-trailing-comma = false
     "S105",    # Possible hardcoded password assigned to: "{}"
     "S106",    # Possible hardcoded password assigned to argument: "{}"
     "PLR0913", # Too many arguments in function definition ({c_args} > {max_args})
+    "PLR0917", # Too many positional arguments ({c_pos} > {max_pos})
 ]
 
 [tool.ruff.lint.pydocstyle]

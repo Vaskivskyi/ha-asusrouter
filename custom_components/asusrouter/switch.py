@@ -26,7 +26,7 @@ from .const import (
 )
 from .dataclass import ARSwitchDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
-from .helpers import to_unique_id
+from .helpers import hide_attributes, to_unique_id
 from .router import ARDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,7 +48,11 @@ async def async_setup_entry(
         hide.extend(["password", "private_key", "psk"])
 
     await async_setup_ar_entry(
-        hass, config_entry, async_add_entities, switches, ARSwitch, hide
+        hass,
+        config_entry,
+        async_add_entities,
+        hide_attributes(switches, hide),
+        ARSwitch,
     )
 
     router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]

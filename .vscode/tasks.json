@@ -1,6 +1,37 @@
 {
   "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "haMinVersion",
+      "type": "promptString",
+      "description": "Minimum HA version for hacs.json (oldest release with all APIs used, NOT the pyproject test pin)"
+    }
+  ],
   "tasks": [
+    {
+      "label": "Bump HACS min HA",
+      "type": "shell",
+      "command": "uv run python scripts/bump_ha_min.py ${input:haMinVersion}",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Show HA versions",
+      "type": "shell",
+      "command": "uv run python scripts/bump_ha_min.py",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
     {
       "label": "Prek",
       "type": "shell",

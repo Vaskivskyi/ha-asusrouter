@@ -6,7 +6,6 @@ repos:
         args:
           - --fix
       - id: ruff-format
-        files: ^((custom-components/asusrouter|tests)/.+)?[^/]+\.(py|pyi)$
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -18,6 +17,14 @@ repos:
 
   - repo: local
     hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: readme
         name: build README
         entry: uv run python scripts/build_readme.py

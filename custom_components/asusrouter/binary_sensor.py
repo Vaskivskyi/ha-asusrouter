@@ -27,7 +27,7 @@ from .const import (
 )
 from .dataclass import ARBinarySensorDescription
 from .entity import ARBinaryEntity, async_setup_ar_entry
-from .helpers import to_unique_id
+from .helpers import hide_attributes, to_unique_id
 from .router import AiMeshNode, ARDevice
 
 
@@ -50,9 +50,8 @@ async def async_setup_entry(
         hass,
         config_entry,
         async_add_entities,
-        binary_sensors,
+        hide_attributes(binary_sensors, hide),
         ARBinarySensor,
-        hide,
     )
 
     router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
