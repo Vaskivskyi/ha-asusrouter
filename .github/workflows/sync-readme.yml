@@ -1,0 +1,128 @@
+name: Sync README from asusrouter
+
+on:
+  repository_dispatch:
+    types: [ar_readme_sync]
+  workflow_dispatch:
+  schedule:
+    - cron: "37 5 * * 1"
+  push:
+    branches: [dev]
+    paths:
+      - ".github/workflows/sync-readme.yml"
+
+env:
+  DEFAULT_PYTHON_VERSION: 3.14
+  SOURCE_REPO: Vaskivskyi/asusrouter
+  SOURCE_REF: dev
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-readme
+  cancel-in-progress: true
+
+jobs:
+  sync-readme:
+    name: Sync README from asusrouter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v3.2.0
+        with:
+          client-id: ${{ secrets.AR_APP_ID }}
+          private-key: ${{ secrets.AR_APP_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          persist-credentials: false
+
+      - name: Setup Python and uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+
+      # `readme/shared/` and the renderer are owned by the library repository.
+      # Everything else under `readme/` is maintained here and is never touched
+      - name: Pull shared sources
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            echo "Fetching $1"
+            gh api "repos/$SOURCE_REPO/contents/$1?ref=$SOURCE_REF" \
+              --jq '.content' | base64 -d > "$1"
+            [ -s "$1" ] || { echo "::error::$1 came back empty"; exit 1; }
+          }
+
+          # The whole folder mirrors the library, so files added or removed
+          # there propagate without touching this workflow. The glob leaves
+          # `.synced-from` alone, it is rewritten by the next step
+          SHARED=$(gh api "repos/$SOURCE_REPO/contents/readme/shared?ref=$SOURCE_REF" --jq '.[] | select(.type == "file") | .path')
+          [ -n "$SHARED" ] || { echo "::error::readme/shared is empty in $SOURCE_REPO"; exit 1; }
+
+          mkdir -p readme/shared
+          rm -f readme/shared/*
+          for FILE in $SHARED; do
+            fetch "$FILE"
+          done
+
+          fetch scripts/build_readme.py
+
+      - name: Record source revision
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          set -euo pipefail
+          SHA=$(gh api "repos/$SOURCE_REPO/commits/$SOURCE_REF" --jq '.sha')
+          [ -n "$SHA" ] || { echo "::error::could not resolve $SOURCE_REPO@$SOURCE_REF"; exit 1; }
+          echo "$SOURCE_REPO@$SOURCE_REF $SHA" > readme/shared/.synced-from
+          echo "SOURCE_SHA=$SHA" >> "$GITHUB_ENV"
+
+      - name: Rebuild README
+        run: uv run --no-project python scripts/build_readme.py
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git status --porcelain | grep -q .; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create (update) Pull Request if changes
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          sign-commits: true
+          commit-message: "🤖 Autoupdate: sync README sources @ ${{ env.SOURCE_SHA }}"
+          branch: "bot-readme-sync"
+          add-paths: |
+            readme/shared
+            scripts/build_readme.py
+            README.md
+          title: "Sync README sources from asusrouter"
+          body: |
+            # 🤖 Automated sync of the shared README sources
+
+            Pulled from [`${{ env.SOURCE_REPO }}@${{ env.SOURCE_REF }}`](https://github.com/${{ env.SOURCE_REPO }}/tree/${{ env.SOURCE_SHA }})
+            at `${{ env.SOURCE_SHA }}`:
+
+            - `readme/shared/` — device database and the snippets shared with the library
+            - `scripts/build_readme.py` — the README renderer
+
+            `README.md` is regenerated from `readme/` afterwards. The sections under
+            `readme/sections/` belong to this repository and are never touched by the sync.
+          author: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          committer: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
+          labels: documentation, bot
+          delete-branch: true

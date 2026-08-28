@@ -98,6 +98,31 @@ jobs:
       - name: Run Ruff Check
         run: uv run prek run --hook-stage manual ruff-check --all-files --show-diff-on-failure
 
+  readme:
+    name: README
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up UV and Python
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-groups
+
+      - name: Check README is up to date
+        run: uv run python scripts/build_readme.py --check
+
   unit-tests:
     name: Unit Tests
     needs:

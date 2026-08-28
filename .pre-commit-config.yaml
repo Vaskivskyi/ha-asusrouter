@@ -15,3 +15,13 @@ repos:
         args:
           - --branch=dev
           - --branch=main
+
+  - repo: local
+    hooks:
+      - id: readme
+        name: build README
+        entry: uv run python scripts/build_readme.py
+        language: system
+        files: ^(readme/|scripts/build_readme\.py$)
+        pass_filenames: false
+        stages: [pre-commit]

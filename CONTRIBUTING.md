@@ -117,6 +117,24 @@ These are already included in `.vscode/settings.example.json`:
 
 ---
 
+## README
+
+`README.md` is generated - never edit it directly. Edit the sources in `readme/` and run:
+
+```sh
+uv run python scripts/build_readme.py
+```
+
+The pre-commit hook does this for you; CI fails if the result is out of date.
+
+- `readme/sections/` - prose owned by this repository.
+- `readme/shared/` and `scripts/build_readme.py` - mirrored from
+  [asusrouter](https://github.com/Vaskivskyi/asusrouter) by the `Sync README from asusrouter`
+  workflow. Do not edit them here, the next sync overwrites the changes.
+  **New supported devices go to `readme/shared/devices.json` in the library repository.**
+
+---
+
 ## Pull Requests
 
 - Ensure all pre-commit hooks pass before pushing.
