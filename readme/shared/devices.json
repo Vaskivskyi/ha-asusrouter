@@ -1,0 +1,892 @@
+{
+  "device_page_base": "https://asusrouter.vaskivskyi.com/devices/",
+  "wifi_generations": [
+    {
+      "id": "be",
+      "label": "WiFi 7 | 802.11be"
+    },
+    {
+      "id": "axe",
+      "label": "WiFi 6e | 802.11axe"
+    },
+    {
+      "id": "ax",
+      "label": "WiFi 6 | 802.11ax"
+    },
+    {
+      "id": "ac",
+      "label": "WiFi 5 | 802.11ac"
+    },
+    {
+      "id": "n",
+      "label": "WiFi 4 | 802.11n"
+    }
+  ],
+  "statuses": {
+    "confirmed": {
+      "emoji": "💚",
+      "label": "Confirmed"
+    },
+    "expected": {
+      "emoji": "💛",
+      "label": "Expected to work"
+    }
+  },
+  "devices": [
+    {
+      "name": "4G-AC55U",
+      "slug": "4G-AC55U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "380.8102"
+        ]
+      },
+      "amazon": "https://amzn.to/3jIWQDu"
+    },
+    {
+      "name": "BRT-AC828",
+      "slug": "BRT-AC828",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "382_70348"
+        ]
+      },
+      "amazon": "https://amzn.to/3X2wSL5"
+    },
+    {
+      "name": "DSL-AC68U",
+      "slug": "DSL-AC68U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.47534",
+          "386.50117"
+        ],
+        "merlin": [
+          "386.4-gnuton2",
+          "386.7_2-gnuton1"
+        ]
+      },
+      "amazon": "https://amzn.to/3Z5k32H"
+    },
+    {
+      "name": "DSL-AX82U",
+      "slug": "DSL-AX82U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "386.07_0-gnuton0_beta2"
+        ]
+      },
+      "amazon": "https://amzn.to/3G87vyR"
+    },
+    {
+      "name": "GT-AX11000",
+      "slug": "GT-AX11000",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "386.7_2",
+          "388.1_0",
+          "388.4_0",
+          "388.7_0_rog"
+        ]
+      },
+      "amazon": "https://amzn.to/3WDzOMT"
+    },
+    {
+      "name": "GT-AX11000 Pro",
+      "slug": "GT-AX11000Pro",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.24198"
+        ],
+        "merlin": [
+          "388.7_0_rog"
+        ]
+      },
+      "amazon": "https://amzn.to/3VUNbHl"
+    },
+    {
+      "name": "GT-AX6000",
+      "slug": "GT-AX6000",
+      "wifi": "ax",
+      "status": "expected",
+      "firmware": {
+        "merlin": [
+          "388.7_beta1"
+        ]
+      },
+      "amazon": "https://amzn.to/3GrKHKG"
+    },
+    {
+      "name": "GT-AXE11000",
+      "slug": "GT-AXE11000",
+      "wifi": "axe",
+      "status": "expected",
+      "amazon": "https://amzn.to/3Gotj9R"
+    },
+    {
+      "name": "GT-AXE16000",
+      "slug": "GT-AXE16000",
+      "wifi": "axe",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.21617"
+        ],
+        "merlin": [
+          "388.7_beta1_rog",
+          "388.7_0_rog"
+        ]
+      },
+      "amazon": "https://amzn.to/3vObLyZ"
+    },
+    {
+      "name": "GT-BE19000",
+      "slug": "GT-BE19000",
+      "wifi": "be",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_39244"
+        ]
+      },  
+      "amazon": "https://amzn.to/3yGFU7U"
+    },
+    {
+      "name": "GT-BE98",
+      "slug": "GT-BE98",
+      "wifi": "be",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_34372"
+        ]
+      },
+      "amazon": "https://amzn.to/3vGztgz"
+    },
+    {
+      "name": "GT-BE98 Pro",
+      "slug": "GT-BE98Pro",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3uoSjeR"
+    },
+    {
+      "name": "GT6",
+      "slug": "GT6",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3GmPCfR"
+    },
+    {
+      "name": "RP-AX56",
+      "slug": "RP-AX56",
+      "wifi": "ax",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/3MpZSY8"
+    },
+    {
+      "name": "RT-AC51U",
+      "slug": "RT-AC51U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "380.8591"
+        ]
+      },
+      "amazon": "https://amzn.to/3WMy2sq"
+    },
+    {
+      "name": "RT-AC52U B1",
+      "slug": "RT-AC52UB1",
+      "wifi": "ac",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/3QcrCkk"
+    },
+    {
+      "name": "RT-AC5300",
+      "slug": "RT-AC5300",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "386.7_2"
+        ]
+      },
+      "amazon": "https://amzn.to/3ZcJQpY"
+    },
+    {
+      "name": "RT-AC57U V3",
+      "slug": "RT-AC57UV3",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.21649"
+        ]
+      },
+      "amazon": "https://amzn.to/3VAxDbx"
+    },
+    {
+      "name": "RT-AC58U",
+      "slug": "RT-AC58U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/3G98Mpl"
+    },
+    {
+      "name": "RT-AC66U",
+      "slug": "RT-AC66U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "380.70_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3WTtTD8"
+    },
+    {
+      "name": "RT-AC66U B1",
+      "slug": "RT-AC66UB1",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.51255"
+        ]
+      },
+      "amazon": "https://amzn.to/3vtZ4Jm"
+    },
+    {
+      "name": "RT-AC68U",
+      "slug": "RT-AC68U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.49703"
+        ],
+        "merlin": [
+          "386.5_2",
+          "386.7_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3i6dQTE"
+    },
+    {
+      "name": "RT-AC85P",
+      "slug": "RT-AC85P",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "382.52516"
+        ]
+      },
+      "amazon": "https://amzn.to/3kMiDdU"
+    },
+    {
+      "name": "RT-AC86U",
+      "slug": "RT-AC86U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.48260",
+          "386.49709"
+        ],
+        "merlin": [
+          "386.7_0",
+          "386.7_2",
+          "386.9_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3CbRarK"
+    },
+    {
+      "name": "RT-AC87U",
+      "slug": "RT-AC87U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "384.13_10"
+        ]
+      },
+      "amazon": "https://amzn.to/3i4sUkE"
+    },
+    {
+      "name": "RT-AC88U",
+      "slug": "RT-AC88U",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.48260"
+        ],
+        "merlin": [
+          "386.5_0",
+          "386.7_beta1",
+          "386.12_2"
+        ]
+      },
+      "amazon": "https://amzn.to/3FYRYBy"
+    },
+    {
+      "name": "RT-ACRH17",
+      "slug": "RT-ACRH17",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "382.52517"
+        ]
+      },
+      "amazon": "https://amzn.to/3i6dWL0"
+    },
+    {
+      "name": "RT-AX3000P",
+      "slug": "RT-AX3000P",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3RPa2UO"
+    },
+    {
+      "name": "RT-AX52",
+      "slug": "RT-AX52",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/40Ph3sO"
+    },
+    {
+      "name": "RT-AX53U",
+      "slug": "RT-AX53U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.69061"
+        ]
+      },
+      "amazon": "https://amzn.to/49jEgqO"
+    },
+    {
+      "name": "RT-AX5400",
+      "slug": "RT-AX5400",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/4aCdvyu"
+    },
+    {
+      "name": "RT-AX55",
+      "slug": "RT-AX55",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.50410",
+          "386.52041"
+        ]
+      },
+      "amazon": "https://amzn.to/3Z2ath5"
+    },
+    {
+      "name": "RT-AX56U",
+      "slug": "RT-AX56U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "386.7_2",
+          "388.1_0",
+          "388.2_2"
+        ]
+      },
+      "amazon": "https://amzn.to/3vrIeuz"
+    },
+    {
+      "name": "RT-AX57",
+      "slug": "RT-AX57",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3IWnZNx"
+    },
+    {
+      "name": "RT-AX57 Go",
+      "slug": "RT-AX57Go",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/47kE9db"
+    },
+    {
+      "name": "RT-AX57M",
+      "slug": "RT-AX57M",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3vbVl6k"
+    },
+    {
+      "name": "RT-AX58U",
+      "slug": "RT-AX58U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.49674",
+          "388.22237"
+        ],
+        "merlin": [
+          "386.7_2",
+          "388.1_0",
+          "388.4_0",
+          "388.7.0"
+        ]
+      },
+      "amazon": "https://amzn.to/3jHri0L"
+    },
+    {
+      "name": "RT-AX59U",
+      "slug": "RT-AX59U",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3CVCVYO"
+    },
+    {
+      "name": "RT-AX68U",
+      "slug": "RT-AX68U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.21732"
+        ]
+      },
+      "amazon": "https://amzn.to/3WzRwk5"
+    },
+    {
+      "name": "RT-AX82U",
+      "slug": "RT-AX82U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.48664",
+          "386.49674"
+        ],
+        "merlin": [
+          "388.8_4-gnuton1"
+        ]
+      },
+      "amazon": "https://amzn.to/3Gv2Bxi"
+    },
+    {
+      "name": "RT-AX86S",
+      "slug": "RT-AX86S",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.46061",
+          "386.48260",
+          "386.49447",
+          "388.22525"
+        ],
+        "merlin": [
+          "386.7_2"
+        ]
+      },
+      "amazon": "https://amzn.to/3GuKac5"
+    },
+    {
+      "name": "RT-AX86U",
+      "slug": "RT-AX86U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.46061",
+          "386.48260",
+          "386.49447",
+          "388.22525"
+        ],
+        "merlin": [
+          "386.7_2",
+          "388.4_0",
+          "388.7_beta1"
+        ]
+      },
+      "amazon": "https://amzn.to/3WCBcPO"
+    },
+    {
+      "name": "RT-AX86U Pro",
+      "slug": "RT-AX86UPro",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.23565"
+        ]
+      },
+      "amazon": "https://amzn.to/3ZDM41T"
+    },
+    {
+      "name": "RT-AX88U",
+      "slug": "RT-AX88U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.45934",
+          "386.48631",
+          "388.24198"
+        ],
+        "merlin": [
+          "386.5_2",
+          "386.8_0",
+          "388.1_0",
+          "388.2_0",
+          "388.4_0",
+          "388.7_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3i2VfYu"
+    },
+    {
+      "name": "RT-AX88U Pro",
+      "slug": "RT-AX88UPro",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "388.4_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3QNDpFZ"
+    },
+    {
+      "name": "RT-AX89X",
+      "slug": "RT-AX89X",
+      "wifi": "ax",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/3i55b3S"
+    },
+    {
+      "name": "RT-AX92U",
+      "slug": "RT-AX92U",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.46061"
+        ]
+      },
+      "amazon": "https://amzn.to/3jJJgzt"
+    },
+    {
+      "name": "RT-AXE7800",
+      "slug": "RT-AXE7800",
+      "wifi": "axe",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388_22068"
+        ]
+      },
+      "amazon": "https://amzn.to/3jUr2LU"
+    },
+    {
+      "name": "RT-BE58U",
+      "slug": "RT-BE58U",
+      "wifi": "be",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/4bHsdo4"
+    },
+    {
+      "name": "RT-BE88U",
+      "slug": "RT-BE88U",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3TAGCKY"
+    },
+    {
+      "name": "RT-BE92U",
+      "slug": "RT-BE92U",
+      "wifi": "be",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_40311"
+        ]
+      },
+      "amazon": "https://amzn.to/4c1E8gg"
+    },
+    {
+      "name": "RT-BE96U",
+      "slug": "RT-BE96U",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3vJu8oD"
+    },
+    {
+      "name": "RT-N66U",
+      "slug": "RT-N66U",
+      "wifi": "n",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/3i7eP5Z"
+    },
+    {
+      "name": "TUF-AX3000 V2",
+      "slug": "TUF-AX3000V2",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.23785"
+        ]
+      },
+      "amazon": "https://amzn.to/3QzzD4C"
+    },
+    {
+      "name": "TUF-AX4200",
+      "slug": "TUF-AX4200",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3kexPjC"
+    },
+    {
+      "name": "TUF-AX5400",
+      "slug": "TUF-AX5400",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.50224",
+          "388.21224",
+          "388.22525",
+          "388.23285",
+          "388.24121",
+          "388.24358"
+        ],
+        "merlin": [
+          "388.4_0"
+        ]
+      },
+      "amazon": "https://amzn.to/3hXgzyQ"
+    },
+    {
+      "name": "TUF-AX6000",
+      "slug": "TUF-AX6000",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.32432"
+        ]
+      },
+      "amazon": "https://amzn.to/3CXqxaG"
+    },
+    {
+      "name": "TUF-BE3600",
+      "slug": "TUF-BE3600",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3VhHoyt"
+    },
+    {
+      "name": "TUF-BE6500",
+      "slug": "TUF-BE6500",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3X3Xltv"
+    },
+    {
+      "name": "ZenWiFi AC Mini(CD6)",
+      "slug": "ZenWiFiACMini(CD6)",
+      "wifi": "ac",
+      "status": "expected",
+      "amazon": "https://amzn.to/3RU7vrL"
+    },
+    {
+      "name": "ZenWiFi AX (XT8)",
+      "slug": "ZenWiFiAX(XT8)",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.48706",
+          "388.23285"
+        ],
+        "merlin": [
+          "386.7_2-gnuton1"
+        ]
+      },
+      "amazon": "https://amzn.to/3GuvY2L"
+    },
+    {
+      "name": "ZenWiFi AX Hybrid (XP4)",
+      "slug": "ZenWiFiAXHybrid(XP4)",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3Itxnbb"
+    },
+    {
+      "name": "ZenWiFi AX Mini (XD4)",
+      "slug": "ZenWiFiAXMini(XD4)",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386.48790",
+          "386.49599"
+        ]
+      },
+      "amazon": "https://amzn.to/3hYGuGl"
+    },
+    {
+      "name": "ZenWiFi BD4",
+      "slug": "ZenWiFiBD4",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3Kfulr1"
+    },
+    {
+      "name": "ZenWiFi BQ16",
+      "slug": "ZenWiFiBQ16",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/4bgVvdo"
+    },
+    {
+      "name": "ZenWiFi BQ16 Pro",
+      "slug": "ZenWiFiBQ16Pro",
+      "wifi": "be",
+      "status": "expected",
+      "amazon": "https://amzn.to/3MNcw48"
+    },
+    {
+      "name": "ZenWiFi BT10",
+      "slug": "ZenWiFiBT10",
+      "wifi": "be",
+      "status": "confirmed",
+      "amazon": "https://amzn.to/48F5wiB"
+    },
+    {
+      "name": "ZenWiFi ET8",
+      "slug": "ZenWiFiET8",
+      "wifi": "axe",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.23759"
+        ]
+      },
+      "amazon": "https://amzn.to/3Iks0La"
+    },
+    {
+      "name": "ZenWiFi ET9",
+      "slug": "ZenWiFiET9",
+      "wifi": "axe",
+      "status": "expected",
+      "amazon": "https://amzn.to/3RbMKJa"
+    },
+    {
+      "name": "ZenWiFi Pro ET12",
+      "slug": "ZenWiFiProET12",
+      "wifi": "axe",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.23013"
+        ]
+      },
+      "amazon": "https://amzn.to/3GTz68P"
+    },
+    {
+      "name": "ZenWiFi Pro XT12",
+      "slug": "ZenWiFiProXT12",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.22127"
+        ]
+      },
+      "amazon": "https://amzn.to/3im6UC5"
+    },
+    {
+      "name": "ZenWiFi XD4 Plus",
+      "slug": "ZenWiFiXD4Plus",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3XtYOWp"
+    },
+    {
+      "name": "ZenWiFi XD4S",
+      "slug": "ZenWiFiXD4S",
+      "wifi": "ax",
+      "status": "expected",
+      "amazon": "https://amzn.to/3E341xI"
+    },
+    {
+      "name": "ZenWiFi XD5",
+      "slug": "ZenWiFiXD5",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.23949"
+        ]
+      },
+      "amazon": "https://amzn.to/3YrhgjM"
+    },
+    {
+      "name": "ZenWiFi XD6",
+      "slug": "ZenWiFiXD6",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.21380"
+        ]
+      },
+      "amazon": "https://amzn.to/3jW23s4"
+    },
+    {
+      "name": "ZenWiFi XD6S",
+      "slug": "ZenWiFiXD6S",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388.21380"
+        ]
+      },
+      "amazon": "https://amzn.to/3YMbyIZ"
+    },
+    {
+      "name": "ZenWiFi XT9",
+      "slug": "ZenWiFiXT9",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388_23285"
+        ]
+      },
+      "amazon": "https://amzn.to/3JZOgLF"
+    }
+  ]
+}

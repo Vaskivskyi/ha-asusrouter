@@ -97,6 +97,10 @@ combine-as-imports = true
 split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
+"scripts/*" = [
+    "INP001", # Standalone scripts, not an importable package
+    "T201",   # `print` found
+]
 "tests/*" = [
     "S101",    # Use of `assert` detected
     "S105",    # Possible hardcoded password assigned to: "{}"
