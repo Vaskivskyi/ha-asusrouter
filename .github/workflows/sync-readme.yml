@@ -99,6 +99,7 @@ jobs:
           fi
 
       - name: Create (update) Pull Request if changes
+        id: create-pr
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
@@ -126,3 +127,11 @@ jobs:
           committer: "asusrouter-bot <asusrouter-bot@users.noreply.github.com>"
           labels: documentation, bot
           delete-branch: true
+
+      - name: Enable Pull Request Automerge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3.0.0
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash
