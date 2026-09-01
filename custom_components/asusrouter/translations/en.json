@@ -51,7 +51,8 @@
           "latest_connected": "Number of latest connected devices to store",
           "interval_devices": "Devices / AiMesh update",
           "consider_home": "Consider device at home for (after last 'online' state)",
-          "create_devices": "Create HA devices when creating clients entities"
+          "create_devices": "Create HA devices when creating clients entities",
+          "create_block_switches": "Create a `Block Internet` switch for every connected client"
         }
       },
       "intervals": {
@@ -168,7 +169,8 @@
           "latest_connected": "Number of latest connected devices to store",
           "interval_devices": "Devices / AiMesh update",
           "consider_home": "Consider device at home for (after last 'online' state)",
-          "create_devices": "Create HA devices when creating clients entities"
+          "create_devices": "Create HA devices when creating clients entities",
+          "create_block_switches": "Create a `Block Internet` switch for every connected client"
         }
       },
       "intervals": {

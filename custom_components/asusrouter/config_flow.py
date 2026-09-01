@@ -40,12 +40,14 @@ from .const import (
     CONF_CLIENT_FILTER_LIST,
     CONF_CLIENTS_IN_ATTR,
     CONF_CONSIDER_HOME,
+    CONF_CREATE_BLOCK_SWITCHES,
     CONF_CREATE_DEVICES,
     CONF_DEFAULT_CACHE_TIME,
     CONF_DEFAULT_CLIENT_DEVICE,
     CONF_DEFAULT_CLIENT_FILTER,
     CONF_DEFAULT_CLIENTS_IN_ATTR,
     CONF_DEFAULT_CONSIDER_HOME,
+    CONF_DEFAULT_CREATE_BLOCK_SWITCHES,
     CONF_DEFAULT_CREATE_DEVICES,
     CONF_DEFAULT_EVENT,
     CONF_DEFAULT_HIDE_PASSWORDS,
@@ -521,6 +523,20 @@ def _create_form_connected_devices(
                     CONF_CREATE_DEVICES,
                     default=user_input.get(
                         CONF_CREATE_DEVICES, CONF_DEFAULT_CREATE_DEVICES
+                    ),
+                ): cv.boolean,
+            }
+        )
+
+    # Parental control is only available in the router mode
+    if mode == ROUTER:
+        schema.update(
+            {
+                vol.Required(
+                    CONF_CREATE_BLOCK_SWITCHES,
+                    default=user_input.get(
+                        CONF_CREATE_BLOCK_SWITCHES,
+                        CONF_DEFAULT_CREATE_BLOCK_SWITCHES,
                     ),
                 ): cv.boolean,
             }
