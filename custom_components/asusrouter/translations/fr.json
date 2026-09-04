@@ -18,166 +18,20 @@
           "port": "Port (0 pour utiliser la valeur par défaut)",
           "ssl": "Utiliser une connexion SSL"
         }
-      },
-      "operation": {
-        "title": "Mode de fonctionnement",
-        "data": {
-          "mode": "Mode de l'appareil",
-          "enable_control": "Activer le contrôle des périphériques",
-          "split_intervals": "Activer les intervalles de mise à jour par capteur"
-        }
-      },
-      "options": {
-        "title": "[NT] Additional options",
-        "menu_options": {
-          "intervals": "Intervalles d'actualisation",
-          "events": "Événements de Home Assistant",
-          "security": "Options de sécurité",
-          "finish": "[NT] Save and finish"
-        }
-      },
-      "intervals": {
-        "title": "Intervalles d'actualisation",
-        "description": "Les valeurs sont en secondes",
-        "data": {
-          "cache_time": "Temps de mise en cache",
-          "scan_interval": "Intervalles d'actualisation des entités",
-          "interval_cpu": "Données CPU",
-          "interval_firmware": "Données du micrologiciel",
-          "interval_gwlan": "Intervalle GWLAN",
-          "interval_light": "État des LED",
-          "interval_misc": "Réglages divers",
-          "interval_network": "Données statistiques du réseau",
-          "interval_parental_control": "Données de contrôle parental",
-          "interval_ports": "Données des Ports",
-          "interval_ram": "Données RAM",
-          "interval_sysinfo": "Données Sysinfo",
-          "interval_temperature": "Température",
-          "interval_vpn": "Données VPN",
-          "interval_wan": "Données WAN",
-          "interval_wlan": "Données WLAN"
-        }
-      },
-      "events": {
-        "title": "Événements",
-        "description": "Quels événements doivent être déclenchés ?",
-        "data": {
-          "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
-          "device_disconnected": "Périphérique déconnecté",
-          "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)",
-          "node_connected": "Node AiMesh connecté (l'appareil n'a pas été suivi auparavant)",
-          "node_disconnected": "Node AiMesh déconnecté",
-          "node_reconnected": "Node AiMesh reconnecté"
-        }
-      },
-      "security": {
-        "title": "Securitée",
-        "data": {
-          "hide_passwords": "Masquer les mots de passe des capteurs et attributs"
-        }
       }
     },
     "error": {
       "access_error": "[NT] Access error. Refer to the log for details",
-      "cannot_resolve_host": "Impossible de résoudre le nom d'hôte. Essayez avec l'adresse IP",
+      "cannot_resolve": "Impossible de résoudre le nom d'hôte. Essayez avec l'adresse IP",
       "connection_error": "[NT] Connection error. Refer to the log for details",
-      "connection_refused": "Connexion rejetée",
       "error": "Échec de connexion",
       "login_blocked": "La connexion est bloquée par le routeur. Veuillez patienter",
-      "password_missing": "Mot de passe manquant",
       "timeout": "[NT] Timeout error",
       "unknown": "Erreur inconnue",
       "wrong_credentials": "Identifiants erronés"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured",
-      "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
-      "not_router": "[NT] Not an Asus router. Cannot be configured"
-    }
-  },
-  "options": {
-    "step": {
-      "options": {
-        "title": "Paramétrages à changer",
-        "menu_options": {
-          "device": "Paramètres d'identification et de connexion",
-          "operation": "Mode de fonctionnement",
-          "intervals": "Intervalles d'actualisation",
-          "events": "Événements de Home Assistant",
-          "security": "Options de sécurité",
-          "finish": "[NT] Save and finish",
-          "credentials": "Identifiants et connexion"
-        }
-      },
-      "credentials": {
-        "title": "Identifiants",
-        "description": "Les même que sur l'interface de gestion du routeur",
-        "data": {
-          "username": "Nom d'utilisateur",
-          "password": "Mot de pass",
-          "port": "Port (0 pour utiliser la valeur par défaut)",
-          "ssl": "Utiliser une connexion SSL"
-        }
-      },
-      "operation": {
-        "title": "Mode de fonctionnement",
-        "data": {
-          "mode": "Mode de l'appareil",
-          "enable_control": "Activer le contrôle des périphériques",
-          "split_intervals": "Activer les intervalles de mise à jour par capteur"
-        }
-      },
-      "intervals": {
-        "title": "Intervalles d'actualisation",
-        "description": "Les valeurs sont en secondes",
-        "data": {
-          "cache_time": "Temps de mise en cache",
-          "scan_interval": "Intervalles d'actualisation des entités",
-          "interval_cpu": "Données CPU",
-          "interval_firmware": "Données du micrologiciel",
-          "interval_gwlan": "Intervalle GWLAN",
-          "interval_light": "État des LED",
-          "interval_misc": "Réglages divers",
-          "interval_network": "Données statistiques du réseau",
-          "interval_parental_control": "Données de contrôle parental",
-          "interval_ports": "Données des Ports",
-          "interval_ram": "Données RAM",
-          "interval_sysinfo": "Données Sysinfo",
-          "interval_temperature": "Température",
-          "interval_vpn": "Données VPN",
-          "interval_wan": "Données WAN",
-          "interval_wlan": "Données WLAN"
-        }
-      },
-      "events": {
-        "title": "Événements",
-        "description": "Quels événements doivent être déclenchés ?",
-        "data": {
-          "device_connected": "Périphérique connecté (l'appareil n'a pas été suivi auparavant)",
-          "device_disconnected": "Périphérique déconnecté",
-          "device_reconnected": "Périphérique reconnecté (cet appareil était déjà suivi auparavant)",
-          "node_connected": "Node AiMesh connecté (l'appareil n'a pas été suivi auparavant)",
-          "node_disconnected": "Node AiMesh déconnecté",
-          "node_reconnected": "Node AiMesh reconnecté"
-        }
-      },
-      "security": {
-        "title": "Securitée",
-        "data": {
-          "hide_passwords": "Masquer les mots de passe des capteurs et des attributs"
-        }
-      }
-    },
-    "error": {
-      "access_error": "[NT] Access error. Refer to the log for details",
-      "connection_error": "[NT] Connection error. Refer to the log for details",
-      "connection_refused": "Connexion rejetée",
-      "error": "Échec de connexion",
-      "login_blocked": "La connexion est bloquée par le routeur, merci de patienter",
-      "not_confirmed": "Vous devez confirmer",
-      "timeout": "[NT] Timeout error",
-      "unknown": "Erreur inconnue",
-      "wrong_credentials": "Identifiants erronés"
+      "already_configured": "[NT] Device is already configured"
     }
   }
 }

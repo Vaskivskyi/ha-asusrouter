@@ -16,6 +16,7 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
+from homeassistant.helpers.device_registry import DeviceInfo
 import pytest
 
 from custom_components.asusrouter.bridge import ARBridge
@@ -182,6 +183,38 @@ async def test_identity_property() -> None:
     bridge._api = Mock(description=identity)
 
     assert bridge.identity is identity
+
+
+async def test_device_info(format_mac: SyncPatch) -> None:
+    """Test that the device information is built from the identity."""
+
+    format_mac()
+
+    bridge = await _get_bridge()
+    bridge._api = Mock(
+        async_connect=AsyncMock(), webpanel="https://192.168.1.1:8443"
+    )
+
+    with patch.object(
+        ARBridge,
+        "identity",
+        new_callable=PropertyMock,
+        return_value=_get_identity(
+            firmware=ARFirmware((3, 0, 0, 4), 388, 1, 0)
+        ),
+    ):
+        await bridge.async_connect()
+
+    assert bridge.device_info == DeviceInfo(
+        configuration_url="https://192.168.1.1:8443",
+        identifiers={(DOMAIN, MAC), (DOMAIN, SERIAL)},
+        manufacturer="Brand",
+        model="Model",
+        model_id="MODEL_ORIGINAL",
+        name="Model",
+        serial_number=SERIAL,
+        sw_version="3.0.0.4.388.1_0",
+    )
 
 
 async def test_async_connect(

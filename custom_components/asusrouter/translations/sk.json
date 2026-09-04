@@ -18,166 +18,20 @@
           "port": "Port (0 pre použitie východzej hodnoty)",
           "ssl": "Použiť pripojenie SSL"
         }
-      },
-      "operation": {
-        "title": "Prevádzkový režim",
-        "data": {
-          "mode": "[NT] Device mode",
-          "enable_control": "Povoliť ovládanie zariadenia",
-          "split_intervals": "Povoliť intervaly aktualizáce pre každý senzor"
-        }
-      },
-      "options": {
-        "title": "[NT] Additional options",
-        "menu_options": {
-          "intervals": "Intervaly aktualizácie",
-          "events": "Udalosti Home Assistant",
-          "security": "Možnosti zabezpečenia",
-          "finish": "[NT] Save and finish"
-        }
-      },
-      "intervals": {
-        "title": "Intervaly aktualizácie",
-        "description": "Hodnoty sú v sekundách",
-        "data": {
-          "cache_time": "Čas medzipamäti",
-          "scan_interval": "Aktualizácia entít",
-          "interval_cpu": "Údaje CPU",
-          "interval_firmware": "Údaje firmwaru",
-          "interval_gwlan": "Interval GWLAN",
-          "interval_light": "Stav LED",
-          "interval_misc": "Rôzne údaje",
-          "interval_network": "Údaje o štatistikách siete",
-          "interval_parental_control": "Údaje rodičovskej kontroly",
-          "interval_ports": "Údaje portov",
-          "interval_ram": "Údaje RAM",
-          "interval_sysinfo": "Údaje systémové info",
-          "interval_temperature": "Údaje o teplote",
-          "interval_vpn": "Údaje VPN",
-          "interval_wan": "Údaje WAN",
-          "interval_wlan": "Údaje WLAN"
-        }
-      },
-      "events": {
-        "title": "Udalosti",
-        "description": "Ktoré udalosti sa majú oznamovať",
-        "data": {
-          "device_connected": "Zariadenie pripojené (zariadenie nebolo predtým sledované)",
-          "device_disconnected": "Zariadenie odpojené",
-          "device_reconnected": "Zariadenie bolo znovu pripojené (toto zariadenie už bolo sledované)",
-          "node_connected": "[NT] AiMesh node connected (not seen before)",
-          "node_disconnected": "[NT] AiMesh node disconnected",
-          "node_reconnected": "[NT] AiMesh node reconnected"
-        }
-      },
-      "security": {
-        "title": "Zabezpečenie",
-        "data": {
-          "hide_passwords": "Skryť heslá zo senzorov a atribútov"
-        }
       }
     },
     "error": {
       "access_error": "[NT] Access error. Refer to the log for details",
-      "cannot_resolve_host": "Nedá sa rozpoznať názov hostiteľa. Skúste použiť IP adresu",
+      "cannot_resolve": "Nedá sa rozpoznať názov hostiteľa. Skúste použiť IP adresu",
       "connection_error": "[NT] Connection error. Refer to the log for details",
-      "connection_refused": "Pripojenie odmietnuté",
       "error": "Nepodarilo se pripojiť",
       "login_blocked": "Prihlásenie je blokované zariadením. Počkajte prosím",
-      "password_missing": "Chýba heslo",
       "timeout": "[NT] Timeout error",
       "unknown": "Neznáma chyba",
       "wrong_credentials": "Chybné prihlasovacie údaje"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured",
-      "no_serial": "[NT] This device does not provide serial number. Discovery aborted",
-      "not_router": "[NT] Not an Asus router. Cannot be configured"
-    }
-  },
-  "options": {
-    "step": {
-      "options": {
-        "title": "Zmena konfigurácií",
-        "menu_options": {
-          "credentials": "Prihlasovacie údaje a nastavenie pripojenia",
-          "operation": "Prevádzkový režim",
-          "intervals": "Intervaly aktualizácie",
-          "events": "Udalosti Home Assistant",
-          "security": "Možnosti zabezpečenia",
-          "finish": "[NT] Save and finish",
-          "device": "Parametre identifikácie a pripojenia"
-        }
-      },
-      "credentials": {
-        "title": "Prihlasovacie údaje",
-        "description": "Rovnaké ako pre webový panel zariadenia",
-        "data": {
-          "username": "Uživateľské meno",
-          "password": "Heslo",
-          "port": "Port (0 pre použitie východzej hodnoty)",
-          "ssl": "Použiť pripojenie SSL"
-        }
-      },
-      "operation": {
-        "title": "Prevádzkový režim",
-        "data": {
-          "mode": "[NT] Device mode",
-          "enable_control": "Povoliť ovladanie zariadenia",
-          "split_intervals": "Povoliť intervaly aktualizácie pre každý senzor"
-        }
-      },
-      "intervals": {
-        "title": "Intervaly aktualizáce",
-        "description": "Hodnoty sú v sekundách",
-        "data": {
-          "cache_time": "Čas mezipamäte",
-          "scan_interval": "Aktualizácia entít",
-          "interval_cpu": "Údaje CPU",
-          "interval_firmware": "Údaje firmwaru",
-          "interval_gwlan": "Interval GWLAN",
-          "interval_light": "Stav LED",
-          "interval_misc": "Rôzne údaje",
-          "interval_network": "Údaje o statistikách siete",
-          "interval_parental_control": "Údaje rodičovskej kontroly",
-          "interval_ports": "Údaje portov",
-          "interval_ram": "Údaje RAM",
-          "interval_sysinfo": "Údaje systémové info",
-          "interval_temperature": "Údaje o teplote",
-          "interval_vpn": "Údaje VPN",
-          "interval_wan": "Údaje WAN",
-          "interval_wlan": "Údaje WLAN"
-        }
-      },
-      "events": {
-        "title": "Udalosti",
-        "description": "Ktoré udalosti sa majú oznamovať",
-        "data": {
-          "device_connected": "Zariadenie pripojené (zariadenie nebolo predtým sledované)",
-          "device_disconnected": "Zariadenie odpojené",
-          "device_reconnected": "Zariadenie bolo znovu pripojené (toto zariadenie už bolo sledované)",
-          "node_connected": "[NT] AiMesh node connected (not seen before)",
-          "node_disconnected": "[NT] AiMesh node disconnected",
-          "node_reconnected": "[NT] AiMesh node reconnected"
-        }
-      },
-      "security": {
-        "title": "Zabezpečenie",
-        "data": {
-          "hide_passwords": "Skryť heslá zo senzorov a atribútov"
-        }
-      }
-    },
-    "error": {
-      "access_error": "[NT] Access error. Refer to the log for details",
-      "connection_error": "[NT] Connection error. Refer to the log for details",
-      "connection_refused": "Pripojenie odmietnuté",
-      "error": "Nepodarilo se pripojiť",
-      "login_blocked": "Prihlásenie je blokované zariadením. Čakaje prosím",
-      "not_confirmed": "Nepotvrdené",
-      "timeout": "[NT] Timeout error",
-      "unknown": "Neznámá chyba",
-      "wrong_credentials": "Chybné prihlasovacie údaje"
+      "already_configured": "[NT] Device is already configured"
     }
   }
 }

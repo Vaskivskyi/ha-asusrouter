@@ -19,7 +19,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 
 from .const import CONF_DEFAULT_PORT, DEFAULT_IDENTITY_NAME, DOMAIN
 
@@ -115,6 +115,21 @@ class ARBridge:
         """Return connection state."""
 
         return self._api.connected
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device information for Home Assistant."""
+
+        return DeviceInfo(
+            configuration_url=self.configuration_url,
+            identifiers=self.identifiers,
+            manufacturer=self.manufacturer,
+            model=self.model,
+            model_id=self.model_id,
+            name=self.name,
+            serial_number=self.serial_number,
+            sw_version=self.sw_version,
+        )
 
     @property
     def identifiers(self) -> set[tuple[str, str]]:
