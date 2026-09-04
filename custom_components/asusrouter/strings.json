@@ -30,28 +30,10 @@
       "options": {
         "title": "Additional options",
         "menu_options": {
-          "connected_devices": "Connected devices",
           "intervals": "Update intervals",
-          "interfaces": "Interfaces to monitor",
           "events": "Home Assistant events",
           "security": "Security options",
           "finish": "Save and finish"
-        }
-      },
-      "connected_devices": {
-        "title": "Connected devices",
-        "data": {
-          "track_devices": "Enable device trackers",
-          "client_device": "Create a device when I enable device_tracker entity",
-          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
-          "client_filter": "Filter clients",
-          "client_filter_list": "List of clients to filter (only active if filter is enabled)",
-          "force_clients": "Force clients update",
-          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
-          "latest_connected": "Number of latest connected devices to store",
-          "interval_devices": "Devices / AiMesh update",
-          "consider_home": "Consider device at home for (after last 'online' state)",
-          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -74,14 +56,6 @@
           "interval_vpn": "VPN data",
           "interval_wan": "WAN data",
           "interval_wlan": "WLAN data"
-        }
-      },
-      "interfaces": {
-        "title": "Interfaces to monitor",
-        "data": {
-          "interfaces": "Select network interfaces to monitor",
-          "units_speed": "Units for speed",
-          "units_traffic": "Units for traffic"
         }
       },
       "events": {
@@ -128,9 +102,7 @@
         "menu_options": {
           "credentials": "Credentials and connection",
           "operation": "Operation mode",
-          "connected_devices": "Connected devices",
           "intervals": "Update intervals",
-          "interfaces": "Interfaces to monitor",
           "events": "Home Assistant events",
           "security": "Security options",
           "finish": "Save and finish"
@@ -154,22 +126,6 @@
           "split_intervals": "Enable per-sensor update intervals"
         }
       },
-      "connected_devices": {
-        "title": "Connected devices",
-        "data": {
-          "track_devices": "Enable device trackers",
-          "client_device": "Create a device when I enable device_tracker entity",
-          "clients_in_attr": "Store clients list in attributes of the connected devices sensor",
-          "client_filter": "Filter clients",
-          "client_filter_list": "List of clients to filter (only active if filter is enabled)",
-          "force_clients": "Force clients update",
-          "force_clients_waittime": "Wait time (force update -> check) (seconds)",
-          "latest_connected": "Number of latest connected devices to store",
-          "interval_devices": "Devices / AiMesh update",
-          "consider_home": "Consider device at home for (after last 'online' state)",
-          "create_devices": "Create HA devices when creating clients entities"
-        }
-      },
       "intervals": {
         "title": "Update intervals",
         "description": "Values are in seconds",
@@ -190,14 +146,6 @@
           "interval_vpn": "VPN data",
           "interval_wan": "WAN data",
           "interval_wlan": "WLAN data"
-        }
-      },
-      "interfaces": {
-        "title": "Interfaces to monitor",
-        "data": {
-          "interfaces": "Select network interfaces to monitor",
-          "units_speed": "Units for speed",
-          "units_traffic": "Units for traffic"
         }
       },
       "events": {
@@ -229,41 +177,6 @@
       "timeout": "Timeout error",
       "unknown": "Unknown error",
       "wrong_credentials": "Wrong credentials"
-    }
-  },
-  "services": {
-    "device_internet_access": {
-      "name": "Device internet access control",
-      "description": "Change device internet access using parental control feature of the router. Please, refer to the documentation for the additional possible parameters",
-      "fields": {
-        "entities": {
-          "name": "Entities",
-          "description": "Select device(s) to change internet access settings"
-        },
-        "state": {
-          "name": "State",
-          "description": "Set the state for the device(s)"
-        }
-      }
-    },
-    "remove_trackers": {
-      "name": "Remove device trackers",
-      "description": "Remove device trackers from the device registry. Please, keep in mind, when run, the service will remove selected trackers from watching and will allow you to remove the entities manually.",
-      "fields": {
-        "entities": {
-          "name": "Entities",
-          "description": "Select device(s) to remove from the device registry"
-        }
-      }
-    }
-  },
-  "selector": {
-    "set_pc_rule": {
-      "options": {
-        "allow": "Allow access",
-        "block": "Block access",
-        "remove": "Remove rule from the list"
-      }
     }
   }
 }

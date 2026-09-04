@@ -30,28 +30,10 @@
       "options": {
         "title": "[NT] Additional options",
         "menu_options": {
-          "connected_devices": "[NT] Connected devices",
           "intervals": "Intervaly aktualizácie",
-          "interfaces": "Rozhrania sledovania",
           "events": "Udalosti Home Assistant",
           "security": "Možnosti zabezpečenia",
           "finish": "[NT] Save and finish"
-        }
-      },
-      "connected_devices": {
-        "title": "Connected devices",
-        "data": {
-          "track_devices": "Povoliť sledovanie zariadení",
-          "client_device": "[NT] Create a device when I enable device_tracker entity",
-          "clients_in_attr": "[NT] Store clients list in attributes of the connected devices sensor",
-          "client_filter": "[NT] Filter clients",
-          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
-          "force_clients": "[NT] Force clients update",
-          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
-          "latest_connected": "Počet najnovších pripojených zariadení pre uloženie",
-          "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
-          "create_devices": "Create HA devices when creating clients entities"
         }
       },
       "intervals": {
@@ -74,14 +56,6 @@
           "interval_vpn": "Údaje VPN",
           "interval_wan": "Údaje WAN",
           "interval_wlan": "Údaje WLAN"
-        }
-      },
-      "interfaces": {
-        "title": "Rozhranie sledovania",
-        "data": {
-          "interfaces": "Vyberte sieťové rozhranie sledovania",
-          "units_speed": "Jednotky pre rýchlost",
-          "units_traffic": "Jednotky pre sieťovú prevádzku"
         }
       },
       "events": {
@@ -128,9 +102,7 @@
         "menu_options": {
           "credentials": "Prihlasovacie údaje a nastavenie pripojenia",
           "operation": "Prevádzkový režim",
-          "connected_devices": "[NT] Connected devices",
           "intervals": "Intervaly aktualizácie",
-          "interfaces": "Rozhrania sledovania",
           "events": "Udalosti Home Assistant",
           "security": "Možnosti zabezpečenia",
           "finish": "[NT] Save and finish",
@@ -155,22 +127,6 @@
           "split_intervals": "Povoliť intervaly aktualizácie pre každý senzor"
         }
       },
-      "connected_devices": {
-        "title": "Connected devices",
-        "data": {
-          "track_devices": "Povoliť sledovanie zariadení",
-          "client_device": "[NT] Create a device when I enable device_tracker entity",
-          "clients_in_attr": "[NT] Store clients list in attributes of the connected devices sensor",
-          "client_filter": "[NT] Filter clients",
-          "client_filter_list": "[NT] List of clients to filter (only active if filter is enabled)",
-          "force_clients": "[NT] Force clients update",
-          "force_clients_waittime": "[NT] Wait time (force update -> check) (seconds)",
-          "latest_connected": "Počet najnovších pripojených zariadení pre uloženie",
-          "interval_devices": "[NT] Devices / AiMesh update",
-          "consider_home": "Považovať zariadenie že je doma (po poslednom 'online' stave)",
-          "create_devices": "Create HA devices when creating clients entities"
-        }
-      },
       "intervals": {
         "title": "Intervaly aktualizáce",
         "description": "Hodnoty sú v sekundách",
@@ -191,14 +147,6 @@
           "interval_vpn": "Údaje VPN",
           "interval_wan": "Údaje WAN",
           "interval_wlan": "Údaje WLAN"
-        }
-      },
-      "interfaces": {
-        "title": "Rozhranie sledovania",
-        "data": {
-          "interfaces": "Vyberte sieťové rozhranie sledovania",
-          "units_speed": "Jednotky pre rýchlosť",
-          "units_traffic": "Jednotky pre sieťovú prevádzku"
         }
       },
       "events": {
@@ -230,41 +178,6 @@
       "timeout": "[NT] Timeout error",
       "unknown": "Neznámá chyba",
       "wrong_credentials": "Chybné prihlasovacie údaje"
-    }
-  },
-  "services": {
-    "device_internet_access": {
-      "name": "Device internet access control",
-      "description": "Change device internet access using parental control feature of the router. Please, refer to the documentation for the additional possible parameters",
-      "fields": {
-        "entities": {
-          "name": "Entities",
-          "description": "Select device(s) to change internet access settings"
-        },
-        "state": {
-          "name": "State",
-          "description": "Set the state for the device(s)"
-        }
-      }
-    },
-    "remove_trackers": {
-      "name": "Remove device trackers",
-      "description": "Remove device trackers from the device registry. Please, keep in mind, when run, the service will remove selected trackers from watching and will allow you to remove the entities manually.",
-      "fields": {
-        "entities": {
-          "name": "Entities",
-          "description": "Select device(s) to remove from the device registry"
-        }
-      }
-    }
-  },
-  "selector": {
-    "set_pc_rule": {
-      "options": {
-        "allow": "Allow access",
-        "block": "Block access",
-        "remove": "Remove rule from the list"
-      }
     }
   }
 }

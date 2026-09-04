@@ -4,15 +4,20 @@ from __future__ import annotations
 
 import logging
 
+from asusrouter import AsusRouterError
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import Event, HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .const import ASUSROUTER, DOMAIN, PLATFORMS, STOP_LISTENER
-from .router import ARDevice
+from .bridge import ARBridge
+from .const import ASUSROUTER, DOMAIN, STOP_LISTENER
 
 _LOGGER = logging.getLogger(__name__)
+
+# The last entry version that stored the network interval under its old name
+VERSION_LEGACY_INTERVAL_NETWORK = 4
 
 
 async def async_setup_entry(
@@ -23,28 +28,35 @@ async def async_setup_entry(
 
     _LOGGER.debug("Setting up entry")
 
-    router = ARDevice(hass, config_entry)
-    await router.setup()
+    bridge = ARBridge(
+        hass, dict(config_entry.data), dict(config_entry.options)
+    )
 
-    router.async_on_close(config_entry.add_update_listener(update_listener))
+    try:
+        await bridge.async_connect()
+    except AsusRouterError as ex:
+        await bridge.async_clean()
+        raise ConfigEntryNotReady(
+            f"Cannot connect to `{config_entry.data.get(CONF_HOST)}`"
+        ) from ex
 
-    async def async_close_connection(event):
+    config_entry.async_on_unload(
+        config_entry.add_update_listener(update_listener)
+    )
+
+    async def async_close_connection(event: Event) -> None:
         """Close router connection on HA stop."""
 
-        await router.close()
+        await bridge.async_clean()
 
     stop_listener = hass.bus.async_listen_once(
         EVENT_HOMEASSISTANT_STOP, async_close_connection
     )
 
     hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = {
-        ASUSROUTER: router,
+        ASUSROUTER: bridge,
         STOP_LISTENER: stop_listener,
     }
-
-    await hass.config_entries.async_forward_entry_setups(
-        config_entry, PLATFORMS
-    )
 
     return True
 
@@ -57,17 +69,11 @@ async def async_unload_entry(
 
     _LOGGER.debug("Unloading entry")
 
-    unload = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
-    )
+    entry_data = hass.data[DOMAIN].pop(config_entry.entry_id)
+    entry_data[STOP_LISTENER]()
+    await entry_data[ASUSROUTER].async_clean()
 
-    if unload:
-        # Close connection
-        hass.data[DOMAIN][config_entry.entry_id][STOP_LISTENER]()
-        await hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER].close()
-        hass.data[DOMAIN].pop(config_entry.entry_id)
-
-    return unload
+    return True
 
 
 async def update_listener(
@@ -78,10 +84,7 @@ async def update_listener(
 
     _LOGGER.debug("Update listener activated")
 
-    router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
-
-    if router.update_options(config_entry.options):
-        await hass.config_entries.async_reload(config_entry.entry_id)
+    await hass.config_entries.async_reload(config_entry.entry_id)
 
 
 # Example migration function
@@ -92,7 +95,7 @@ async def async_migrate_entry(
 
     _LOGGER.debug("Migrating from version %s", config_entry.version)
 
-    if config_entry.version == 4:  # noqa: PLR2004
+    if config_entry.version == VERSION_LEGACY_INTERVAL_NETWORK:
         new_options = {**config_entry.options}
         new_options["interval_network"] = new_options.pop(
             "interval_network_stat", 30

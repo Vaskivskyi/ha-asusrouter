@@ -29,7 +29,7 @@ class UniversalMockPatcher:
         """Patch a method on the provided object."""
 
         patcher = patch.object(obj, method_name, new_callable=mock_type)
-        mock_method = patcher.start()
+        mock_method: AsyncMock | Mock = patcher.start()
         self.patches.append(patcher)
         if side_effect is not None:
             mock_method.side_effect = side_effect
@@ -64,18 +64,6 @@ def mock_create_clientsession(
     ) -> Mock:
         return universal_mock.patch(
             obj, "async_create_clientsession", side_effect, return_value, Mock
-        )
-
-    return _patch
-
-
-@pytest.fixture(name="get_cookie_jar")
-def mock_get_cookie_jar(universal_mock: UniversalMockPatcher) -> SyncPatch:
-    """Mock the get_cookie_jar function."""
-
-    def _patch(side_effect: Any = None, return_value: Any = None) -> Mock:
-        return universal_mock.patch(
-            bridge_module, "get_cookie_jar", side_effect, return_value, Mock
         )
 
     return _patch
