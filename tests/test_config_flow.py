@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock, Mock, patch
 from asusrouter.error import (
     AsusRouterAccessError,
     AsusRouterConnectionError,
+    AsusRouterSSLCertificateError,
     AsusRouterTimeoutError,
 )
 from asusrouter.modules.endpoint.error import ARAccessError
@@ -70,7 +71,7 @@ def _mock_bridge(
 
     bridge = Mock(
         async_connect=AsyncMock(side_effect=connect),
-        async_clean=AsyncMock(),
+        async_close=AsyncMock(),
         identity=Mock(serial=serial),
     )
 
@@ -83,26 +84,32 @@ def _access_error(error: ARAccessError, **attributes: Any) -> Exception:
     return AsusRouterAccessError("Access error", error, attributes)
 
 
-# HELPERS ->
+# ---------------------------
+# HELPERS -->
+# ---------------------------
 
 
 async def test_check_host_resolves() -> None:
-    """Test that a resolvable host returns its IP address."""
+    """Test that a resolvable host is accepted."""
 
     with patch.object(socket, "gethostbyname", return_value=HOST):
-        assert _check_host("router.local") == HOST
+        assert _check_host("router.local") is True
 
 
 async def test_check_host_cannot_resolve() -> None:
-    """Test that an unresolvable host returns nothing."""
+    """Test that an unresolvable host is rejected."""
 
     with patch.object(socket, "gethostbyname", side_effect=socket.gaierror):
-        assert _check_host("router.local") is None
+        assert _check_host("router.local") is False
 
 
-# <- HELPERS
+# ---------------------------
+# <-- HELPERS
+# ---------------------------
 
-# CONNECTION CHECK ->
+# ---------------------------
+# CONNECTION CHECK -->
+# ---------------------------
 
 
 async def test_check_connection_success() -> None:
@@ -116,7 +123,7 @@ async def test_check_connection_success() -> None:
             None,
         )
 
-    bridge.async_clean.assert_awaited_once()
+    bridge.async_close.assert_awaited_once()
 
 
 @pytest.mark.parametrize(
@@ -132,6 +139,8 @@ async def test_check_connection_success() -> None:
         (_access_error(ARAccessError.NO_TOKEN), RESULT_ACCESS_ERROR),
         (AsusRouterTimeoutError(), RESULT_TIMEOUT),
         (AsusRouterConnectionError(), RESULT_CONNECTION_ERROR),
+        # Known to the library, but without a mapping of its own
+        (AsusRouterSSLCertificateError(), RESULT_ERROR),
         (ValueError("anything else"), RESULT_UNKNOWN),
     ],
 )
@@ -149,12 +158,16 @@ async def test_check_connection_errors(
         )
 
     # The session is closed even when the connection fails
-    bridge.async_clean.assert_awaited_once()
+    bridge.async_close.assert_awaited_once()
 
 
-# <- CONNECTION CHECK
+# ---------------------------
+# <-- CONNECTION CHECK
+# ---------------------------
 
-# FORMS ->
+# ---------------------------
+# FORMS -->
+# ---------------------------
 
 
 @pytest.mark.parametrize(
@@ -196,9 +209,13 @@ async def test_create_forms_prefilled(
     assert defaults[key] == user_input[key]
 
 
-# <- FORMS
+# ---------------------------
+# <-- FORMS
+# ---------------------------
 
-# CONFIG FLOW ->
+# ---------------------------
+# CONFIG FLOW -->
+# ---------------------------
 
 
 @dataclass
@@ -341,9 +358,13 @@ async def test_flow_step_credentials_success(
     mocks.entry.assert_called_once_with(title=HOST, data=ENTRY_DATA)
 
 
-# <- CONFIG FLOW
+# ---------------------------
+# <-- CONFIG FLOW
+# ---------------------------
 
-# RECONFIGURE ->
+# ---------------------------
+# RECONFIGURE -->
+# ---------------------------
 
 
 @pytest.fixture(name="reconfigure_flow")
@@ -417,4 +438,6 @@ async def test_flow_step_reconfigure_success(
     mocks.reload_and_abort.assert_called_once_with(entry, data=user_input)
 
 
-# <- RECONFIGURE
+# ---------------------------
+# <-- RECONFIGURE
+# ---------------------------

@@ -1,7 +1,8 @@
-"""AsusRouter config flow module."""
+"""Config flow module for AsusRouter."""
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import logging
 import socket
 from typing import Any
@@ -9,6 +10,7 @@ from typing import Any
 from asusrouter.error import (
     AsusRouterAccessError,
     AsusRouterConnectionError,
+    AsusRouterError,
     AsusRouterTimeoutError,
 )
 from asusrouter.modules.endpoint.error import ARAccessError
@@ -31,7 +33,6 @@ from .const import (
     CONF_DEFAULT_SSL,
     CONF_DEFAULT_USERNAME,
     DOMAIN,
-    ENTRY_VERSION,
     RESULT_ACCESS_ERROR,
     RESULT_CANNOT_RESOLVE,
     RESULT_CONNECTION_ERROR,
@@ -58,20 +59,25 @@ ACCESS_ERRORS: dict[ARAccessError, str] = {
 }
 
 
-def _check_host(
-    host: str,
-) -> str | None:
-    """Get the IP address for the hostname."""
+# ---------------------------
+# HELPERS -->
+# ---------------------------
+
+
+def _check_host(host: str) -> bool:
+    """Check whether the hostname can be resolved."""
 
     try:
-        return socket.gethostbyname(host)
+        socket.gethostbyname(host)
     except socket.gaierror:
-        return None
+        return False
+
+    return True
 
 
 async def _async_check_connection(
     hass: HomeAssistant,
-    configs: dict[str, Any],
+    configs: Mapping[str, Any],
 ) -> tuple[str | None, str | None]:
     """Connect to the device.
 
@@ -86,9 +92,14 @@ async def _async_check_connection(
 
     try:
         await bridge.async_connect()
+        # Serial number of the device is the best unique_id.
+        # API provides it all the time for all the devices.
+        # MAC as an alternative might not be used / found on some
+        # older devices and some Merlin-builds of FW
+        serial = bridge.identity.serial
     except AsusRouterAccessError as ex:
         error = ACCESS_ERRORS.get(ex.args[1], RESULT_ACCESS_ERROR)
-        _LOGGER.error(
+        _LOGGER.debug(
             "Access error `%s` while connecting to `%s`: %s",
             error,
             host,
@@ -96,40 +107,46 @@ async def _async_check_connection(
         )
         return None, error
     except AsusRouterTimeoutError as ex:
-        _LOGGER.error("Timeout while connecting to `%s`: %s", host, ex)
+        _LOGGER.debug("Timeout while connecting to `%s`: %s", host, ex)
         return None, RESULT_TIMEOUT
     except AsusRouterConnectionError as ex:
-        _LOGGER.error("Cannot connect to `%s`: %s", host, ex)
+        _LOGGER.debug("Cannot connect to `%s`: %s", host, ex)
         return None, RESULT_CONNECTION_ERROR
-    except Exception as ex:  # noqa: BLE001
-        _LOGGER.error(
-            "Unknown error of type `%s` while connecting to `%s`: %s",
-            type(ex),
+    except AsusRouterError as ex:
+        # Recognised by the library, but without a mapping of its own
+        _LOGGER.debug(
+            "Device error `%s` while connecting to `%s`: %s",
+            type(ex).__name__,
             host,
             ex,
         )
+        return None, RESULT_ERROR
+    except Exception:
+        # Only a genuine fault reaches this point, so keep the traceback
+        _LOGGER.exception("Unknown error while connecting to `%s`", host)
         return None, RESULT_UNKNOWN
     finally:
         # Cleanup, so no unclosed sessions will be reported
-        await bridge.async_clean()
+        await bridge.async_close()
 
-    # Serial number of the device is the best unique_id.
-    # API provides it all the time for all the devices.
-    # MAC as an alternative might not be used / found on some
-    # older devices and some Merlin-builds of FW
-    return bridge.identity.serial, None
+    return serial, None
 
 
-# FORMS ->
+# ---------------------------
+# <-- HELPERS
+# ---------------------------
+
+# ---------------------------
+# FORMS -->
+# ---------------------------
 
 
 def _create_form_find(
-    user_input: dict[str, Any] | None = None,
+    user_input: Mapping[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the 'find' step."""
 
-    if not user_input:
-        user_input = {}
+    user_input = user_input or {}
 
     return vol.Schema(
         {
@@ -141,12 +158,11 @@ def _create_form_find(
 
 
 def _create_form_credentials(
-    user_input: dict[str, Any] | None = None,
+    user_input: Mapping[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the 'credentials' step."""
 
-    if not user_input:
-        user_input = {}
+    user_input = user_input or {}
 
     return vol.Schema(
         {
@@ -169,7 +185,7 @@ def _create_form_credentials(
 
 
 def _create_form_reconfigure(
-    user_input: dict[str, Any] | None = None,
+    user_input: Mapping[str, Any] | None = None,
 ) -> vol.Schema:
     """Create a form for the `reconfigure` step."""
 
@@ -178,20 +194,27 @@ def _create_form_reconfigure(
     )
 
 
-# <- FORMS
+# ---------------------------
+# <-- FORMS
+# ---------------------------
+
+
+# ---------------------------
+# CONFIG FLOW -->
+# ---------------------------
 
 
 class ARFlowHandler(ConfigFlow, domain=DOMAIN):
     """Handle config flow for AsusRouter."""
 
-    VERSION = ENTRY_VERSION
+    # Connection settings live in the entry data, options are unused
+    VERSION = 6
 
     def __init__(self) -> None:
         """Initialise config flow."""
 
         self._configs: dict[str, Any] = {}
 
-    # User setup
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
@@ -200,7 +223,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_find(user_input)
 
-    # Find the device
     async def async_step_find(
         self,
         user_input: dict[str, Any] | None = None,
@@ -210,11 +232,10 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input:
-            # Check if host can be resolved
-            ip = await self.hass.async_add_executor_job(
+            resolved = await self.hass.async_add_executor_job(
                 _check_host, user_input[CONF_HOST]
             )
-            if ip:
+            if resolved:
                 self._configs.update(user_input)
                 return await self.async_step_credentials()
 
@@ -226,7 +247,6 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Credentials & connection
     async def async_step_credentials(
         self,
         user_input: dict[str, Any] | None = None,
@@ -257,12 +277,11 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    # Change the connection settings of a configured device
     async def async_step_reconfigure(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
-        """Reconfigure step."""
+        """Change the connection settings of a configured device."""
 
         entry = self._get_reconfigure_entry()
 
@@ -285,8 +304,11 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id=STEP_RECONFIGURE,
-            data_schema=_create_form_reconfigure(
-                user_input if user_input else dict(entry.data)
-            ),
+            data_schema=_create_form_reconfigure(user_input or entry.data),
             errors=errors,
         )
+
+
+# ---------------------------
+# <-- CONFIG FLOW
+# ---------------------------

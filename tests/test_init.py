@@ -18,20 +18,14 @@ import pytest
 
 from custom_components.asusrouter import (
     ARRuntimeData,
-    async_migrate_entry,
     async_setup_entry,
     async_unload_entry,
-    update_listener,
 )
-from custom_components.asusrouter.const import ENTRY_VERSION
 
 pytestmark = pytest.mark.asyncio
 
 ENTRY_ID = "entry_id"
 HOST = "192.168.1.1"
-
-# The stop listener and the update listener
-UNLOAD_LISTENERS = 2
 
 ENTRY_DATA: dict[str, Any] = {
     CONF_HOST: HOST,
@@ -49,26 +43,17 @@ def _get_hass() -> Mock:
 
     hass = Mock()
     hass.bus.async_listen_once = Mock(return_value=Mock())
-    hass.config_entries.async_reload = AsyncMock()
-    hass.config_entries.async_update_entry = Mock()
 
     return hass
 
 
-def _get_entry(
-    data: dict[str, Any] | None = None,
-    options: dict[str, Any] | None = None,
-    version: int = ENTRY_VERSION,
-) -> Mock:
+def _get_entry() -> Mock:
     """Create a config entry with the used parts mocked."""
 
     return Mock(
-        data=data if data is not None else ENTRY_DATA,
-        options=options if options is not None else {},
+        data=ENTRY_DATA,
         entry_id=ENTRY_ID,
-        version=version,
         async_on_unload=Mock(),
-        add_update_listener=Mock(return_value=Mock()),
     )
 
 
@@ -77,12 +62,14 @@ def _get_bridge(connect: Any = None) -> Mock:
 
     return Mock(
         async_connect=AsyncMock(side_effect=connect),
-        async_clean=AsyncMock(),
+        async_close=AsyncMock(),
         device_info=DEVICE_INFO,
     )
 
 
-# SETUP ->
+# ---------------------------
+# SETUP -->
+# ---------------------------
 
 
 async def test_setup_entry() -> None:
@@ -125,8 +112,8 @@ async def test_setup_entry_registers_device() -> None:
     )
 
 
-async def test_setup_entry_registers_listeners() -> None:
-    """Test that the stop and update listeners are tied to the entry."""
+async def test_setup_entry_registers_stop_listener() -> None:
+    """Test that the stop listener is removed together with the entry."""
 
     hass = _get_hass()
     entry = _get_entry()
@@ -140,8 +127,9 @@ async def test_setup_entry_registers_listeners() -> None:
     ):
         await async_setup_entry(hass, entry)
 
-    entry.add_update_listener.assert_called_once_with(update_listener)
-    assert entry.async_on_unload.call_count == UNLOAD_LISTENERS
+    entry.async_on_unload.assert_called_once_with(
+        hass.bus.async_listen_once.return_value
+    )
 
 
 async def test_setup_entry_cannot_connect() -> None:
@@ -159,7 +147,7 @@ async def test_setup_entry_cannot_connect() -> None:
     ):
         await async_setup_entry(hass, entry)
 
-    bridge.async_clean.assert_awaited_once()
+    bridge.async_close.assert_awaited_once()
 
 
 async def test_setup_entry_closes_on_stop() -> None:
@@ -180,12 +168,16 @@ async def test_setup_entry_closes_on_stop() -> None:
     close_connection = hass.bus.async_listen_once.call_args.args[1]
     await close_connection(Mock())
 
-    bridge.async_clean.assert_awaited_once()
+    bridge.async_close.assert_awaited_once()
 
 
-# <- SETUP
+# ---------------------------
+# <-- SETUP
+# ---------------------------
 
-# LIFECYCLE ->
+# ---------------------------
+# LIFECYCLE -->
+# ---------------------------
 
 
 async def test_unload_entry() -> None:
@@ -197,76 +189,9 @@ async def test_unload_entry() -> None:
 
     assert await async_unload_entry(_get_hass(), entry) is True
 
-    bridge.async_clean.assert_awaited_once()
+    bridge.async_close.assert_awaited_once()
 
 
-async def test_update_listener() -> None:
-    """Test that changed settings reload the entry."""
-
-    hass = _get_hass()
-
-    await update_listener(hass, _get_entry())
-
-    hass.config_entries.async_reload.assert_awaited_once_with(ENTRY_ID)
-
-
-# <- LIFECYCLE
-
-# MIGRATION ->
-
-
-async def test_migrate_entry() -> None:
-    """Test that the connection is kept and every other option dropped."""
-
-    hass = _get_hass()
-    entry = _get_entry(
-        data={CONF_HOST: HOST},
-        options={
-            CONF_USERNAME: "user",
-            CONF_PASSWORD: "password",
-            CONF_PORT: 8443,
-            CONF_SSL: True,
-            "mode": "router",
-            "interval_network": 30,
-            "hide_passwords": False,
-        },
-        version=5,
-    )
-
-    assert await async_migrate_entry(hass, entry) is True
-
-    hass.config_entries.async_update_entry.assert_called_once_with(
-        entry, data=ENTRY_DATA, options={}, version=ENTRY_VERSION
-    )
-
-
-async def test_migrate_entry_partial_data() -> None:
-    """Test that a missing connection key is not invented."""
-
-    hass = _get_hass()
-    entry = _get_entry(
-        data={CONF_HOST: HOST},
-        options={CONF_USERNAME: "user", CONF_PASSWORD: "password"},
-        version=5,
-    )
-
-    await async_migrate_entry(hass, entry)
-
-    assert hass.config_entries.async_update_entry.call_args.kwargs["data"] == {
-        CONF_HOST: HOST,
-        CONF_USERNAME: "user",
-        CONF_PASSWORD: "password",
-    }
-
-
-async def test_migrate_entry_current_version() -> None:
-    """Test that a current entry is not migrated."""
-
-    hass = _get_hass()
-
-    assert await async_migrate_entry(hass, _get_entry()) is True
-
-    hass.config_entries.async_update_entry.assert_not_called()
-
-
-# <- MIGRATION
+# ---------------------------
+# <-- LIFECYCLE
+# ---------------------------

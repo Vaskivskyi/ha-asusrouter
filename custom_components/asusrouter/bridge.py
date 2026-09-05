@@ -1,14 +1,13 @@
-"""AsusRouter bridge module."""
+"""Bridge module for AsusRouter."""
 
 from __future__ import annotations
 
-import logging
+from collections.abc import Mapping
 from typing import Any
 
 import aiohttp
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfigKey as ARConfKey
-from asusrouter.const import DEFAULT_IDENTITY_BRAND
+from asusrouter.config import ARConfigKey
 from asusrouter.modules.device.identity import ARDeviceIdentity
 from homeassistant.const import (
     CONF_HOST,
@@ -23,7 +22,11 @@ from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 
 from .const import CONF_DEFAULT_PORT, DEFAULT_IDENTITY_NAME, DOMAIN
 
-_LOGGER = logging.getLogger(__name__)
+API_CONFIG: dict[ARConfigKey, Any] = {
+    # Enable automatic temperature fix and disable the notification
+    ARConfigKey.OPTIMISTIC_TEMPERATURE: True,
+    ARConfigKey.NOTIFIED_OPTIMISTIC_TEMPERATURE: True,
+}
 
 
 class ARBridge:
@@ -32,49 +35,48 @@ class ARBridge:
     def __init__(
         self,
         hass: HomeAssistant,
-        configs: dict[str, Any],
-        options: dict[str, Any] | None = None,
+        configs: Mapping[str, Any],
     ) -> None:
         """Initialize bridge to the library."""
 
-        self.hass = hass
-
-        # Save all the HA configs and options
-        self._configs = configs.copy()
-        if options:
-            self._configs.update(options)
-
-        # Get session from HA
-        # By default, don't verify SSL <- this is a temp solution
-        # which should be done properly in the future
         session = async_create_clientsession(
             hass,
+            # TODO: implement proper SSL verification eventually
             verify_ssl=False,
             # Routers set cookies for a bare IP and do not quote them
             cookie_jar=aiohttp.CookieJar(unsafe=True, quote_cookie=False),
         )
 
-        # Initialize API
-        self._api = self._get_api(
-            self._configs, session, self._get_api_config()
-        )
+        self._api = self._get_api(configs, session)
 
-        self._host = self._configs[CONF_HOST]
+    # ---------------------------
+    # Properties -->
+    # ---------------------------
 
-        # Define properties
-        self._identifiers: set[tuple[str, str]] = set()
-        self._manufacturer = DEFAULT_IDENTITY_BRAND
-        self._model: str | None = None
-        self._model_id: str | None = None
-        self._name: str = DEFAULT_IDENTITY_NAME
-        self._serial_number: str | None = None
-        self._sw_version: str | None = None
+    @property
+    def api(self) -> AsusRouter:
+        """Return API."""
+
+        return self._api
+
+    @property
+    def identity(self) -> ARDeviceIdentity:
+        """Return device identity."""
+
+        return self._api.description
+
+    # ---------------------------
+    # <-- Properties
+    # ---------------------------
+
+    # ---------------------------
+    # Connection -->
+    # ---------------------------
 
     @staticmethod
     def _get_api(
-        configs: dict[str, Any],
+        configs: Mapping[str, Any],
         session: aiohttp.ClientSession,
-        config: dict[ARConfKey, Any],
     ) -> AsusRouter:
         """Get AsusRouter API."""
 
@@ -85,144 +87,58 @@ class ARBridge:
             port=configs.get(CONF_PORT, CONF_DEFAULT_PORT),
             use_ssl=configs[CONF_SSL],
             session=session,
-            config=config,
+            config=API_CONFIG,
         )
 
-    def _get_api_config(self) -> dict[ARConfKey, Any]:
-        """Get configuration for AsusRouter instance."""
+    async def async_connect(self) -> None:
+        """Connect to the device and read its identity."""
 
-        return {
-            # Enable automatic temperature fix
-            ARConfKey.OPTIMISTIC_TEMPERATURE: True,
-            # Disable log warning message
-            ARConfKey.NOTIFIED_OPTIMISTIC_TEMPERATURE: True,
-        }
+        await self._api.async_connect()
 
-    @property
-    def api(self) -> AsusRouter:
-        """Return API."""
+    async def async_close(self) -> None:
+        """Log out from the device and release the connection."""
 
-        return self._api
+        await self._api.async_close()
 
-    @property
-    def configuration_url(self) -> str:
-        """Return device configuration URL."""
+    # ---------------------------
+    # <-- Connection
+    # ---------------------------
 
-        return self._api.webpanel
+    # ---------------------------
+    # Device -->
+    # ---------------------------
 
-    @property
-    def connected(self) -> bool:
-        """Return connection state."""
+    @staticmethod
+    def _get_identifiers(identity: ARDeviceIdentity) -> set[tuple[str, str]]:
+        """Get device identifiers."""
 
-        return self._api.connected
+        identifiers: set[tuple[str, str]] = set()
+        if identity.mac is not None:
+            identifiers.add((DOMAIN, format_mac(str(identity.mac))))
+        if identity.serial is not None:
+            identifiers.add((DOMAIN, identity.serial))
+
+        return identifiers
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Return device information for Home Assistant."""
+        """Return device information."""
+
+        identity = self.identity
+        firmware = identity.firmware
 
         return DeviceInfo(
-            configuration_url=self.configuration_url,
-            identifiers=self.identifiers,
-            manufacturer=self.manufacturer,
-            model=self.model,
-            model_id=self.model_id,
-            name=self.name,
-            serial_number=self.serial_number,
-            sw_version=self.sw_version,
+            configuration_url=self._api.webpanel,
+            identifiers=self._get_identifiers(identity),
+            manufacturer=identity.brand,
+            model=identity.model,
+            model_id=identity.model_original,
+            name=identity.model or DEFAULT_IDENTITY_NAME,
+            serial_number=identity.serial,
+            # Safelock against placeholders-filled string
+            sw_version=str(firmware) if firmware.major is not None else None,
         )
 
-    @property
-    def identifiers(self) -> set[tuple[str, str]]:
-        """Return device identifiers."""
-
-        return self._identifiers
-
-    @property
-    def identity(self) -> ARDeviceIdentity:
-        """Return device identity."""
-
-        return self._api.description
-
-    @property
-    def manufacturer(self) -> str:
-        """Return device manufacturer."""
-
-        return self._manufacturer
-
-    @property
-    def model(self) -> str | None:
-        """Return device model."""
-
-        return self._model
-
-    @property
-    def model_id(self) -> str | None:
-        """Return device model ID."""
-
-        return self._model_id
-
-    @property
-    def name(self) -> str:
-        """Return device name."""
-
-        return self._name
-
-    @property
-    def serial_number(self) -> str | None:
-        """Return device serial number."""
-
-        return self._serial_number
-
-    @property
-    def sw_version(self) -> str | None:
-        """Return device software version."""
-
-        return self._sw_version
-
-    # --------------------
-    # Connection -->
-    # --------------------
-
-    async def async_connect(self) -> None:
-        """Connect to the device."""
-
-        _LOGGER.debug("Connecting to the API")
-
-        await self.api.async_connect()
-        identity = self.identity
-
-        # Set properties
-        self._identifiers = set()
-        if identity.mac is not None:
-            self._identifiers.add((DOMAIN, format_mac(str(identity.mac))))
-        if identity.serial is not None:
-            self._identifiers.add((DOMAIN, identity.serial))
-        self._manufacturer = identity.brand
-        self._model = identity.model
-        self._model_id = identity.model_original
-        self._name = identity.model or DEFAULT_IDENTITY_NAME
-        self._serial_number = identity.serial
-        # An empty version renders as a placeholder string, not as nothing
-        self._sw_version = (
-            str(identity.firmware)
-            if identity.firmware.major is not None
-            else None
-        )
-
-    async def async_disconnect(self) -> None:
-        """Disconnect from the device."""
-
-        _LOGGER.debug("Disconnecting from the API")
-
-        await self.api.async_disconnect()
-
-    async def async_clean(self) -> None:
-        """Cleanup."""
-
-        _LOGGER.debug("Cleaning up")
-
-        await self.api.async_close()
-
-    # --------------------
-    # <-- Connection
-    # --------------------
+    # ---------------------------
+    # <-- Device
+    # ---------------------------

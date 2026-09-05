@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import AsyncMock, Mock, PropertyMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouter
-from asusrouter.config import ARConfigKey as ARConfKey
 from asusrouter.const import DEFAULT_IDENTITY_BRAND
+from asusrouter.modules.device.identity import ARDeviceIdentity
 from asusrouter.modules.firmware.version import ARFirmware
+from asusrouter.tools.identifiers.mac import MacAddress
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -19,13 +20,12 @@ from homeassistant.const import (
 from homeassistant.helpers.device_registry import DeviceInfo
 import pytest
 
-from custom_components.asusrouter.bridge import ARBridge
+from custom_components.asusrouter.bridge import API_CONFIG, ARBridge
 from custom_components.asusrouter.const import (
     CONF_DEFAULT_PORT,
     DEFAULT_IDENTITY_NAME,
     DOMAIN,
 )
-from tests.conftest import UniversalMockPatcher
 from tests.helpers import SyncPatch
 
 pytestmark = pytest.mark.asyncio
@@ -37,14 +37,38 @@ CONFIGS: dict[str, Any] = {
     CONF_SSL: True,
 }
 
-MAC = "AA:BB:CC:DD:EE:FF"
-PORT = 1234
+MAC = MacAddress("AA:BB:CC:DD:EE:FF")
+# The library normalises the MAC, and format_mac keeps that form
+MAC_FORMATTED = str(MAC)
 SERIAL = "SERIAL123"
+WEBPANEL = "https://192.168.1.1:8443"
+
+FIRMWARE = ARFirmware((3, 0, 0, 4), 388, 1, 0)
+FIRMWARE_STRING = "3.0.0.4.388.1_0"
+
+
+def _get_identity(
+    mac: MacAddress | None = MAC,
+    serial: str | None = SERIAL,
+    model: str | None = "Model",
+    firmware: ARFirmware | None = None,
+) -> ARDeviceIdentity:
+    """Create a device identity as the library reports it."""
+
+    identity = ARDeviceIdentity()
+    identity._brand = "Brand"
+    identity._firmware = firmware if firmware else ARFirmware()
+    identity._mac = mac
+    identity._model = model
+    identity._model_original = "MODEL_ORIGINAL"
+    identity._serial = serial
+
+    return identity
 
 
 async def _get_bridge(
+    identity: ARDeviceIdentity | None = None,
     configs: dict[str, Any] | None = None,
-    options: dict[str, Any] | None = None,
 ) -> ARBridge:
     """Create a bridge with the library API replaced by a mock."""
 
@@ -55,60 +79,21 @@ async def _get_bridge(
         ),
         patch.object(ARBridge, "_get_api", Mock(spec=AsusRouter)),
     ):
-        return ARBridge(Mock(), configs if configs else CONFIGS, options)
+        bridge = ARBridge(Mock(), configs if configs else CONFIGS)
 
-
-def _get_identity(
-    mac: str | None = MAC,
-    serial: str | None = SERIAL,
-    firmware: ARFirmware | None = None,
-) -> Mock:
-    """Create a device identity mock."""
-
-    return Mock(
-        brand="Brand",
-        firmware=firmware if firmware else ARFirmware(),
-        mac=mac,
-        model="Model",
-        model_original="MODEL_ORIGINAL",
-        serial=serial,
+    bridge._api = Mock(
+        async_connect=AsyncMock(),
+        async_close=AsyncMock(),
+        description=identity if identity else ARDeviceIdentity(),
+        webpanel=WEBPANEL,
     )
 
-
-async def test_init_stores_configs_and_options() -> None:
-    """Test that options overwrite the configs on init."""
-
-    bridge = await _get_bridge(CONFIGS, {CONF_PORT: PORT})
-
-    assert bridge._configs[CONF_PORT] == PORT
-    assert bridge._configs[CONF_HOST] == CONFIGS[CONF_HOST]
-    # The original configs are not mutated
-    assert CONF_PORT not in CONFIGS
+    return bridge
 
 
-async def test_init_defines_default_properties() -> None:
-    """Test the properties available before connecting."""
-
-    bridge = await _get_bridge()
-
-    assert bridge.identifiers == set()
-    assert bridge.manufacturer == DEFAULT_IDENTITY_BRAND
-    assert bridge.model is None
-    assert bridge.model_id is None
-    assert bridge.name == DEFAULT_IDENTITY_NAME
-    assert bridge.serial_number is None
-    assert bridge.sw_version is None
-
-
-async def test_get_api_config() -> None:
-    """Test the instance configuration passed to the library."""
-
-    bridge = await _get_bridge()
-
-    assert bridge._get_api_config() == {
-        ARConfKey.OPTIMISTIC_TEMPERATURE: True,
-        ARConfKey.NOTIFIED_OPTIMISTIC_TEMPERATURE: True,
-    }
+# ---------------------------
+# API -->
+# ---------------------------
 
 
 @pytest.mark.parametrize(
@@ -122,10 +107,9 @@ async def test_get_api(configs: dict[str, Any], expected_port: int) -> None:
     """Test that the library API is created with the HA configs."""
 
     session = Mock()
-    config = {ARConfKey.OPTIMISTIC_TEMPERATURE: True}
 
     with patch("custom_components.asusrouter.bridge.AsusRouter") as mock_api:
-        ARBridge._get_api(configs, session, config)
+        ARBridge._get_api(configs, session)
 
     mock_api.assert_called_once_with(
         hostname=configs[CONF_HOST],
@@ -134,7 +118,7 @@ async def test_get_api(configs: dict[str, Any], expected_port: int) -> None:
         port=expected_port,
         use_ssl=configs[CONF_SSL],
         session=session,
-        config=config,
+        config=API_CONFIG,
     )
 
 
@@ -156,33 +140,48 @@ async def test_init_creates_unsafe_cookie_jar() -> None:
     assert cookie_jar._quote_cookie is False
 
 
-@pytest.mark.parametrize(
-    ("attribute", "value"),
-    [
-        ("api", "_api"),
-        ("configuration_url", "webpanel"),
-        ("connected", "connected"),
-    ],
-)
-async def test_properties_from_api(attribute: str, value: str) -> None:
-    """Test the properties served directly by the library API."""
+async def test_api_property() -> None:
+    """Test that the API is served as it is."""
 
     bridge = await _get_bridge()
-    bridge._api = Mock(webpanel="https://192.168.1.1:8443", connected=True)
 
-    expected = bridge._api if value == "_api" else getattr(bridge._api, value)
-
-    assert getattr(bridge, attribute) == expected
+    assert bridge.api is bridge._api
 
 
 async def test_identity_property() -> None:
     """Test that the identity is the library device description."""
 
-    bridge = await _get_bridge()
     identity = _get_identity()
-    bridge._api = Mock(description=identity)
+    bridge = await _get_bridge(identity)
 
     assert bridge.identity is identity
+
+
+# ---------------------------
+# <-- API
+# ---------------------------
+
+# ---------------------------
+# DEVICE -->
+# ---------------------------
+
+
+async def test_device_info_without_identity() -> None:
+    """Test the device information available before connecting."""
+
+    bridge = await _get_bridge()
+
+    assert bridge.device_info == DeviceInfo(
+        configuration_url=WEBPANEL,
+        identifiers=set(),
+        # The library already defaults the brand
+        manufacturer=DEFAULT_IDENTITY_BRAND,
+        model=None,
+        model_id=None,
+        name=DEFAULT_IDENTITY_NAME,
+        serial_number=None,
+        sw_version=None,
+    )
 
 
 async def test_device_info(format_mac: SyncPatch) -> None:
@@ -190,72 +189,48 @@ async def test_device_info(format_mac: SyncPatch) -> None:
 
     format_mac()
 
-    bridge = await _get_bridge()
-    bridge._api = Mock(
-        async_connect=AsyncMock(), webpanel="https://192.168.1.1:8443"
-    )
-
-    with patch.object(
-        ARBridge,
-        "identity",
-        new_callable=PropertyMock,
-        return_value=_get_identity(
-            firmware=ARFirmware((3, 0, 0, 4), 388, 1, 0)
-        ),
-    ):
-        await bridge.async_connect()
+    bridge = await _get_bridge(_get_identity(firmware=FIRMWARE))
 
     assert bridge.device_info == DeviceInfo(
-        configuration_url="https://192.168.1.1:8443",
-        identifiers={(DOMAIN, MAC), (DOMAIN, SERIAL)},
+        configuration_url=WEBPANEL,
+        identifiers={(DOMAIN, MAC_FORMATTED), (DOMAIN, SERIAL)},
         manufacturer="Brand",
         model="Model",
         model_id="MODEL_ORIGINAL",
         name="Model",
         serial_number=SERIAL,
-        sw_version="3.0.0.4.388.1_0",
+        sw_version=FIRMWARE_STRING,
     )
 
 
-async def test_async_connect(
-    universal_mock: UniversalMockPatcher,
-    format_mac: SyncPatch,
-) -> None:
-    """Test that connecting fills the device properties."""
+async def test_device_info_without_model() -> None:
+    """Test the fallback name when the device reports no model."""
 
-    format_mac()
+    bridge = await _get_bridge(_get_identity(model=None))
 
-    bridge = await _get_bridge()
-    bridge._api = Mock(async_connect=AsyncMock())
-    identity = _get_identity(firmware=ARFirmware((3, 0, 0, 4), 388, 1, 0))
+    assert bridge.device_info["name"] == DEFAULT_IDENTITY_NAME
 
-    with patch.object(
-        ARBridge, "identity", new_callable=PropertyMock, return_value=identity
-    ):
-        await bridge.async_connect()
 
-    bridge._api.async_connect.assert_awaited_once()
-    assert bridge.identifiers == {(DOMAIN, MAC), (DOMAIN, SERIAL)}
-    assert bridge.manufacturer == "Brand"
-    assert bridge.model == "Model"
-    assert bridge.model_id == "MODEL_ORIGINAL"
-    assert bridge.name == "Model"
-    assert bridge.serial_number == SERIAL
-    assert bridge.sw_version == "3.0.0.4.388.1_0"
+async def test_device_info_unknown_firmware() -> None:
+    """Test that an unknown firmware is reported as no version."""
+
+    bridge = await _get_bridge(_get_identity())
+
+    assert bridge.device_info["sw_version"] is None
 
 
 @pytest.mark.parametrize(
     ("mac", "serial", "expected"),
     [
-        (MAC, SERIAL, {(DOMAIN, MAC), (DOMAIN, SERIAL)}),
+        (MAC, SERIAL, {(DOMAIN, MAC_FORMATTED), (DOMAIN, SERIAL)}),
         (None, SERIAL, {(DOMAIN, SERIAL)}),
-        (MAC, None, {(DOMAIN, MAC)}),
+        (MAC, None, {(DOMAIN, MAC_FORMATTED)}),
         (None, None, set()),
     ],
 )
-async def test_async_connect_identifiers(
+async def test_get_identifiers(
     format_mac: SyncPatch,
-    mac: str | None,
+    mac: MacAddress | None,
     serial: str | None,
     expected: set[tuple[str, str]],
 ) -> None:
@@ -263,70 +238,31 @@ async def test_async_connect_identifiers(
 
     format_mac()
 
-    bridge = await _get_bridge()
-    bridge._api = Mock(async_connect=AsyncMock())
+    identity = _get_identity(mac=mac, serial=serial)
 
-    with patch.object(
-        ARBridge,
-        "identity",
-        new_callable=PropertyMock,
-        return_value=_get_identity(mac=mac, serial=serial),
-    ):
-        await bridge.async_connect()
-
-    assert bridge.identifiers == expected
+    assert ARBridge._get_identifiers(identity) == expected
 
 
-async def test_async_connect_no_model(format_mac: SyncPatch) -> None:
-    """Test the fallback name when the device reports no model."""
+# ---------------------------
+# <-- DEVICE
+# ---------------------------
 
-    format_mac()
-
-    bridge = await _get_bridge()
-    bridge._api = Mock(async_connect=AsyncMock())
-    identity = _get_identity()
-    identity.model = None
-
-    with patch.object(
-        ARBridge, "identity", new_callable=PropertyMock, return_value=identity
-    ):
-        await bridge.async_connect()
-
-    assert bridge.name == DEFAULT_IDENTITY_NAME
+# ---------------------------
+# CONNECTION -->
+# ---------------------------
 
 
-async def test_async_connect_empty_firmware(format_mac: SyncPatch) -> None:
-    """Test that an unknown firmware is reported as no version."""
-
-    format_mac()
-
-    bridge = await _get_bridge()
-    bridge._api = Mock(async_connect=AsyncMock())
-
-    with patch.object(
-        ARBridge,
-        "identity",
-        new_callable=PropertyMock,
-        return_value=_get_identity(),
-    ):
-        await bridge.async_connect()
-
-    assert bridge.sw_version is None
-
-
-@pytest.mark.parametrize(
-    ("method", "api_method"),
-    [
-        ("async_disconnect", "async_disconnect"),
-        ("async_clean", "async_close"),
-    ],
-)
-async def test_connection_methods(method: str, api_method: str) -> None:
+@pytest.mark.parametrize("method", ["async_connect", "async_close"])
+async def test_connection_methods(method: str) -> None:
     """Test that the connection methods are delegated to the library."""
 
     bridge = await _get_bridge()
-    bridge._api = Mock(**{api_method: AsyncMock()})
 
     await getattr(bridge, method)()
 
-    getattr(bridge._api, api_method).assert_awaited_once()
+    getattr(bridge._api, method).assert_awaited_once()
+
+
+# ---------------------------
+# <-- CONNECTION
+# ---------------------------

@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
+# ---------------------------
 # INTEGRATION DATA -->
+# ---------------------------
 
 ASUSROUTER = "asusrouter"
 DOMAIN = ASUSROUTER
 
-# Connection settings live in the entry data, options are unused
-ENTRY_VERSION = 6
-
+# ---------------------------
 # <-- INTEGRATION DATA
+# ---------------------------
 
+# ---------------------------
 # CONFIGURATION CONSTANTS & DEFAULTS -->
+# ---------------------------
 
 # The library picks the port matching the SSL setting when none is given
 CONF_DEFAULT_PORT = 0
@@ -21,9 +24,13 @@ CONF_DEFAULT_USERNAME = "admin"
 
 DEFAULT_IDENTITY_NAME = "AsusRouter"
 
-# <-- CONFIGURATION
+# ---------------------------
+# <-- CONFIGURATION CONSTANTS & DEFAULTS
+# ---------------------------
 
+# ---------------------------
 # CONSTANTS BY MODULE -->
+# ---------------------------
 
 # Configuration flow
 BASE = "base"
@@ -41,4 +48,6 @@ STEP_CREDENTIALS = "credentials"
 STEP_FIND = "find"
 STEP_RECONFIGURE = "reconfigure"
 
+# ---------------------------
 # <-- CONSTANTS BY MODULE
+# ---------------------------
