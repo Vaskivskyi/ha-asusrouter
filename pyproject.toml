@@ -31,9 +31,9 @@ asusrouter = { git = "https://github.com/Vaskivskyi/asusrouter.git", branch = "d
 [dependency-groups]
 dev = [
     "mypy==2.3.1",
-    "pydantic==2.13.4",
-    "ruff==0.16.4",
-    "prek==0.4.14",
+    "pydantic==2.13.5",
+    "ruff==0.16.5",
+    "prek==0.5.0",
 ]
 test = [
     "pytest==9.1.1",
