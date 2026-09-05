@@ -25,6 +25,14 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
 
+      - id: mypy
+        name: mypy
+        entry: uv run mypy custom_components tests
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: readme
         name: build README
         entry: uv run python scripts/build_readme.py

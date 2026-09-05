@@ -1,49 +1,61 @@
-"""Support for AsusRouter devices."""
+"""AsusRouter integration."""
 
 from __future__ import annotations
 
-import logging
+from dataclasses import dataclass
 
+from asusrouter import AsusRouterError
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import Event, HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 
-from .const import ASUSROUTER, DOMAIN, PLATFORMS, STOP_LISTENER
-from .router import ARDevice
+from .bridge import ARBridge
 
-_LOGGER = logging.getLogger(__name__)
+
+@dataclass
+class ARRuntimeData:
+    """Runtime data of an AsusRouter config entry."""
+
+    bridge: ARBridge
+
+
+type ARConfigEntry = ConfigEntry[ARRuntimeData]
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: ARConfigEntry,
 ) -> bool:
     """Set up AsusRouter platform."""
 
-    _LOGGER.debug("Setting up entry")
+    bridge = ARBridge(hass, config_entry.data)
 
-    router = ARDevice(hass, config_entry)
-    await router.setup()
+    try:
+        await bridge.async_connect()
+    except AsusRouterError as ex:
+        await bridge.async_close()
+        raise ConfigEntryNotReady(
+            f"Cannot connect to `{config_entry.data[CONF_HOST]}`"
+        ) from ex
 
-    router.async_on_close(config_entry.add_update_listener(update_listener))
+    config_entry.runtime_data = ARRuntimeData(bridge=bridge)
 
-    async def async_close_connection(event):
-        """Close router connection on HA stop."""
-
-        await router.close()
-
-    stop_listener = hass.bus.async_listen_once(
-        EVENT_HOMEASSISTANT_STOP, async_close_connection
+    # Register the bridge device
+    dr.async_get(hass).async_get_or_create(
+        config_entry_id=config_entry.entry_id, **bridge.device_info
     )
 
-    hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = {
-        ASUSROUTER: router,
-        STOP_LISTENER: stop_listener,
-    }
+    async def async_close_connection(event: Event) -> None:
+        """Close router connection on HA stop."""
 
-    await hass.config_entries.async_forward_entry_setups(
-        config_entry, PLATFORMS
+        await bridge.async_close()
+
+    config_entry.async_on_unload(
+        hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STOP, async_close_connection
+        )
     )
 
     return True
@@ -51,70 +63,10 @@ async def async_setup_entry(
 
 async def async_unload_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: ARConfigEntry,
 ) -> bool:
     """Unload AsusRouter config entry."""
 
-    _LOGGER.debug("Unloading entry")
-
-    unload = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
-    )
-
-    if unload:
-        # Close connection
-        hass.data[DOMAIN][config_entry.entry_id][STOP_LISTENER]()
-        await hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER].close()
-        hass.data[DOMAIN].pop(config_entry.entry_id)
-
-    return unload
-
-
-async def update_listener(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> None:
-    """Reload on config entry update."""
-
-    _LOGGER.debug("Update listener activated")
-
-    router = hass.data[DOMAIN][config_entry.entry_id][ASUSROUTER]
-
-    if router.update_options(config_entry.options):
-        await hass.config_entries.async_reload(config_entry.entry_id)
-
-
-# Example migration function
-async def async_migrate_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry
-) -> bool:
-    """Migrate old entry."""
-
-    _LOGGER.debug("Migrating from version %s", config_entry.version)
-
-    if config_entry.version == 4:  # noqa: PLR2004
-        new_options = {**config_entry.options}
-        new_options["interval_network"] = new_options.pop(
-            "interval_network_stat", 30
-        )
-
-        config_entry.version = 5
-        hass.config_entries.async_update_entry(
-            config_entry, options=new_options
-        )
-
-    _LOGGER.debug("Migration to version %s successful", config_entry.version)
-
-    return True
-
-
-async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
-) -> bool:
-    """Remove a device."""
-
-    # This would actually work and should not provide any issues
-
-    _LOGGER.debug("Removing device")
+    await config_entry.runtime_data.bridge.async_close()
 
     return True

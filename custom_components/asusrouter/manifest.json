@@ -13,7 +13,7 @@
     "asusrouter"
   ],
   "requirements": [
-    "asusrouter==1.21.3"
+    "asusrouter==2.0.0.dev0"
   ],
   "version": "1.0.0.dev0"
 }

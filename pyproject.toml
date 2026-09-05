@@ -16,9 +16,12 @@ classifiers     = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies    = [
-    "asusrouter==1.21.3",
+    "asusrouter",
     "homeassistant==2026.8.3",
 ]
+
+[tool.uv.sources]
+asusrouter = { git = "https://github.com/Vaskivskyi/asusrouter.git", branch = "dev" }
 
 [project.urls]
 "Homepage"      = "https://asusrouter.vaskivskyi.com/"
