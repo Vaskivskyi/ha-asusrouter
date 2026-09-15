@@ -17,7 +17,7 @@ classifiers     = [
 ]
 dependencies    = [
     "asusrouter",
-    "homeassistant==2026.9.1",
+    "homeassistant==2026.9.2",
 ]
 
 [tool.uv.sources]
