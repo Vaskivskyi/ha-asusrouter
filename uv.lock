@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14.2"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -311,7 +311,7 @@ wheels = [
 [[package]]
 name = "asusrouter"
 version = "2.0.0.dev0"
-source = { git = "https://github.com/Vaskivskyi/asusrouter.git?branch=dev#720c7687915a78d790cd5955c5633ace4abacbb3" }
+source = { git = "https://github.com/Vaskivskyi/asusrouter.git?branch=dev#c9f09eef5730be1467291c0bf3d271c5b02baf01" }
 dependencies = [
     { name = "aiohttp" },
     { name = "urllib3" },
