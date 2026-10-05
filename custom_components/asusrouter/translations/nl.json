@@ -18,20 +18,33 @@
           "port": "Poort (0 voor standaard waarde)",
           "ssl": "Gebruik SSL verbinding"
         }
+      },
+      "reconfigure": {
+        "title": "Verbindingsinstellingen",
+        "description": "Wijzig hoe Home Assistant het apparaat bereikt",
+        "data": {
+          "host": "Hostnaam / IP-adres",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "port": "Poort (0 om de standaardwaarde te gebruiken)",
+          "ssl": "SSL-verbinding gebruiken"
+        }
       }
     },
     "error": {
-      "access_error": "[NT] Access error. Refer to the log for details",
+      "access_error": "Toegangsfout. Bekijk het log voor details",
       "cannot_resolve": "Kan hostnaam niet herleiden. Probeer met IP adres",
-      "connection_error": "[NT] Connection error. Refer to the log for details",
+      "connection_error": "Verbindingsfout. Bekijk het log voor details",
       "error": "Problemen met connectie",
       "login_blocked": "Inloggen is geblokkeerd door device. Wacht aub",
-      "timeout": "[NT] Timeout error",
+      "timeout": "Time-outfout",
       "unknown": "Onbekende fout",
       "wrong_credentials": "Verkeerde login gegevens"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured"
+      "already_configured": "Apparaat is al geconfigureerd",
+      "reconfigure_successful": "Herconfiguratie is gelukt",
+      "unique_id_mismatch": "Dit is een ander apparaat. Herconfiguratie afgebroken"
     }
   }
 }
