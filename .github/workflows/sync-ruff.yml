@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Create GitHub App token
         id: app_token
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ secrets.AR_APP_ID }}
           private-key: ${{ secrets.AR_APP_KEY }}
