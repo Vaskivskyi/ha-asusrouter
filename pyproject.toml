@@ -33,7 +33,7 @@ dev = [
     "mypy==2.4.0",
     "pydantic==2.14.1",
     "ruff==0.17.1",
-    "prek==0.5.5",
+    "prek==0.5.6",
 ]
 test = [
     "pytest==9.1.1",
