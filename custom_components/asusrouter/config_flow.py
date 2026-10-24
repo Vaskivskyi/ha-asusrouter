@@ -24,7 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-import voluptuous as vol
+import probatio
 
 from .bridge import ARBridge
 from .const import (
@@ -143,14 +143,14 @@ async def _async_check_connection(
 
 def _create_form_find(
     user_input: Mapping[str, Any] | None = None,
-) -> vol.Schema:
+) -> probatio.Schema:
     """Create a form for the 'find' step."""
 
     user_input = user_input or {}
 
-    return vol.Schema(
+    return probatio.Schema(
         {
-            vol.Required(
+            probatio.Required(
                 CONF_HOST, default=user_input.get(CONF_HOST, "")
             ): cv.string,
         }
@@ -159,25 +159,25 @@ def _create_form_find(
 
 def _create_form_credentials(
     user_input: Mapping[str, Any] | None = None,
-) -> vol.Schema:
+) -> probatio.Schema:
     """Create a form for the 'credentials' step."""
 
     user_input = user_input or {}
 
-    return vol.Schema(
+    return probatio.Schema(
         {
-            vol.Required(
+            probatio.Required(
                 CONF_USERNAME,
                 default=user_input.get(CONF_USERNAME, CONF_DEFAULT_USERNAME),
             ): cv.string,
-            vol.Required(
+            probatio.Required(
                 CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
             ): cv.string,
-            vol.Optional(
+            probatio.Optional(
                 CONF_PORT,
                 default=user_input.get(CONF_PORT, CONF_DEFAULT_PORT),
             ): cv.positive_int,
-            vol.Optional(
+            probatio.Optional(
                 CONF_SSL, default=user_input.get(CONF_SSL, CONF_DEFAULT_SSL)
             ): cv.boolean,
         }
@@ -186,7 +186,7 @@ def _create_form_credentials(
 
 def _create_form_reconfigure(
     user_input: Mapping[str, Any] | None = None,
-) -> vol.Schema:
+) -> probatio.Schema:
     """Create a form for the `reconfigure` step."""
 
     return _create_form_find(user_input).extend(
