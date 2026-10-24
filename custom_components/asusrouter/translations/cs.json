@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Přidat zařízení",
@@ -13,6 +13,25 @@
         "title": "Přihlašovací údaje",
         "description": "Stejné jako pro webový panel zařízení",
         "data": {
+          "username": "Uživatelské jméno",
+          "password": "Heslo",
+          "port": "Port (0 pro použití výchozí hodnoty)",
+          "ssl": "Použít připojení SSL"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Opětovné ověření",
+        "description": "Zařízení `{host}` odmítlo uložené přihlašovací údaje",
+        "data": {
+          "username": "Uživatelské jméno",
+          "password": "Heslo"
+        }
+      },
+      "reconfigure": {
+        "title": "Nastavení připojení",
+        "description": "Změňte, jak se Home Assistant připojuje k vašemu zařízení",
+        "data": {
+          "host": "Hostitel / IP addresa",
           "username": "Uživatelské jméno",
           "password": "Heslo",
           "port": "Port (0 pro použití výchozí hodnoty)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Chybné přihlašovací údaje"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured"
+      "already_configured": "[NT] Device is already configured",
+      "reauth_successful": "Opětovné ověření bylo úspěšné",
+      "reconfigure_successful": "Změna konfigurace byla úspěšná",
+      "unique_id_mismatch": "Toto je jiné zařízení. Operace přerušena"
     }
   }
 }

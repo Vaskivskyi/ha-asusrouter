@@ -8,10 +8,11 @@ from asusrouter import AsusRouterError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import Event, HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
 from .bridge import ARBridge
+from .errors import is_auth_error
 
 
 @dataclass
@@ -36,9 +37,13 @@ async def async_setup_entry(
         await bridge.async_connect()
     except AsusRouterError as ex:
         await bridge.async_close()
-        raise ConfigEntryNotReady(
-            f"Cannot connect to `{config_entry.data[CONF_HOST]}`"
-        ) from ex
+        host = config_entry.data[CONF_HOST]
+        if is_auth_error(ex):
+            # Reconnecting cannot help, requires new credentials
+            raise ConfigEntryAuthFailed(
+                f"Device `{host}` refused the saved credentials"
+            ) from ex
+        raise ConfigEntryNotReady(f"Cannot connect to `{host}`") from ex
 
     config_entry.runtime_data = ARRuntimeData(bridge=bridge)
 

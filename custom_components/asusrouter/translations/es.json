@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Localizar dispositivo",
@@ -13,6 +13,25 @@
         "title": "Credenciales",
         "description": "Los mismos que en la interfaz Web",
         "data": {
+          "username": "Usuario",
+          "password": "Contraseña",
+          "port": "Puerto (0 para usar el valor por defecto)",
+          "ssl": "Usar conexión SSL"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautenticación",
+        "description": "El dispositivo `{host}` rechazó las credenciales guardadas",
+        "data": {
+          "username": "Usuario",
+          "password": "Contraseña"
+        }
+      },
+      "reconfigure": {
+        "title": "Configuración de conexión",
+        "description": "Cambia cómo Home Assistant se conecta a tu dispositivo",
+        "data": {
+          "host": "Nombre de equipo / Dirección IP",
           "username": "Usuario",
           "password": "Contraseña",
           "port": "Puerto (0 para usar el valor por defecto)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Credenciales inválidos"
     },
     "abort": {
-      "already_configured": "El dispositivo ya está configurado"
+      "already_configured": "El dispositivo ya está configurado",
+      "reauth_successful": "La reautenticación se realizó correctamente",
+      "reconfigure_successful": "La reconfiguración se realizó correctamente",
+      "unique_id_mismatch": "Este es un dispositivo diferente. Operación cancelada"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Gerätestandort",
@@ -13,6 +13,25 @@
         "title": "Referenzen",
         "description": "Dasselbe wie für das Geräte-Webpanel",
         "data": {
+          "username": "Nutzername",
+          "password": "Passwort",
+          "port": "Port (0, um den Standardwert zu verwenden)",
+          "ssl": "Verwenden Sie eine SSL-Verbindung"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Erneute Authentifizierung",
+        "description": "Das Gerät `{host}` hat die gespeicherten Anmeldedaten abgelehnt",
+        "data": {
+          "username": "Nutzername",
+          "password": "Passwort"
+        }
+      },
+      "reconfigure": {
+        "title": "Verbindungseinstellungen",
+        "description": "Ändern Sie, wie Home Assistant Ihr Gerät erreicht",
+        "data": {
+          "host": "Hostname / IP-Adresse",
           "username": "Nutzername",
           "password": "Passwort",
           "port": "Port (0, um den Standardwert zu verwenden)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Falsche Anmeldeinformationen"
     },
     "abort": {
-      "already_configured": "Gerät ist bereits konfiguriert"
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "reauth_successful": "Die erneute Authentifizierung war erfolgreich",
+      "reconfigure_successful": "Die Neukonfiguration war erfolgreich",
+      "unique_id_mismatch": "Dies ist ein anderes Gerät. Vorgang abgebrochen"
     }
   }
 }

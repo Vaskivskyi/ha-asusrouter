@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Emplacement de l'appareil",
@@ -13,6 +13,25 @@
         "title": "Identifiants",
         "description": "Les même que sur l'interface de gestion du routeur",
         "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de pass",
+          "port": "Port (0 pour utiliser la valeur par défaut)",
+          "ssl": "Utiliser une connexion SSL"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Réauthentification",
+        "description": "L'appareil `{host}` a refusé les identifiants enregistrés",
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de pass"
+        }
+      },
+      "reconfigure": {
+        "title": "Paramètres de connexion",
+        "description": "Modifiez la façon dont Home Assistant accède à votre appareil",
+        "data": {
+          "host": "Nom d'hôte / Addresse IP ",
           "username": "Nom d'utilisateur",
           "password": "Mot de pass",
           "port": "Port (0 pour utiliser la valeur par défaut)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Identifiants erronés"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured"
+      "already_configured": "[NT] Device is already configured",
+      "reauth_successful": "La réauthentification a réussi",
+      "reconfigure_successful": "La reconfiguration a réussi",
+      "unique_id_mismatch": "Il s'agit d'un autre appareil. Opération annulée"
     }
   }
 }

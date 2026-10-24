@@ -46,6 +46,7 @@ RESULT_WRONG_CREDENTIALS = "wrong_credentials"
 
 STEP_CREDENTIALS = "credentials"
 STEP_FIND = "find"
+STEP_REAUTH_CONFIRM = "reauth_confirm"
 STEP_RECONFIGURE = "reconfigure"
 
 # ---------------------------
