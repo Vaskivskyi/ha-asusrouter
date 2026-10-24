@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Device location",
@@ -19,13 +19,21 @@
           "ssl": "Use SSL connection"
         }
       },
+      "reauth_confirm": {
+        "title": "Re-authentication",
+        "description": "Device `{host}` refused the saved credentials",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
       "reconfigure": {
         "title": "Connection settings",
         "description": "Change how Home Assistant reaches your device",
         "data": {
           "host": "Hostname / IP address",
-          "username": "[%key:common::config_flow::data::username%]",
-          "password": "[%key:common::config_flow::data::password%]",
+          "username": "Username",
+          "password": "Password",
           "port": "Port (0 to use default value)",
           "ssl": "Use SSL connection"
         }
@@ -43,8 +51,9 @@
     },
     "abort": {
       "already_configured": "Device is already configured",
-      "reconfigure_successful": "[%key:common::config_flow::abort::reconfigure_successful%]",
-      "unique_id_mismatch": "This is a different device. Reconfiguration aborted"
+      "reauth_successful": "Re-authentication was successful",
+      "reconfigure_successful": "Reconfiguration was successful",
+      "unique_id_mismatch": "This is a different device. Operation aborted"
     }
   }
 }

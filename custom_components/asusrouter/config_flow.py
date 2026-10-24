@@ -13,7 +13,6 @@ from asusrouter.error import (
     AsusRouterError,
     AsusRouterTimeoutError,
 )
-from asusrouter.modules.endpoint.error import ARAccessError
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import (
     CONF_HOST,
@@ -33,30 +32,19 @@ from .const import (
     CONF_DEFAULT_SSL,
     CONF_DEFAULT_USERNAME,
     DOMAIN,
-    RESULT_ACCESS_ERROR,
     RESULT_CANNOT_RESOLVE,
     RESULT_CONNECTION_ERROR,
     RESULT_ERROR,
-    RESULT_LOGIN_BLOCKED,
     RESULT_TIMEOUT,
     RESULT_UNKNOWN,
-    RESULT_WRONG_CREDENTIALS,
     STEP_CREDENTIALS,
     STEP_FIND,
+    STEP_REAUTH_CONFIRM,
     STEP_RECONFIGURE,
 )
+from .errors import get_error_result
 
 _LOGGER = logging.getLogger(__name__)
-
-# Maps a library access error onto the string shown to the user
-ACCESS_ERRORS: dict[ARAccessError, str] = {
-    ARAccessError.CREDENTIALS: RESULT_WRONG_CREDENTIALS,
-    ARAccessError.TRY_AGAIN: RESULT_LOGIN_BLOCKED,
-    ARAccessError.RESET_REQUIRED: RESULT_LOGIN_BLOCKED,
-    ARAccessError.CAPTCHA: RESULT_LOGIN_BLOCKED,
-    ARAccessError.ANOTHER: RESULT_ERROR,
-    ARAccessError.UNKNOWN: RESULT_UNKNOWN,
-}
 
 
 # ---------------------------
@@ -98,7 +86,7 @@ async def _async_check_connection(
         # older devices and some Merlin-builds of FW
         serial = bridge.identity.serial
     except AsusRouterAccessError as ex:
-        error = ACCESS_ERRORS.get(ex.args[1], RESULT_ACCESS_ERROR)
+        error = get_error_result(ex)
         _LOGGER.debug(
             "Access error `%s` while connecting to `%s`: %s",
             error,
@@ -144,7 +132,7 @@ async def _async_check_connection(
 def _create_form_find(
     user_input: Mapping[str, Any] | None = None,
 ) -> probatio.Schema:
-    """Create a form for the 'find' step."""
+    """Create a form for the `find` step."""
 
     user_input = user_input or {}
 
@@ -157,10 +145,10 @@ def _create_form_find(
     )
 
 
-def _create_form_credentials(
+def _create_form_reauth(
     user_input: Mapping[str, Any] | None = None,
 ) -> probatio.Schema:
-    """Create a form for the 'credentials' step."""
+    """Create a form for the `reauth_confirm` step."""
 
     user_input = user_input or {}
 
@@ -173,6 +161,19 @@ def _create_form_credentials(
             probatio.Required(
                 CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, "")
             ): cv.string,
+        }
+    )
+
+
+def _create_form_credentials(
+    user_input: Mapping[str, Any] | None = None,
+) -> probatio.Schema:
+    """Create a form for the `credentials` step."""
+
+    user_input = user_input or {}
+
+    return _create_form_reauth(user_input).extend(
+        {
             probatio.Optional(
                 CONF_PORT,
                 default=user_input.get(CONF_PORT, CONF_DEFAULT_PORT),
@@ -275,6 +276,46 @@ class ARFlowHandler(ConfigFlow, domain=DOMAIN):
             step_id=STEP_CREDENTIALS,
             data_schema=_create_form_credentials(user_input),
             errors=errors,
+        )
+
+    async def async_step_reauth(
+        self,
+        entry_data: Mapping[str, Any],
+    ) -> ConfigFlowResult:
+        """Handle the refused credentials."""
+
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Ask for the credentials of an already configured device."""
+
+        entry = self._get_reauth_entry()
+
+        errors = {}
+
+        if user_input:
+            serial, error = await _async_check_connection(
+                self.hass, {**entry.data, **user_input}
+            )
+
+            if error:
+                errors[BASE] = error
+            else:
+                await self.async_set_unique_id(serial)
+                self._abort_if_unique_id_mismatch()
+
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input
+                )
+
+        return self.async_show_form(
+            step_id=STEP_REAUTH_CONFIRM,
+            data_schema=_create_form_reauth(user_input or entry.data),
+            errors=errors,
+            description_placeholders={CONF_HOST: entry.data[CONF_HOST]},
         )
 
     async def async_step_reconfigure(

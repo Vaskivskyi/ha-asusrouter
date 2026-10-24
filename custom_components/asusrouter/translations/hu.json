@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Az eszköz helye",
@@ -13,6 +13,25 @@
         "title": "Hitelesítő adatok",
         "description": "Ugyanaz, mint az eszköz webes felületén",
         "data": {
+          "username": "Felhasználónév",
+          "password": "Jelszó",
+          "port": "Port (0 az alapértelmezett érték használatához)",
+          "ssl": "SSL kapcsolat használata"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Újrahitelesítés",
+        "description": "A(z) `{host}` eszköz elutasította a mentett hitelesítő adatokat",
+        "data": {
+          "username": "Felhasználónév",
+          "password": "Jelszó"
+        }
+      },
+      "reconfigure": {
+        "title": "Kapcsolati beállítások",
+        "description": "Módosítsa, hogyan éri el a Home Assistant az eszközt",
+        "data": {
+          "host": "Gazdanév / IP-cím",
           "username": "Felhasználónév",
           "password": "Jelszó",
           "port": "Port (0 az alapértelmezett érték használatához)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Nem megfelelő hitelesítő adatok"
     },
     "abort": {
-      "already_configured": "Az eszköz már konfigurálva van"
+      "already_configured": "Az eszköz már konfigurálva van",
+      "reauth_successful": "Az újrahitelesítés sikeres volt",
+      "reconfigure_successful": "Az újrakonfigurálás sikeres volt",
+      "unique_id_mismatch": "Ez egy másik eszköz. A művelet megszakítva"
     }
   }
 }

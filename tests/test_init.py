@@ -6,6 +6,8 @@ from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouterError
+from asusrouter.error import AsusRouterAccessError
+from asusrouter.modules.endpoint.error import ARAccessError
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -13,7 +15,7 @@ from homeassistant.const import (
     CONF_SSL,
     CONF_USERNAME,
 )
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 import pytest
 
 from custom_components.asusrouter import (
@@ -132,18 +134,48 @@ async def test_setup_entry_registers_stop_listener() -> None:
     )
 
 
-async def test_setup_entry_cannot_connect() -> None:
+@pytest.mark.parametrize(
+    "exception",
+    [
+        AsusRouterError(),
+        # The device lifts this lock on its own, so reconnecting is right
+        AsusRouterAccessError("Access error", ARAccessError.TRY_AGAIN, {}),
+    ],
+)
+async def test_setup_entry_cannot_connect(exception: Exception) -> None:
     """Test that a failed connection defers the setup."""
 
     hass = _get_hass()
     entry = _get_entry()
-    bridge = _get_bridge(connect=AsusRouterError)
+    bridge = _get_bridge(connect=exception)
 
     with (
         patch(
             "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
         ),
         pytest.raises(ConfigEntryNotReady, match=HOST),
+    ):
+        await async_setup_entry(hass, entry)
+
+    bridge.async_close.assert_awaited_once()
+
+
+async def test_setup_entry_wrong_credentials() -> None:
+    """Test that refused credentials ask the user instead of retrying."""
+
+    hass = _get_hass()
+    entry = _get_entry()
+    bridge = _get_bridge(
+        connect=AsusRouterAccessError(
+            "Access error", ARAccessError.CREDENTIALS, {}
+        )
+    )
+
+    with (
+        patch(
+            "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
+        ),
+        pytest.raises(ConfigEntryAuthFailed, match=HOST),
     ):
         await async_setup_entry(hass, entry)
 

@@ -32,20 +32,20 @@ from custom_components.asusrouter.config_flow import (
     _check_host,
     _create_form_credentials,
     _create_form_find,
+    _create_form_reauth,
     _create_form_reconfigure,
 )
 from custom_components.asusrouter.const import (
     BASE,
-    RESULT_ACCESS_ERROR,
     RESULT_CANNOT_RESOLVE,
     RESULT_CONNECTION_ERROR,
     RESULT_ERROR,
-    RESULT_LOGIN_BLOCKED,
     RESULT_TIMEOUT,
     RESULT_UNKNOWN,
     RESULT_WRONG_CREDENTIALS,
     STEP_CREDENTIALS,
     STEP_FIND,
+    STEP_REAUTH_CONFIRM,
     STEP_RECONFIGURE,
 )
 
@@ -129,14 +129,8 @@ async def test_check_connection_success() -> None:
 @pytest.mark.parametrize(
     ("exception", "expected"),
     [
+        # The full access error mapping is covered in `test_errors`
         (_access_error(ARAccessError.CREDENTIALS), RESULT_WRONG_CREDENTIALS),
-        (_access_error(ARAccessError.TRY_AGAIN), RESULT_LOGIN_BLOCKED),
-        (_access_error(ARAccessError.RESET_REQUIRED), RESULT_LOGIN_BLOCKED),
-        (_access_error(ARAccessError.CAPTCHA), RESULT_LOGIN_BLOCKED),
-        (_access_error(ARAccessError.ANOTHER), RESULT_ERROR),
-        (_access_error(ARAccessError.UNKNOWN), RESULT_UNKNOWN),
-        # An access error with no mapping of its own
-        (_access_error(ARAccessError.NO_TOKEN), RESULT_ACCESS_ERROR),
         (AsusRouterTimeoutError(), RESULT_TIMEOUT),
         (AsusRouterConnectionError(), RESULT_CONNECTION_ERROR),
         # Known to the library, but without a mapping of its own
@@ -174,6 +168,7 @@ async def test_check_connection_errors(
     ("creator", "expected"),
     [
         (_create_form_find, [CONF_HOST]),
+        (_create_form_reauth, [CONF_USERNAME, CONF_PASSWORD]),
         (
             _create_form_credentials,
             [CONF_USERNAME, CONF_PASSWORD, CONF_PORT, CONF_SSL],
@@ -194,6 +189,7 @@ async def test_create_forms(creator: Any, expected: list[str]) -> None:
     ("creator", "user_input", "key"),
     [
         (_create_form_find, HOST_DATA, CONF_HOST),
+        (_create_form_reauth, CREDENTIALS_DATA, CONF_USERNAME),
         (_create_form_credentials, CREDENTIALS_DATA, CONF_USERNAME),
         (_create_form_reconfigure, ENTRY_DATA, CONF_HOST),
     ],
@@ -360,6 +356,108 @@ async def test_flow_step_credentials_success(
 
 # ---------------------------
 # <-- CONFIG FLOW
+# ---------------------------
+
+# ---------------------------
+# REAUTH -->
+# ---------------------------
+
+
+@pytest.fixture(name="reauth_flow")
+def mock_reauth_flow(
+    flow: tuple[ARFlowHandler, FlowMocks],
+) -> Iterator[tuple[ARFlowHandler, FlowMocks, Mock]]:
+    """Create a config flow reauthenticating a known entry."""
+
+    handler, mocks = flow
+    entry = Mock(data=ENTRY_DATA.copy())
+
+    with patch.object(
+        ARFlowHandler, "_get_reauth_entry", Mock(return_value=entry)
+    ):
+        yield handler, mocks, entry
+
+
+async def test_flow_step_reauth(
+    reauth_flow: tuple[ARFlowHandler, FlowMocks, Mock],
+) -> None:
+    """Test that a reauth opens the confirmation step."""
+
+    handler, mocks, _ = reauth_flow
+
+    await handler.async_step_reauth(ENTRY_DATA)
+
+    assert mocks.form.call_args.kwargs["step_id"] == STEP_REAUTH_CONFIRM
+
+
+async def test_flow_step_reauth_confirm_form(
+    reauth_flow: tuple[ARFlowHandler, FlowMocks, Mock],
+) -> None:
+    """Test that the reauth step asks for the credentials only."""
+
+    handler, mocks, _ = reauth_flow
+
+    await handler.async_step_reauth_confirm()
+
+    schema = mocks.form.call_args.kwargs["data_schema"].schema
+    defaults = {str(item): item.default() for item in schema}
+
+    assert list(defaults) == [CONF_USERNAME, CONF_PASSWORD]
+    assert defaults[CONF_USERNAME] == CREDENTIALS_DATA[CONF_USERNAME]
+    assert mocks.form.call_args.kwargs["description_placeholders"] == {
+        CONF_HOST: HOST
+    }
+
+
+async def test_flow_step_reauth_confirm_error(
+    reauth_flow: tuple[ARFlowHandler, FlowMocks, Mock],
+) -> None:
+    """Test that refused credentials repeat the reauth step."""
+
+    handler, mocks, _ = reauth_flow
+
+    with patch.object(
+        config_flow,
+        "_async_check_connection",
+        AsyncMock(return_value=(None, RESULT_WRONG_CREDENTIALS)),
+    ):
+        await handler.async_step_reauth_confirm(CREDENTIALS_DATA)
+
+    assert mocks.form.call_args.kwargs["errors"] == {
+        BASE: RESULT_WRONG_CREDENTIALS
+    }
+    mocks.reload_and_abort.assert_not_called()
+
+
+async def test_flow_step_reauth_confirm_success(
+    reauth_flow: tuple[ARFlowHandler, FlowMocks, Mock],
+) -> None:
+    """Test that new credentials update and reload the entry."""
+
+    handler, mocks, entry = reauth_flow
+    user_input = {CONF_USERNAME: "user", CONF_PASSWORD: "new"}
+
+    with patch.object(
+        config_flow,
+        "_async_check_connection",
+        AsyncMock(return_value=(SERIAL, None)),
+    ) as check_connection:
+        await handler.async_step_reauth_confirm(user_input)
+
+    # The new credentials are checked against the stored connection settings
+    check_connection.assert_awaited_once_with(
+        handler.hass, {**ENTRY_DATA, **user_input}
+    )
+    mocks.unique_id.assert_awaited_once_with(SERIAL)
+    # A different device must not overwrite this entry
+    mocks.abort_mismatch.assert_called_once()
+    mocks.reload_and_abort.assert_called_once_with(
+        entry, data_updates=user_input
+    )
+
+
+# ---------------------------
+# <-- REAUTH
 # ---------------------------
 
 # ---------------------------

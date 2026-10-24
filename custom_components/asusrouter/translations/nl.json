@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "{name} ({host})",
+    "flow_title": "{name}",
     "step": {
       "find": {
         "title": "Device locatie",
@@ -13,6 +13,25 @@
         "title": "Login gegevens",
         "description": "Dezelfde als die van je router web paneel",
         "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "port": "Poort (0 voor standaard waarde)",
+          "ssl": "Gebruik SSL verbinding"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Opnieuw authenticeren",
+        "description": "Apparaat `{host}` heeft de opgeslagen inloggegevens geweigerd",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
+        }
+      },
+      "reconfigure": {
+        "title": "Verbindingsinstellingen",
+        "description": "Wijzig hoe Home Assistant je apparaat bereikt",
+        "data": {
+          "host": "Hostnaam / IP adres",
           "username": "Gebruikersnaam",
           "password": "Wachtwoord",
           "port": "Poort (0 voor standaard waarde)",
@@ -31,7 +50,10 @@
       "wrong_credentials": "Verkeerde login gegevens"
     },
     "abort": {
-      "already_configured": "[NT] Device is already configured"
+      "already_configured": "[NT] Device is already configured",
+      "reauth_successful": "Opnieuw authenticeren is gelukt",
+      "reconfigure_successful": "Herconfiguratie is gelukt",
+      "unique_id_mismatch": "Dit is een ander apparaat. Bewerking afgebroken"
     }
   }
 }

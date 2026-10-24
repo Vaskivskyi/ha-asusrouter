@@ -12,9 +12,26 @@ import pytest
 COMPONENT = Path("custom_components/asusrouter")
 CONST = COMPONENT / "const.py"
 STRINGS = COMPONENT / "strings.json"
+LOCALES = sorted((COMPONENT / "translations").iterdir())
+ENGLISH = COMPONENT / "translations" / "en.json"
 
 # `RESULT_X = "value"` / `STEP_X = "value"`
 CONSTANTS = re.compile(r'^(RESULT|STEP)_\w+ = "([^"]+)"', re.MULTILINE)
+
+# `{placeholder}` of a translation string
+PLACEHOLDERS = re.compile(r"\{(\w+)\}")
+
+# A reference to the Home Assistant common strings
+REFERENCE = "[%key:"
+
+# Home Assistant titles a reauth flow with the entry title and nothing else,
+# and the integration has no discovery step adding placeholders of its own
+FLOW_TITLE_PLACEHOLDERS = {"name"}
+
+# The placeholders the flow passes to each step, by step id
+STEP_PLACEHOLDERS: dict[str, set[str]] = {
+    "reauth_confirm": {"host"},
+}
 
 
 def _get_constants(prefix: str) -> set[str]:
@@ -27,14 +44,36 @@ def _get_constants(prefix: str) -> set[str]:
     }
 
 
-def _get_strings() -> dict[str, Any]:
-    """Get the config section of the source strings."""
+def _get_config(source: Path = STRINGS) -> dict[str, Any]:
+    """Get the config section of a translation source."""
 
-    config: dict[str, Any] = json.loads(STRINGS.read_text(encoding="utf-8"))[
+    config: dict[str, Any] = json.loads(source.read_text(encoding="utf-8"))[
         "config"
     ]
 
     return config
+
+
+def _flatten(data: Any, prefix: str = "") -> set[str]:
+    """Return every leaf path of a nested mapping."""
+
+    if not isinstance(data, dict):
+        return {prefix}
+
+    return {
+        key
+        for name, value in data.items()
+        for key in _flatten(value, f"{prefix}.{name}")
+    }
+
+
+def _get_placeholders(data: Any) -> set[str]:
+    """Return every placeholder used by a translation subtree."""
+
+    if not isinstance(data, dict):
+        return set(PLACEHOLDERS.findall(str(data)))
+
+    return {key for value in data.values() for key in _get_placeholders(value)}
 
 
 @pytest.mark.parametrize(
@@ -47,7 +86,7 @@ def _get_strings() -> dict[str, Any]:
 def test_constants_have_strings(prefix: str, section: str) -> None:
     """Test that every constant shown to the user can be translated."""
 
-    assert _get_constants(prefix) <= set(_get_strings()[section])
+    assert _get_constants(prefix) <= set(_get_config()[section])
 
 
 @pytest.mark.parametrize(
@@ -60,26 +99,43 @@ def test_constants_have_strings(prefix: str, section: str) -> None:
 def test_strings_are_used(prefix: str, section: str) -> None:
     """Test that no string is kept for a constant which no longer exists."""
 
-    assert set(_get_strings()[section]) <= _get_constants(prefix)
+    assert set(_get_config()[section]) <= _get_constants(prefix)
 
 
-def test_locales_match_the_source() -> None:
-    """Test that every locale offers the same keys as the source strings."""
+@pytest.mark.parametrize("source", [STRINGS, *LOCALES], ids=lambda p: p.name)
+def test_flow_title_placeholders(source: Path) -> None:
+    """Test that the flow title only uses provided placeholders."""
 
-    def flatten(data: Any, prefix: str = "") -> set[str]:
-        """Return every leaf path of a nested mapping."""
+    title = _get_config(source).get("flow_title", "")
 
-        if not isinstance(data, dict):
-            return {prefix}
+    assert set(PLACEHOLDERS.findall(title)) <= FLOW_TITLE_PLACEHOLDERS
 
-        return {
-            key
-            for name, value in data.items()
-            for key in flatten(value, f"{prefix}.{name}")
-        }
 
-    expected = flatten(_get_strings())
+@pytest.mark.parametrize("source", [STRINGS, *LOCALES], ids=lambda p: p.name)
+def test_step_placeholders(source: Path) -> None:
+    """Test that each step only uses the placeholders the flow passes."""
 
-    for locale in sorted((COMPONENT / "translations").iterdir()):
-        content = json.loads(locale.read_text(encoding="utf-8"))
-        assert flatten(content["config"]) <= expected, locale.name
+    for step, content in _get_config(source).get("step", {}).items():
+        expected = STEP_PLACEHOLDERS.get(step, set())
+
+        assert _get_placeholders(content) <= expected, step
+
+
+@pytest.mark.parametrize("locale", LOCALES, ids=lambda p: p.name)
+def test_locales_have_no_references(locale: Path) -> None:
+    """Test that no locale ships an unresolved reference."""
+
+    assert REFERENCE not in locale.read_text(encoding="utf-8")
+
+
+def test_english_matches_the_source() -> None:
+    """Test that the English locale offers every string of the source."""
+
+    assert _flatten(_get_config(ENGLISH)) == _flatten(_get_config())
+
+
+@pytest.mark.parametrize("locale", LOCALES, ids=lambda p: p.name)
+def test_locales_match_the_source(locale: Path) -> None:
+    """Test that no locale offers a string the source does not have."""
+
+    assert _flatten(_get_config(locale)) <= _flatten(_get_config())
