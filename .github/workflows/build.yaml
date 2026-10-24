@@ -34,4 +34,36 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v7"
-      - uses: "home-assistant/actions/hassfest@master"
+      # Runs the image of `home-assistant/actions/hassfest` directly to
+      # tolerate a single known error: core `asuswrt` pins asusrouter v1,
+      # while i1 is developed on v2.
+      - name: hassfest
+        env:
+          KNOWN_ERROR: >-
+            ^\* \[ERROR\] \[REQUIREMENTS\] Requirement asusrouter\S* is
+            incompatible with asusrouter\S*, which Home Assistant depends on\.
+        run: |
+          set -o pipefail
+          status=0
+          docker run --rm -v "${{ github.workspace }}://github/workspace" \
+            ghcr.io/home-assistant/hassfest 2>&1 | tee hassfest.log \
+            || status=$?
+
+          errors=$(grep -E '^\* \[ERROR\]' hassfest.log || true)
+          unexpected=$(grep -vE "$KNOWN_ERROR" <<< "$errors" || true)
+
+          if [ -n "$errors" ] && [ -z "$unexpected" ]; then
+            echo "::warning::Tolerated known hassfest error: $errors"
+          fi
+
+          if [ -n "$unexpected" ]; then
+            while IFS= read -r line; do
+              echo "::error::$line"
+            done <<< "$unexpected"
+            exit 1
+          fi
+
+          # Failed without reporting an error, e.g. the image did not run
+          if [ "$status" -ne 0 ] && [ -z "$errors" ]; then
+            exit "$status"
+          fi
