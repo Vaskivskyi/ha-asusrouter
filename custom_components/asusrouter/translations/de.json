@@ -55,5 +55,15 @@
       "reconfigure_successful": "Die Neukonfiguration war erfolgreich",
       "unique_id_mismatch": "Dies ist ein anderes Gerät. Vorgang abgebrochen"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU"
+      },
+      "ram": {
+        "name": "RAM"
+      }
+    }
   }
 }

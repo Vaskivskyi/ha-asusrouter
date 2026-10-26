@@ -44,12 +44,18 @@ def _get_constants(prefix: str) -> set[str]:
     }
 
 
+def _get_strings(source: Path = STRINGS) -> dict[str, Any]:
+    """Get every section of a translation source."""
+
+    strings: dict[str, Any] = json.loads(source.read_text(encoding="utf-8"))
+
+    return strings
+
+
 def _get_config(source: Path = STRINGS) -> dict[str, Any]:
     """Get the config section of a translation source."""
 
-    config: dict[str, Any] = json.loads(source.read_text(encoding="utf-8"))[
-        "config"
-    ]
+    config: dict[str, Any] = _get_strings(source)["config"]
 
     return config
 
@@ -121,21 +127,21 @@ def test_step_placeholders(source: Path) -> None:
         assert _get_placeholders(content) <= expected, step
 
 
-@pytest.mark.parametrize("locale", LOCALES, ids=lambda p: p.name)
-def test_locales_have_no_references(locale: Path) -> None:
-    """Test that no locale ships an unresolved reference."""
+@pytest.mark.parametrize("source", [STRINGS, *LOCALES], ids=lambda p: p.name)
+def test_strings_have_no_references(source: Path) -> None:
+    """Test that no translation source holds an unresolved reference."""
 
-    assert REFERENCE not in locale.read_text(encoding="utf-8")
+    assert REFERENCE not in source.read_text(encoding="utf-8")
 
 
 def test_english_matches_the_source() -> None:
     """Test that the English locale offers every string of the source."""
 
-    assert _flatten(_get_config(ENGLISH)) == _flatten(_get_config())
+    assert _flatten(_get_strings(ENGLISH)) == _flatten(_get_strings())
 
 
 @pytest.mark.parametrize("locale", LOCALES, ids=lambda p: p.name)
 def test_locales_match_the_source(locale: Path) -> None:
     """Test that no locale offers a string the source does not have."""
 
-    assert _flatten(_get_config(locale)) <= _flatten(_get_config())
+    assert _flatten(_get_strings(locale)) <= _flatten(_get_strings())

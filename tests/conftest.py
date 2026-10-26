@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from custom_components.asusrouter import bridge as bridge_module
+from custom_components.asusrouter import helpers as helpers_module
 from tests.helpers import SyncPatch
 
 
@@ -82,7 +82,7 @@ def mock_format_mac(universal_mock: UniversalMockPatcher) -> SyncPatch:
         side_effect: Any = mock_format_mac, return_value: Any = None
     ) -> Mock:
         return universal_mock.patch(
-            bridge_module, "format_mac", side_effect, return_value, Mock
+            helpers_module, "format_mac", side_effect, return_value, Mock
         )
 
     return _patch

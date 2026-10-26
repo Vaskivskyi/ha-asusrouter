@@ -55,5 +55,15 @@
       "reconfigure_successful": "Переналаштування виконано успішно",
       "unique_id_mismatch": "Це інший пристрій. Операцію перервано"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "ЦП"
+      },
+      "ram": {
+        "name": "ОЗП"
+      }
+    }
   }
 }

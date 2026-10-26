@@ -55,5 +55,15 @@
       "reconfigure_successful": "Herconfiguratie is gelukt",
       "unique_id_mismatch": "Dit is een ander apparaat. Bewerking afgebroken"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU"
+      },
+      "ram": {
+        "name": "RAM"
+      }
+    }
   }
 }

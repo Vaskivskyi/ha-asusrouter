@@ -7,6 +7,12 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouter
 from asusrouter.const import DEFAULT_IDENTITY_BRAND
+from asusrouter.modules.aimesh import (
+    ARAiMeshNode,
+    ARAiMeshRole,
+    ARAiMeshTopology,
+)
+from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.device.identity import ARDeviceIdentity
 from asusrouter.modules.firmware.version import ARFirmware
 from asusrouter.tools.identifiers.mac import MacAddress
@@ -45,6 +51,22 @@ WEBPANEL = "https://192.168.1.1:8443"
 
 FIRMWARE = ARFirmware((3, 0, 0, 4), 388, 1, 0)
 FIRMWARE_STRING = "3.0.0.4.388.1_0"
+
+NODE_MAC = MacAddress("AA:BB:CC:DD:EE:01")
+OTHER_NODE_MAC = MacAddress("AA:BB:CC:DD:EE:02")
+ROOT_MAC = MacAddress("AA:BB:CC:DD:EE:03")
+VIA_DEVICE_ID = "router_device_id"
+
+
+def _get_node(
+    mac: MacAddress = NODE_MAC,
+    role: ARAiMeshRole = ARAiMeshRole.NODE,
+    alias: str | MacAddress | None = None,
+    model: str | None = "Node",
+) -> ARAiMeshNode:
+    """Create an AiMesh node as the library reports it."""
+
+    return ARAiMeshNode(mac=mac, alias=alias, model=model, role=role)
 
 
 def _get_identity(
@@ -157,6 +179,38 @@ async def test_identity_property() -> None:
     assert bridge.identity is identity
 
 
+@pytest.mark.parametrize(
+    ("mode", "expected"),
+    [
+        (AROperationMode.ROUTER, [NODE_MAC, OTHER_NODE_MAC]),
+        (AROperationMode.UNKNOWN, [NODE_MAC, OTHER_NODE_MAC]),
+        # A node sees the whole mesh but cannot serve the others
+        (AROperationMode.AIMESH_NODE, []),
+    ],
+)
+async def test_nodes(
+    mode: AROperationMode, expected: list[MacAddress]
+) -> None:
+    """Test that only the nodes served through the device are reported."""
+
+    identity = _get_identity()
+    identity._operation_mode = mode
+    nodes = [
+        _get_node(ROOT_MAC, ARAiMeshRole.ROUTER),
+        _get_node(NODE_MAC),
+        _get_node(OTHER_NODE_MAC),
+        # The device itself listed as a node
+        _get_node(MAC),
+    ]
+    identity.update_aimesh(
+        ARAiMeshTopology(nodes={node.mac: node for node in nodes})
+    )
+
+    bridge = await _get_bridge(identity)
+
+    assert [node.mac for node in bridge.nodes] == expected
+
+
 # ---------------------------
 # <-- API
 # ---------------------------
@@ -171,7 +225,7 @@ async def test_device_info_without_identity() -> None:
 
     bridge = await _get_bridge()
 
-    assert bridge.device_info == DeviceInfo(
+    assert bridge.get_device_info(None) == DeviceInfo(
         configuration_url=WEBPANEL,
         identifiers=set(),
         # The library already defaults the brand
@@ -191,24 +245,41 @@ async def test_device_info(format_mac: SyncPatch) -> None:
 
     bridge = await _get_bridge(_get_identity(firmware=FIRMWARE))
 
-    assert bridge.device_info == DeviceInfo(
+    assert bridge.get_device_info(None) == DeviceInfo(
         configuration_url=WEBPANEL,
         identifiers={(DOMAIN, MAC_FORMATTED), (DOMAIN, SERIAL)},
         manufacturer="Brand",
-        model="Model",
-        model_id="MODEL_ORIGINAL",
-        name="Model",
+        model="MODEL_ORIGINAL",
+        model_id="Model",
+        name="MODEL_ORIGINAL",
         serial_number=SERIAL,
         sw_version=FIRMWARE_STRING,
     )
 
 
+async def test_device_info_mesh_node() -> None:
+    """Test that the device takes its name from its AiMesh node."""
+
+    mesh_node = _get_node(MAC, alias="Office")
+    mesh_node.model_display = "Model Display"
+
+    bridge = await _get_bridge(_get_identity())
+    device_info = bridge.get_device_info(mesh_node)
+
+    assert device_info["model"] == "Model Display"
+    assert device_info["model_id"] == "Model"
+    assert device_info["name"] == "Model Display (Office)"
+
+
 async def test_device_info_without_model() -> None:
     """Test the fallback name when the device reports no model."""
 
-    bridge = await _get_bridge(_get_identity(model=None))
+    identity = _get_identity(model=None)
+    identity._model_original = None
 
-    assert bridge.device_info["name"] == DEFAULT_IDENTITY_NAME
+    bridge = await _get_bridge(identity)
+
+    assert bridge.get_device_info(None)["name"] == DEFAULT_IDENTITY_NAME
 
 
 async def test_device_info_unknown_firmware() -> None:
@@ -216,7 +287,7 @@ async def test_device_info_unknown_firmware() -> None:
 
     bridge = await _get_bridge(_get_identity())
 
-    assert bridge.device_info["sw_version"] is None
+    assert bridge.get_device_info(None)["sw_version"] is None
 
 
 @pytest.mark.parametrize(
@@ -241,6 +312,89 @@ async def test_get_identifiers(
     identity = _get_identity(mac=mac, serial=serial)
 
     assert ARBridge._get_identifiers(identity) == expected
+
+
+@pytest.mark.parametrize(
+    ("models", "expected"),
+    [
+        (("Display", "Original", "Model"), "Display"),
+        ((None, "Original", "Model"), "Original"),
+        # Some nodes report an empty product id
+        ((None, None, ""), None),
+        ((), None),
+    ],
+)
+async def test_get_model(
+    models: tuple[str | None, ...], expected: str | None
+) -> None:
+    """Test that the first reported model is used."""
+
+    assert ARBridge._get_model(*models) == expected
+
+
+@pytest.mark.parametrize(
+    ("alias", "model", "expected"),
+    [
+        ("Living room", "Node", "Node (Living room)"),
+        # An alias never set by the user is the node MAC
+        (NODE_MAC, "Node", "Node"),
+        (None, "Node", "Node"),
+        ("Node", "Node", "Node"),
+        ("Living room", None, f"{DEFAULT_IDENTITY_NAME} (Living room)"),
+    ],
+)
+async def test_get_name(
+    alias: str | MacAddress | None, model: str | None, expected: str
+) -> None:
+    """Test that the name keeps the model and adds a real alias."""
+
+    assert ARBridge._get_name(model, alias) == expected
+
+
+@pytest.mark.parametrize(
+    ("firmware", "expected"),
+    [
+        (FIRMWARE, FIRMWARE_STRING),
+        # Placeholders of an unknown firmware
+        (ARFirmware(), None),
+    ],
+)
+async def test_get_sw_version(
+    firmware: ARFirmware, expected: str | None
+) -> None:
+    """Test that only a known firmware is reported as the version."""
+
+    assert ARBridge._get_sw_version(firmware) == expected
+
+
+@pytest.mark.parametrize(
+    ("firmware", "sw_version"),
+    [
+        (FIRMWARE, FIRMWARE_STRING),
+        (ARFirmware(), None),
+    ],
+)
+async def test_get_node_device_info(
+    firmware: ARFirmware, sw_version: str | None
+) -> None:
+    """Test that a node is a device linked to its router."""
+
+    node = _get_node(alias="Living room")
+    node.model_original = "NODE_ORIGINAL"
+    node.model_display = "Node Display"
+    node.firmware = firmware
+
+    bridge = await _get_bridge(_get_identity())
+
+    assert bridge.get_node_device_info(node, VIA_DEVICE_ID) == DeviceInfo(
+        identifiers={(DOMAIN, str(NODE_MAC))},
+        manufacturer="Brand",
+        model="Node Display",
+        model_id="Node",
+        name="Node Display (Living room)",
+        sw_version=sw_version,
+        via_device_id=VIA_DEVICE_ID,
+    )
 
 
 # ---------------------------

@@ -55,5 +55,15 @@
       "reconfigure_successful": "Zmena konfigurácie bola úspešná",
       "unique_id_mismatch": "Toto je iné zariadenie. Operácia prerušená"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU"
+      },
+      "ram": {
+        "name": "RAM"
+      }
+    }
   }
 }

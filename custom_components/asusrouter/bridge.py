@@ -8,7 +8,11 @@ from typing import Any
 import aiohttp
 from asusrouter import AsusRouter
 from asusrouter.config import ARConfigKey
+from asusrouter.modules.aimesh import ARAiMeshNode, ARAiMeshRole
+from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.device.identity import ARDeviceIdentity
+from asusrouter.modules.firmware import ARFirmware
+from asusrouter.tools.identifiers import MacAddress
 from homeassistant.const import (
     CONF_HOST,
     CONF_PASSWORD,
@@ -18,9 +22,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.device_registry import DeviceInfo, format_mac
+from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import CONF_DEFAULT_PORT, DEFAULT_IDENTITY_NAME, DOMAIN
+from .helpers import to_identifier
 
 API_CONFIG: dict[ARConfigKey, Any] = {
     # Enable automatic temperature fix and disable the notification
@@ -64,6 +69,21 @@ class ARBridge:
         """Return device identity."""
 
         return self._api.description
+
+    @property
+    def nodes(self) -> list[ARAiMeshNode]:
+        """Return the AiMesh nodes served through this device."""
+
+        identity = self.identity
+        # A node reports the whole mesh, but only the router serves its data
+        if identity.operation_mode is AROperationMode.AIMESH_NODE:
+            return []
+
+        return [
+            node
+            for node in identity.aimesh.nodes.values()
+            if node.role is ARAiMeshRole.NODE and node.mac != identity.mac
+        ]
 
     # ---------------------------
     # <-- Properties
@@ -114,29 +134,82 @@ class ARBridge:
 
         identifiers: set[tuple[str, str]] = set()
         if identity.mac is not None:
-            identifiers.add((DOMAIN, format_mac(str(identity.mac))))
+            identifiers.add(to_identifier(identity.mac))
         if identity.serial is not None:
             identifiers.add((DOMAIN, identity.serial))
 
         return identifiers
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device information."""
+    def get_device_info(self, mesh_node: ARAiMeshNode | None) -> DeviceInfo:
+        """Return device information, named after its AiMesh node if known."""
 
         identity = self.identity
-        firmware = identity.firmware
+        model = self._get_model(
+            mesh_node.model_display if mesh_node else None,
+            identity.model_original,
+            identity.model,
+        )
 
         return DeviceInfo(
             configuration_url=self._api.webpanel,
             identifiers=self._get_identifiers(identity),
             manufacturer=identity.brand,
-            model=identity.model,
-            model_id=identity.model_original,
-            name=identity.model or DEFAULT_IDENTITY_NAME,
+            model=model,
+            model_id=identity.model,
+            name=self._get_name(model, mesh_node.alias if mesh_node else None),
             serial_number=identity.serial,
-            # Safelock against placeholders-filled string
-            sw_version=str(firmware) if firmware.major is not None else None,
+            sw_version=self._get_sw_version(identity.firmware),
+        )
+
+    @staticmethod
+    def _get_model(*models: str | None) -> str | None:
+        """Get the first reported model, the friendliest first."""
+
+        return next((model for model in models if model), None)
+
+    @staticmethod
+    def _get_name(model: str | None, alias: str | MacAddress | None) -> str:
+        """Get the device name from its model and alias."""
+
+        model = model or DEFAULT_IDENTITY_NAME
+        # An alias never set by the user is reported as the node MAC
+        if isinstance(alias, str) and alias != model:
+            return f"{model} ({alias})"
+
+        return model
+
+    @staticmethod
+    def _get_sw_version(firmware: ARFirmware) -> str | None:
+        """Get the firmware version, None when unknown."""
+
+        # Safelock against placeholders-filled string
+        return str(firmware) if firmware.major is not None else None
+
+    @classmethod
+    def get_node_naming(cls, node: ARAiMeshNode) -> tuple[str | None, str]:
+        """Return the model and the device name of an AiMesh node."""
+
+        model = cls._get_model(
+            node.model_display, node.model_original, node.model
+        )
+
+        return model, cls._get_name(model, node.alias)
+
+    def get_node_device_info(
+        self, node: ARAiMeshNode, via_device_id: str
+    ) -> DeviceInfo:
+        """Return device information of an AiMesh node."""
+
+        model, name = self.get_node_naming(node)
+
+        return DeviceInfo(
+            identifiers={to_identifier(node.mac)},
+            manufacturer=self.identity.brand,
+            model=model,
+            model_id=node.model,
+            name=name,
+            sw_version=self._get_sw_version(node.firmware),
+            via_device_id=via_device_id,
         )
 
     # ---------------------------

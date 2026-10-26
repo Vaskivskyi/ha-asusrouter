@@ -55,5 +55,15 @@
       "reconfigure_successful": "Az újrakonfigurálás sikeres volt",
       "unique_id_mismatch": "Ez egy másik eszköz. A művelet megszakítva"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU"
+      },
+      "ram": {
+        "name": "RAM"
+      }
+    }
   }
 }
