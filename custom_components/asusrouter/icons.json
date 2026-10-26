@@ -1,0 +1,12 @@
+{
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "default": "mdi:cpu-32-bit"
+      },
+      "ram": {
+        "default": "mdi:memory"
+      }
+    }
+  }
+}

@@ -55,5 +55,15 @@
       "reconfigure_successful": "Reconfiguração realizada com sucesso",
       "unique_id_mismatch": "Este é um dispositivo diferente. Operação cancelada"
     }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU"
+      },
+      "ram": {
+        "name": "RAM"
+      }
+    }
   }
 }
