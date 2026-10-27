@@ -60,12 +60,12 @@ def _get_entry(mesh: Any = ()) -> Mock:
     return entry
 
 
-def _get_coordinator(*macs: MacAddress, success: bool = True) -> Mock:
+def _get_coordinator(*macs: MacAddress) -> Mock:
     """Create a topology coordinator with the given nodes."""
 
     return Mock(
         data=ARAiMeshTopology(nodes={mac: _get_node(mac) for mac in macs}),
-        last_update_success=success,
+        last_update_success=True,
     )
 
 
@@ -136,19 +136,12 @@ async def test_remove_stale_devices(registry: Mock) -> None:
 # ---------------------------
 
 
-@pytest.mark.parametrize(
-    "coordinator",
-    [
-        # Listeners are called on failures too
-        _get_coordinator(NODE_MAC, success=False),
-        # Nothing was ever read
-        _get_coordinator(),
-    ],
-)
-async def test_sync_topology_nothing_new(coordinator: Mock) -> None:
+async def test_sync_topology_nothing_new() -> None:
     """Test that a failed read changes nothing."""
 
     hass = Mock()
+    # Listeners are called on failures too
+    coordinator = Mock(data=None, last_update_success=False)
 
     with patch.object(topology, "async_register_devices") as register:
         async_sync_topology(

@@ -84,13 +84,12 @@ def async_sync_topology(
 ) -> None:
     """Follow the AiMesh topology of the device."""
 
-    topology = coordinator.data
     # Listeners are called on failures too, with nothing new to follow
-    if not coordinator.last_update_success or not topology.nodes:
+    if not coordinator.last_update_success:
         return
 
     runtime_data = config_entry.runtime_data
-    nodes = runtime_data.bridge.get_nodes(topology)
+    nodes = runtime_data.bridge.get_nodes(coordinator.data)
     macs = frozenset(node.mac for node in nodes)
 
     if macs != runtime_data.mesh:

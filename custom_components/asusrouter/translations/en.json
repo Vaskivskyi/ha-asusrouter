@@ -57,9 +57,56 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "connected": {
+        "name": "Connected"
+      }
+    },
     "sensor": {
+      "aimesh": {
+        "name": "AiMesh",
+        "state_attributes": {
+          "total": {
+            "name": "Total"
+          }
+        }
+      },
+      "backhaul": {
+        "name": "Backhaul",
+        "state": {
+          "mlo": "MLO",
+          "moca": "MoCA",
+          "plc": "Powerline",
+          "wired": "Wired",
+          "wireless_2g1": "Wireless 2.4 GHz",
+          "wireless_2g2": "Wireless 2.4 GHz-2",
+          "wireless_5g1": "Wireless 5 GHz",
+          "wireless_5g2": "Wireless 5 GHz-2",
+          "wireless_6g1": "Wireless 6 GHz",
+          "wireless_6g2": "Wireless 6 GHz-2"
+        },
+        "state_attributes": {
+          "parent": {
+            "name": "Parent"
+          }
+        }
+      },
+      "backhaul_link_rate": {
+        "name": "Backhaul link rate",
+        "state_attributes": {
+          "port": {
+            "name": "Port"
+          }
+        }
+      },
+      "backhaul_rssi": {
+        "name": "Backhaul RSSI"
+      },
       "cpu": {
         "name": "CPU"
+      },
+      "ip_address": {
+        "name": "IP address"
       },
       "ram": {
         "name": "RAM"

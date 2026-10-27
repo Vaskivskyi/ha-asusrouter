@@ -15,6 +15,7 @@ from asusrouter.modules.aimesh import (
 from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.device.identity import ARDeviceIdentity
 from asusrouter.modules.firmware.version import ARFirmware
+from asusrouter.modules.support import ARSupportType
 from asusrouter.tools.identifiers.mac import MacAddress
 from homeassistant.const import (
     CONF_HOST,
@@ -84,6 +85,7 @@ def _get_identity(
     identity._model = model
     identity._model_original = "MODEL_ORIGINAL"
     identity._serial = serial
+    identity._support = {ARSupportType.AIMESH: True}
 
     return identity
 
@@ -216,18 +218,26 @@ async def test_get_nodes(
 
 
 @pytest.mark.parametrize(
-    ("mode", "expected"),
+    ("mode", "support", "expected"),
     [
-        (AROperationMode.ROUTER, True),
-        (AROperationMode.UNKNOWN, True),
-        (AROperationMode.AIMESH_NODE, False),
+        (AROperationMode.ROUTER, True, True),
+        (AROperationMode.UNKNOWN, True, True),
+        (AROperationMode.AIMESH_NODE, True, False),
+        # No AiMesh to serve
+        (AROperationMode.ROUTER, False, False),
+        (AROperationMode.ROUTER, None, False),
     ],
 )
-async def test_serves_mesh(mode: AROperationMode, expected: bool) -> None:
-    """Test that only a node never serves the AiMesh."""
+async def test_serves_mesh(
+    mode: AROperationMode, support: bool | None, expected: bool
+) -> None:
+    """Test that only a router supporting AiMesh serves it."""
 
     identity = _get_identity()
     identity._operation_mode = mode
+    identity._support = (
+        {} if support is None else {ARSupportType.AIMESH: support}
+    )
 
     bridge = await _get_bridge(identity)
 

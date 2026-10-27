@@ -165,7 +165,7 @@ async def test_setup_entry(setup_coordinators: AsyncMock) -> None:
     bridge_class.assert_called_once_with(hass, ENTRY_DATA)
     bridge.async_connect.assert_awaited_once()
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, DESCRIPTIONS, [], BACKGROUND
+        hass, entry, list(DESCRIPTIONS), BACKGROUND
     )
     assert entry.runtime_data == ARRuntimeData(
         bridge=bridge, coordinators=COORDINATORS
@@ -187,8 +187,12 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
     ):
         await async_setup_entry(hass, entry)
 
+    # Nothing of the AiMesh is set up
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, DESCRIPTIONS, [], []
+        hass,
+        entry,
+        [d for d in DESCRIPTIONS if d.supported_fn is None],
+        [],
     )
 
 
@@ -217,7 +221,7 @@ async def test_setup_entry_nodes(
     assert entry.runtime_data.mesh == {NODE_MAC, OWNED_NODE_MAC}
     assert entry.runtime_data.nodes == [NODE_MAC]
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, DESCRIPTIONS, [NODE_MAC], BACKGROUND
+        hass, entry, list(DESCRIPTIONS), BACKGROUND
     )
 
     device = register_devices.return_value
@@ -450,3 +454,22 @@ async def test_remove_entry() -> None:
 # ---------------------------
 # <-- LIFECYCLE
 # ---------------------------
+
+
+@pytest.mark.parametrize(
+    ("covers_mesh", "expected"),
+    [(True, {NODE_MAC, OWNED_NODE_MAC}), (False, {NODE_MAC})],
+)
+async def test_get_node_macs(
+    covers_mesh: bool, expected: set[MacAddress]
+) -> None:
+    """Test that only a source of the whole mesh serves every node."""
+
+    runtime_data = ARRuntimeData(
+        bridge=Mock(),
+        mesh=frozenset({NODE_MAC, OWNED_NODE_MAC}),
+        nodes=[NODE_MAC],
+    )
+    description = Mock(covers_mesh=covers_mesh)
+
+    assert set(runtime_data.get_node_macs(description)) == expected

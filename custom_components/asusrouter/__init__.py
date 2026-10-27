@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from asusrouter import AsusRouterError
 from asusrouter.modules.aimesh import ARAiMeshSourceUniversal
@@ -22,6 +23,7 @@ from .coordinator import (
     ARTopologyCoordinator,
     async_setup_coordinators,
 )
+from .entity import get_supported
 from .errors import is_auth_error
 from .modules import DESCRIPTIONS
 from .ownership import async_hand_back, async_take_over, get_owned_devices
@@ -33,7 +35,10 @@ from .topology import (
     can_remove_device,
 )
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+if TYPE_CHECKING:
+    from .entity import AREntityDescription
+
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
 
 @dataclass
@@ -48,6 +53,13 @@ class ARRuntimeData:
     mesh: frozenset[MacAddress] = frozenset()
     # AiMesh nodes served through this entry
     nodes: list[MacAddress] = field(default_factory=list)
+
+    def get_node_macs(
+        self, description: AREntityDescription
+    ) -> Iterable[MacAddress]:
+        """Get the AiMesh nodes the description serves."""
+
+        return self.mesh if description.covers_mesh else self.nodes
 
 
 type ARConfigEntry = ConfigEntry[ARRuntimeData]
@@ -82,7 +94,7 @@ async def async_setup_entry(
     runtime_data.mesh = frozenset(node.mac for node in nodes)
     runtime_data.nodes = [node.mac for node in nodes if node.mac not in owned]
 
-    # The topology is followed even with no entity using it
+    # Optional, so a failed topology read never fails the setup
     background = (
         [(ARAiMeshSourceUniversal, TOPOLOGY_INTERVAL)]
         if bridge.serves_mesh
@@ -93,7 +105,10 @@ async def async_setup_entry(
     # first refresh of every coordinator runs here
     try:
         runtime_data.coordinators = await async_setup_coordinators(
-            hass, config_entry, DESCRIPTIONS, runtime_data.nodes, background
+            hass,
+            config_entry,
+            get_supported(DESCRIPTIONS, bridge),
+            background,
         )
     except Exception:
         # A failed setup is never unloaded

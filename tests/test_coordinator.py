@@ -39,9 +39,16 @@ SHORT_INTERVAL = timedelta(seconds=10)
 SOURCE = ARSystemStatusSourceUniversal
 OTHER_SOURCE = ARSystemStatusSource(target="aa:bb:cc:dd:ee:02")
 NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:03")
+OTHER_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:04")
+DEVICE_DATA = {"key": "value"}
 
 
-def _get_entry(fetch: Any = None, side_effect: Any = None) -> Mock:
+def _get_entry(
+    fetch: Any = None,
+    side_effect: Any = None,
+    mesh: frozenset[MacAddress] = frozenset(),
+    nodes: list[MacAddress] | None = None,
+) -> Mock:
     """Create a config entry with a bridge mocked."""
 
     bridge = Mock()
@@ -50,7 +57,9 @@ def _get_entry(fetch: Any = None, side_effect: Any = None) -> Mock:
     )
 
     entry = Mock()
-    entry.runtime_data = ARRuntimeData(bridge=bridge)
+    entry.runtime_data = ARRuntimeData(
+        bridge=bridge, mesh=mesh, nodes=nodes or []
+    )
 
     return entry
 
@@ -129,31 +138,48 @@ async def test_update_data_wrong_credentials() -> None:
         await coordinator._async_update_data()
 
 
-@pytest.mark.parametrize(
-    ("content", "previous", "expected"),
-    [
-        (_get_topology(NODE_MAC), None, _get_topology(NODE_MAC)),
-        # A failed read keeps the last known topology
-        (_get_topology(), _get_topology(NODE_MAC), _get_topology(NODE_MAC)),
-        (None, _get_topology(NODE_MAC), _get_topology(NODE_MAC)),
-        (None, None, _get_topology()),
-    ],
-)
-async def test_topology_content(
-    content: Any,
-    previous: ARAiMeshTopology | None,
-    expected: ARAiMeshTopology,
-) -> None:
-    """Test that the topology never empties after a failed read."""
+def _get_topology_coordinator() -> ARTopologyCoordinator:
+    """Create a coordinator of the AiMesh topology."""
 
-    coordinator = ARTopologyCoordinator(
+    return ARTopologyCoordinator(
         Mock(), _get_entry(), ARAiMeshSourceUniversal, INTERVAL
     )
-    # A new coordinator has no data yet
-    if previous is not None:
-        coordinator.data = previous
 
-    assert coordinator._get_content(content) == expected
+
+async def test_topology_content() -> None:
+    """Test that a fetched topology becomes the data."""
+
+    topology = _get_topology(NODE_MAC)
+
+    assert _get_topology_coordinator()._get_content(topology) is topology
+
+
+@pytest.mark.parametrize("content", [_get_topology(), None, {}])
+async def test_topology_content_failed(content: Any) -> None:
+    """Test that a read with no topology fails the update."""
+
+    with pytest.raises(UpdateFailed):
+        _get_topology_coordinator()._get_content(content)
+
+
+async def test_state_get_device() -> None:
+    """Test that the state of a device is read by its MAC."""
+
+    coordinator = _get_coordinator(_get_entry())
+    coordinator.data = {NODE_MAC: DEVICE_DATA}
+
+    assert coordinator.get_device(NODE_MAC) is DEVICE_DATA
+    assert coordinator.get_device(OTHER_MAC) is None
+
+
+async def test_topology_get_device() -> None:
+    """Test that the AiMesh node of a device is read by its MAC."""
+
+    coordinator = _get_topology_coordinator()
+    coordinator.data = _get_topology(NODE_MAC)
+
+    assert coordinator.get_device(NODE_MAC) is coordinator.data.nodes[NODE_MAC]
+    assert coordinator.get_device(OTHER_MAC) is None
 
 
 # ---------------------------
@@ -195,6 +221,7 @@ async def test_setup_coordinators_nodes() -> None:
             source=SOURCE,
             update_interval=INTERVAL,
             node_source=ARSystemStatusSource,
+            covers_mesh=False,
         ),
         # Available on the router only
         Mock(source=OTHER_SOURCE, update_interval=INTERVAL, node_source=None),
@@ -208,9 +235,14 @@ async def test_setup_coordinators_nodes() -> None:
         patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh,
     ):
         coordinators = await async_setup_coordinators(
-            Mock(), _get_entry(), descriptions, [NODE_MAC]
+            Mock(),
+            _get_entry(
+                mesh=frozenset({NODE_MAC, OTHER_MAC}), nodes=[NODE_MAC]
+            ),
+            descriptions,
         )
 
+    # The node another entry serves gets no coordinator here
     assert list(coordinators) == [
         SOURCE,
         OTHER_SOURCE,
@@ -218,6 +250,31 @@ async def test_setup_coordinators_nodes() -> None:
     ]
     assert first_refresh.await_count == len(descriptions)
     refresh.assert_awaited_once()
+
+
+async def test_setup_coordinators_mesh() -> None:
+    """Test that a source of the whole mesh serves every node."""
+
+    description = Mock(
+        source=SOURCE,
+        update_interval=INTERVAL,
+        node_source=ARSystemStatusSource,
+        covers_mesh=True,
+    )
+
+    with (
+        patch.object(
+            ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
+        ),
+        patch.object(ARCoordinator, "async_refresh", AsyncMock()),
+    ):
+        coordinators = await async_setup_coordinators(
+            Mock(),
+            _get_entry(mesh=frozenset({NODE_MAC}), nodes=[]),
+            [description],
+        )
+
+    assert ARSystemStatusSource(target=NODE_MAC) in coordinators
 
 
 async def test_setup_coordinators_background() -> None:
