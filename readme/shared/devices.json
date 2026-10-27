@@ -40,7 +40,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "380.8102"
+          "380_8102"
         ]
       },
       "amazon": "https://amzn.to/3jIWQDu"
@@ -64,8 +64,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.47534",
-          "386.50117"
+          "386_47534",
+          "386_50117"
         ],
         "merlin": [
           "386.4-gnuton2",
@@ -108,7 +108,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.24198"
+          "388_24198",
+          "102_34735"
         ],
         "merlin": [
           "388.7_0_rog"
@@ -120,7 +121,7 @@
       "name": "GT-AX6000",
       "slug": "GT-AX6000",
       "wifi": "ax",
-      "status": "expected",
+      "status": "confirmed",
       "firmware": {
         "merlin": [
           "388.7_beta1"
@@ -142,7 +143,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.21617"
+          "388_21617"
         ],
         "merlin": [
           "388.7_beta1_rog",
@@ -160,8 +161,20 @@
         "stock": [
           "102_39244"
         ]
-      },  
+      },
       "amazon": "https://amzn.to/3yGFU7U"
+    },
+    {
+      "name": "GT-BE19000AI",
+      "slug": "GT-BE19000AI",
+      "wifi": "be",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_40456"
+        ]
+      },
+      "amazon": "https://link.amazon/B06bdKVg1"
     },
     {
       "name": "GT-BE98",
@@ -186,8 +199,25 @@
       "name": "GT6",
       "slug": "GT6",
       "wifi": "ax",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "388_25133"
+        ]
+      },
       "amazon": "https://amzn.to/3GmPCfR"
+    },
+    {
+      "name": "Lyra Mini",
+      "slug": "LyraMini",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386_41615"
+        ]
+      },
+      "amazon": "https://link.amazon/B06rhWxwo"
     },
     {
       "name": "RP-AX56",
@@ -197,13 +227,37 @@
       "amazon": "https://amzn.to/3MpZSY8"
     },
     {
+      "name": "RT-AC1200",
+      "slug": "RT-AC1200",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "380_10931"
+        ]
+      },
+      "amazon": "https://link.amazon/B0diIA2a1"
+    },
+    {
+      "name": "RT-AC1200G+",
+      "slug": "RT-AC1200G+",
+      "wifi": "ac",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "382_52272"
+        ]
+      },
+      "amazon": "https://link.amazon/B0aXKrwgL"
+    },
+    {
       "name": "RT-AC51U",
       "slug": "RT-AC51U",
       "wifi": "ac",
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "380.8591"
+          "380_8591"
         ]
       },
       "amazon": "https://amzn.to/3WMy2sq"
@@ -234,7 +288,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.21649"
+          "386_21649"
         ]
       },
       "amazon": "https://amzn.to/3VAxDbx"
@@ -265,7 +319,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.51255"
+          "386_51255"
         ]
       },
       "amazon": "https://amzn.to/3vtZ4Jm"
@@ -277,7 +331,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.49703"
+          "386_49703"
         ],
         "merlin": [
           "386.5_2",
@@ -293,7 +347,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "382.52516"
+          "382_52516"
         ]
       },
       "amazon": "https://amzn.to/3kMiDdU"
@@ -305,8 +359,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.48260",
-          "386.49709"
+          "386_48260",
+          "386_49709"
         ],
         "merlin": [
           "386.7_0",
@@ -335,7 +389,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.48260"
+          "386_48260"
         ],
         "merlin": [
           "386.5_0",
@@ -352,10 +406,22 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "382.52517"
+          "382_52517"
         ]
       },
       "amazon": "https://amzn.to/3i6dWL0"
+    },
+    {
+      "name": "RT-AX3000",
+      "slug": "RT-AX3000",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "merlin": [
+          "388.9"
+        ]
+      },
+      "amazon": "https://link.amazon/B08zIwJsu"
     },
     {
       "name": "RT-AX3000P",
@@ -378,7 +444,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.69061"
+          "386_69061"
         ]
       },
       "amazon": "https://amzn.to/49jEgqO"
@@ -391,14 +457,26 @@
       "amazon": "https://amzn.to/4aCdvyu"
     },
     {
+      "name": "RT-AX54HP",
+      "slug": "RT-AX54HP",
+      "wifi": "ax",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386_69195"
+        ]
+      },
+      "amazon": "https://link.amazon/B0anLgL4f"
+    },
+    {
       "name": "RT-AX55",
       "slug": "RT-AX55",
       "wifi": "ax",
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.50410",
-          "386.52041"
+          "386_50410",
+          "386_52041"
         ]
       },
       "amazon": "https://amzn.to/3Z2ath5"
@@ -445,14 +523,14 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.49674",
-          "388.22237"
+          "386_49674",
+          "388_22237"
         ],
         "merlin": [
           "386.7_2",
           "388.1_0",
           "388.4_0",
-          "388.7.0"
+          "388.7_0"
         ]
       },
       "amazon": "https://amzn.to/3jHri0L"
@@ -471,7 +549,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.21732"
+          "388_21732"
         ]
       },
       "amazon": "https://amzn.to/3WzRwk5"
@@ -483,8 +561,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.48664",
-          "386.49674"
+          "386_48664",
+          "386_49674"
         ],
         "merlin": [
           "388.8_4-gnuton1"
@@ -499,10 +577,10 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.46061",
-          "386.48260",
-          "386.49447",
-          "388.22525"
+          "386_46061",
+          "386_48260",
+          "386_49447",
+          "388_22525"
         ],
         "merlin": [
           "386.7_2"
@@ -517,10 +595,10 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.46061",
-          "386.48260",
-          "386.49447",
-          "388.22525"
+          "386_46061",
+          "386_48260",
+          "386_49447",
+          "388_22525"
         ],
         "merlin": [
           "386.7_2",
@@ -537,7 +615,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.23565"
+          "388_23565"
         ]
       },
       "amazon": "https://amzn.to/3ZDM41T"
@@ -549,9 +627,10 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.45934",
-          "386.48631",
-          "388.24198"
+          "386_45934",
+          "386_48631",
+          "388_24198",
+          "388_24346"
         ],
         "merlin": [
           "386.5_2",
@@ -590,7 +669,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.46061"
+          "386_46061"
         ]
       },
       "amazon": "https://amzn.to/3jJJgzt"
@@ -615,10 +694,28 @@
       "amazon": "https://amzn.to/4bHsdo4"
     },
     {
+      "name": "RT-BE58U V2",
+      "slug": "RT-BE58UV2",
+      "wifi": "be",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_39407"
+        ]
+      },
+      "amazon": "https://link.amazon/B0iIHkyOP"
+    },
+    {
       "name": "RT-BE88U",
       "slug": "RT-BE88U",
       "wifi": "be",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_39256",
+          "102_39396"
+        ]
+      },
       "amazon": "https://amzn.to/3TAGCKY"
     },
     {
@@ -654,7 +751,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.23785"
+          "388_23785"
         ]
       },
       "amazon": "https://amzn.to/3QzzD4C"
@@ -673,12 +770,12 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.50224",
-          "388.21224",
-          "388.22525",
-          "388.23285",
-          "388.24121",
-          "388.24358"
+          "386_50224",
+          "388_21224",
+          "388_22525",
+          "388_23285",
+          "388_24121",
+          "388_24358"
         ],
         "merlin": [
           "388.4_0"
@@ -693,7 +790,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.32432"
+          "388_32432"
         ]
       },
       "amazon": "https://amzn.to/3CXqxaG"
@@ -709,14 +806,31 @@
       "name": "TUF-BE6500",
       "slug": "TUF-BE6500",
       "wifi": "be",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_57247"
+        ]
+      },
       "amazon": "https://amzn.to/3X3Xltv"
     },
     {
-      "name": "ZenWiFi AC Mini(CD6)",
+      "name": "TUF-BE9400",
+      "slug": "TUF-BE9400",
+      "wifi": "be",
+      "status": "confirmed",
+      "amazon": "https://link.amazon/B0aKXmffe"
+    },
+    {
+      "name": "ZenWiFi AC Mini (CD6)",
       "slug": "ZenWiFiACMini(CD6)",
       "wifi": "ac",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386_49693"
+        ]
+      },
       "amazon": "https://amzn.to/3RU7vrL"
     },
     {
@@ -726,8 +840,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.48706",
-          "388.23285"
+          "386_48706",
+          "388_23285"
         ],
         "merlin": [
           "386.7_2-gnuton1"
@@ -749,8 +863,8 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "386.48790",
-          "386.49599"
+          "386_48790",
+          "386_49599"
         ]
       },
       "amazon": "https://amzn.to/3hYGuGl"
@@ -766,14 +880,24 @@
       "name": "ZenWiFi BQ16",
       "slug": "ZenWiFiBQ16",
       "wifi": "be",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_39265"
+        ]
+      },
       "amazon": "https://amzn.to/4bgVvdo"
     },
     {
       "name": "ZenWiFi BQ16 Pro",
       "slug": "ZenWiFiBQ16Pro",
       "wifi": "be",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "102_37026"
+        ]
+      },
       "amazon": "https://amzn.to/3MNcw48"
     },
     {
@@ -790,7 +914,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.23759"
+          "388_23759"
         ]
       },
       "amazon": "https://amzn.to/3Iks0La"
@@ -809,7 +933,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.23013"
+          "388_23013"
         ]
       },
       "amazon": "https://amzn.to/3GTz68P"
@@ -821,7 +945,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.22127"
+          "388_22127"
         ]
       },
       "amazon": "https://amzn.to/3im6UC5"
@@ -830,7 +954,12 @@
       "name": "ZenWiFi XD4 Plus",
       "slug": "ZenWiFiXD4Plus",
       "wifi": "ax",
-      "status": "expected",
+      "status": "confirmed",
+      "firmware": {
+        "stock": [
+          "386_69276"
+        ]
+      },
       "amazon": "https://amzn.to/3XtYOWp"
     },
     {
@@ -847,7 +976,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.23949"
+          "388_23949"
         ]
       },
       "amazon": "https://amzn.to/3YrhgjM"
@@ -859,7 +988,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.21380"
+          "388_21380"
         ]
       },
       "amazon": "https://amzn.to/3jW23s4"
@@ -871,7 +1000,7 @@
       "status": "confirmed",
       "firmware": {
         "stock": [
-          "388.21380"
+          "388_21380"
         ]
       },
       "amazon": "https://amzn.to/3YMbyIZ"
