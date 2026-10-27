@@ -24,6 +24,16 @@ BANNER = (
 INCLUDE_RE = re.compile(r"^<!-- include:\s*(?P<path>.+?)\s*-->$", re.MULTILINE)
 DEVICES_MARKER = "<!-- devices -->"
 
+# Firmware versions as ASUS writes them, without the major part
+FIRMWARE_RE = {
+    # 3.0.0.4.388_23285 -> 388_23285
+    "stock": re.compile(r"^\d+_\d+$"),
+    # 3004.388.8_4 -> 388.8_4, plus the fork, beta and ROG suffixes
+    "merlin": re.compile(
+        r"^\d+\.\d+(?:_\d+)?(?:-gnuton\d+)?(?:_beta\d+)?(?:_rog)?$"
+    ),
+}
+
 
 def device_page(base: str, slug: str) -> str:
     """Build the device page markdown link target, escaping parentheses."""
@@ -69,6 +79,21 @@ def validate(data: dict[str, Any]) -> None:
         if device["slug"] in seen_slugs:
             raise ValueError(f"Duplicate slug {device['slug']!r}")
         seen_slugs.add(device["slug"])
+        validate_firmware(name, device.get("firmware", {}))
+
+
+def validate_firmware(name: str, firmware: dict[str, list[str]]) -> None:
+    """Fail loud on a firmware version not written as ASUS does."""
+
+    for kind, versions in firmware.items():
+        pattern = FIRMWARE_RE.get(kind)
+        if pattern is None:
+            raise ValueError(f"Device {name!r} has unknown firmware {kind!r}")
+        for version in versions:
+            if not pattern.match(version):
+                raise ValueError(
+                    f"Device {name!r} has malformed {kind} version {version!r}"
+                )
 
 
 def render_devices(data: dict[str, Any]) -> str:
