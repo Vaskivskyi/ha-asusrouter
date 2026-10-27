@@ -10,7 +10,11 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from asusrouter import AsusRouterError
-from asusrouter.modules.aimesh import ARAiMeshSource, ARAiMeshTopology
+from asusrouter.modules.aimesh import (
+    ARAiMeshNode,
+    ARAiMeshSource,
+    ARAiMeshTopology,
+)
 from asusrouter.modules.source import ARDataSource
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.core import HomeAssistant
@@ -78,6 +82,10 @@ class ARCoordinator[DataT](DataUpdateCoordinator[DataT], ABC):
     def _get_content(self, content: Any) -> DataT:
         """Get the coordinator data from the fetched source content."""
 
+    @abstractmethod
+    def get_device(self, mac: MacAddress) -> Any:
+        """Get the data of the device with the given MAC, None when absent."""
+
 
 class ARStateCoordinator(ARCoordinator[dict[Any, Any]]):
     """Coordinator of a source reporting its state as a dict."""
@@ -88,19 +96,29 @@ class ARStateCoordinator(ARCoordinator[dict[Any, Any]]):
         state: dict[Any, Any] = content or {}
         return state
 
+    def get_device(self, mac: MacAddress) -> Any:
+        """Get the state of the device with the given MAC."""
+
+        return self.data.get(mac)
+
 
 class ARTopologyCoordinator(ARCoordinator[ARAiMeshTopology]):
     """Coordinator of the AiMesh topology."""
 
     def _get_content(self, content: Any) -> ARAiMeshTopology:
-        """Get the topology, the last known one when nothing was fetched."""
+        """Get the topology, failing when nothing was fetched."""
 
         # The device lists itself, so an empty topology is a failed read
-        if isinstance(content, ARAiMeshTopology) and content.nodes:
-            return content
+        # HA keeps the last topology, so the mesh never looks gone
+        if not isinstance(content, ARAiMeshTopology) or not content.nodes:
+            raise UpdateFailed(f"No topology in `{self._source}`")
 
-        # A failed read must never look like the whole mesh left
-        return self.data or ARAiMeshTopology()
+        return content
+
+    def get_device(self, mac: MacAddress) -> ARAiMeshNode | None:
+        """Get the AiMesh node with the given MAC."""
+
+        return self.data.nodes.get(mac)
 
 
 # Sources whose content is not a state dict
@@ -113,26 +131,25 @@ async def async_setup_coordinators(
     hass: HomeAssistant,
     config_entry: ARConfigEntry,
     descriptions: Iterable[AREntityDescription],
-    nodes: Iterable[MacAddress] = (),
     background: Iterable[tuple[ARDataSource, timedelta]] = (),
 ) -> dict[ARDataSource, ARCoordinator[Any]]:
     """Set up a coordinator for every source of the descriptions."""
 
     descriptions = tuple(descriptions)
-    nodes = tuple(nodes)
+    runtime_data = config_entry.runtime_data
 
     requests = [
         (description.source, description.update_interval)
         for description in descriptions
     ]
-    # Sources polled for nodes or for no entity at all
+    # Sources that never fail the setup: the node and background ones
     optional_requests = [
         *background,
         *(
             (description.node_source(mac), description.update_interval)
             for description in descriptions
             if description.node_source is not None
-            for mac in nodes
+            for mac in runtime_data.get_node_macs(description)
         ),
     ]
     optional_sources = {source for source, _ in optional_requests}

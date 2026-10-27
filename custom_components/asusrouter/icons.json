@@ -1,8 +1,31 @@
 {
   "entity": {
+    "binary_sensor": {
+      "connected": {
+        "default": "mdi:lan-disconnect",
+        "state": {
+          "on": "mdi:lan-connect"
+        }
+      }
+    },
     "sensor": {
+      "aimesh": {
+        "default": "mdi:devices"
+      },
+      "backhaul": {
+        "default": "mdi:transit-connection-variant"
+      },
+      "backhaul_link_rate": {
+        "default": "mdi:ethernet"
+      },
+      "backhaul_rssi": {
+        "default": "mdi:wifi"
+      },
       "cpu": {
         "default": "mdi:cpu-32-bit"
+      },
+      "ip_address": {
+        "default": "mdi:ip-network"
       },
       "ram": {
         "default": "mdi:memory"

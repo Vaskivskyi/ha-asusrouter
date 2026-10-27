@@ -12,6 +12,7 @@ from asusrouter.modules.aimesh import ARAiMeshNode, ARAiMeshTopology
 from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.device.identity import ARDeviceIdentity
 from asusrouter.modules.firmware import ARFirmware
+from asusrouter.modules.support import ARSupportType, support_available
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.const import (
     CONF_HOST,
@@ -74,8 +75,11 @@ class ARBridge:
     def serves_mesh(self) -> bool:
         """Return whether the AiMesh nodes are served through this device."""
 
+        identity = self.identity
         # A node reports the whole mesh, but only the router serves its data
-        return self.identity.operation_mode is not AROperationMode.AIMESH_NODE
+        return identity.operation_mode is not AROperationMode.AIMESH_NODE and (
+            support_available(identity.support, ARSupportType.AIMESH)
+        )
 
     # ---------------------------
     # <-- Properties

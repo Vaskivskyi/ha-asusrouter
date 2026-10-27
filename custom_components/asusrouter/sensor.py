@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import (
 )
 
 from . import ARConfigEntry
-from .entity import AREntity, ARSensorDescription
+from .entity import AREntity, ARSensorDescription, get_entities
 from .modules import SENSORS
 
 
@@ -22,27 +22,9 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter sensors."""
 
-    runtime_data = config_entry.runtime_data
-    mac = runtime_data.bridge.identity.mac
-    # Entities are tied to the device MAC, nothing to attach them to
-    if mac is None:
-        return
-
-    coordinators = runtime_data.coordinators
-    entities = [
-        ARSensor(coordinators[description.source], description, mac)
-        for description in SENSORS
-    ]
-    entities.extend(
-        ARSensor(
-            coordinators[description.node_source(node)], description, node
-        )
-        for description in SENSORS
-        if description.node_source is not None
-        for node in runtime_data.nodes
+    async_add_entities(
+        get_entities(config_entry.runtime_data, SENSORS, ARSensor)
     )
-
-    async_add_entities(entities)
 
 
 class ARSensor(AREntity, SensorEntity):
