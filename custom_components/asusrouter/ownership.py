@@ -152,7 +152,7 @@ def async_hand_back(hass: HomeAssistant, config_entry: ARConfigEntry) -> None:
 
     for entry in hass.config_entries.async_loaded_entries(DOMAIN):
         if entry.entry_id != config_entry.entry_id and any(
-            to_identifier(node.mac) in identifiers
-            for node in entry.runtime_data.bridge.nodes
+            to_identifier(mac) in identifiers
+            for mac in entry.runtime_data.mesh
         ):
             hass.config_entries.async_schedule_reload(entry.entry_id)

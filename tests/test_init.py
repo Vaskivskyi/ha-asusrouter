@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouterError
 from asusrouter.error import AsusRouterAccessError
+from asusrouter.modules.aimesh import ARAiMeshSourceUniversal
 from asusrouter.modules.endpoint.error import ARAccessError
 from asusrouter.modules.source import ARDataSource
 from asusrouter.modules.system_status import ARSystemStatusSourceUniversal
@@ -25,11 +26,14 @@ import pytest
 from custom_components.asusrouter import (
     PLATFORMS,
     ARRuntimeData,
+    async_remove_config_entry_device,
     async_remove_entry,
     async_setup_entry,
     async_unload_entry,
 )
+from custom_components.asusrouter.coordinator import ARTopologyCoordinator
 from custom_components.asusrouter.modules import DESCRIPTIONS
+from custom_components.asusrouter.topology import TOPOLOGY_INTERVAL
 
 pytestmark = pytest.mark.asyncio
 
@@ -44,13 +48,11 @@ ENTRY_DATA: dict[str, Any] = {
     CONF_SSL: True,
 }
 
-DEVICE_INFO = {"identifiers": {("asusrouter", HOST)}, "name": "Model"}
 COORDINATORS: dict[ARDataSource, Any] = {ARSystemStatusSourceUniversal: Mock()}
-
+BACKGROUND = [(ARAiMeshSourceUniversal, TOPOLOGY_INTERVAL)]
 
 NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:01")
 OWNED_NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:02")
-NODE_DEVICE_INFO = {"identifiers": {("asusrouter", "node")}, "name": "Node"}
 
 
 @pytest.fixture(autouse=True)
@@ -76,12 +78,21 @@ def owned_devices() -> Iterator[Mock]:
 
 
 @pytest.fixture(autouse=True)
-def device_info() -> Iterator[Mock]:
-    """Mock the device information of the entry."""
+def register_devices() -> Iterator[Mock]:
+    """Mock the registration of the device and its nodes."""
 
     with patch(
-        "custom_components.asusrouter.get_device_info",
-        Mock(return_value=DEVICE_INFO),
+        "custom_components.asusrouter.async_register_devices", Mock()
+    ) as mock:
+        yield mock
+
+
+@pytest.fixture(autouse=True)
+def remove_stale_devices() -> Iterator[Mock]:
+    """Mock the removal of the devices of the nodes that left."""
+
+    with patch(
+        "custom_components.asusrouter.async_remove_stale_devices", Mock()
     ) as mock:
         yield mock
 
@@ -117,16 +128,21 @@ def _get_entry() -> Mock:
     )
 
 
-def _get_bridge(connect: Any = None, nodes: Any = ()) -> Mock:
+def _get_bridge(
+    connect: Any = None, nodes: Any = (), serves_mesh: bool = True
+) -> Mock:
     """Create a bridge with the used parts mocked."""
 
-    return Mock(
+    bridge = Mock(
         async_connect=AsyncMock(side_effect=connect),
         async_close=AsyncMock(),
-        nodes=[Mock(mac=mac) for mac in nodes],
-        get_node_device_info=Mock(return_value=NODE_DEVICE_INFO),
-        get_node_naming=Mock(return_value=("Model", "Name")),
+        get_nodes=Mock(return_value=[Mock(mac=mac) for mac in nodes]),
+        serves_mesh=serves_mesh,
     )
+    # The device lists itself among the nodes
+    bridge.identity.aimesh.nodes = {"device": Mock()}
+
+    return bridge
 
 
 # ---------------------------
@@ -141,17 +157,16 @@ async def test_setup_entry(setup_coordinators: AsyncMock) -> None:
     entry = _get_entry()
     bridge = _get_bridge()
 
-    with (
-        patch(
-            "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
-        ) as bridge_class,
-        patch("custom_components.asusrouter.dr.async_get"),
-    ):
+    with patch(
+        "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
+    ) as bridge_class:
         assert await async_setup_entry(hass, entry) is True
 
     bridge_class.assert_called_once_with(hass, ENTRY_DATA)
     bridge.async_connect.assert_awaited_once()
-    setup_coordinators.assert_awaited_once_with(hass, entry, DESCRIPTIONS, [])
+    setup_coordinators.assert_awaited_once_with(
+        hass, entry, DESCRIPTIONS, [], BACKGROUND
+    )
     assert entry.runtime_data == ARRuntimeData(
         bridge=bridge, coordinators=COORDINATORS
     )
@@ -160,30 +175,28 @@ async def test_setup_entry(setup_coordinators: AsyncMock) -> None:
     )
 
 
-async def test_setup_entry_registers_device(device_info: Mock) -> None:
-    """Test that the device is registered from the bridge identity."""
+async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
+    """Test that a node never follows the topology."""
 
     hass = _get_hass()
     entry = _get_entry()
-    bridge = _get_bridge()
 
-    with (
-        patch(
-            "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
-        ),
-        patch("custom_components.asusrouter.dr.async_get") as registry,
+    with patch(
+        "custom_components.asusrouter.ARBridge",
+        Mock(return_value=_get_bridge(serves_mesh=False)),
     ):
         await async_setup_entry(hass, entry)
 
-    device_info.assert_called_once_with(hass, entry, bridge)
-    registry.return_value.async_get_or_create.assert_called_once_with(
-        config_entry_id=ENTRY_ID, **DEVICE_INFO
+    setup_coordinators.assert_awaited_once_with(
+        hass, entry, DESCRIPTIONS, [], []
     )
 
 
 async def test_setup_entry_nodes(
     setup_coordinators: AsyncMock,
     owned_devices: Mock,
+    register_devices: Mock,
+    remove_stale_devices: Mock,
     take_over: AsyncMock,
 ) -> None:
     """Test that nodes owned by no other entry are served as devices."""
@@ -193,33 +206,70 @@ async def test_setup_entry_nodes(
     bridge = _get_bridge(nodes=[NODE_MAC, OWNED_NODE_MAC])
     owned_devices.return_value = {OWNED_NODE_MAC: Mock(id="owned")}
 
-    with (
-        patch(
-            "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
-        ),
-        patch("custom_components.asusrouter.dr.async_get") as registry,
+    with patch(
+        "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
     ):
         await async_setup_entry(hass, entry)
 
+    nodes = bridge.get_nodes.return_value
+    bridge.get_nodes.assert_called_once_with(bridge.identity.aimesh)
     assert list(owned_devices.call_args.args[2]) == [NODE_MAC, OWNED_NODE_MAC]
+    assert entry.runtime_data.mesh == {NODE_MAC, OWNED_NODE_MAC}
     assert entry.runtime_data.nodes == [NODE_MAC]
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, DESCRIPTIONS, [NODE_MAC]
+        hass, entry, DESCRIPTIONS, [NODE_MAC], BACKGROUND
     )
 
-    device = registry.return_value.async_get_or_create.return_value
-    bridge.get_node_device_info.assert_called_once_with(
-        bridge.nodes[0], device.id
+    device = register_devices.return_value
+    register_devices.assert_called_once_with(
+        hass, entry, nodes, owned_devices.return_value
     )
-    registry.return_value.async_get_or_create.assert_called_with(
-        config_entry_id=ENTRY_ID, **NODE_DEVICE_INFO
-    )
-    # The entry of the node cannot name it, so its router does
-    bridge.get_node_naming.assert_called_once_with(bridge.nodes[1])
-    registry.return_value.async_update_device.assert_called_once_with(
-        "owned", model="Model", name="Name"
-    )
+    remove_stale_devices.assert_called_once_with(hass, entry, device, nodes)
     take_over.assert_awaited_once_with(hass, entry, device)
+
+
+async def test_setup_entry_empty_topology(remove_stale_devices: Mock) -> None:
+    """Test that a failed topology read never removes node devices."""
+
+    bridge = _get_bridge()
+    bridge.identity.aimesh.nodes = {}
+
+    with patch(
+        "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
+    ):
+        await async_setup_entry(_get_hass(), _get_entry())
+
+    remove_stale_devices.assert_not_called()
+
+
+async def test_setup_entry_follows_topology(
+    setup_coordinators: AsyncMock,
+) -> None:
+    """Test that topology updates are followed until the entry unloads."""
+
+    hass = _get_hass()
+    entry = _get_entry()
+    coordinator = Mock(spec=ARTopologyCoordinator)
+    setup_coordinators.return_value = {ARAiMeshSourceUniversal: coordinator}
+
+    with (
+        patch(
+            "custom_components.asusrouter.ARBridge",
+            Mock(return_value=_get_bridge()),
+        ),
+        patch(
+            "custom_components.asusrouter.async_sync_topology"
+        ) as sync_topology,
+    ):
+        await async_setup_entry(hass, entry)
+
+        listener = coordinator.async_add_listener.call_args.args[0]
+        listener()
+
+    sync_topology.assert_called_once_with(hass, entry, coordinator)
+    entry.async_on_unload.assert_any_call(
+        coordinator.async_add_listener.return_value
+    )
 
 
 async def test_setup_entry_registers_stop_listener() -> None:
@@ -228,12 +278,9 @@ async def test_setup_entry_registers_stop_listener() -> None:
     hass = _get_hass()
     entry = _get_entry()
 
-    with (
-        patch(
-            "custom_components.asusrouter.ARBridge",
-            Mock(return_value=_get_bridge()),
-        ),
-        patch("custom_components.asusrouter.dr.async_get"),
+    with patch(
+        "custom_components.asusrouter.ARBridge",
+        Mock(return_value=_get_bridge()),
     ):
         await async_setup_entry(hass, entry)
 
@@ -322,11 +369,8 @@ async def test_setup_entry_closes_on_stop() -> None:
     entry = _get_entry()
     bridge = _get_bridge()
 
-    with (
-        patch(
-            "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
-        ),
-        patch("custom_components.asusrouter.dr.async_get"),
+    with patch(
+        "custom_components.asusrouter.ARBridge", Mock(return_value=bridge)
     ):
         await async_setup_entry(hass, entry)
 
@@ -372,6 +416,23 @@ async def test_unload_entry_platforms_failed() -> None:
     assert await async_unload_entry(_get_hass(unload=False), entry) is False
 
     bridge.async_close.assert_not_awaited()
+
+
+async def test_remove_config_entry_device() -> None:
+    """Test that only a node that left the AiMesh can be removed."""
+
+    entry = _get_entry()
+    device = Mock()
+
+    with patch(
+        "custom_components.asusrouter.can_remove_device",
+        Mock(return_value=True),
+    ) as can_remove:
+        assert await async_remove_config_entry_device(
+            _get_hass(), entry, device
+        )
+
+    can_remove.assert_called_once_with(entry, device)
 
 
 async def test_remove_entry() -> None:

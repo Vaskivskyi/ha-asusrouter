@@ -52,7 +52,7 @@ def _get_entry(entry_id: str = ENTRY_ID, nodes: Any = ()) -> Mock:
     """Create a config entry serving the given nodes."""
 
     entry = Mock(entry_id=entry_id)
-    entry.runtime_data.bridge.nodes = [Mock(mac=mac) for mac in nodes]
+    entry.runtime_data.mesh = frozenset(nodes)
 
     return entry
 
