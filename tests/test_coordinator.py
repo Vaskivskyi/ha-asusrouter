@@ -9,6 +9,11 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouterError
 from asusrouter.error import AsusRouterAccessError
+from asusrouter.modules.aimesh import (
+    ARAiMeshNode,
+    ARAiMeshSourceUniversal,
+    ARAiMeshTopology,
+)
 from asusrouter.modules.endpoint.error import ARAccessError
 from asusrouter.modules.system_status import (
     ARSystemStatusSource,
@@ -22,6 +27,8 @@ import pytest
 from custom_components.asusrouter import ARRuntimeData
 from custom_components.asusrouter.coordinator import (
     ARCoordinator,
+    ARStateCoordinator,
+    ARTopologyCoordinator,
     async_setup_coordinators,
 )
 
@@ -48,10 +55,16 @@ def _get_entry(fetch: Any = None, side_effect: Any = None) -> Mock:
     return entry
 
 
-def _get_coordinator(entry: Mock) -> ARCoordinator:
+def _get_coordinator(entry: Mock) -> ARStateCoordinator:
     """Create a coordinator of the test source."""
 
-    return ARCoordinator(Mock(), entry, SOURCE, INTERVAL)
+    return ARStateCoordinator(Mock(), entry, SOURCE, INTERVAL)
+
+
+def _get_topology(*macs: MacAddress) -> ARAiMeshTopology:
+    """Create a topology of the given nodes."""
+
+    return ARAiMeshTopology(nodes={mac: ARAiMeshNode(mac=mac) for mac in macs})
 
 
 # ---------------------------
@@ -116,6 +129,33 @@ async def test_update_data_wrong_credentials() -> None:
         await coordinator._async_update_data()
 
 
+@pytest.mark.parametrize(
+    ("content", "previous", "expected"),
+    [
+        (_get_topology(NODE_MAC), None, _get_topology(NODE_MAC)),
+        # A failed read keeps the last known topology
+        (_get_topology(), _get_topology(NODE_MAC), _get_topology(NODE_MAC)),
+        (None, _get_topology(NODE_MAC), _get_topology(NODE_MAC)),
+        (None, None, _get_topology()),
+    ],
+)
+async def test_topology_content(
+    content: Any,
+    previous: ARAiMeshTopology | None,
+    expected: ARAiMeshTopology,
+) -> None:
+    """Test that the topology never empties after a failed read."""
+
+    coordinator = ARTopologyCoordinator(
+        Mock(), _get_entry(), ARAiMeshSourceUniversal, INTERVAL
+    )
+    # A new coordinator has no data yet
+    if previous is not None:
+        coordinator.data = previous
+
+    assert coordinator._get_content(content) == expected
+
+
 # ---------------------------
 # <-- UPDATE
 # ---------------------------
@@ -177,6 +217,30 @@ async def test_setup_coordinators_nodes() -> None:
         ARSystemStatusSource(target=NODE_MAC),
     ]
     assert first_refresh.await_count == len(descriptions)
+    refresh.assert_awaited_once()
+
+
+async def test_setup_coordinators_background() -> None:
+    """Test that a source of no entity is polled without failing the setup."""
+
+    with (
+        patch.object(
+            ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
+        ) as first_refresh,
+        patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh,
+    ):
+        coordinators = await async_setup_coordinators(
+            Mock(),
+            _get_entry(),
+            [Mock(source=SOURCE, update_interval=INTERVAL)],
+            background=[(ARAiMeshSourceUniversal, SHORT_INTERVAL)],
+        )
+
+    assert isinstance(coordinators[SOURCE], ARStateCoordinator)
+    topology = coordinators[ARAiMeshSourceUniversal]
+    assert isinstance(topology, ARTopologyCoordinator)
+    assert topology.update_interval == SHORT_INTERVAL
+    first_refresh.assert_awaited_once()
     refresh.assert_awaited_once()
 
 

@@ -8,7 +8,7 @@ from typing import Any
 import aiohttp
 from asusrouter import AsusRouter
 from asusrouter.config import ARConfigKey
-from asusrouter.modules.aimesh import ARAiMeshNode, ARAiMeshRole
+from asusrouter.modules.aimesh import ARAiMeshNode, ARAiMeshTopology
 from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.device.identity import ARDeviceIdentity
 from asusrouter.modules.firmware import ARFirmware
@@ -71,22 +71,32 @@ class ARBridge:
         return self._api.description
 
     @property
-    def nodes(self) -> list[ARAiMeshNode]:
-        """Return the AiMesh nodes served through this device."""
+    def serves_mesh(self) -> bool:
+        """Return whether the AiMesh nodes are served through this device."""
 
-        identity = self.identity
         # A node reports the whole mesh, but only the router serves its data
-        if identity.operation_mode is AROperationMode.AIMESH_NODE:
-            return []
-
-        return [
-            node
-            for node in identity.aimesh.nodes.values()
-            if node.role is ARAiMeshRole.NODE and node.mac != identity.mac
-        ]
+        return self.identity.operation_mode is not AROperationMode.AIMESH_NODE
 
     # ---------------------------
     # <-- Properties
+    # ---------------------------
+
+    # ---------------------------
+    # AiMesh -->
+    # ---------------------------
+
+    def get_nodes(self, topology: ARAiMeshTopology) -> list[ARAiMeshNode]:
+        """Return the nodes of the topology served through this device."""
+
+        if not self.serves_mesh:
+            return []
+
+        mac = self.identity.mac
+        # An offline node is reported as a router, so the role is not used
+        return [node for node in topology.nodes.values() if node.mac != mac]
+
+    # ---------------------------
+    # <-- AiMesh
     # ---------------------------
 
     # ---------------------------

@@ -37,7 +37,7 @@ class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """AsusRouter sensor description."""
 
 
-class AREntity(CoordinatorEntity[ARCoordinator]):
+class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
     """AsusRouter entity of a single device."""
 
     _attr_has_entity_name = True
@@ -46,7 +46,7 @@ class AREntity(CoordinatorEntity[ARCoordinator]):
 
     def __init__(
         self,
-        coordinator: ARCoordinator,
+        coordinator: ARCoordinator[Any],
         description: AREntityDescription,
         mac: MacAddress,
     ) -> None:

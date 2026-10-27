@@ -179,36 +179,59 @@ async def test_identity_property() -> None:
     assert bridge.identity is identity
 
 
+def _get_topology() -> ARAiMeshTopology:
+    """Create a topology listing the device among its nodes."""
+
+    nodes = [
+        _get_node(MAC, ARAiMeshRole.ROUTER),
+        _get_node(NODE_MAC),
+        # An offline node is reported as a router
+        _get_node(ROOT_MAC, ARAiMeshRole.ROUTER),
+    ]
+
+    return ARAiMeshTopology(nodes={node.mac: node for node in nodes})
+
+
 @pytest.mark.parametrize(
     ("mode", "expected"),
     [
-        (AROperationMode.ROUTER, [NODE_MAC, OTHER_NODE_MAC]),
-        (AROperationMode.UNKNOWN, [NODE_MAC, OTHER_NODE_MAC]),
+        (AROperationMode.ROUTER, [NODE_MAC, ROOT_MAC]),
+        (AROperationMode.UNKNOWN, [NODE_MAC, ROOT_MAC]),
         # A node sees the whole mesh but cannot serve the others
         (AROperationMode.AIMESH_NODE, []),
     ],
 )
-async def test_nodes(
+async def test_get_nodes(
     mode: AROperationMode, expected: list[MacAddress]
 ) -> None:
-    """Test that only the nodes served through the device are reported."""
+    """Test that every node but the device itself is served through it."""
 
     identity = _get_identity()
     identity._operation_mode = mode
-    nodes = [
-        _get_node(ROOT_MAC, ARAiMeshRole.ROUTER),
-        _get_node(NODE_MAC),
-        _get_node(OTHER_NODE_MAC),
-        # The device itself listed as a node
-        _get_node(MAC),
-    ]
-    identity.update_aimesh(
-        ARAiMeshTopology(nodes={node.mac: node for node in nodes})
-    )
 
     bridge = await _get_bridge(identity)
 
-    assert [node.mac for node in bridge.nodes] == expected
+    nodes = bridge.get_nodes(_get_topology())
+    assert [node.mac for node in nodes] == expected
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected"),
+    [
+        (AROperationMode.ROUTER, True),
+        (AROperationMode.UNKNOWN, True),
+        (AROperationMode.AIMESH_NODE, False),
+    ],
+)
+async def test_serves_mesh(mode: AROperationMode, expected: bool) -> None:
+    """Test that only a node never serves the AiMesh."""
+
+    identity = _get_identity()
+    identity._operation_mode = mode
+
+    bridge = await _get_bridge(identity)
+
+    assert bridge.serves_mesh is expected
 
 
 # ---------------------------
