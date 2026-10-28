@@ -55,6 +55,15 @@
       "ip_address": {
         "default": "mdi:ip-network"
       },
+      "load_average_1": {
+        "default": "mdi:cpu-32-bit"
+      },
+      "load_average_15": {
+        "default": "mdi:cpu-32-bit"
+      },
+      "load_average_5": {
+        "default": "mdi:cpu-32-bit"
+      },
       "ram": {
         "default": "mdi:memory"
       },
