@@ -133,6 +133,15 @@
       "ip_address": {
         "name": "IP address"
       },
+      "load_average_1": {
+        "name": "Load average (1 min)"
+      },
+      "load_average_15": {
+        "name": "Load average (15 min)"
+      },
+      "load_average_5": {
+        "name": "Load average (5 min)"
+      },
       "ram": {
         "name": "RAM"
       },
