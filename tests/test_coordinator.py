@@ -20,7 +20,7 @@ from asusrouter.modules.system_status import (
     ARSystemStatusSourceUniversal,
 )
 from asusrouter.tools.identifiers import MacAddress
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
 import pytest
 
@@ -200,9 +200,7 @@ async def test_setup_coordinators() -> None:
         Mock(source=OTHER_SOURCE, update_interval=INTERVAL),
     ]
 
-    with patch.object(
-        ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
-    ) as first_refresh:
+    with patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh:
         coordinators = await async_setup_coordinators(
             Mock(), _get_entry(), descriptions
         )
@@ -210,11 +208,11 @@ async def test_setup_coordinators() -> None:
     assert list(coordinators) == [SOURCE, OTHER_SOURCE]
     assert coordinators[SOURCE].update_interval == SHORT_INTERVAL
     assert coordinators[OTHER_SOURCE].update_interval == INTERVAL
-    assert first_refresh.await_count == len(coordinators)
+    assert refresh.await_count == len(coordinators)
 
 
 async def test_setup_coordinators_nodes() -> None:
-    """Test that node coordinators refresh without failing the setup."""
+    """Test that the nodes served through the entry get coordinators."""
 
     descriptions = [
         Mock(
@@ -227,13 +225,7 @@ async def test_setup_coordinators_nodes() -> None:
         Mock(source=OTHER_SOURCE, update_interval=INTERVAL, node_source=None),
     ]
 
-    with (
-        patch.object(
-            ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
-        ) as first_refresh,
-        # Unlike the first refresh, a plain refresh never raises
-        patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh,
-    ):
+    with patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh:
         coordinators = await async_setup_coordinators(
             Mock(),
             _get_entry(
@@ -248,8 +240,7 @@ async def test_setup_coordinators_nodes() -> None:
         OTHER_SOURCE,
         ARSystemStatusSource(target=NODE_MAC),
     ]
-    assert first_refresh.await_count == len(descriptions)
-    refresh.assert_awaited_once()
+    assert refresh.await_count == len(coordinators)
 
 
 async def test_setup_coordinators_mesh() -> None:
@@ -262,12 +253,7 @@ async def test_setup_coordinators_mesh() -> None:
         covers_mesh=True,
     )
 
-    with (
-        patch.object(
-            ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
-        ),
-        patch.object(ARCoordinator, "async_refresh", AsyncMock()),
-    ):
+    with patch.object(ARCoordinator, "async_refresh", AsyncMock()):
         coordinators = await async_setup_coordinators(
             Mock(),
             _get_entry(mesh=frozenset({NODE_MAC}), nodes=[]),
@@ -277,60 +263,63 @@ async def test_setup_coordinators_mesh() -> None:
     assert ARSystemStatusSource(target=NODE_MAC) in coordinators
 
 
-async def test_setup_coordinators_background() -> None:
-    """Test that a source of no entity is polled without failing the setup."""
+async def test_setup_coordinators_topology() -> None:
+    """Test that the AiMesh topology gets its own coordinator type."""
 
-    with (
-        patch.object(
-            ARCoordinator, "async_config_entry_first_refresh", AsyncMock()
-        ) as first_refresh,
-        patch.object(ARCoordinator, "async_refresh", AsyncMock()) as refresh,
-    ):
+    descriptions = [
+        Mock(source=SOURCE, update_interval=INTERVAL),
+        Mock(source=ARAiMeshSourceUniversal, update_interval=INTERVAL),
+    ]
+
+    with patch.object(ARCoordinator, "async_refresh", AsyncMock()):
         coordinators = await async_setup_coordinators(
-            Mock(),
-            _get_entry(),
-            [Mock(source=SOURCE, update_interval=INTERVAL)],
-            background=[(ARAiMeshSourceUniversal, SHORT_INTERVAL)],
+            Mock(), _get_entry(), descriptions
         )
 
     assert isinstance(coordinators[SOURCE], ARStateCoordinator)
-    topology = coordinators[ARAiMeshSourceUniversal]
-    assert isinstance(topology, ARTopologyCoordinator)
-    assert topology.update_interval == SHORT_INTERVAL
-    first_refresh.assert_awaited_once()
-    refresh.assert_awaited_once()
+    assert isinstance(
+        coordinators[ARAiMeshSourceUniversal], ARTopologyCoordinator
+    )
 
 
 @pytest.mark.parametrize(
-    ("side_effect", "expected"),
+    ("exception", "raised"),
     [
-        ([ConfigEntryNotReady, None], ConfigEntryNotReady),
-        # New credentials win over any other failure
-        ([ConfigEntryNotReady, ConfigEntryAuthFailed], ConfigEntryAuthFailed),
+        # Only the entities of the failed source are left unavailable
+        (UpdateFailed(), False),
+        (ConfigEntryAuthFailed(), True),
     ],
 )
 async def test_setup_coordinators_failed(
-    side_effect: list[Any], expected: type[Exception]
+    exception: Exception, raised: bool
 ) -> None:
-    """Test that a failed first refresh fails the setup."""
+    """Test that only refused credentials fail the setup."""
 
     descriptions = [
         Mock(source=SOURCE, update_interval=INTERVAL),
         Mock(source=OTHER_SOURCE, update_interval=INTERVAL),
     ]
+    refreshed: list[ARCoordinator[Any]] = []
 
-    with (
-        patch.object(
-            ARCoordinator,
-            "async_config_entry_first_refresh",
-            AsyncMock(side_effect=side_effect),
-        ) as first_refresh,
-        pytest.raises(expected),
-    ):
-        await async_setup_coordinators(Mock(), _get_entry(), descriptions)
+    async def _refresh(coordinator: ARCoordinator[Any]) -> None:
+        """Fail the refresh of the other source only."""
+
+        refreshed.append(coordinator)
+        coordinator.last_exception = (
+            exception if coordinator.name.endswith(str(OTHER_SOURCE)) else None
+        )
+
+    with patch.object(ARCoordinator, "async_refresh", _refresh):
+        if raised:
+            with pytest.raises(type(exception)):
+                await async_setup_coordinators(
+                    Mock(), _get_entry(), descriptions
+                )
+        else:
+            await async_setup_coordinators(Mock(), _get_entry(), descriptions)
 
     # Every refresh runs to the end, none is left behind
-    assert first_refresh.await_count == len(descriptions)
+    assert len(refreshed) == len(descriptions)
 
 
 # ---------------------------

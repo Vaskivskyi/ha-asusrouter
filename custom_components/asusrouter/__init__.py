@@ -28,7 +28,6 @@ from .errors import is_auth_error
 from .modules import DESCRIPTIONS
 from .ownership import async_hand_back, async_take_over, get_owned_devices
 from .topology import (
-    TOPOLOGY_INTERVAL,
     async_register_devices,
     async_remove_stale_devices,
     async_sync_topology,
@@ -94,21 +93,11 @@ async def async_setup_entry(
     runtime_data.mesh = frozenset(node.mac for node in nodes)
     runtime_data.nodes = [node.mac for node in nodes if node.mac not in owned]
 
-    # Optional, so a failed topology read never fails the setup
-    background = (
-        [(ARAiMeshSourceUniversal, TOPOLOGY_INTERVAL)]
-        if bridge.serves_mesh
-        else []
-    )
-
-    # Platforms cannot defer the setup or ask for new credentials, so the
-    # first refresh of every coordinator runs here
+    # Platforms cannot ask for new credentials and create only what the
+    # device reports, so the first refresh of every coordinator runs here
     try:
         runtime_data.coordinators = await async_setup_coordinators(
-            hass,
-            config_entry,
-            get_supported(DESCRIPTIONS, bridge),
-            background,
+            hass, config_entry, get_supported(DESCRIPTIONS, bridge)
         )
     except Exception:
         # A failed setup is never unloaded

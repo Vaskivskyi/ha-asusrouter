@@ -227,6 +227,64 @@ async def test_get_entities_mesh() -> None:
     ]
 
 
+async def test_get_entities_exists() -> None:
+    """Test that only the entities the device reports are created."""
+
+    runtime_data = _get_runtime_data()
+    coordinator = Mock(get_device=Mock(return_value=DEVICE_DATA))
+    runtime_data.coordinators[SOURCE] = coordinator
+    exists_fn = Mock(side_effect=[True, False])
+    reported = _get_description(exists_fn=exists_fn)
+    missing = _get_description(exists_fn=exists_fn)
+
+    entities = get_entities(
+        runtime_data, [reported, missing], _get_entity_args
+    )
+
+    assert entities == [(coordinator, reported, MAC)]
+    exists_fn.assert_called_with(DEVICE_DATA)
+
+
+async def test_get_entities_exists_no_device() -> None:
+    """Test that no entity is created when the device is not in the data."""
+
+    runtime_data = _get_runtime_data()
+    runtime_data.coordinators[SOURCE] = Mock(
+        get_device=Mock(return_value=None)
+    )
+    exists_fn = Mock()
+
+    assert (
+        get_entities(
+            runtime_data,
+            [_get_description(exists_fn=exists_fn)],
+            _get_entity_args,
+        )
+        == []
+    )
+    exists_fn.assert_not_called()
+
+
+async def test_get_entities_exists_unread(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that an unread source gets its entities only on reload."""
+
+    runtime_data = _get_runtime_data()
+    coordinator = runtime_data.coordinators[SOURCE]
+    coordinator.data = None
+    coordinator.name = "source"
+    description = _get_description(exists_fn=Mock())
+
+    entities = get_entities(
+        runtime_data, [description, description], _get_entity_args
+    )
+
+    assert entities == []
+    # Reported once per source
+    assert caplog.text.count("Cannot read `source` at setup") == 1
+
+
 async def test_get_entities_unsupported() -> None:
     """Test that an unsupported description gets no entity."""
 

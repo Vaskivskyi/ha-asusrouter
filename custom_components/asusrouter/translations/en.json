@@ -110,6 +110,27 @@
       },
       "ram": {
         "name": "RAM"
+      },
+      "temperature_cpu": {
+        "name": "Temperature CPU"
+      },
+      "temperature_radio_2g1": {
+        "name": "Temperature 2.4 GHz"
+      },
+      "temperature_radio_2g2": {
+        "name": "Temperature 2.4 GHz-2"
+      },
+      "temperature_radio_5g1": {
+        "name": "Temperature 5 GHz"
+      },
+      "temperature_radio_5g2": {
+        "name": "Temperature 5 GHz-2"
+      },
+      "temperature_radio_6g1": {
+        "name": "Temperature 6 GHz"
+      },
+      "temperature_radio_6g2": {
+        "name": "Temperature 6 GHz-2"
       }
     }
   }

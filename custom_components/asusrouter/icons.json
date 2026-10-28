@@ -29,6 +29,27 @@
       },
       "ram": {
         "default": "mdi:memory"
+      },
+      "temperature_cpu": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_2g1": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_2g2": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_5g1": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_5g2": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_6g1": {
+        "default": "mdi:thermometer"
+      },
+      "temperature_radio_6g2": {
+        "default": "mdi:thermometer"
       }
     }
   }

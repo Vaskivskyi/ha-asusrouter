@@ -33,7 +33,6 @@ from custom_components.asusrouter import (
 )
 from custom_components.asusrouter.coordinator import ARTopologyCoordinator
 from custom_components.asusrouter.modules import DESCRIPTIONS
-from custom_components.asusrouter.topology import TOPOLOGY_INTERVAL
 
 pytestmark = pytest.mark.asyncio
 
@@ -49,7 +48,6 @@ ENTRY_DATA: dict[str, Any] = {
 }
 
 COORDINATORS: dict[ARDataSource, Any] = {ARSystemStatusSourceUniversal: Mock()}
-BACKGROUND = [(ARAiMeshSourceUniversal, TOPOLOGY_INTERVAL)]
 
 NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:01")
 OWNED_NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:02")
@@ -165,7 +163,7 @@ async def test_setup_entry(setup_coordinators: AsyncMock) -> None:
     bridge_class.assert_called_once_with(hass, ENTRY_DATA)
     bridge.async_connect.assert_awaited_once()
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, list(DESCRIPTIONS), BACKGROUND
+        hass, entry, list(DESCRIPTIONS)
     )
     assert entry.runtime_data == ARRuntimeData(
         bridge=bridge, coordinators=COORDINATORS
@@ -192,7 +190,6 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
         hass,
         entry,
         [d for d in DESCRIPTIONS if d.supported_fn is None],
-        [],
     )
 
 
@@ -221,7 +218,7 @@ async def test_setup_entry_nodes(
     assert entry.runtime_data.mesh == {NODE_MAC, OWNED_NODE_MAC}
     assert entry.runtime_data.nodes == [NODE_MAC]
     setup_coordinators.assert_awaited_once_with(
-        hass, entry, list(DESCRIPTIONS), BACKGROUND
+        hass, entry, list(DESCRIPTIONS)
     )
 
     device = register_devices.return_value
