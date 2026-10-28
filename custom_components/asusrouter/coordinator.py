@@ -131,7 +131,6 @@ async def async_setup_coordinators(
     hass: HomeAssistant,
     config_entry: ARConfigEntry,
     descriptions: Iterable[AREntityDescription],
-    background: Iterable[tuple[ARDataSource, timedelta]] = (),
 ) -> dict[ARDataSource, ARCoordinator[Any]]:
     """Set up a coordinator for every source of the descriptions."""
 
@@ -139,12 +138,10 @@ async def async_setup_coordinators(
     runtime_data = config_entry.runtime_data
 
     requests = [
-        (description.source, description.update_interval)
-        for description in descriptions
-    ]
-    # Sources that never fail the setup: the node and background ones
-    optional_requests = [
-        *background,
+        *(
+            (description.source, description.update_interval)
+            for description in descriptions
+        ),
         *(
             (description.node_source(mac), description.update_interval)
             for description in descriptions
@@ -152,11 +149,10 @@ async def async_setup_coordinators(
             for mac in runtime_data.get_node_macs(description)
         ),
     ]
-    optional_sources = {source for source, _ in optional_requests}
 
     # A shared source polls at the shortest interval requested
     intervals: dict[ARDataSource, timedelta] = {}
-    for source, interval in (*requests, *optional_requests):
+    for source, interval in requests:
         intervals[source] = min(intervals.get(source, interval), interval)
 
     coordinators = {
@@ -166,30 +162,16 @@ async def async_setup_coordinators(
         for source, interval in intervals.items()
     }
 
-    # Let the library decide how many fetches run at once
-    results = await asyncio.gather(
-        *(
-            # A failed optional source leaves only its own entities unavailable
-            coordinator.async_refresh()
-            if source in optional_sources
-            else coordinator.async_config_entry_first_refresh()
-            for source, coordinator in coordinators.items()
-        ),
-        return_exceptions=True,
+    # Let the library decide how many fetches run at once. The connection is
+    # checked before, so a failed source leaves only its own entities
+    # unavailable
+    await asyncio.gather(
+        *(coordinator.async_refresh() for coordinator in coordinators.values())
     )
 
-    errors = [
-        result for result in results if isinstance(result, BaseException)
-    ]
-    if errors:
-        # New credentials are required whatever else failed
-        raise next(
-            (
-                error
-                for error in errors
-                if isinstance(error, ConfigEntryAuthFailed)
-            ),
-            errors[0],
-        )
+    # New credentials are required whatever else was read
+    for coordinator in coordinators.values():
+        if isinstance(coordinator.last_exception, ConfigEntryAuthFailed):
+            raise coordinator.last_exception
 
     return coordinators

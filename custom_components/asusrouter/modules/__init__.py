@@ -7,7 +7,7 @@ from ..entity import (
     AREntityDescription,
     ARSensorDescription,
 )
-from . import aimesh, system_status
+from . import aimesh, system_status, temperature
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
@@ -15,6 +15,7 @@ BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
     *system_status.SENSORS,
+    *temperature.SENSORS,
 )
 
 # Every entity description, defines the coordinators to set up

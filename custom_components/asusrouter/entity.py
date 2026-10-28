@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import timedelta
+import logging
 from typing import TYPE_CHECKING, Any
 
 from asusrouter.modules.source import ARDataSource
@@ -25,6 +26,8 @@ if TYPE_CHECKING:
     from . import ARRuntimeData
     from .bridge import ARBridge
 
+_LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True, kw_only=True)
 class AREntityDescription(EntityDescription):
@@ -40,6 +43,8 @@ class AREntityDescription(EntityDescription):
     attributes_fn: Callable[[Any], dict[str, Any]] | None = None
     # Whether the data has a live value, always when None
     available_fn: Callable[[Any], bool] | None = None
+    # Whether the device reports the entity at setup, always when None
+    exists_fn: Callable[[Any], bool] | None = None
     # Whether the device of the entry has the entity, not only its nodes
     on_device: bool = True
     # Source of an AiMesh node by its MAC, None when only the router has it
@@ -60,6 +65,48 @@ class ARBinarySensorDescription(
 @dataclass(frozen=True, kw_only=True)
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """AsusRouter sensor description."""
+
+
+def _get_data(
+    coordinator: ARCoordinator[Any],
+    description: AREntityDescription,
+    mac: MacAddress,
+) -> Any:
+    """Get the data of an entity of the device with the given MAC."""
+
+    if description.data_fn is not None:
+        return description.data_fn(coordinator.data)
+
+    return coordinator.get_device(mac)
+
+
+def _get_targets[DescriptionT: AREntityDescription](
+    runtime_data: ARRuntimeData,
+    descriptions: Iterable[DescriptionT],
+) -> list[tuple[ARCoordinator[Any], DescriptionT, MacAddress]]:
+    """Get the coordinator and the MAC of every supported entity."""
+
+    mac = runtime_data.bridge.identity.mac
+    # Entities are tied to the device MAC, nothing to attach them to
+    if mac is None:
+        return []
+
+    coordinators = runtime_data.coordinators
+    targets: list[tuple[ARCoordinator[Any], DescriptionT, MacAddress]] = []
+
+    for description in get_supported(descriptions, runtime_data.bridge):
+        if description.on_device:
+            targets.append(
+                (coordinators[description.source], description, mac)
+            )
+        if description.node_source is None:
+            continue
+        targets.extend(
+            (coordinators[description.node_source(node)], description, node)
+            for node in runtime_data.get_node_macs(description)
+        )
+
+    return targets
 
 
 class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
@@ -92,11 +139,7 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
     def _device_data(self) -> Any:
         """Return the data of this entity's device."""
 
-        data_fn = self.entity_description.data_fn
-        if data_fn is not None:
-            return data_fn(self.coordinator.data)
-
-        return self.coordinator.get_device(self._mac)
+        return _get_data(self.coordinator, self.entity_description, self._mac)
 
     @property
     def available(self) -> bool:
@@ -143,26 +186,27 @@ def get_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
 ) -> list[EntityT]:
     """Get the entities of the device and its AiMesh nodes."""
 
-    mac = runtime_data.bridge.identity.mac
-    # Entities are tied to the device MAC, nothing to attach them to
-    if mac is None:
-        return []
-
-    coordinators = runtime_data.coordinators
     entities: list[EntityT] = []
+    unread: set[str] = set()
 
-    for description in get_supported(descriptions, runtime_data.bridge):
-        if description.on_device:
-            entities.append(
-                entity_type(coordinators[description.source], description, mac)
-            )
-        if description.node_source is None:
-            continue
-        entities.extend(
-            entity_type(
-                coordinators[description.node_source(node)], description, node
-            )
-            for node in runtime_data.get_node_macs(description)
+    for coordinator, description, mac in _get_targets(
+        runtime_data, descriptions
+    ):
+        exists_fn = description.exists_fn
+        if exists_fn is not None:
+            # Nothing was read, so the entity is known only after a reload
+            if coordinator.data is None:
+                unread.add(coordinator.name)
+                continue
+            data = _get_data(coordinator, description, mac)
+            if data is None or not exists_fn(data):
+                continue
+        entities.append(entity_type(coordinator, description, mac))
+
+    for name in sorted(unread):
+        _LOGGER.warning(
+            "Cannot read `%s` at setup, its entities are created on reload",
+            name,
         )
 
     return entities
