@@ -142,6 +142,30 @@
       "load_average_5": {
         "name": "Load average (5 min)"
       },
+      "port": {
+        "name": "Port {port}",
+        "state_attributes": {
+          "capabilities": {
+            "name": "Capabilities"
+          },
+          "max_rate": {
+            "name": "Maximum rate"
+          },
+          "role": {
+            "name": "Role",
+            "state": {
+              "ai": "AI",
+              "ethernet": "Ethernet",
+              "lan": "LAN",
+              "moca": "MoCA",
+              "powerline": "Powerline",
+              "sfpp": "SFP+",
+              "usb": "USB",
+              "wan": "WAN"
+            }
+          }
+        }
+      },
       "ram": {
         "name": "RAM"
       },
@@ -168,6 +192,30 @@
       },
       "uptime": {
         "name": "Uptime"
+      },
+      "usb_port": {
+        "name": "Port {port}",
+        "state_attributes": {
+          "capabilities": {
+            "name": "Capabilities"
+          },
+          "max_rate": {
+            "name": "Maximum rate"
+          },
+          "role": {
+            "name": "Role",
+            "state": {
+              "ai": "AI",
+              "ethernet": "Ethernet",
+              "lan": "LAN",
+              "moca": "MoCA",
+              "powerline": "Powerline",
+              "sfpp": "SFP+",
+              "usb": "USB",
+              "wan": "WAN"
+            }
+          }
+        }
       }
     }
   },

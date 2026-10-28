@@ -9,7 +9,16 @@ from ..entity import (
     ARLightDescription,
     ARSensorDescription,
 )
-from . import aimesh, clock, led, service, sysinfo, system_status, temperature
+from . import (
+    aimesh,
+    clock,
+    led,
+    ports,
+    service,
+    sysinfo,
+    system_status,
+    temperature,
+)
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
@@ -19,6 +28,7 @@ LIGHTS: tuple[ARLightDescription, ...] = (*led.LIGHTS,)
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
     *clock.SENSORS,
+    *ports.SENSORS,
     *sysinfo.SENSORS,
     *system_status.SENSORS,
     *temperature.SENSORS,
