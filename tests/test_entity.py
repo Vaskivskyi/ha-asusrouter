@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from datetime import timedelta
 from typing import Any
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
+from asusrouter import AsusRouterError
 from asusrouter.modules.system_status import (
     ARSystemStatusSource,
     ARSystemStatusSourceUniversal,
 )
 from asusrouter.tools.identifiers import MacAddress
+from homeassistant.exceptions import HomeAssistantError
 import pytest
 
 from custom_components.asusrouter import ARRuntimeData
@@ -144,6 +146,60 @@ async def test_extra_state_attributes() -> None:
     assert entity.extra_state_attributes == {"attribute": "value"}
     attributes_fn.assert_called_once_with(DEVICE_DATA)
     assert _get_entity().extra_state_attributes is None
+
+
+def _get_action_entity(run_action: AsyncMock) -> AREntity:
+    """Create an entity whose device runs actions with the given mock."""
+
+    entity = _get_entity()
+    coordinator: Any = entity.coordinator
+    coordinator.config_entry.runtime_data.bridge.api.async_run_action = (
+        run_action
+    )
+    coordinator.async_refresh = AsyncMock()
+
+    return entity
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+async def test_run_action(refresh: bool) -> None:
+    """Test that an applied action is read back right away when asked."""
+
+    run_action = AsyncMock(return_value=True)
+    entity = _get_action_entity(run_action)
+    action = Mock()
+
+    await entity._async_run_action(action, refresh=refresh)
+
+    run_action.assert_awaited_once_with(action)
+    coordinator: Any = entity.coordinator
+    assert coordinator.async_refresh.await_count == int(refresh)
+
+
+@pytest.mark.parametrize(
+    ("run_action", "translation_key"),
+    [
+        (AsyncMock(side_effect=AsusRouterError()), "action_failed"),
+        (AsyncMock(return_value=False), "action_not_applied"),
+    ],
+)
+async def test_run_action_failed(
+    run_action: AsyncMock, translation_key: str
+) -> None:
+    """Test that a failed action raises and reads nothing back."""
+
+    entity = _get_action_entity(run_action)
+    entity.entity_id = "light.test"
+
+    with pytest.raises(HomeAssistantError) as error:
+        await entity._async_run_action(Mock())
+
+    assert error.value.translation_domain == DOMAIN
+    assert error.value.translation_key == translation_key
+    assert error.value.translation_placeholders == {"entity": "light.test"}
+
+    coordinator: Any = entity.coordinator
+    coordinator.async_refresh.assert_not_awaited()
 
 
 # ---------------------------

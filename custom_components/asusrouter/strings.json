@@ -62,6 +62,11 @@
         "name": "Connected"
       }
     },
+    "light": {
+      "led": {
+        "name": "LED"
+      }
+    },
     "sensor": {
       "aimesh": {
         "name": "AiMesh",
@@ -138,6 +143,14 @@
       "uptime": {
         "name": "Uptime"
       }
+    }
+  },
+  "exceptions": {
+    "action_failed": {
+      "message": "Cannot run the action of {entity}"
+    },
+    "action_not_applied": {
+      "message": "{entity} did not apply the action"
     }
   }
 }

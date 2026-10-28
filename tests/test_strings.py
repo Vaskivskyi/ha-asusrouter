@@ -18,6 +18,11 @@ ENGLISH = COMPONENT / "translations" / "en.json"
 # `RESULT_X = "value"` / `STEP_X = "value"`
 CONSTANTS = re.compile(r'^(RESULT|STEP)_\w+ = "([^"]+)"', re.MULTILINE)
 
+# `translation_domain=DOMAIN, translation_key="value"` of a raised error
+EXCEPTIONS = re.compile(
+    r'translation_domain=DOMAIN,\s*translation_key="([^"]+)"'
+)
+
 # `{placeholder}` of a translation string
 PLACEHOLDERS = re.compile(r"\{(\w+)\}")
 
@@ -41,6 +46,16 @@ def _get_constants(prefix: str) -> set[str]:
 
     return {
         value for name, value in CONSTANTS.findall(source) if name == prefix
+    }
+
+
+def _get_exceptions() -> set[str]:
+    """Get the translation key of every error the code raises."""
+
+    return {
+        key
+        for source in COMPONENT.rglob("*.py")
+        for key in EXCEPTIONS.findall(source.read_text(encoding="utf-8"))
     }
 
 
@@ -106,6 +121,12 @@ def test_strings_are_used(prefix: str, section: str) -> None:
     """Test that no string is kept for a constant which no longer exists."""
 
     assert set(_get_config()[section]) <= _get_constants(prefix)
+
+
+def test_exceptions_have_strings() -> None:
+    """Test that every raised error can be translated, and only those."""
+
+    assert _get_exceptions() == set(_get_strings()["exceptions"])
 
 
 @pytest.mark.parametrize("source", [STRINGS, *LOCALES], ids=lambda p: p.name)
