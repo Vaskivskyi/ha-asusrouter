@@ -21,6 +21,9 @@
       "backhaul_rssi": {
         "default": "mdi:wifi"
       },
+      "boot_time": {
+        "default": "mdi:restart"
+      },
       "cpu": {
         "default": "mdi:cpu-32-bit"
       },
@@ -50,6 +53,9 @@
       },
       "temperature_radio_6g2": {
         "default": "mdi:thermometer"
+      },
+      "uptime": {
+        "default": "mdi:timer-outline"
       }
     }
   }
