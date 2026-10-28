@@ -102,6 +102,9 @@
       "backhaul_rssi": {
         "name": "Backhaul RSSI"
       },
+      "boot_time": {
+        "name": "Boot time"
+      },
       "cpu": {
         "name": "CPU"
       },
@@ -131,6 +134,9 @@
       },
       "temperature_radio_6g2": {
         "name": "Temperature 6 GHz-2"
+      },
+      "uptime": {
+        "name": "Uptime"
       }
     }
   }

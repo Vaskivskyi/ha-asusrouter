@@ -7,13 +7,14 @@ from ..entity import (
     AREntityDescription,
     ARSensorDescription,
 )
-from . import aimesh, system_status, temperature
+from . import aimesh, clock, system_status, temperature
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
 )
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
+    *clock.SENSORS,
     *system_status.SENSORS,
     *temperature.SENSORS,
 )
