@@ -8,6 +8,14 @@
         }
       }
     },
+    "light": {
+      "led": {
+        "default": "mdi:led-off",
+        "state": {
+          "on": "mdi:led-on"
+        }
+      }
+    },
     "sensor": {
       "aimesh": {
         "default": "mdi:devices"

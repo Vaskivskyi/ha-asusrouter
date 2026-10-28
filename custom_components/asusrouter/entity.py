@@ -8,12 +8,16 @@ from datetime import timedelta
 import logging
 from typing import TYPE_CHECKING, Any
 
+from asusrouter import AsusRouterError
+from asusrouter.modules.action import ARAction
 from asusrouter.modules.source import ARDataSource
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
+from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -60,6 +64,14 @@ class ARBinarySensorDescription(
     AREntityDescription, BinarySensorEntityDescription
 ):
     """AsusRouter binary sensor description."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class ARLightDescription(AREntityDescription, LightEntityDescription):
+    """AsusRouter light description."""
+
+    # Builds the action turning the light on or off
+    action_fn: Callable[[bool], ARAction]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -163,6 +175,33 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         return (
             None if attributes_fn is None else attributes_fn(self._device_data)
         )
+
+    async def _async_run_action(
+        self, action: ARAction, *, refresh: bool = True
+    ) -> None:
+        """Run an action on the device."""
+
+        api = self.coordinator.config_entry.runtime_data.bridge.api
+        placeholders = {"entity": self.entity_id}
+
+        try:
+            result = await api.async_run_action(action)
+        except AsusRouterError as ex:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="action_failed",
+                translation_placeholders=placeholders,
+            ) from ex
+        if not result:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="action_not_applied",
+                translation_placeholders=placeholders,
+            )
+
+        # Otherwise the new state waits for the next poll
+        if refresh:
+            await self.coordinator.async_refresh()
 
 
 def get_supported[DescriptionT: AREntityDescription](

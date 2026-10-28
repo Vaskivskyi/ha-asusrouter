@@ -37,7 +37,11 @@ from .topology import (
 if TYPE_CHECKING:
     from .entity import AREntityDescription
 
-PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.LIGHT,
+    Platform.SENSOR,
+]
 
 
 @dataclass

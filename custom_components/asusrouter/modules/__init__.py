@@ -5,13 +5,15 @@ from __future__ import annotations
 from ..entity import (
     ARBinarySensorDescription,
     AREntityDescription,
+    ARLightDescription,
     ARSensorDescription,
 )
-from . import aimesh, clock, system_status, temperature
+from . import aimesh, clock, led, system_status, temperature
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
 )
+LIGHTS: tuple[ARLightDescription, ...] = (*led.LIGHTS,)
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
     *clock.SENSORS,
@@ -20,4 +22,8 @@ SENSORS: tuple[ARSensorDescription, ...] = (
 )
 
 # Every entity description, defines the coordinators to set up
-DESCRIPTIONS: tuple[AREntityDescription, ...] = (*BINARY_SENSORS, *SENSORS)
+DESCRIPTIONS: tuple[AREntityDescription, ...] = (
+    *BINARY_SENSORS,
+    *LIGHTS,
+    *SENSORS,
+)
