@@ -8,6 +8,23 @@
         }
       }
     },
+    "button": {
+      "reboot": {
+        "default": "mdi:restart"
+      },
+      "restart_firewall": {
+        "default": "mdi:wall-fire"
+      },
+      "restart_httpd": {
+        "default": "mdi:restart"
+      },
+      "restart_wired": {
+        "default": "mdi:ethernet"
+      },
+      "restart_wireless": {
+        "default": "mdi:wifi-refresh"
+      }
+    },
     "light": {
       "led": {
         "default": "mdi:led-off",

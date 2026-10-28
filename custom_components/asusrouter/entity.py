@@ -15,6 +15,7 @@ from asusrouter.tools.identifiers import MacAddress
 from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
+from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.exceptions import HomeAssistantError
@@ -64,6 +65,16 @@ class ARBinarySensorDescription(
     AREntityDescription, BinarySensorEntityDescription
 ):
     """AsusRouter binary sensor description."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
+    """AsusRouter button description."""
+
+    # A button has no state, its source only follows the device
+    value_fn: Callable[[Any], Any] = lambda _: None
+    # Builds the action the button runs
+    action_fn: Callable[[], ARAction]
 
 
 @dataclass(frozen=True, kw_only=True)

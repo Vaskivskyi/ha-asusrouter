@@ -62,6 +62,23 @@
         "name": "Connected"
       }
     },
+    "button": {
+      "reboot": {
+        "name": "Reboot"
+      },
+      "restart_firewall": {
+        "name": "Restart firewall"
+      },
+      "restart_httpd": {
+        "name": "Restart HTTP daemon"
+      },
+      "restart_wired": {
+        "name": "Restart wired"
+      },
+      "restart_wireless": {
+        "name": "Restart wireless"
+      }
+    },
     "light": {
       "led": {
         "name": "LED"
