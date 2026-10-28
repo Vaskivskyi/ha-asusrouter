@@ -271,6 +271,18 @@ def test_aimesh_sensor() -> None:
     assert description.node_source is None
 
 
+def test_backhaul_link_rate_precision() -> None:
+    """Test that the link rate is shown in whole Mbit/s."""
+
+    description = next(
+        description
+        for description in SENSORS
+        if description.key == "backhaul_link_rate"
+    )
+
+    assert description.suggested_display_precision == 0
+
+
 def test_backhaul_options() -> None:
     """Test that every known medium and wireless band is an option."""
 

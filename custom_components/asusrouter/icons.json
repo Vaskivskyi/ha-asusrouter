@@ -64,6 +64,9 @@
       "load_average_5": {
         "default": "mdi:cpu-32-bit"
       },
+      "port": {
+        "default": "mdi:ethernet"
+      },
       "ram": {
         "default": "mdi:memory"
       },
@@ -90,6 +93,9 @@
       },
       "uptime": {
         "default": "mdi:timer-outline"
+      },
+      "usb_port": {
+        "default": "mdi:usb-port"
       }
     }
   }
