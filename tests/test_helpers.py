@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from asusrouter.tools.identifiers import MacAddress
+from typing import Any
+
+from asusrouter.tools.identifiers import Hostname, IpAddress, MacAddress
 import pytest
 
 from custom_components.asusrouter.const import DOMAIN
-from custom_components.asusrouter.helpers import to_identifier, to_unique_id
+from custom_components.asusrouter.helpers import (
+    to_identifier,
+    to_str,
+    to_unique_id,
+)
 
 
 def test_to_identifier() -> None:
@@ -15,6 +21,20 @@ def test_to_identifier() -> None:
     mac = MacAddress.from_value("AA:BB:CC:DD:EE:01")
 
     assert to_identifier(mac) == (DOMAIN, "aa:bb:cc:dd:ee:01")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, None),
+        (Hostname("example.com"), "example.com"),
+        (IpAddress.from_value("192.0.2.10"), "192.0.2.10"),
+    ],
+)
+def test_to_str(value: Any, expected: str | None) -> None:
+    """Test that a value is converted to string."""
+
+    assert to_str(value) == expected
 
 
 @pytest.mark.parametrize(

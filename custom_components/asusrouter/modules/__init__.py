@@ -12,6 +12,7 @@ from ..entity import (
 from . import (
     aimesh,
     clock,
+    ddns,
     led,
     ports,
     service,
@@ -23,6 +24,7 @@ from . import (
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
+    *ddns.BINARY_SENSORS,
     *wan.BINARY_SENSORS,
 )
 BUTTONS: tuple[ARButtonDescription, ...] = (*service.BUTTONS,)
