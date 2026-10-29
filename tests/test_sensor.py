@@ -29,11 +29,12 @@ async def test_setup_entry() -> None:
     entry = Mock()
     add_entities = Mock()
 
-    with patch.object(sensor, "get_entities") as get_entities:
+    with patch.object(sensor, "async_setup_entities") as setup_entities:
         await async_setup_entry(Mock(), entry, add_entities)
 
-    get_entities.assert_called_once_with(entry.runtime_data, SENSORS, ARSensor)
-    add_entities.assert_called_once_with(get_entities.return_value)
+    setup_entities.assert_called_once_with(
+        entry, SENSORS, ARSensor, add_entities
+    )
 
 
 async def test_native_value() -> None:

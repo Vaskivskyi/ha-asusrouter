@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import (
 )
 
 from . import ARConfigEntry
-from .entity import AREntity, ARLightDescription, get_entities
+from .entity import AREntity, ARLightDescription, async_setup_entities
 from .modules import LIGHTS
 
 
@@ -22,9 +22,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter lights."""
 
-    async_add_entities(
-        get_entities(config_entry.runtime_data, LIGHTS, ARLight)
-    )
+    async_setup_entities(config_entry, LIGHTS, ARLight, async_add_entities)
 
 
 class ARLight(AREntity, LightEntity):

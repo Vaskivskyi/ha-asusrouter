@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import (
 )
 
 from . import ARConfigEntry
-from .entity import ARButtonDescription, AREntity, get_entities
+from .entity import ARButtonDescription, AREntity, async_setup_entities
 from .modules import BUTTONS
 
 
@@ -20,9 +20,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter buttons."""
 
-    async_add_entities(
-        get_entities(config_entry.runtime_data, BUTTONS, ARButton)
-    )
+    async_setup_entities(config_entry, BUTTONS, ARButton, async_add_entities)
 
 
 class ARButton(AREntity, ButtonEntity):

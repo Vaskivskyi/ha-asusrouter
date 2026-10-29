@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import (
 )
 
 from . import ARConfigEntry
-from .entity import ARBinarySensorDescription, AREntity, get_entities
+from .entity import ARBinarySensorDescription, AREntity, async_setup_entities
 from .modules import BINARY_SENSORS
 
 
@@ -20,8 +20,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter binary sensors."""
 
-    async_add_entities(
-        get_entities(config_entry.runtime_data, BINARY_SENSORS, ARBinarySensor)
+    async_setup_entities(
+        config_entry, BINARY_SENSORS, ARBinarySensor, async_add_entities
     )
 
 

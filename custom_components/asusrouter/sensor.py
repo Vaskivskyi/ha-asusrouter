@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import (
 )
 
 from . import ARConfigEntry
-from .entity import AREntity, ARSensorDescription, get_entities
+from .entity import AREntity, ARSensorDescription, async_setup_entities
 from .modules import SENSORS
 
 
@@ -22,9 +22,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up AsusRouter sensors."""
 
-    async_add_entities(
-        get_entities(config_entry.runtime_data, SENSORS, ARSensor)
-    )
+    async_setup_entities(config_entry, SENSORS, ARSensor, async_add_entities)
 
 
 class ARSensor(AREntity, SensorEntity):

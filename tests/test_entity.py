@@ -20,7 +20,7 @@ from custom_components.asusrouter.const import DOMAIN
 from custom_components.asusrouter.entity import (
     AREntity,
     AREntityDescription,
-    get_entities,
+    async_setup_entities,
     get_supported,
 )
 
@@ -226,21 +226,41 @@ async def test_get_supported() -> None:
     supported_fn.assert_called_once_with(bridge)
 
 
-def _get_runtime_data(mac: MacAddress | None = MAC) -> ARRuntimeData:
-    """Create the runtime data of a router with one node of its own."""
+def _get_runtime_coordinator(data: dict[Any, Any]) -> Mock:
+    """Create a coordinator that can be listened to."""
+
+    coordinator = _get_coordinator(data)
+    coordinator.async_add_listener = Mock(return_value=Mock())
+
+    return coordinator
+
+
+def _get_entry(
+    mac: MacAddress | None = MAC,
+    data: dict[Any, Any] | None = None,
+    node_data: dict[Any, Any] | None = None,
+) -> Mock:
+    """Create the entry of a router with one node of its own."""
 
     bridge = Mock()
     bridge.identity.mac = mac
 
-    return ARRuntimeData(
+    entry = Mock()
+    entry.runtime_data = ARRuntimeData(
         bridge=bridge,
         coordinators={
-            SOURCE: Mock(),
-            ARSystemStatusSource(target=NODE_MAC): Mock(),
+            SOURCE: _get_runtime_coordinator(
+                {MAC: DEVICE_DATA} if data is None else data
+            ),
+            ARSystemStatusSource(target=NODE_MAC): _get_runtime_coordinator(
+                {NODE_MAC: DEVICE_DATA} if node_data is None else node_data
+            ),
         },
         mesh=frozenset({NODE_MAC, OWNED_NODE_MAC}),
         nodes=[NODE_MAC],
     )
+
+    return entry
 
 
 def _get_entity_args(*args: Any) -> Any:
@@ -249,33 +269,55 @@ def _get_entity_args(*args: Any) -> Any:
     return args
 
 
-async def test_get_entities() -> None:
+def _setup_entities(
+    entry: Mock, descriptions: list[AREntityDescription]
+) -> list[Any]:
+    """Set up the entities, returning the ones added in each call."""
+
+    add_entities = Mock()
+    async_setup_entities(entry, descriptions, _get_entity_args, add_entities)
+
+    return [call.args[0] for call in add_entities.call_args_list]
+
+
+def _get_listener(coordinator: Mock) -> Any:
+    """Get the only listener added to the coordinator."""
+
+    coordinator.async_add_listener.assert_called_once()
+    return coordinator.async_add_listener.call_args.args[0]
+
+
+async def test_setup_entities() -> None:
     """Test that the device and its own nodes get their entities."""
 
-    runtime_data = _get_runtime_data()
-    coordinators = runtime_data.coordinators
+    entry = _get_entry()
+    coordinators = entry.runtime_data.coordinators
+    node_coordinator = coordinators[ARSystemStatusSource(target=NODE_MAC)]
     device = _get_description()
     node = _get_description(node_source=ARSystemStatusSource)
 
-    entities = get_entities(runtime_data, [device, node], _get_entity_args)
-
-    assert entities == [
-        (coordinators[SOURCE], device, MAC),
-        (coordinators[SOURCE], node, MAC),
-        (coordinators[ARSystemStatusSource(target=NODE_MAC)], node, NODE_MAC),
+    assert _setup_entities(entry, [device, node]) == [
+        [
+            (coordinators[SOURCE], device, MAC),
+            (coordinators[SOURCE], node, MAC),
+            (node_coordinator, node, NODE_MAC),
+        ]
     ]
+    # Nothing waits, so nothing is listened to
+    for coordinator in coordinators.values():
+        coordinator.async_add_listener.assert_not_called()
 
 
-async def test_get_entities_mesh() -> None:
+async def test_setup_entities_mesh() -> None:
     """Test that a source of the whole mesh serves every node."""
 
-    runtime_data = _get_runtime_data()
-    coordinator = runtime_data.coordinators[SOURCE]
+    entry = _get_entry()
+    coordinator = entry.runtime_data.coordinators[SOURCE]
     description = _get_description(
         on_device=False, node_source=lambda _: SOURCE, covers_mesh=True
     )
 
-    entities = get_entities(runtime_data, [description], _get_entity_args)
+    (entities,) = _setup_entities(entry, [description])
 
     assert sorted(entities, key=lambda args: str(args[2])) == [
         (coordinator, description, NODE_MAC),
@@ -283,84 +325,123 @@ async def test_get_entities_mesh() -> None:
     ]
 
 
-async def test_get_entities_exists() -> None:
+async def test_setup_entities_exists() -> None:
     """Test that only the entities the device reports are created."""
 
-    runtime_data = _get_runtime_data()
-    coordinator = Mock(get_device=Mock(return_value=DEVICE_DATA))
-    runtime_data.coordinators[SOURCE] = coordinator
+    entry = _get_entry()
+    coordinator = entry.runtime_data.coordinators[SOURCE]
     exists_fn = Mock(side_effect=[True, False])
     reported = _get_description(exists_fn=exists_fn)
     missing = _get_description(exists_fn=exists_fn)
 
-    entities = get_entities(
-        runtime_data, [reported, missing], _get_entity_args
-    )
-
-    assert entities == [(coordinator, reported, MAC)]
+    assert _setup_entities(entry, [reported, missing]) == [
+        [(coordinator, reported, MAC)]
+    ]
     exists_fn.assert_called_with(DEVICE_DATA)
+    # The device was read, so the missing entity never appears
+    coordinator.async_add_listener.assert_not_called()
 
 
-async def test_get_entities_exists_no_device() -> None:
-    """Test that no entity is created when the device is not in the data."""
+async def test_setup_entities_exists_no_device() -> None:
+    """Test that the device not in its read data gets no entity."""
 
-    runtime_data = _get_runtime_data()
-    runtime_data.coordinators[SOURCE] = Mock(
-        get_device=Mock(return_value=None)
-    )
+    entry = _get_entry(data={OTHER_MAC: DEVICE_DATA})
+    coordinator = entry.runtime_data.coordinators[SOURCE]
     exists_fn = Mock()
 
     assert (
-        get_entities(
-            runtime_data,
-            [_get_description(exists_fn=exists_fn)],
-            _get_entity_args,
-        )
-        == []
+        _setup_entities(entry, [_get_description(exists_fn=exists_fn)]) == []
     )
     exists_fn.assert_not_called()
+    coordinator.async_add_listener.assert_not_called()
 
 
-async def test_get_entities_exists_unread(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Test that an unread source gets its entities only on reload."""
+async def test_setup_entities_unread() -> None:
+    """Test that the entities of an unread source appear once it is read."""
 
-    runtime_data = _get_runtime_data()
-    coordinator = runtime_data.coordinators[SOURCE]
+    entry = _get_entry()
+    coordinator = entry.runtime_data.coordinators[SOURCE]
     coordinator.data = None
-    coordinator.name = "source"
-    description = _get_description(exists_fn=Mock())
+    reported = _get_description(exists_fn=Mock(return_value=True))
+    missing = _get_description(exists_fn=Mock(return_value=False))
+    add_entities = Mock()
 
-    entities = get_entities(
-        runtime_data, [description, description], _get_entity_args
+    async_setup_entities(
+        entry, [reported, missing], _get_entity_args, add_entities
     )
 
-    assert entities == []
-    # Reported once per source
-    assert caplog.text.count("Cannot read `source` at setup") == 1
+    add_entities.assert_not_called()
+    # Listened to once for both entities
+    listener = _get_listener(coordinator)
+
+    # Still nothing read
+    listener()
+    add_entities.assert_not_called()
+
+    coordinator.data = {MAC: DEVICE_DATA}
+    listener()
+    add_entities.assert_called_once_with([(coordinator, reported, MAC)])
+    # Nothing waits any more
+    coordinator.async_add_listener.return_value.assert_called_once_with()
+
+    # Every entity was decided, none is added twice
+    listener()
+    add_entities.assert_called_once()
 
 
-async def test_get_entities_unsupported() -> None:
+async def test_setup_entities_node_offline() -> None:
+    """Test that the entities of an offline node appear once it is online."""
+
+    entry = _get_entry(data={MAC: DEVICE_DATA})
+    coordinator = entry.runtime_data.coordinators[SOURCE]
+    description = _get_description(
+        node_source=lambda _: SOURCE, exists_fn=Mock(return_value=True)
+    )
+    add_entities = Mock()
+
+    async_setup_entities(entry, [description], _get_entity_args, add_entities)
+
+    add_entities.assert_called_once_with([(coordinator, description, MAC)])
+    listener = _get_listener(coordinator)
+
+    coordinator.data[NODE_MAC] = DEVICE_DATA
+    listener()
+
+    add_entities.assert_called_with([(coordinator, description, NODE_MAC)])
+    coordinator.async_add_listener.return_value.assert_called_once_with()
+
+
+async def test_setup_entities_unload() -> None:
+    """Test that the coordinators are no longer listened to on unload."""
+
+    entry = _get_entry()
+    coordinator = entry.runtime_data.coordinators[SOURCE]
+    coordinator.data = None
+
+    _setup_entities(entry, [_get_description(exists_fn=Mock())])
+
+    remove_listener = coordinator.async_add_listener.return_value
+    (unload,) = entry.async_on_unload.call_args.args
+    unload()
+    remove_listener.assert_called_once_with()
+
+    # Removed only once
+    unload()
+    remove_listener.assert_called_once_with()
+
+
+async def test_setup_entities_unsupported() -> None:
     """Test that an unsupported description gets no entity."""
 
     description = _get_description(supported_fn=Mock(return_value=False))
 
-    assert (
-        get_entities(_get_runtime_data(), [description], _get_entity_args)
-        == []
-    )
+    assert _setup_entities(_get_entry(), [description]) == []
 
 
-async def test_get_entities_without_mac() -> None:
+async def test_setup_entities_without_mac() -> None:
     """Test that no entity is created for a device without a MAC."""
 
-    description = _get_description()
-
-    assert (
-        get_entities(_get_runtime_data(None), [description], _get_entity_args)
-        == []
-    )
+    assert _setup_entities(_get_entry(None), [_get_description()]) == []
 
 
 # ---------------------------
