@@ -27,13 +27,10 @@ jobs:
             console.log('Processing issue:', issue.number);
             console.log('Title:', issueTitle);
 
-            // Extract device model from issue body
+            // Extract device model from the issue form section only
             function extractDeviceModel(body) {
               const patterns = [
-                /### Device model\s*\n\s*([^\n\#]+)/i,
-                /Device model[^:]*:?\s*([^\r\n]+)/i,
-                /Your device model[^:]*:?\s*([^\r\n]+)/i,
-                /Model[^:]*:?\s*([^\r\n]+)/i
+                /### Device model\s*\n\s*([^\n\#]+)/i
               ];
               
               for (const pattern of patterns) {
@@ -50,12 +47,10 @@ jobs:
               return null;
             }
 
-            // Extract firmware version from issue body
+            // Extract firmware version from the issue form section only
             function extractFirmwareVersion(body) {
               const patterns = [
-                /### Firmware version\s*\n\s*([^\n\#]+)/i,
-                /Firmware version[^:]*:?\s*([^\r\n]+)/i,
-                /Version[^:]*:?\s*([^\r\n]+)/i
+                /### Firmware version\s*\n\s*([^\n\#]+)/i
               ];
               
               for (const pattern of patterns) {
@@ -116,6 +111,12 @@ jobs:
                 correctTitle = '[Feature] ' + issueTitle.replace(/^\[.*?\]\s*/, '');
               }
               expectedLabels.push('enhancement');
+            }
+
+            // Not a bug, support or feature issue, e.g. a tracker
+            if (issueType === null) {
+              console.log('No issue type detected, skipping');
+              return;
             }
 
             // Extract information
