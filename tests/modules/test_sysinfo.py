@@ -22,7 +22,7 @@ DESCRIPTIONS = {description.key: description for description in SENSORS}
     ],
 )
 def test_load_average(key: str, unique_id_name: str, value: float) -> None:
-    """Test that every window keeps its i0 unique_id and reads its value."""
+    """Test that every window keeps its unique_id and reads its value."""
 
     description = DESCRIPTIONS[key]
 

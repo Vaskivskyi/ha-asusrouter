@@ -106,7 +106,7 @@ def test_data_unread(data: Any) -> None:
     ],
 )
 def test_description(key: str, unique_id_name: str, enabled: bool) -> None:
-    """Test that every entity keeps its i0 unique_id and default."""
+    """Test that every entity keeps its unique_id and default."""
 
     description = _get_description(key)
 

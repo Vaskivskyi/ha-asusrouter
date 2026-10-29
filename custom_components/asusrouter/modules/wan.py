@@ -24,7 +24,7 @@ from ..helpers import to_str
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
-# Index of the unit, its key and its i0 label
+# Index of the unit, its key and its unique_id label
 _UNITS = ((0, "", ""), (1, "_secondary", " (Secondary)"))
 
 

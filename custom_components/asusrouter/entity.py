@@ -17,6 +17,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.core import CALLBACK_TYPE, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
@@ -41,7 +42,7 @@ class AREntityDescription(EntityDescription):
 
     source: ARDataSource
     update_interval: timedelta
-    # The i0 entity name, used only to keep the unique_id unchanged
+    # The name the unique_id is built from, kept for existing entities
     unique_id_name: str
     # Reads the entity data, the device's own when None
     data_fn: Callable[[Any], Any] | None = None
@@ -62,6 +63,14 @@ class AREntityDescription(EntityDescription):
 
 
 @dataclass(frozen=True, kw_only=True)
+class ARToggleDescription(AREntityDescription):
+    """AsusRouter description of an entity turned on and off."""
+
+    # Builds the action turning the entity on or off
+    action_fn: Callable[[bool], ARAction]
+
+
+@dataclass(frozen=True, kw_only=True)
 class ARBinarySensorDescription(
     AREntityDescription, BinarySensorEntityDescription
 ):
@@ -79,16 +88,18 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
 
 
 @dataclass(frozen=True, kw_only=True)
-class ARLightDescription(AREntityDescription, LightEntityDescription):
+class ARLightDescription(ARToggleDescription, LightEntityDescription):
     """AsusRouter light description."""
-
-    # Builds the action turning the light on or off
-    action_fn: Callable[[bool], ARAction]
 
 
 @dataclass(frozen=True, kw_only=True)
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):
     """AsusRouter sensor description."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class ARSwitchDescription(ARToggleDescription, SwitchEntityDescription):
+    """AsusRouter switch description."""
 
 
 def _get_data(
@@ -214,6 +225,31 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         # Otherwise the new state waits for the next poll
         if refresh:
             await self.coordinator.async_refresh()
+
+
+class ARToggleEntity(AREntity):
+    """AsusRouter entity turned on and off."""
+
+    entity_description: ARToggleDescription
+
+    @property
+    def is_on(self) -> bool | None:
+        """Return the entity state."""
+
+        value: bool | None = self.entity_description.value_fn(
+            self._device_data
+        )
+        return value
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the entity on."""
+
+        await self._async_run_action(self.entity_description.action_fn(True))
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn the entity off."""
+
+        await self._async_run_action(self.entity_description.action_fn(False))
 
 
 def get_supported[DescriptionT: AREntityDescription](

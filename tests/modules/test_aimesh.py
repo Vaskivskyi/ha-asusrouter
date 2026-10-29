@@ -257,7 +257,7 @@ def test_is_online(node: ARAiMeshNode, expected: bool) -> None:
 
 
 def test_aimesh_sensor() -> None:
-    """Test that the AiMesh sensor keeps its i0 name and counts the mesh."""
+    """Test that the AiMesh sensor keeps its unique_id and counts the mesh."""
 
     description = DESCRIPTIONS["aimesh"]
     topology = ARAiMeshTopology(nodes={NODE_MAC: NODE})

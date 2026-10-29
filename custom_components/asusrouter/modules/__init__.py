@@ -8,6 +8,7 @@ from ..entity import (
     AREntityDescription,
     ARLightDescription,
     ARSensorDescription,
+    ARSwitchDescription,
 )
 from . import (
     aimesh,
@@ -20,6 +21,7 @@ from . import (
     system_status,
     temperature,
     wan,
+    wifi,
 )
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
@@ -38,6 +40,7 @@ SENSORS: tuple[ARSensorDescription, ...] = (
     *temperature.SENSORS,
     *wan.SENSORS,
 )
+SWITCHES: tuple[ARSwitchDescription, ...] = (*wifi.SWITCHES,)
 
 # Every entity description, defines the coordinators to set up
 DESCRIPTIONS: tuple[AREntityDescription, ...] = (
@@ -45,4 +48,5 @@ DESCRIPTIONS: tuple[AREntityDescription, ...] = (
     *BUTTONS,
     *LIGHTS,
     *SENSORS,
+    *SWITCHES,
 )

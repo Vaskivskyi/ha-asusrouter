@@ -62,7 +62,7 @@ def test_get_usage_sensor() -> None:
     ],
 )
 def test_sensors(key: str, unique_id_name: str, value: Any) -> None:
-    """Test that each sensor keeps its i0 name and reads its usage."""
+    """Test that each sensor keeps its unique_id name and reads its usage."""
 
     description = next(item for item in SENSORS if item.key == key)
 

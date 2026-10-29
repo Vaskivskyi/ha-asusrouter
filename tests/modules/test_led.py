@@ -15,7 +15,7 @@ DESCRIPTION = LIGHTS[0]
 
 
 def test_led() -> None:
-    """Test that the LED keeps its i0 unique_id and reads its state."""
+    """Test that the LED keeps its unique_id and reads its state."""
 
     data = {ARLedField.STATE: True}
 

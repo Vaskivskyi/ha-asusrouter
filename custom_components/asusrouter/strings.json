@@ -389,6 +389,128 @@
           }
         }
       }
+    },
+    "switch": {
+      "wifi_2g1": {
+        "name": "Wireless 2.4 GHz",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      },
+      "wifi_2g2": {
+        "name": "Wireless 2.4 GHz-2",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      },
+      "wifi_5g1": {
+        "name": "Wireless 5 GHz",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      },
+      "wifi_5g2": {
+        "name": "Wireless 5 GHz-2",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      },
+      "wifi_6g1": {
+        "name": "Wireless 6 GHz",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      },
+      "wifi_6g2": {
+        "name": "Wireless 6 GHz-2",
+        "state_attributes": {
+          "channel": {
+            "name": "Channel"
+          },
+          "channel_bandwidth": {
+            "name": "Channel bandwidth",
+            "state": {
+              "auto": "Auto"
+            }
+          },
+          "chanspec": {
+            "name": "Chanspec"
+          },
+          "country_code": {
+            "name": "Country code"
+          }
+        }
+      }
     }
   },
   "exceptions": {

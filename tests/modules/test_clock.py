@@ -31,7 +31,7 @@ DESCRIPTIONS = {description.key: description for description in SENSORS}
     ],
 )
 def test_sensor(key: str, unique_id_name: str, value: Any) -> None:
-    """Test that every sensor keeps its i0 unique_id and reads its value."""
+    """Test that every sensor keeps its unique_id and reads its value."""
 
     description = DESCRIPTIONS[key]
 

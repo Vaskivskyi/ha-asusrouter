@@ -13,6 +13,7 @@ from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.endpoint.error import ARAccessError
 from asusrouter.modules.source import ARDataSource
 from asusrouter.modules.system_status import ARSystemStatusSourceUniversal
+from asusrouter.modules.wifi import ARWiFiBand
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.const import (
     CONF_HOST,
@@ -33,7 +34,7 @@ from custom_components.asusrouter import (
     async_unload_entry,
 )
 from custom_components.asusrouter.coordinator import ARTopologyCoordinator
-from custom_components.asusrouter.modules import DESCRIPTIONS
+from custom_components.asusrouter.modules import DESCRIPTIONS, aimesh, ddns
 
 pytestmark = pytest.mark.asyncio
 
@@ -49,6 +50,8 @@ ENTRY_DATA: dict[str, Any] = {
 }
 
 COORDINATORS: dict[ARDataSource, Any] = {ARSystemStatusSourceUniversal: Mock()}
+# Every band, so every radio is supported
+BANDS = [band for band in ARWiFiBand if band is not ARWiFiBand.UNKNOWN]
 
 NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:01")
 OWNED_NODE_MAC = MacAddress.from_value("AA:BB:CC:DD:EE:02")
@@ -144,6 +147,7 @@ def _get_bridge(
     )
     # The device lists itself among the nodes
     bridge.identity.aimesh.nodes = {"device": Mock()}
+    bridge.identity.wifi = {band: unit for unit, band in enumerate(BANDS)}
 
     return bridge
 
@@ -190,11 +194,12 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
     ):
         await async_setup_entry(hass, entry)
 
-    # Nothing of the AiMesh is set up
+    # Nothing of the AiMesh is set up, nor of a router
+    excluded = [*aimesh.BINARY_SENSORS, *aimesh.SENSORS, *ddns.BINARY_SENSORS]
     setup_coordinators.assert_awaited_once_with(
         hass,
         entry,
-        [d for d in DESCRIPTIONS if d.supported_fn is None],
+        [d for d in DESCRIPTIONS if d not in excluded],
     )
 
 

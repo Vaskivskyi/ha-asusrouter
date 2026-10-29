@@ -40,7 +40,7 @@ def test_to_str(value: Any, expected: str | None) -> None:
 @pytest.mark.parametrize(
     ("raw", "expected"),
     [
-        # Unique ids of i0 entities, which must never change
+        # Unique ids of existing entities, which must never change
         ("aa:bb:cc:dd:ee:01_CPU", "aa:bb:cc:dd:ee:01_cpu"),
         ("aa:bb:cc:dd:ee:01_RAM", "aa:bb:cc:dd:ee:01_ram"),
         (
@@ -54,6 +54,6 @@ def test_to_str(value: Any, expected: str | None) -> None:
     ],
 )
 def test_to_unique_id(raw: str, expected: str) -> None:
-    """Test that a raw name is converted the same way as in i0."""
+    """Test that a raw name is converted to its frozen unique_id."""
 
     assert to_unique_id(raw) == expected
