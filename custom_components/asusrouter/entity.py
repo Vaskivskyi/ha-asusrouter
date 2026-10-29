@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import timedelta
-import logging
 from typing import TYPE_CHECKING, Any
 
 from asusrouter import AsusRouterError
@@ -18,9 +17,13 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.core import CALLBACK_TYPE, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+)
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
@@ -28,10 +31,8 @@ from .coordinator import ARCoordinator
 from .helpers import to_unique_id
 
 if TYPE_CHECKING:
-    from . import ARRuntimeData
+    from . import ARConfigEntry, ARRuntimeData
     from .bridge import ARBridge
-
-_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -48,7 +49,7 @@ class AREntityDescription(EntityDescription):
     attributes_fn: Callable[[Any], dict[str, Any]] | None = None
     # Whether the data has a live value, always when None
     available_fn: Callable[[Any], bool] | None = None
-    # Whether the device reports the entity at setup, always when None
+    # Whether the device reports the entity, always when None
     exists_fn: Callable[[Any], bool] | None = None
     # Whether the device of the entry has the entity, not only its nodes
     on_device: bool = True
@@ -227,36 +228,87 @@ def get_supported[DescriptionT: AREntityDescription](
     ]
 
 
-def get_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
-    runtime_data: ARRuntimeData,
+def _exists(
+    coordinator: ARCoordinator[Any],
+    description: AREntityDescription,
+    mac: MacAddress,
+    device_mac: MacAddress | None,
+) -> bool | None:
+    """Get whether the device with the given MAC has the entity.
+
+    None while not known yet.
+    """
+
+    exists_fn = description.exists_fn
+    if exists_fn is None:
+        return True
+    # Nothing was read yet
+    if coordinator.data is None:
+        return None
+
+    data = _get_data(coordinator, description, mac)
+    if data is None:
+        # A node missing from the data is offline, while the device itself
+        # does not report the entity
+        return None if mac != device_mac else False
+
+    return exists_fn(data)
+
+
+@callback
+def async_setup_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
+    config_entry: ARConfigEntry,
     descriptions: Iterable[DescriptionT],
     entity_type: Callable[
         [ARCoordinator[Any], DescriptionT, MacAddress], EntityT
     ],
-) -> list[EntityT]:
-    """Get the entities of the device and its AiMesh nodes."""
+    async_add_entities: AddConfigEntryEntitiesCallback,
+) -> None:
+    """Add the entities of the device and its AiMesh nodes as they appear."""
 
-    entities: list[EntityT] = []
-    unread: set[str] = set()
+    runtime_data = config_entry.runtime_data
+    device_mac = runtime_data.bridge.identity.mac
+    pending = _get_targets(runtime_data, descriptions)
+    listeners: dict[ARCoordinator[Any], CALLBACK_TYPE] = {}
 
-    for coordinator, description, mac in _get_targets(
-        runtime_data, descriptions
-    ):
-        exists_fn = description.exists_fn
-        if exists_fn is not None:
-            # Nothing was read, so the entity is known only after a reload
-            if coordinator.data is None:
-                unread.add(coordinator.name)
-                continue
-            data = _get_data(coordinator, description, mac)
-            if data is None or not exists_fn(data):
-                continue
-        entities.append(entity_type(coordinator, description, mac))
+    @callback
+    def _async_add_entities() -> None:
+        """Add the entities known to exist by now."""
 
-    for name in sorted(unread):
-        _LOGGER.warning(
-            "Cannot read `%s` at setup, its entities are created on reload",
-            name,
+        nonlocal pending
+
+        entities: list[EntityT] = []
+        waiting: list[tuple[ARCoordinator[Any], DescriptionT, MacAddress]] = []
+        for target in pending:
+            exists = _exists(*target, device_mac)
+            if exists is None:
+                waiting.append(target)
+            elif exists:
+                entities.append(entity_type(*target))
+        pending = waiting
+
+        if entities:
+            async_add_entities(entities)
+
+        # Stop listening to the coordinators nothing waits for
+        waited = {target[0] for target in pending}
+        for coordinator in listeners.keys() - waited:
+            listeners.pop(coordinator)()
+
+    _async_add_entities()
+
+    # A coordinator without entities polls only while something waits for it
+    for coordinator in {target[0] for target in pending}:
+        listeners[coordinator] = coordinator.async_add_listener(
+            _async_add_entities
         )
 
-    return entities
+    @callback
+    def _async_remove_listeners() -> None:
+        """Stop listening to the coordinators."""
+
+        for remove_listener in listeners.values():
+            remove_listener()
+        listeners.clear()
+
+    config_entry.async_on_unload(_async_remove_listeners)

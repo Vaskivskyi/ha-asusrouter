@@ -32,13 +32,12 @@ async def test_setup_entry() -> None:
     entry = Mock()
     add_entities = Mock()
 
-    with patch.object(binary_sensor, "get_entities") as get_entities:
+    with patch.object(binary_sensor, "async_setup_entities") as setup_entities:
         await async_setup_entry(Mock(), entry, add_entities)
 
-    get_entities.assert_called_once_with(
-        entry.runtime_data, BINARY_SENSORS, ARBinarySensor
+    setup_entities.assert_called_once_with(
+        entry, BINARY_SENSORS, ARBinarySensor, add_entities
     )
-    add_entities.assert_called_once_with(get_entities.return_value)
 
 
 async def test_is_on() -> None:
