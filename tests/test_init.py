@@ -34,7 +34,12 @@ from custom_components.asusrouter import (
     async_unload_entry,
 )
 from custom_components.asusrouter.coordinator import ARTopologyCoordinator
-from custom_components.asusrouter.modules import DESCRIPTIONS, aimesh, ddns
+from custom_components.asusrouter.modules import (
+    DESCRIPTIONS,
+    aimesh,
+    ddns,
+    network,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -194,8 +199,14 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
     ):
         await async_setup_entry(hass, entry)
 
-    # Nothing of the AiMesh is set up, nor of a router
-    excluded = [*aimesh.BINARY_SENSORS, *aimesh.SENSORS, *ddns.BINARY_SENSORS]
+    # Nothing of the AiMesh is set up, nor of a router or its networks
+    excluded = [
+        *aimesh.BINARY_SENSORS,
+        *aimesh.SENSORS,
+        *ddns.BINARY_SENSORS,
+        *network.BINARY_SENSORS,
+        *network.SWITCHES,
+    ]
     setup_coordinators.assert_awaited_once_with(
         hass,
         entry,

@@ -25,7 +25,7 @@ LIGHTS: tuple[ARLightDescription, ...] = (
         # The device reports its LED, not keyed by its MAC
         data_fn=lambda data: data,
         value_fn=lambda data: data.get(ARLedField.STATE),
-        action_fn=lambda state: ARLedAction(state=state),
+        action_fn=lambda state, _: ARLedAction(state=state),
         entity_category=EntityCategory.CONFIG,
     ),
 )

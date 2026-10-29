@@ -1,6 +1,12 @@
 {
   "entity": {
     "binary_sensor": {
+      "backhaul_network": {
+        "default": "mdi:access-point-network-off",
+        "state": {
+          "on": "mdi:access-point-network"
+        }
+      },
       "connected": {
         "default": "mdi:lan-disconnect",
         "state": {
@@ -132,6 +138,12 @@
       }
     },
     "switch": {
+      "network": {
+        "default": "mdi:access-point-network-off",
+        "state": {
+          "on": "mdi:access-point-network"
+        }
+      },
       "wifi_2g1": {
         "default": "mdi:wifi-off",
         "state": {

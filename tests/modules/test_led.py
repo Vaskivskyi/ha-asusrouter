@@ -34,4 +34,4 @@ def test_led() -> None:
 def test_led_action(state: bool) -> None:
     """Test that the LED is switched by its library action."""
 
-    assert DESCRIPTION.action_fn(state) == ARLedAction(state=state)
+    assert DESCRIPTION.action_fn(state, {}) == ARLedAction(state=state)

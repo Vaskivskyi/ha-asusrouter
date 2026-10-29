@@ -13,6 +13,7 @@ from asusrouter.modules.system_status import (
 )
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 import pytest
 
 from custom_components.asusrouter import ARRuntimeData
@@ -150,6 +151,46 @@ async def test_extra_state_attributes() -> None:
     assert _get_entity().extra_state_attributes is None
 
 
+@pytest.mark.parametrize(("name", "named"), [("Example", True), (None, False)])
+async def test_name(name: str | None, named: bool) -> None:
+    """Test that an entity is named from its data when it names itself."""
+
+    name_fn = Mock(return_value=name)
+    entity = _get_entity(name_fn=name_fn)
+
+    name_fn.assert_called_once_with(DEVICE_DATA)
+    assert hasattr(entity, "_attr_name") is named
+
+
+async def test_name_unread() -> None:
+    """Test that an entity without data keeps its translated name."""
+
+    name_fn = Mock()
+    entity = _get_entity(data={}, name_fn=name_fn)
+
+    name_fn.assert_not_called()
+    assert not hasattr(entity, "_attr_name")
+
+
+async def test_name_update() -> None:
+    """Test that an entity is renamed before its state is written."""
+
+    entity = _get_entity(name_fn=Mock(side_effect=["Old", "New", None]))
+
+    with patch.object(
+        CoordinatorEntity, "_handle_coordinator_update"
+    ) as handle_update:
+        entity._handle_coordinator_update()
+        assert entity._attr_name == "New"
+        handle_update.assert_called_once()
+
+        # A missing name keeps the last one
+        handle_update.reset_mock()
+        entity._handle_coordinator_update()
+        assert entity._attr_name == "New"
+        handle_update.assert_called_once()
+
+
 def _get_action_entity(run_action: AsyncMock) -> AREntity:
     """Create an entity whose device runs actions with the given mock."""
 
@@ -241,7 +282,7 @@ async def test_toggle_turn(method: str, state: bool) -> None:
     ) as run_action:
         await getattr(entity, f"async_turn_{method}")()
 
-    action_fn.assert_called_once_with(state)
+    action_fn.assert_called_once_with(state, DEVICE_DATA)
     run_action.assert_awaited_once_with(action_fn.return_value)
 
 

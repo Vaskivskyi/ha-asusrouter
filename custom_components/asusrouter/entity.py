@@ -48,6 +48,8 @@ class AREntityDescription(EntityDescription):
     data_fn: Callable[[Any], Any] | None = None
     value_fn: Callable[[Any], Any]
     attributes_fn: Callable[[Any], dict[str, Any]] | None = None
+    # Names the entity from its data, its translated name when None
+    name_fn: Callable[[Any], str | None] | None = None
     # Whether the data has a live value, always when None
     available_fn: Callable[[Any], bool] | None = None
     # Whether the device reports the entity, always when None
@@ -66,8 +68,8 @@ class AREntityDescription(EntityDescription):
 class ARToggleDescription(AREntityDescription):
     """AsusRouter description of an entity turned on and off."""
 
-    # Builds the action turning the entity on or off
-    action_fn: Callable[[bool], ARAction]
+    # Builds the action turning the entity on or off from its data
+    action_fn: Callable[[bool, Any], ARAction]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -169,12 +171,31 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
             f"{device_mac}_{description.unique_id_name}"
         )
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device_mac)})
+        self._update_name()
 
     @property
     def _device_data(self) -> Any:
         """Return the data of this entity's device."""
 
         return _get_data(self.coordinator, self.entity_description, self._mac)
+
+    def _update_name(self) -> None:
+        """Name the entity from its data, when it names itself."""
+
+        name_fn = self.entity_description.name_fn
+        if name_fn is None or (data := self._device_data) is None:
+            return
+
+        # A missing name keeps the last one
+        if (name := name_fn(data)) is not None:
+            self._attr_name = name
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Rename the entity from the new data before writing its state."""
+
+        self._update_name()
+        super()._handle_coordinator_update()
 
     @property
     def available(self) -> bool:
@@ -244,12 +265,16 @@ class ARToggleEntity(AREntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
 
-        await self._async_run_action(self.entity_description.action_fn(True))
+        await self._async_run_action(
+            self.entity_description.action_fn(True, self._device_data)
+        )
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
 
-        await self._async_run_action(self.entity_description.action_fn(False))
+        await self._async_run_action(
+            self.entity_description.action_fn(False, self._device_data)
+        )
 
 
 def get_supported[DescriptionT: AREntityDescription](
