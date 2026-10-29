@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock, Mock, patch
 from asusrouter import AsusRouterError
 from asusrouter.error import AsusRouterAccessError
 from asusrouter.modules.aimesh import ARAiMeshSourceUniversal
+from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.endpoint.error import ARAccessError
 from asusrouter.modules.source import ARDataSource
 from asusrouter.modules.system_status import ARSystemStatusSourceUniversal
@@ -136,6 +137,10 @@ def _get_bridge(
         async_close=AsyncMock(),
         get_nodes=Mock(return_value=[Mock(mac=mac) for mac in nodes]),
         serves_mesh=serves_mesh,
+    )
+    # A device not serving the mesh is a node, which is not a router
+    bridge.identity.operation_mode = (
+        AROperationMode.ROUTER if serves_mesh else AROperationMode.AIMESH_NODE
     )
     # The device lists itself among the nodes
     bridge.identity.aimesh.nodes = {"device": Mock()}

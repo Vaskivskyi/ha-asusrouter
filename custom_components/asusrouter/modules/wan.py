@@ -16,11 +16,11 @@ from asusrouter.modules.wan import (
     ARWanSourceUniversal,
     ARWanUnit,
 )
-from asusrouter.tools.identifiers.ip import IpAddress
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.const import EntityCategory
 
 from ..entity import ARBinarySensorDescription, ARSensorDescription
+from ..helpers import to_str
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
@@ -55,19 +55,13 @@ def _has_dual_wan(wan: ARWan) -> bool:
     return wan.dualwan is not None
 
 
-def _to_str(ip: IpAddress | None) -> str | None:
-    """Get an IP address as a string."""
-
-    return None if ip is None else str(ip)
-
-
 def _get_internet_attributes(wan: ARWan) -> dict[str, Any]:
     """Get the attributes of the internet connection."""
 
     unit = None if wan.active_unit is None else wan.units.get(wan.active_unit)
 
     return {
-        "ip_address": None if unit is None else _to_str(unit.main.ip),
+        "ip_address": None if unit is None else to_str(unit.main.ip),
         "wan_unit": wan.active_unit,
     }
 
@@ -92,9 +86,9 @@ def _get_address_attributes(address: ARWanAddress) -> dict[str, Any]:
     return {
         "dns": [str(dns) for dns in address.dns],
         "expires": address.expires,
-        "gateway": _to_str(address.gateway),
+        "gateway": to_str(address.gateway),
         "lease": address.lease,
-        "mask": _to_str(address.mask),
+        "mask": to_str(address.mask),
     }
 
 
@@ -138,7 +132,7 @@ def _get_address_sensor(
         key=f"wan_ip{key}{suffix}",
         translation_key=f"wan_ip{key}{suffix}",
         unique_id_name=f"WAN IP{label}{' (Extra)' if extra else ''}",
-        value_fn=lambda wan: _to_str(_get_address(wan).ip),
+        value_fn=lambda wan: to_str(_get_address(wan).ip),
         attributes_fn=lambda wan: _get_address_attributes(_get_address(wan)),
         available_fn=lambda wan: index in wan.units,
         entity_registry_enabled_default=False,
