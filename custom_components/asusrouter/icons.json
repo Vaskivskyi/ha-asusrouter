@@ -6,6 +6,24 @@
         "state": {
           "on": "mdi:lan-connect"
         }
+      },
+      "dual_wan": {
+        "default": "mdi:call-split"
+      },
+      "internet": {
+        "default": "mdi:web-off",
+        "state": {
+          "on": "mdi:web"
+        }
+      },
+      "wan": {
+        "default": "mdi:wan"
+      },
+      "wan_aggregation": {
+        "default": "mdi:call-merge"
+      },
+      "wan_secondary": {
+        "default": "mdi:wan"
       }
     },
     "button": {
@@ -96,6 +114,18 @@
       },
       "usb_port": {
         "default": "mdi:usb-port"
+      },
+      "wan_ip": {
+        "default": "mdi:ip"
+      },
+      "wan_ip_extra": {
+        "default": "mdi:ip"
+      },
+      "wan_ip_secondary": {
+        "default": "mdi:ip"
+      },
+      "wan_ip_secondary_extra": {
+        "default": "mdi:ip"
       }
     }
   }
