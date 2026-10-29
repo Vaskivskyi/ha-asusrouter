@@ -15,6 +15,7 @@ from . import (
     clock,
     ddns,
     led,
+    network,
     ports,
     service,
     sysinfo,
@@ -27,6 +28,7 @@ from . import (
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
     *ddns.BINARY_SENSORS,
+    *network.BINARY_SENSORS,
     *wan.BINARY_SENSORS,
 )
 BUTTONS: tuple[ARButtonDescription, ...] = (*service.BUTTONS,)
@@ -40,7 +42,10 @@ SENSORS: tuple[ARSensorDescription, ...] = (
     *temperature.SENSORS,
     *wan.SENSORS,
 )
-SWITCHES: tuple[ARSwitchDescription, ...] = (*wifi.SWITCHES,)
+SWITCHES: tuple[ARSwitchDescription, ...] = (
+    *network.SWITCHES,
+    *wifi.SWITCHES,
+)
 
 # Every entity description, defines the coordinators to set up
 DESCRIPTIONS: tuple[AREntityDescription, ...] = (

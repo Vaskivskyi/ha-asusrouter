@@ -58,6 +58,45 @@
   },
   "entity": {
     "binary_sensor": {
+      "backhaul_network": {
+        "name": "Backhaul network",
+        "state_attributes": {
+          "ap_isolate": {
+            "name": "AP isolation"
+          },
+          "bands": {
+            "name": "Bands"
+          },
+          "hidden": {
+            "name": "Hidden"
+          },
+          "lan_access": {
+            "name": "LAN access"
+          },
+          "mac_filter_mode": {
+            "name": "MAC filter mode",
+            "state": {
+              "allow": "Allow",
+              "deny": "Deny",
+              "disabled": "Disabled"
+            }
+          },
+          "schedule_mode": {
+            "name": "Schedule mode",
+            "state": {
+              "disabled": "Disabled",
+              "one_time": "One time",
+              "scheduled": "Scheduled"
+            }
+          },
+          "type": {
+            "name": "Type"
+          },
+          "wifi7": {
+            "name": "WiFi 7"
+          }
+        }
+      },
       "connected": {
         "name": "Connected"
       },
@@ -391,6 +430,45 @@
       }
     },
     "switch": {
+      "network": {
+        "name": "Network",
+        "state_attributes": {
+          "ap_isolate": {
+            "name": "AP isolation"
+          },
+          "bands": {
+            "name": "Bands"
+          },
+          "hidden": {
+            "name": "Hidden"
+          },
+          "lan_access": {
+            "name": "LAN access"
+          },
+          "mac_filter_mode": {
+            "name": "MAC filter mode",
+            "state": {
+              "allow": "Allow",
+              "deny": "Deny",
+              "disabled": "Disabled"
+            }
+          },
+          "schedule_mode": {
+            "name": "Schedule mode",
+            "state": {
+              "disabled": "Disabled",
+              "one_time": "One time",
+              "scheduled": "Scheduled"
+            }
+          },
+          "type": {
+            "name": "Type"
+          },
+          "wifi7": {
+            "name": "WiFi 7"
+          }
+        }
+      },
       "wifi_2g1": {
         "name": "Wireless 2.4 GHz",
         "state_attributes": {

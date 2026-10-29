@@ -106,7 +106,7 @@ def test_value(state: bool) -> None:
 def test_action(state: bool) -> None:
     """Test that a radio is switched by its library action."""
 
-    action = DESCRIPTIONS["wifi_6g1"].action_fn(state)
+    action = DESCRIPTIONS["wifi_6g1"].action_fn(state, {})
 
     assert isinstance(action, ARWiFiAction)
     assert action.band is ARWiFiBand.BAND_6G1

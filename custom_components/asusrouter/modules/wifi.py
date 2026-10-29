@@ -73,7 +73,7 @@ def _get_radio_switch(band: ARWiFiBand, label: str) -> ARSwitchDescription:
         ),
         value_fn=lambda radio: radio.get(ARWiFiField.STATE),
         attributes_fn=_get_attributes,
-        action_fn=lambda state: ARWiFiAction(band, state),
+        action_fn=lambda state, _: ARWiFiAction(band, state),
         supported_fn=_has_band,
         entity_category=EntityCategory.CONFIG,
     )
