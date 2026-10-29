@@ -26,7 +26,7 @@ def to_str(value: Any) -> str | None:
 def to_unique_id(raw: str) -> str:
     """Convert string to unique_id."""
 
-    # Frozen since i0: changing the output orphans every existing entity
+    # Frozen: changing the output orphans every existing entity
     string = (
         re.sub(r"(?<=[a-z0-9:_])(?=[A-Z])|[^a-zA-Z0-9:_]", " ", raw)
         .strip()

@@ -35,7 +35,7 @@ DDNS: dict[ARDdnsField, Any] = {
 
 
 def test_description() -> None:
-    """Test that the DDNS keeps its i0 unique_id and default."""
+    """Test that the DDNS keeps its unique_id and default."""
 
     assert DESCRIPTION.translation_key == "ddns"
     assert DESCRIPTION.unique_id_name == "DDNS"

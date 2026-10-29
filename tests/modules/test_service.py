@@ -40,7 +40,7 @@ DESCRIPTIONS = {description.key: description for description in BUTTONS}
 def test_button(
     key: str, unique_id_name: str, service: ARService, enabled: bool
 ) -> None:
-    """Test that every button keeps its i0 unique_id and runs its service."""
+    """Test that every button keeps its unique_id and runs its service."""
 
     description = DESCRIPTIONS[key]
     action = description.action_fn()

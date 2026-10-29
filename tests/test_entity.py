@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 from typing import Any
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 from asusrouter import AsusRouterError
 from asusrouter.modules.system_status import (
@@ -20,6 +20,8 @@ from custom_components.asusrouter.const import DOMAIN
 from custom_components.asusrouter.entity import (
     AREntity,
     AREntityDescription,
+    ARToggleDescription,
+    ARToggleEntity,
     async_setup_entities,
     get_supported,
 )
@@ -200,6 +202,47 @@ async def test_run_action_failed(
 
     coordinator: Any = entity.coordinator
     coordinator.async_refresh.assert_not_awaited()
+
+
+def _get_toggle_entity(**kwargs: Any) -> ARToggleEntity:
+    """Create an entity of the test device turned on and off."""
+
+    description = ARToggleDescription(
+        key="test",
+        translation_key="test",
+        source=SOURCE,
+        update_interval=timedelta(seconds=30),
+        unique_id_name="Test Name",
+        **{"value_fn": Mock(), "action_fn": Mock(), **kwargs},
+    )
+
+    return ARToggleEntity(_get_coordinator(), description, MAC)
+
+
+async def test_toggle_is_on() -> None:
+    """Test that the state is read from the device data."""
+
+    value_fn = Mock(return_value=True)
+    entity = _get_toggle_entity(value_fn=value_fn)
+
+    assert entity.is_on is True
+    value_fn.assert_called_once_with(DEVICE_DATA)
+
+
+@pytest.mark.parametrize(("method", "state"), [("on", True), ("off", False)])
+async def test_toggle_turn(method: str, state: bool) -> None:
+    """Test that turning the entity runs its action."""
+
+    action_fn = Mock()
+    entity = _get_toggle_entity(action_fn=action_fn)
+
+    with patch.object(
+        ARToggleEntity, "_async_run_action", AsyncMock()
+    ) as run_action:
+        await getattr(entity, f"async_turn_{method}")()
+
+    action_fn.assert_called_once_with(state)
+    run_action.assert_awaited_once_with(action_fn.return_value)
 
 
 # ---------------------------

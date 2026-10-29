@@ -29,7 +29,7 @@ DESCRIPTIONS = {description.key: description for description in SENSORS}
     ],
 )
 def test_unique_id_names(key: str, unique_id_name: str) -> None:
-    """Test that every sensor keeps its i0 unique_id name."""
+    """Test that every sensor keeps its unique_id name."""
 
     assert DESCRIPTIONS[key].unique_id_name == unique_id_name
 
