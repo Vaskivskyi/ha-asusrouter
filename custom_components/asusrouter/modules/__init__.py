@@ -18,10 +18,12 @@ from . import (
     sysinfo,
     system_status,
     temperature,
+    wan,
 )
 
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *aimesh.BINARY_SENSORS,
+    *wan.BINARY_SENSORS,
 )
 BUTTONS: tuple[ARButtonDescription, ...] = (*service.BUTTONS,)
 LIGHTS: tuple[ARLightDescription, ...] = (*led.LIGHTS,)
@@ -32,6 +34,7 @@ SENSORS: tuple[ARSensorDescription, ...] = (
     *sysinfo.SENSORS,
     *system_status.SENSORS,
     *temperature.SENSORS,
+    *wan.SENSORS,
 )
 
 # Every entity description, defines the coordinators to set up

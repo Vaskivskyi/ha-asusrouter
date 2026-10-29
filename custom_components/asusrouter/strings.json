@@ -60,6 +60,69 @@
     "binary_sensor": {
       "connected": {
         "name": "Connected"
+      },
+      "dual_wan": {
+        "name": "Dual WAN",
+        "state_attributes": {
+          "mode": {
+            "name": "Mode",
+            "state": {
+              "failover": "Failover",
+              "fallback": "Fallback",
+              "load_balance": "Load balance"
+            }
+          },
+          "priority": {
+            "name": "Priority"
+          }
+        }
+      },
+      "internet": {
+        "name": "Internet",
+        "state_attributes": {
+          "ip_address": {
+            "name": "IP address"
+          },
+          "wan_unit": {
+            "name": "WAN unit"
+          }
+        }
+      },
+      "wan": {
+        "name": "WAN",
+        "state_attributes": {
+          "link": {
+            "name": "Link"
+          },
+          "primary": {
+            "name": "Primary"
+          },
+          "protocol": {
+            "name": "Protocol"
+          }
+        }
+      },
+      "wan_aggregation": {
+        "name": "WAN aggregation",
+        "state_attributes": {
+          "ports": {
+            "name": "Ports"
+          }
+        }
+      },
+      "wan_secondary": {
+        "name": "Secondary WAN",
+        "state_attributes": {
+          "link": {
+            "name": "Link"
+          },
+          "primary": {
+            "name": "Primary"
+          },
+          "protocol": {
+            "name": "Protocol"
+          }
+        }
       }
     },
     "button": {
@@ -214,6 +277,86 @@
               "usb": "USB",
               "wan": "WAN"
             }
+          }
+        }
+      },
+      "wan_ip": {
+        "name": "WAN IP",
+        "state_attributes": {
+          "dns": {
+            "name": "DNS"
+          },
+          "expires": {
+            "name": "Expires"
+          },
+          "gateway": {
+            "name": "Gateway"
+          },
+          "lease": {
+            "name": "Lease"
+          },
+          "mask": {
+            "name": "Mask"
+          }
+        }
+      },
+      "wan_ip_extra": {
+        "name": "WAN IP extra",
+        "state_attributes": {
+          "dns": {
+            "name": "DNS"
+          },
+          "expires": {
+            "name": "Expires"
+          },
+          "gateway": {
+            "name": "Gateway"
+          },
+          "lease": {
+            "name": "Lease"
+          },
+          "mask": {
+            "name": "Mask"
+          }
+        }
+      },
+      "wan_ip_secondary": {
+        "name": "Secondary WAN IP",
+        "state_attributes": {
+          "dns": {
+            "name": "DNS"
+          },
+          "expires": {
+            "name": "Expires"
+          },
+          "gateway": {
+            "name": "Gateway"
+          },
+          "lease": {
+            "name": "Lease"
+          },
+          "mask": {
+            "name": "Mask"
+          }
+        }
+      },
+      "wan_ip_secondary_extra": {
+        "name": "Secondary WAN IP extra",
+        "state_attributes": {
+          "dns": {
+            "name": "DNS"
+          },
+          "expires": {
+            "name": "Expires"
+          },
+          "gateway": {
+            "name": "Gateway"
+          },
+          "lease": {
+            "name": "Lease"
+          },
+          "mask": {
+            "name": "Mask"
           }
         }
       }
