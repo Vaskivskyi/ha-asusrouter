@@ -39,6 +39,7 @@ from custom_components.asusrouter.modules import (
     aimesh,
     ddns,
     network,
+    port_forwarding,
 )
 
 pytestmark = pytest.mark.asyncio
@@ -145,6 +146,8 @@ def _get_bridge(
         async_close=AsyncMock(),
         get_nodes=Mock(return_value=[Mock(mac=mac) for mac in nodes]),
         serves_mesh=serves_mesh,
+        # A node is not a router
+        is_router=serves_mesh,
     )
     # A device not serving the mesh is a node, which is not a router
     bridge.identity.operation_mode = (
@@ -206,6 +209,7 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
         *ddns.BINARY_SENSORS,
         *network.BINARY_SENSORS,
         *network.SWITCHES,
+        *port_forwarding.SWITCHES,
     ]
     setup_coordinators.assert_awaited_once_with(
         hass,

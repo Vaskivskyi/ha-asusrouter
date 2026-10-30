@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import Mock
 
-from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.ddns import (
     ARDdnsField,
     ARDdnsServer,
@@ -15,10 +14,7 @@ from asusrouter.modules.ddns import (
 from asusrouter.tools.identifiers import Hostname, IpAddress
 import pytest
 
-from custom_components.asusrouter.modules.ddns import (
-    BINARY_SENSORS,
-    _is_router,
-)
+from custom_components.asusrouter.modules.ddns import BINARY_SENSORS
 
 DESCRIPTION = BINARY_SENSORS[0]
 
@@ -41,7 +37,6 @@ def test_description() -> None:
     assert DESCRIPTION.unique_id_name == "DDNS"
     assert DESCRIPTION.entity_registry_enabled_default is False
     assert DESCRIPTION.source is ARDdnsSourceUniversal
-    assert DESCRIPTION.supported_fn is _is_router
 
 
 @pytest.mark.parametrize(
@@ -55,22 +50,12 @@ def test_data(data: Any, expected: Any) -> None:
     assert DESCRIPTION.data_fn(data) == expected
 
 
-@pytest.mark.parametrize(
-    ("mode", "expected"),
-    [
-        (AROperationMode.ACCESS_POINT, False),
-        (AROperationMode.AIMESH_NODE, False),
-        (AROperationMode.ROUTER, True),
-        (AROperationMode.UNKNOWN, False),
-    ],
-)
-def test_is_router(mode: AROperationMode, expected: bool) -> None:
+@pytest.mark.parametrize("is_router", [True, False])
+def test_supported(is_router: bool) -> None:
     """Test that only a router has the DDNS."""
 
-    bridge = Mock()
-    bridge.identity.operation_mode = mode
-
-    assert _is_router(bridge) is expected
+    assert DESCRIPTION.supported_fn is not None
+    assert DESCRIPTION.supported_fn(Mock(is_router=is_router)) is is_router
 
 
 @pytest.mark.parametrize(

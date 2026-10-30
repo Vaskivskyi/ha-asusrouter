@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from asusrouter.modules.port_forwarding import ARPortForwardingProtocol
 from asusrouter.tools.identifiers import Hostname, IpAddress, MacAddress
 import pytest
 
@@ -12,6 +13,7 @@ from custom_components.asusrouter.helpers import (
     to_identifier,
     to_str,
     to_unique_id,
+    to_value,
 )
 
 
@@ -57,3 +59,18 @@ def test_to_unique_id(raw: str, expected: str) -> None:
     """Test that a raw name is converted to its frozen unique_id."""
 
     assert to_unique_id(raw) == expected
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, None),
+        ("TCP", None),
+        (ARPortForwardingProtocol.TCP, "TCP"),
+        (ARPortForwardingProtocol.UNKNOWN, None),
+    ],
+)
+def test_to_value(value: Any, expected: str | None) -> None:
+    """Test that an enum member is converted to its value."""
+
+    assert to_value(value, ARPortForwardingProtocol) == expected

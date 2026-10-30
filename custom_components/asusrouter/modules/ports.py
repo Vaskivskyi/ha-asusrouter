@@ -17,6 +17,7 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import EntityCategory, UnitOfDataRate
 
 from ..entity import ARSensorDescription
+from ..helpers import to_value
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
@@ -62,7 +63,6 @@ def _get_attributes(data: ARPortsData, name: str) -> dict[str, Any]:
     """Get the attributes of a port."""
 
     port = _get_port(data, name) or {}
-    role = port.get(ARPortProperty.ROLE)
 
     return {
         "capabilities": sorted(
@@ -70,11 +70,7 @@ def _get_attributes(data: ARPortsData, name: str) -> dict[str, Any]:
             for capability in port.get(ARPortProperty.CAPABILITIES, [])
         ),
         "max_rate": _get_rate(port, ARPortProperty.MAX_RATE),
-        "role": (
-            role.value
-            if isinstance(role, ARPortType) and role is not ARPortType.UNKNOWN
-            else None
-        ),
+        "role": to_value(port.get(ARPortProperty.ROLE), ARPortType),
     }
 
 

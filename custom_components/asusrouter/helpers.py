@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
 import re
 from typing import Any
 
@@ -21,6 +22,16 @@ def to_str(value: Any) -> str | None:
     """Convert a value to string, None when missing."""
 
     return None if value is None else str(value)
+
+
+def to_value(value: Any, enum: type[StrEnum]) -> str | None:
+    """Convert an enum member to its value, None when missing or unknown."""
+
+    return (
+        value.value
+        if isinstance(value, enum) and value.name != "UNKNOWN"
+        else None
+    )
 
 
 def to_unique_id(raw: str) -> str:

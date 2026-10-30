@@ -469,6 +469,14 @@
           }
         }
       },
+      "port_forwarding": {
+        "name": "Port forwarding",
+        "state_attributes": {
+          "rules": {
+            "name": "Rules"
+          }
+        }
+      },
       "wifi_2g1": {
         "name": "Wireless 2.4 GHz",
         "state_attributes": {
