@@ -144,6 +144,12 @@
           "on": "mdi:access-point-network"
         }
       },
+      "port_forwarding": {
+        "default": "mdi:lan-disconnect",
+        "state": {
+          "on": "mdi:lan-connect"
+        }
+      },
       "wifi_2g1": {
         "default": "mdi:wifi-off",
         "state": {

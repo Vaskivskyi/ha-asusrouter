@@ -72,6 +72,12 @@ class ARBridge:
         return self._api.description
 
     @property
+    def is_router(self) -> bool:
+        """Return whether the device works as a router."""
+
+        return self.identity.operation_mode is AROperationMode.ROUTER
+
+    @property
     def serves_mesh(self) -> bool:
         """Return whether the AiMesh nodes are served through this device."""
 

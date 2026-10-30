@@ -16,6 +16,7 @@ from . import (
     ddns,
     led,
     network,
+    port_forwarding,
     ports,
     service,
     sysinfo,
@@ -44,6 +45,7 @@ SENSORS: tuple[ARSensorDescription, ...] = (
 )
 SWITCHES: tuple[ARSwitchDescription, ...] = (
     *network.SWITCHES,
+    *port_forwarding.SWITCHES,
     *wifi.SWITCHES,
 )
 

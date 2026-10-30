@@ -20,7 +20,7 @@ from asusrouter.modules.wifi import ARWiFiBand, ARWiFiMacFilterMode
 from homeassistant.const import EntityCategory
 
 from ..entity import ARBinarySensorDescription, ARSwitchDescription
-from ..helpers import to_str
+from ..helpers import to_str, to_value
 
 if TYPE_CHECKING:
     from ..bridge import ARBridge
@@ -83,7 +83,6 @@ def _get_attributes(network: _Network) -> dict[str, Any]:
     """Get the attributes of a network."""
 
     profile = network.profile
-    mac_filter = profile.get(ARNetworkField.MAC_FILTER_MODE)
     schedule = profile.get(ARNetworkField.SCHEDULE_MODE)
 
     return {
@@ -93,11 +92,8 @@ def _get_attributes(network: _Network) -> dict[str, Any]:
         ],
         "hidden": profile.get(ARNetworkField.HIDDEN),
         "lan_access": profile.get(ARNetworkField.LAN_ACCESS),
-        "mac_filter_mode": (
-            mac_filter.value
-            if isinstance(mac_filter, ARWiFiMacFilterMode)
-            and mac_filter is not ARWiFiMacFilterMode.UNKNOWN
-            else None
+        "mac_filter_mode": to_value(
+            profile.get(ARNetworkField.MAC_FILTER_MODE), ARWiFiMacFilterMode
         ),
         "schedule_mode": (
             schedule.name.lower()
