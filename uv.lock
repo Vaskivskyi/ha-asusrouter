@@ -354,7 +354,7 @@ wheels = [
 [[package]]
 name = "asusrouter"
 version = "2.0.0.dev0"
-source = { git = "https://github.com/Vaskivskyi/asusrouter.git?branch=dev#6bb95d681859f9eb76dcf4c69af502b36b78fac4" }
+source = { git = "https://github.com/Vaskivskyi/asusrouter.git?branch=dev#9390382b339dfa552ec80343558cbf2ddfcd6b10" }
 dependencies = [
     { name = "aiohttp" },
     { name = "urllib3" },
