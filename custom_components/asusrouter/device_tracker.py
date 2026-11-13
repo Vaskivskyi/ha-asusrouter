@@ -106,6 +106,10 @@ class ARDeviceEntity(ScannerEntity):
             self._attr_device_info = self._compile_device_info(
                 client.mac_address, client.name
             )
+        else:
+            # An empty DeviceInfo tells Home Assistant the tracker
+            # intentionally has no device (required from HA 2027.11)
+            self._attr_device_info = DeviceInfo()
 
     def _compile_device_info(
         self, mac_address: str, name: str | None
