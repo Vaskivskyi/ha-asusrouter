@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock, call, patch
 
 from asusrouter.modules.common.device import AROperationMode
 from asusrouter.tools.identifiers import MacAddress
+from homeassistant.helpers.device_registry import DeviceInfo
 import pytest
 
 from custom_components.asusrouter import ownership
@@ -158,11 +159,11 @@ def _get_bridge(own: Any, mode: AROperationMode) -> Mock:
     bridge.identity.operation_mode = mode
     bridge.identity.aimesh.get = Mock(return_value=own)
     bridge.get_device_info = Mock(
-        side_effect=lambda mesh_node: {
-            "identifiers": {NODE_IDENTIFIER},
-            "model": "Model",
-            "name": "Name",
-        }
+        side_effect=lambda mesh_node: DeviceInfo(
+            identifiers={NODE_IDENTIFIER},
+            model="Model",
+            name="Name",
+        )
     )
 
     return bridge

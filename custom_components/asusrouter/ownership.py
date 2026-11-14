@@ -11,6 +11,7 @@ from asusrouter.tools.identifiers import MacAddress
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.typing import UNDEFINED
 
 from .const import DOMAIN
 from .helpers import to_identifier
@@ -96,8 +97,8 @@ def get_device_info(
         )
     ):
         # Keep the name its router gave, the node alone cannot tell it
-        device_info.pop("model")
-        device_info.pop("name")
+        device_info.model = UNDEFINED
+        device_info.name = UNDEFINED
 
     return device_info
 
