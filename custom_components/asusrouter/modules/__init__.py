@@ -24,6 +24,7 @@ from . import (
     sysinfo,
     system_status,
     temperature,
+    vpn,
     wan,
     wifi,
 )
@@ -44,12 +45,14 @@ SENSORS: tuple[ARSensorDescription, ...] = (
     *sysinfo.SENSORS,
     *system_status.SENSORS,
     *temperature.SENSORS,
+    *vpn.SENSORS,
     *wan.SENSORS,
 )
 SWITCHES: tuple[ARSwitchDescription, ...] = (
     *network.SWITCHES,
     *parental_control.SWITCHES,
     *port_forwarding.SWITCHES,
+    *vpn.SWITCHES,
     *wifi.SWITCHES,
 )
 

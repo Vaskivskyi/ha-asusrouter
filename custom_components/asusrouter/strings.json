@@ -279,6 +279,37 @@
       "load_average_5": {
         "name": "Load average (5 min)"
       },
+      "openvpn_client_state": {
+        "name": "OpenVPN client {name} state",
+        "state": {
+          "connected": "Connected",
+          "connecting": "Connecting",
+          "disconnected": "Disconnected",
+          "error": "Error"
+        },
+        "state_attributes": {
+          "connected_since": {
+            "name": "Connected since"
+          },
+          "state_reason": {
+            "name": "State reason"
+          }
+        }
+      },
+      "openvpn_server_state": {
+        "name": "OpenVPN server {unit} state",
+        "state": {
+          "connected": "Connected",
+          "connecting": "Connecting",
+          "disconnected": "Disconnected",
+          "error": "Error"
+        },
+        "state_attributes": {
+          "errno": {
+            "name": "Error code"
+          }
+        }
+      },
       "port": {
         "name": "Port {port}",
         "state_attributes": {
@@ -433,6 +464,20 @@
             "name": "Mask"
           }
         }
+      },
+      "wireguard_client_state": {
+        "name": "WireGuard client {name} state",
+        "state": {
+          "connected": "Connected",
+          "connecting": "Connecting",
+          "disconnected": "Disconnected",
+          "error": "Error"
+        },
+        "state_attributes": {
+          "state_reason": {
+            "name": "State reason"
+          }
+        }
       }
     },
     "switch": {
@@ -440,7 +485,7 @@
         "name": "Block Internet"
       },
       "network": {
-        "name": "Network",
+        "name": "Network {name}",
         "state_attributes": {
           "ap_isolate": {
             "name": "AP isolation"
@@ -477,6 +522,12 @@
             "name": "WiFi 7"
           }
         }
+      },
+      "openvpn_client": {
+        "name": "OpenVPN client {name}"
+      },
+      "openvpn_server": {
+        "name": "OpenVPN server {unit}"
       },
       "parental_control": {
         "name": "Parental control"
@@ -608,6 +659,12 @@
             "name": "Country code"
           }
         }
+      },
+      "wireguard_client": {
+        "name": "WireGuard client {name}"
+      },
+      "wireguard_server": {
+        "name": "WireGuard server {unit}"
       }
     }
   },

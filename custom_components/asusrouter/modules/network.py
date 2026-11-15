@@ -117,13 +117,18 @@ def _get_action(state: bool, network: _Network) -> ARNetworkAction:
 
 
 def _get_switch(
-    key: str, unique_id_name: str, match: Callable[[ARNetworkHandle], bool]
+    key: str,
+    unique_id_name: str,
+    default_name: str,
+    match: Callable[[ARNetworkHandle], bool],
 ) -> ARSwitchDescription:
     """Get the description of the switch of a network."""
 
     return ARSwitchDescription(
         key=key,
         translation_key="network",
+        # The handle names the network until its SSID is read
+        translation_placeholders={"name": default_name},
         source=ARNetworkSourceUniversal,
         update_interval=UPDATE_INTERVAL,
         unique_id_name=unique_id_name,
@@ -147,6 +152,7 @@ def _get_sdn_switch(index: int) -> ARSwitchDescription:
     return _get_switch(
         f"network_sdn_{index}",
         f"Network SDN {index}",
+        f"SDN {index}",
         lambda handle: (
             handle.backend is ARNetworkBackend.SDN and handle.sdn_idx == index
         ),
@@ -160,6 +166,7 @@ def _get_legacy_switch(unit: int, slot: int) -> ARSwitchDescription:
     return _get_switch(
         f"network_{unit}_{slot}",
         f"Network {unit}.{slot}",
+        f"{unit}.{slot}",
         lambda handle: (
             handle.backend is ARNetworkBackend.LEGACY
             and bool(handle.units)

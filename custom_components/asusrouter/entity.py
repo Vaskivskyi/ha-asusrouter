@@ -180,15 +180,19 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         return _get_data(self.coordinator, self.entity_description, self._mac)
 
     def _update_name(self) -> None:
-        """Name the entity from its data, when it names itself."""
+        """Fill the name placeholder from its data, when it names itself."""
 
-        name_fn = self.entity_description.name_fn
+        description = self.entity_description
+        name_fn = description.name_fn
         if name_fn is None or (data := self._device_data) is None:
             return
 
         # A missing name keeps the last one
         if (name := name_fn(data)) is not None:
-            self._attr_name = name
+            self._attr_translation_placeholders = {
+                **(description.translation_placeholders or {}),
+                "name": name,
+            }
 
     @callback
     def _handle_coordinator_update(self) -> None:

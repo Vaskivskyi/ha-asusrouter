@@ -193,6 +193,15 @@ def test_switch(state: bool) -> None:
     assert action.state is state
 
 
+@pytest.mark.parametrize(
+    ("key", "name"), [("network_sdn_3", "SDN 3"), ("network_0_1", "0.1")]
+)
+def test_default_name(key: str, name: str) -> None:
+    """Test that the handle names a network until its SSID is read."""
+
+    assert DESCRIPTIONS[key].translation_placeholders == {"name": name}
+
+
 def test_name_missing() -> None:
     """Test that a network without an SSID reports no name."""
 
