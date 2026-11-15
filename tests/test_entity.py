@@ -151,15 +151,29 @@ async def test_extra_state_attributes() -> None:
     assert _get_entity().extra_state_attributes is None
 
 
-@pytest.mark.parametrize(("name", "named"), [("Example", True), (None, False)])
-async def test_name(name: str | None, named: bool) -> None:
-    """Test that an entity is named from its data when it names itself."""
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [("Example", {"unit": "1", "name": "Example"}), (None, {"unit": "1"})],
+)
+async def test_name(name: str | None, expected: dict[str, str]) -> None:
+    """Test that the name placeholder is filled from the data."""
 
     name_fn = Mock(return_value=name)
-    entity = _get_entity(name_fn=name_fn)
+    entity = _get_entity(
+        name_fn=name_fn, translation_placeholders={"unit": "1"}
+    )
 
     name_fn.assert_called_once_with(DEVICE_DATA)
-    assert hasattr(entity, "_attr_name") is named
+    assert not hasattr(entity, "_attr_name")
+    assert entity.translation_placeholders == expected
+
+
+async def test_name_without_placeholders() -> None:
+    """Test that a description without placeholders gets only the name."""
+
+    entity = _get_entity(name_fn=Mock(return_value="Example"))
+
+    assert entity.translation_placeholders == {"name": "Example"}
 
 
 async def test_name_unread() -> None:
@@ -169,7 +183,7 @@ async def test_name_unread() -> None:
     entity = _get_entity(data={}, name_fn=name_fn)
 
     name_fn.assert_not_called()
-    assert not hasattr(entity, "_attr_name")
+    assert not hasattr(entity, "_attr_translation_placeholders")
 
 
 async def test_name_update() -> None:
@@ -181,13 +195,13 @@ async def test_name_update() -> None:
         CoordinatorEntity, "_handle_coordinator_update"
     ) as handle_update:
         entity._handle_coordinator_update()
-        assert entity._attr_name == "New"
+        assert entity.translation_placeholders == {"name": "New"}
         handle_update.assert_called_once()
 
         # A missing name keeps the last one
         handle_update.reset_mock()
         entity._handle_coordinator_update()
-        assert entity._attr_name == "New"
+        assert entity.translation_placeholders == {"name": "New"}
         handle_update.assert_called_once()
 
 

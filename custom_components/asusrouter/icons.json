@@ -97,6 +97,18 @@
       "load_average_5": {
         "default": "mdi:cpu-32-bit"
       },
+      "openvpn_client_state": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "connected": "mdi:check-network-outline"
+        }
+      },
+      "openvpn_server_state": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "connected": "mdi:check-network-outline"
+        }
+      },
       "port": {
         "default": "mdi:ethernet"
       },
@@ -141,6 +153,12 @@
       },
       "wan_ip_secondary_extra": {
         "default": "mdi:ip"
+      },
+      "wireguard_client_state": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "connected": "mdi:check-network-outline"
+        }
       }
     },
     "switch": {
@@ -154,6 +172,18 @@
         "default": "mdi:access-point-network-off",
         "state": {
           "on": "mdi:access-point-network"
+        }
+      },
+      "openvpn_client": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "on": "mdi:check-network-outline"
+        }
+      },
+      "openvpn_server": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "on": "mdi:check-network-outline"
         }
       },
       "parental_control": {
@@ -202,6 +232,18 @@
         "default": "mdi:wifi-off",
         "state": {
           "on": "mdi:wifi"
+        }
+      },
+      "wireguard_client": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "on": "mdi:check-network-outline"
+        }
+      },
+      "wireguard_server": {
+        "default": "mdi:close-network-outline",
+        "state": {
+          "on": "mdi:check-network-outline"
         }
       }
     }

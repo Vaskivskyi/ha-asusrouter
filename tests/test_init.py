@@ -41,6 +41,7 @@ from custom_components.asusrouter.modules import (
     network,
     parental_control,
     port_forwarding,
+    vpn,
 )
 
 pytestmark = pytest.mark.asyncio
@@ -212,6 +213,8 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
         *network.SWITCHES,
         *parental_control.SWITCHES,
         *port_forwarding.SWITCHES,
+        *vpn.SENSORS,
+        *vpn.SWITCHES,
     ]
     setup_coordinators.assert_awaited_once_with(
         hass,
