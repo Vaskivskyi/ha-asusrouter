@@ -16,13 +16,14 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 import pytest
 
-from custom_components.asusrouter import ARRuntimeData
+from custom_components.asusrouter import ARRuntimeData, entity as entity_module
 from custom_components.asusrouter.const import DOMAIN
 from custom_components.asusrouter.entity import (
     AREntity,
     AREntityDescription,
     ARToggleDescription,
     ARToggleEntity,
+    _async_remove_entity,
     async_setup_entities,
     get_supported,
 )
@@ -46,9 +47,8 @@ def _get_description(**kwargs: Any) -> AREntityDescription:
         translation_key="test",
         source=SOURCE,
         update_interval=timedelta(seconds=30),
-        unique_id_name="Test Name",
         value_fn=Mock(),
-        **kwargs,
+        **{"unique_id_name": "Test Name", **kwargs},
     )
 
 
@@ -112,6 +112,57 @@ async def test_device_data_fn() -> None:
 
     assert _get_entity(data, data_fn=data_fn)._device_data is DEVICE_DATA
     data_fn.assert_called_once_with(data)
+
+
+def _get_keyed_entity(
+    data: dict[Any, Any] | None = None, **kwargs: Any
+) -> AREntity:
+    """Create the entity of the key "a" of the test device."""
+
+    description = _get_description(
+        unique_id_name="",
+        keys_fn=lambda data: data,
+        item_fn=lambda data, key: data.get(key),
+        unique_id_fn=lambda key: f"Test {key}",
+        placeholders_fn=lambda key: {"key": key},
+        **kwargs,
+    )
+
+    return AREntity(_get_coordinator(data), description, MAC, "a")
+
+
+async def test_keyed_init() -> None:
+    """Test that a keyed entity builds its unique_id and name from its key."""
+
+    entity = _get_keyed_entity(translation_placeholders={"unit": "1"})
+
+    assert entity.unique_id == "aa:bb:cc:dd:ee:01_test_a"
+    assert entity.translation_placeholders == {"unit": "1", "key": "a"}
+
+
+async def test_keyed_name() -> None:
+    """Test that the name of a keyed entity keeps the key placeholders."""
+
+    entity = _get_keyed_entity(
+        {MAC: {"a": "item"}}, name_fn=Mock(return_value="Example")
+    )
+
+    assert entity.translation_placeholders == {"key": "a", "name": "Example"}
+
+
+@pytest.mark.parametrize(
+    ("data", "expected"),
+    [
+        ({MAC: {"a": "item"}}, "item"),
+        ({MAC: {"b": "item"}}, None),
+        # The device itself is not read
+        ({OTHER_MAC: {"a": "item"}}, None),
+    ],
+)
+async def test_keyed_device_data(data: dict[Any, Any], expected: Any) -> None:
+    """Test that a keyed entity reads the data of its key."""
+
+    assert _get_keyed_entity(data)._device_data == expected
 
 
 @pytest.mark.parametrize(
@@ -540,6 +591,152 @@ async def test_setup_entities_without_mac() -> None:
     """Test that no entity is created for a device without a MAC."""
 
     assert _setup_entities(_get_entry(None), [_get_description()]) == []
+
+
+def _get_keyed_description(**kwargs: Any) -> AREntityDescription:
+    """Create a description of an entity for each key of the device data."""
+
+    return _get_description(
+        unique_id_name="",
+        keys_fn=lambda data: data,
+        item_fn=lambda data, key: data.get(key),
+        unique_id_fn=lambda key: f"Test {key}",
+        **kwargs,
+    )
+
+
+def _setup_keyed(
+    description: AREntityDescription, data: dict[Any, Any] | None
+) -> tuple[Mock, Mock, Any, Mock]:
+    """Set up the keyed entities, removing none for real."""
+
+    entry = _get_entry(data={MAC: data} if data is not None else {})
+    coordinator = entry.runtime_data.coordinators[SOURCE]
+    coordinator.last_update_success = True
+
+    def _get_device(mac: MacAddress) -> Any:
+        """Read whatever the data is by then."""
+
+        return (coordinator.data or {}).get(mac)
+
+    coordinator.get_device = Mock(side_effect=_get_device)
+    if data is None:
+        coordinator.data = None
+    add_entities = Mock()
+
+    with patch.object(entity_module, "_async_remove_entity") as remove:
+        async_setup_entities(
+            entry, [description], _get_entity_args, add_entities
+        )
+    listener = _get_listener(coordinator)
+
+    return coordinator, add_entities, listener, remove
+
+
+async def test_setup_entities_keyed() -> None:
+    """Test that every key gets its entity, also those appearing later."""
+
+    description = _get_keyed_description()
+    coordinator, add_entities, listener, _ = _setup_keyed(
+        description, {"a": 1, "b": 2}
+    )
+
+    (entities,) = add_entities.call_args.args
+    assert sorted(entities, key=lambda args: args[3]) == [
+        (coordinator, description, MAC, "a"),
+        (coordinator, description, MAC, "b"),
+    ]
+
+    coordinator.data[MAC]["c"] = 3
+    listener()
+    add_entities.assert_called_with([(coordinator, description, MAC, "c")])
+
+    # Known keys are not added twice, and the listener stays for new ones
+    add_entities.reset_mock()
+    listener()
+    add_entities.assert_not_called()
+    coordinator.async_add_listener.return_value.assert_not_called()
+
+
+async def test_setup_entities_keyed_unread() -> None:
+    """Test that the keys are read once the source is read."""
+
+    description = _get_keyed_description()
+    coordinator, add_entities, listener, _ = _setup_keyed(description, None)
+
+    add_entities.assert_not_called()
+
+    # A failed read is not read
+    coordinator.data = {MAC: {"a": 1}}
+    coordinator.last_update_success = False
+    listener()
+    add_entities.assert_not_called()
+
+    # Nor is a device missing from the data, as an offline node
+    coordinator.last_update_success = True
+    coordinator.data = {OTHER_MAC: {"a": 1}}
+    listener()
+    add_entities.assert_not_called()
+
+    coordinator.data = {MAC: {"a": 1}}
+    listener()
+    add_entities.assert_called_once_with(
+        [(coordinator, description, MAC, "a")]
+    )
+
+
+@pytest.mark.parametrize(
+    ("remove_missing", "data", "removed"),
+    [
+        (True, {"a": 1}, ("b", 2)),
+        # An empty read is no proof that every key is gone
+        (True, {}, None),
+        (False, {"a": 1}, None),
+    ],
+)
+async def test_setup_entities_keyed_missing(
+    remove_missing: bool, data: dict[str, int], removed: Any
+) -> None:
+    """Test that the entity of a missing key is removed only when asked."""
+
+    description = _get_keyed_description(remove_missing=remove_missing)
+    coordinator, _, listener, _ = _setup_keyed(description, {"a": 1, "b": 2})
+    coordinator.data[MAC] = data
+
+    with patch.object(entity_module, "_async_remove_entity") as remove:
+        listener()
+
+    if removed is None:
+        remove.assert_not_called()
+    else:
+        (entry, entity) = remove.call_args.args
+        assert entry is not None
+        assert entity == (coordinator, description, MAC, removed[0])
+
+
+async def test_remove_entity() -> None:
+    """Test that an entity is removed with its registry entry."""
+
+    entry = Mock(entry_id="entry")
+    entity = Mock(unique_id="unique")
+    registry = Mock()
+    entries = [
+        Mock(unique_id="other", entity_id="sensor.other"),
+        Mock(unique_id="unique", entity_id="sensor.unique"),
+    ]
+
+    with (
+        patch.object(entity_module.er, "async_get", return_value=registry),
+        patch.object(
+            entity_module.er,
+            "async_entries_for_config_entry",
+            return_value=entries,
+        ) as entries_for,
+    ):
+        _async_remove_entity(entry, entity)
+
+    entries_for.assert_called_once_with(registry, "entry")
+    registry.async_remove.assert_called_once_with("sensor.unique")
 
 
 # ---------------------------

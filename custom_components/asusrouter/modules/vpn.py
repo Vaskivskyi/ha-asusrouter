@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from datetime import timedelta
-from typing import Any
+from typing import Any, NamedTuple
 
 from asusrouter.modules.vpn import (
     ARVpnClientAction,
@@ -24,12 +24,6 @@ from ..helpers import to_str
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
-# Units of the clients and servers of every protocol
-_CLIENT_UNITS = range(1, 6)
-_SERVER_UNITS: dict[ARVpnProtocol, range] = {
-    ARVpnProtocol.OPENVPN: range(1, 3),
-    ARVpnProtocol.WIREGUARD: range(1, 2),
-}
 # Names of the protocols in the unique_id names
 _LABELS: dict[ARVpnProtocol, str] = {
     ARVpnProtocol.OPENVPN: "OpenVPN",
@@ -53,6 +47,13 @@ _CLIENT_ATTRIBUTES: dict[ARVpnProtocol, tuple[ARVpnClientField, ...]] = {
 _SERVER_ATTRIBUTES: dict[ARVpnProtocol, tuple[ARVpnServerField, ...]] = {
     ARVpnProtocol.OPENVPN: (ARVpnServerField.ERRNO,),
 }
+
+
+class _Unit(NamedTuple):
+    """A client or server profile with the unit it is controlled by."""
+
+    unit: int
+    profile: dict[Any, Any]
 
 
 def _get_state(value: Any) -> str | None:
@@ -83,167 +84,150 @@ def _get_unit(profile: dict[ARVpnClientField, Any]) -> Any:
     return profile.get(ARVpnClientField.UNIT)
 
 
-def _find_client(
-    data: Any, protocol: ARVpnProtocol, unit: int
-) -> dict[ARVpnClientField, Any] | None:
-    """Find the client of the protocol and unit, None when not reported."""
+def _get_profiles(data: Any, protocol: ARVpnProtocol) -> dict[Any, Any]:
+    """Get the profiles of the protocol, empty when none is reported."""
 
     profiles = data.get(protocol) if isinstance(data, dict) else None
-    if not isinstance(profiles, dict):
-        return None
-
-    return next(
-        (
-            profile
-            for profile in profiles.values()
-            if _get_unit(profile) == unit
-        ),
-        None,
-    )
+    return profiles if isinstance(profiles, dict) else {}
 
 
-def _find_server(
-    data: Any, protocol: ARVpnProtocol, unit: int
-) -> dict[ARVpnServerField, Any] | None:
-    """Find the server of the protocol and unit, None when not reported."""
+def _get_clients(data: Any, protocol: ARVpnProtocol) -> dict[int, _Unit]:
+    """Get the clients of the protocol by their unit."""
 
-    profiles = data.get(protocol) if isinstance(data, dict) else None
-    if not isinstance(profiles, dict):
-        return None
-
-    profile: dict[ARVpnServerField, Any] | None = profiles.get(unit) or None
-    return profile
+    clients: dict[int, _Unit] = {}
+    for profile in _get_profiles(data, protocol).values():
+        if isinstance(unit := _get_unit(profile), int):
+            clients[unit] = _Unit(unit, profile)
+    return clients
 
 
-def _get_client_args(protocol: ARVpnProtocol, unit: int) -> dict[str, Any]:
-    """Get the arguments shared by the entities of a client."""
+def _get_servers(data: Any, protocol: ARVpnProtocol) -> dict[int, _Unit]:
+    """Get the servers of the protocol by their unit."""
 
     return {
-        # The unit names the client until its profile name is read
-        "translation_placeholders": {"name": str(unit)},
+        unit: _Unit(unit, profile)
+        for unit, profile in _get_profiles(data, protocol).items()
+        if isinstance(unit, int) and profile
+    }
+
+
+def _get_client_args(protocol: ARVpnProtocol) -> dict[str, Any]:
+    """Get the arguments shared by the entities of the clients."""
+
+    return {
         "source": ARVpnClientSourceUniversal,
         "update_interval": UPDATE_INTERVAL,
         # The device reports its clients, not keyed by its MAC
-        "data_fn": lambda data: _find_client(data, protocol, unit),
-        "name_fn": lambda profile: to_str(profile.get(ARVpnClientField.NAME)),
-        # Only the units the device reports
-        "exists_fn": lambda _: True,
+        "data_fn": lambda data: data,
+        "keys_fn": lambda data: _get_clients(data, protocol),
+        "item_fn": lambda data, unit: _get_clients(data, protocol).get(unit),
+        # The unit names a client until its profile name is read
+        "placeholders_fn": lambda unit: {"name": str(unit)},
+        "name_fn": lambda client: to_str(
+            client.profile.get(ARVpnClientField.NAME)
+        ),
+        "remove_missing": True,
         "supported_fn": lambda bridge: bridge.is_router,
         "entity_registry_enabled_default": False,
     }
 
 
-def _get_server_args(protocol: ARVpnProtocol, unit: int) -> dict[str, Any]:
-    """Get the arguments shared by the entities of a server."""
+def _get_server_args(protocol: ARVpnProtocol) -> dict[str, Any]:
+    """Get the arguments shared by the entities of the servers."""
 
     return {
-        "translation_placeholders": {"unit": str(unit)},
         "source": ARVpnServerSourceUniversal,
         "update_interval": UPDATE_INTERVAL,
         # The device reports its servers, not keyed by its MAC
-        "data_fn": lambda data: _find_server(data, protocol, unit),
-        # Only the units the device reports
-        "exists_fn": lambda _: True,
+        "data_fn": lambda data: data,
+        "keys_fn": lambda data: _get_servers(data, protocol),
+        "item_fn": lambda data, unit: _get_servers(data, protocol).get(unit),
+        "placeholders_fn": lambda unit: {"unit": str(unit)},
+        "remove_missing": True,
         "supported_fn": lambda bridge: bridge.is_router,
         "entity_registry_enabled_default": False,
     }
 
 
-def _get_client_switch(
-    protocol: ARVpnProtocol, unit: int
-) -> ARSwitchDescription:
-    """Get the description of the switch of a client."""
+def _get_client_switch(protocol: ARVpnProtocol) -> ARSwitchDescription:
+    """Get the description of the switches of the clients."""
 
+    label = _LABELS[protocol]
     return ARSwitchDescription(
-        key=f"{protocol.value}_client_{unit}",
+        key=f"{protocol.value}_client",
         translation_key=f"{protocol.value}_client",
-        unique_id_name=f"{_LABELS[protocol]} Client {unit}",
-        value_fn=lambda profile: profile.get(ARVpnClientField.ENABLED),
-        action_fn=lambda state, _: ARVpnClientAction(
-            protocol, state, unit=unit
+        unique_id_fn=lambda unit: f"{label} Client {unit}",
+        value_fn=lambda client: client.profile.get(ARVpnClientField.ENABLED),
+        action_fn=lambda state, client: ARVpnClientAction(
+            protocol, state, unit=client.unit
         ),
         entity_category=EntityCategory.CONFIG,
-        **_get_client_args(protocol, unit),
+        **_get_client_args(protocol),
     )
 
 
-def _get_client_state(
-    protocol: ARVpnProtocol, unit: int
-) -> ARSensorDescription:
-    """Get the description of the state sensor of a client."""
+def _get_client_state(protocol: ARVpnProtocol) -> ARSensorDescription:
+    """Get the description of the state sensors of the clients."""
 
+    label = _LABELS[protocol]
+    fields = _CLIENT_ATTRIBUTES[protocol]
     return ARSensorDescription(
-        key=f"{protocol.value}_client_{unit}_state",
+        key=f"{protocol.value}_client_state",
         translation_key=f"{protocol.value}_client_state",
-        unique_id_name=f"{_LABELS[protocol]} Client {unit} State",
-        value_fn=lambda profile: _get_state(
-            profile.get(ARVpnClientField.STATE)
+        unique_id_fn=lambda unit: f"{label} Client {unit} State",
+        value_fn=lambda client: _get_state(
+            client.profile.get(ARVpnClientField.STATE)
         ),
-        attributes_fn=lambda profile: _get_attributes(
-            profile, _CLIENT_ATTRIBUTES[protocol]
-        ),
+        attributes_fn=lambda client: _get_attributes(client.profile, fields),
         device_class=SensorDeviceClass.ENUM,
         options=_STATE_OPTIONS,
         entity_category=EntityCategory.DIAGNOSTIC,
-        **_get_client_args(protocol, unit),
+        **_get_client_args(protocol),
     )
 
 
-def _get_server_switch(
-    protocol: ARVpnProtocol, unit: int
-) -> ARSwitchDescription:
-    """Get the description of the switch of a server."""
+def _get_server_switch(protocol: ARVpnProtocol) -> ARSwitchDescription:
+    """Get the description of the switches of the servers."""
 
+    label = _LABELS[protocol]
     return ARSwitchDescription(
-        key=f"{protocol.value}_server_{unit}",
+        key=f"{protocol.value}_server",
         translation_key=f"{protocol.value}_server",
-        unique_id_name=f"{_LABELS[protocol]} Server {unit}",
-        value_fn=lambda profile: profile.get(ARVpnServerField.ENABLED),
-        action_fn=lambda state, _: ARVpnServerAction(
-            protocol, state, unit=unit
+        unique_id_fn=lambda unit: f"{label} Server {unit}",
+        value_fn=lambda server: server.profile.get(ARVpnServerField.ENABLED),
+        action_fn=lambda state, server: ARVpnServerAction(
+            protocol, state, unit=server.unit
         ),
         entity_category=EntityCategory.CONFIG,
-        **_get_server_args(protocol, unit),
+        **_get_server_args(protocol),
     )
 
 
-def _get_server_state(
-    protocol: ARVpnProtocol, unit: int
-) -> ARSensorDescription:
-    """Get the description of the state sensor of a server."""
+def _get_server_state(protocol: ARVpnProtocol) -> ARSensorDescription:
+    """Get the description of the state sensors of the servers."""
 
+    label = _LABELS[protocol]
     fields = _SERVER_ATTRIBUTES[protocol]
     return ARSensorDescription(
-        key=f"{protocol.value}_server_{unit}_state",
+        key=f"{protocol.value}_server_state",
         translation_key=f"{protocol.value}_server_state",
-        unique_id_name=f"{_LABELS[protocol]} Server {unit} State",
-        value_fn=lambda profile: _get_state(
-            profile.get(ARVpnServerField.STATE)
+        unique_id_fn=lambda unit: f"{label} Server {unit} State",
+        value_fn=lambda server: _get_state(
+            server.profile.get(ARVpnServerField.STATE)
         ),
-        attributes_fn=lambda profile: _get_attributes(profile, fields),
+        attributes_fn=lambda server: _get_attributes(server.profile, fields),
         device_class=SensorDeviceClass.ENUM,
         options=_STATE_OPTIONS,
         entity_category=EntityCategory.DIAGNOSTIC,
-        **_get_server_args(protocol, unit),
+        **_get_server_args(protocol),
     )
 
 
-_CLIENTS = [(protocol, unit) for protocol in _LABELS for unit in _CLIENT_UNITS]
-_SERVERS = [
-    (protocol, unit)
-    for protocol, units in _SERVER_UNITS.items()
-    for unit in units
-]
-
 SENSORS: tuple[ARSensorDescription, ...] = (
-    *(_get_client_state(protocol, unit) for protocol, unit in _CLIENTS),
-    *(
-        _get_server_state(protocol, unit)
-        for protocol, unit in _SERVERS
-        if protocol in _SERVER_ATTRIBUTES
-    ),
+    *(_get_client_state(protocol) for protocol in _LABELS),
+    *(_get_server_state(protocol) for protocol in _SERVER_ATTRIBUTES),
 )
 SWITCHES: tuple[ARSwitchDescription, ...] = (
-    *(_get_client_switch(protocol, unit) for protocol, unit in _CLIENTS),
-    *(_get_server_switch(protocol, unit) for protocol, unit in _SERVERS),
+    *(_get_client_switch(protocol) for protocol in _LABELS),
+    *(_get_server_switch(protocol) for protocol in _LABELS),
 )
