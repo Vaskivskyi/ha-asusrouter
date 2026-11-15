@@ -211,6 +211,38 @@
       }
     },
     "light": {
+      "aura": {
+        "name": "Aura",
+        "state_attributes": {
+          "effect": {
+            "state": {
+              "breathing": "Breathing",
+              "evolution": "Evolution",
+              "gradient": "Gradient",
+              "marquee": "Marquee",
+              "rainbow": "Rainbow",
+              "static": "Static",
+              "wave": "Wave"
+            }
+          }
+        }
+      },
+      "aura_zone": {
+        "name": "Aura zone {zone}",
+        "state_attributes": {
+          "effect": {
+            "state": {
+              "breathing": "Breathing",
+              "evolution": "Evolution",
+              "gradient": "Gradient",
+              "marquee": "Marquee",
+              "rainbow": "Rainbow",
+              "static": "Static",
+              "wave": "Wave"
+            }
+          }
+        }
+      },
       "led": {
         "name": "LED"
       }
@@ -481,6 +513,9 @@
       }
     },
     "switch": {
+      "aura_night_mode": {
+        "name": "Aura night mode"
+      },
       "block_internet": {
         "name": "Block Internet"
       },

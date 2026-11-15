@@ -13,6 +13,7 @@ from ..entity import (
 )
 from . import (
     aimesh,
+    aura,
     clock,
     ddns,
     dsl,
@@ -38,7 +39,7 @@ BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *wan.BINARY_SENSORS,
 )
 BUTTONS: tuple[ARButtonDescription, ...] = (*service.BUTTONS,)
-LIGHTS: tuple[ARLightDescription, ...] = (*led.LIGHTS,)
+LIGHTS: tuple[ARLightDescription, ...] = (*aura.LIGHTS, *led.LIGHTS)
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
     *clock.SENSORS,
@@ -51,6 +52,7 @@ SENSORS: tuple[ARSensorDescription, ...] = (
     *wan.SENSORS,
 )
 SWITCHES: tuple[ARSwitchDescription, ...] = (
+    *aura.SWITCHES,
     *network.SWITCHES,
     *parental_control.SWITCHES,
     *port_forwarding.SWITCHES,
