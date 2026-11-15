@@ -94,6 +94,18 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
 class ARLightDescription(ARToggleDescription, LightEntityDescription):
     """AsusRouter light description."""
 
+    # Effects the light can show, none when empty
+    effects: tuple[str, ...] = ()
+    # Reads the effect, None when no effect is shown
+    effect_fn: Callable[[Any], str | None] | None = None
+    # Reads the RGB color, a light without colors when None
+    rgb_fn: Callable[[Any], tuple[int, int, int] | None] | None = None
+    # Reads the brightness on 0..255
+    brightness_fn: Callable[[Any], int | None] | None = None
+    # Builds the action turning the light on with the requested settings,
+    # the plain action when None
+    turn_on_fn: Callable[[dict[str, Any], Any], ARAction] | None = None
+
 
 @dataclass(frozen=True, kw_only=True)
 class ARSensorDescription(AREntityDescription, SensorEntityDescription):

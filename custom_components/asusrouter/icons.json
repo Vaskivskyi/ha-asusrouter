@@ -53,6 +53,18 @@
       }
     },
     "light": {
+      "aura": {
+        "default": "mdi:led-strip-variant-off",
+        "state": {
+          "on": "mdi:led-strip-variant"
+        }
+      },
+      "aura_zone": {
+        "default": "mdi:led-strip-variant-off",
+        "state": {
+          "on": "mdi:led-strip-variant"
+        }
+      },
       "led": {
         "default": "mdi:led-off",
         "state": {
@@ -162,6 +174,9 @@
       }
     },
     "switch": {
+      "aura_night_mode": {
+        "default": "mdi:weather-night"
+      },
       "block_internet": {
         "default": "mdi:lock-open-variant-outline",
         "state": {
