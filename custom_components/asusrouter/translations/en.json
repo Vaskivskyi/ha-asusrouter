@@ -261,6 +261,12 @@
       "cpu": {
         "name": "CPU"
       },
+      "dsl_datarate_down": {
+        "name": "DSL data rate down"
+      },
+      "dsl_datarate_up": {
+        "name": "DSL data rate up"
+      },
       "ip_address": {
         "name": "IP address"
       },
