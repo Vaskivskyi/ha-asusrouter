@@ -14,6 +14,7 @@ from asusrouter.modules.ports import ARPortSpeed
 from asusrouter.modules.wifi import ARWiFiBand
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.components.update import UpdateDeviceClass
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
@@ -21,7 +22,12 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.device_registry import format_mac
 
-from ..entity import ARBinarySensorDescription, ARSensorDescription
+from ..entity import (
+    ARBinarySensorDescription,
+    ARSensorDescription,
+    ARUpdateDescription,
+)
+from ..helpers import to_version
 from ..topology import TOPOLOGY_INTERVAL
 
 if TYPE_CHECKING:
@@ -156,6 +162,14 @@ def _is_online(node: ARAiMeshNode) -> bool:
     return node.online
 
 
+def _get_latest(node: ARAiMeshNode) -> str | None:
+    """Get the latest firmware of the node, installed one when up to date."""
+
+    return to_version(
+        node.firmware_available if node.firmware_update else node.firmware
+    )
+
+
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     ARBinarySensorDescription(
         key="connected",
@@ -236,5 +250,21 @@ SENSORS: tuple[ARSensorDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         **_NODE,
+    ),
+)
+
+UPDATES: tuple[ARUpdateDescription, ...] = (
+    ARUpdateDescription(
+        key="aimesh_firmware",
+        translation_key="firmware",
+        # The same entity a node gets from its own entry
+        unique_id_name="Firmware update",
+        value_fn=lambda node: to_version(node.firmware),
+        latest_fn=_get_latest,
+        # The router reads its own firmware
+        on_device=False,
+        device_class=UpdateDeviceClass.FIRMWARE,
+        **_MESH,
+        node_source=lambda _: ARAiMeshSourceUniversal,
     ),
 )

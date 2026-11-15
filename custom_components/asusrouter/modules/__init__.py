@@ -9,12 +9,14 @@ from ..entity import (
     ARLightDescription,
     ARSensorDescription,
     ARSwitchDescription,
+    ARUpdateDescription,
 )
 from . import (
     aimesh,
     clock,
     ddns,
     dsl,
+    firmware,
     led,
     network,
     parental_control,
@@ -55,6 +57,10 @@ SWITCHES: tuple[ARSwitchDescription, ...] = (
     *vpn.SWITCHES,
     *wifi.SWITCHES,
 )
+UPDATES: tuple[ARUpdateDescription, ...] = (
+    *aimesh.UPDATES,
+    *firmware.UPDATES,
+)
 
 # Every entity description, defines the coordinators to set up
 DESCRIPTIONS: tuple[AREntityDescription, ...] = (
@@ -63,4 +69,5 @@ DESCRIPTIONS: tuple[AREntityDescription, ...] = (
     *LIGHTS,
     *SENSORS,
     *SWITCHES,
+    *UPDATES,
 )

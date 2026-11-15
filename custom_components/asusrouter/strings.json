@@ -666,6 +666,14 @@
       "wireguard_server": {
         "name": "WireGuard server {unit}"
       }
+    },
+    "update": {
+      "firmware": {
+        "name": "Firmware"
+      },
+      "firmware_beta": {
+        "name": "Firmware (beta)"
+      }
     }
   },
   "exceptions": {

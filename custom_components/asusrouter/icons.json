@@ -246,6 +246,14 @@
           "on": "mdi:check-network-outline"
         }
       }
+    },
+    "update": {
+      "firmware": {
+        "default": "mdi:update"
+      },
+      "firmware_beta": {
+        "default": "mdi:update"
+      }
     }
   }
 }
