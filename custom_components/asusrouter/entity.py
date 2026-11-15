@@ -18,6 +18,7 @@ from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
+from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.core import CALLBACK_TYPE, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
@@ -102,6 +103,16 @@ class ARSensorDescription(AREntityDescription, SensorEntityDescription):
 @dataclass(frozen=True, kw_only=True)
 class ARSwitchDescription(ARToggleDescription, SwitchEntityDescription):
     """AsusRouter switch description."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class ARUpdateDescription(AREntityDescription, UpdateEntityDescription):
+    """AsusRouter update description."""
+
+    # The installed version is the value, the latest one is read here
+    latest_fn: Callable[[Any], str | None]
+    # Reads the release notes, none when None
+    release_notes_fn: Callable[[Any], str | None] | None = None
 
 
 def _get_data(

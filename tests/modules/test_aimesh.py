@@ -12,6 +12,7 @@ from asusrouter.modules.aimesh import (
     ARAiMeshSourceUniversal,
     ARAiMeshTopology,
 )
+from asusrouter.modules.firmware import ARFirmware
 from asusrouter.modules.ports import ARPortSpeed
 from asusrouter.modules.wifi import ARWiFiBand
 from asusrouter.tools.identifiers import IpAddress, MacAddress
@@ -20,10 +21,12 @@ import pytest
 from custom_components.asusrouter.modules.aimesh import (
     BINARY_SENSORS,
     SENSORS,
+    UPDATES,
     _get_aimesh_attributes,
     _get_backhaul,
     _get_backhaul_attributes,
     _get_ip,
+    _get_latest,
     _get_link_rate,
     _get_link_rate_attributes,
     _get_online,
@@ -329,4 +332,54 @@ def test_node_entities(
     assert description.node_source(NODE_MAC) is ARAiMeshSourceUniversal
     # The router reports the nodes other entries serve as well
     assert description.covers_mesh is True
+    assert description.supported_fn is _serves_mesh
+
+
+CURRENT = ARFirmware.from_string("3.0.0.4.388.24000_0")
+AVAILABLE = ARFirmware.from_string("3.0.0.4.388.25000_0")
+
+
+@pytest.mark.parametrize(
+    ("node", "expected"),
+    [
+        (
+            ARAiMeshNode(
+                mac=NODE_MAC,
+                firmware=CURRENT,
+                firmware_available=AVAILABLE,
+                firmware_update=True,
+            ),
+            "3.0.0.4.388.25000_0",
+        ),
+        # Without an update the installed firmware is the latest
+        (
+            ARAiMeshNode(
+                mac=NODE_MAC, firmware=CURRENT, firmware_available=AVAILABLE
+            ),
+            "3.0.0.4.388.24000_0",
+        ),
+        (ARAiMeshNode(mac=NODE_MAC), None),
+    ],
+)
+def test_get_latest(node: ARAiMeshNode, expected: str | None) -> None:
+    """Test that the latest firmware is the available one on an update."""
+
+    assert _get_latest(node) == expected
+
+
+def test_firmware_update() -> None:
+    """Test that a node gets the firmware update its own entry would."""
+
+    (description,) = UPDATES
+
+    assert description.unique_id_name == "Firmware update"
+    assert description.value_fn(
+        ARAiMeshNode(mac=NODE_MAC, firmware=CURRENT)
+    ) == ("3.0.0.4.388.24000_0")
+    assert description.latest_fn is _get_latest
+    # The router reads its own firmware, a node with its own entry too
+    assert description.on_device is False
+    assert description.covers_mesh is False
+    assert description.node_source is not None
+    assert description.node_source(NODE_MAC) is ARAiMeshSourceUniversal
     assert description.supported_fn is _serves_mesh

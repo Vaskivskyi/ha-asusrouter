@@ -208,6 +208,7 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
     excluded = [
         *aimesh.BINARY_SENSORS,
         *aimesh.SENSORS,
+        *aimesh.UPDATES,
         *ddns.BINARY_SENSORS,
         *network.BINARY_SENSORS,
         *network.SWITCHES,

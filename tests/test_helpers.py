@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from asusrouter.modules.firmware import ARFirmware
 from asusrouter.modules.port_forwarding import ARPortForwardingProtocol
 from asusrouter.tools.identifiers import Hostname, IpAddress, MacAddress
 import pytest
@@ -14,6 +15,7 @@ from custom_components.asusrouter.helpers import (
     to_str,
     to_unique_id,
     to_value,
+    to_version,
 )
 
 
@@ -74,3 +76,18 @@ def test_to_value(value: Any, expected: str | None) -> None:
     """Test that an enum member is converted to its value."""
 
     assert to_value(value, ARPortForwardingProtocol) == expected
+
+
+@pytest.mark.parametrize(
+    ("firmware", "expected"),
+    [
+        (None, None),
+        # The library renders an empty firmware as a template
+        (ARFirmware(), None),
+        (ARFirmware.from_string("3.0.0.4.388.24000_0"), "3.0.0.4.388.24000_0"),
+    ],
+)
+def test_to_version(firmware: ARFirmware | None, expected: str | None) -> None:
+    """Test that a firmware is converted to its version."""
+
+    assert to_version(firmware) == expected

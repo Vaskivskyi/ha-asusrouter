@@ -6,6 +6,7 @@ from enum import StrEnum
 import re
 from typing import Any
 
+from asusrouter.modules.firmware import ARFirmware
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.helpers.device_registry import format_mac
 
@@ -48,3 +49,11 @@ def to_unique_id(raw: str) -> str:
         result = result.replace("__", "_")
 
     return result
+
+
+def to_version(firmware: ARFirmware | None) -> str | None:
+    """Convert a firmware to its version, None when not reported."""
+
+    return (
+        None if firmware is None or firmware.major is None else str(firmware)
+    )
