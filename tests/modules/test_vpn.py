@@ -23,7 +23,6 @@ import pytest
 
 from custom_components.asusrouter.modules.vpn import SENSORS, SWITCHES
 
-COUNT = 13
 DESCRIPTIONS: dict[str, Any] = {
     description.key: description for description in (*SENSORS, *SWITCHES)
 }
@@ -54,8 +53,12 @@ CLASSIC_CLIENT: dict[ARVpnClientField, Any] = {
     ARVpnClientField.STATE_REASON: 4,
     ARVpnClientField.UNIT: 3,
 }
+# A client the device reports without a unit
+UNPLACED_CLIENT: dict[ARVpnClientField, Any] = {
+    ARVpnClientField.ENABLED: False,
+}
 CLIENTS: dict[ARVpnProtocol, dict[int, dict[ARVpnClientField, Any]]] = {
-    ARVpnProtocol.OPENVPN: {3: CLASSIC_CLIENT},
+    ARVpnProtocol.OPENVPN: {3: CLASSIC_CLIENT, 4: UNPLACED_CLIENT},
     ARVpnProtocol.WIREGUARD: {5: FUSION_CLIENT},
 }
 
@@ -73,79 +76,103 @@ SERVER: dict[ARVpnServerField, Any] = {
     ARVpnServerField.PRIVATE_KEY: "secret",
     ARVpnServerField.STATE: ARVpnState.UNKNOWN,
 }
+OPENVPN_SERVER: dict[ARVpnServerField, Any] = {
+    ARVpnServerField.ERRNO: 1,
+    ARVpnServerField.STATE: ARVpnState.CONNECTED,
+}
 SERVERS: dict[ARVpnProtocol, dict[int, dict[ARVpnServerField, Any]]] = {
-    ARVpnProtocol.OPENVPN: {2: {ARVpnServerField.STATE: ARVpnState.CONNECTED}},
+    # An empty server is not reported
+    ARVpnProtocol.OPENVPN: {1: {}, 2: OPENVPN_SERVER},
     ARVpnProtocol.WIREGUARD: {1: SERVER},
 }
 
 
+def _get_item(key: str, data: Any, unit: int) -> Any:
+    """Get the item of a unit from the data of a description."""
+
+    description = DESCRIPTIONS[key]
+    return description.item_fn(description.data_fn(data), unit)
+
+
 @pytest.mark.parametrize(
-    ("key", "unique_id_name", "source", "category"),
+    ("key", "unique_id_name", "placeholders", "source", "category"),
     [
         (
-            "openvpn_client_1",
-            "OpenVPN Client 1",
+            "openvpn_client",
+            "OpenVPN Client 3",
+            {"name": "3"},
             ARVpnClientSourceUniversal,
             EntityCategory.CONFIG,
         ),
         (
-            "wireguard_client_5",
-            "WireGuard Client 5",
+            "wireguard_client",
+            "WireGuard Client 3",
+            {"name": "3"},
             ARVpnClientSourceUniversal,
             EntityCategory.CONFIG,
         ),
         (
-            "openvpn_server_2",
-            "OpenVPN Server 2",
+            "openvpn_server",
+            "OpenVPN Server 3",
+            {"unit": "3"},
             ARVpnServerSourceUniversal,
             EntityCategory.CONFIG,
         ),
         (
-            "wireguard_server_1",
-            "WireGuard Server 1",
+            "wireguard_server",
+            "WireGuard Server 3",
+            {"unit": "3"},
             ARVpnServerSourceUniversal,
             EntityCategory.CONFIG,
         ),
         (
-            "openvpn_client_1_state",
-            "OpenVPN Client 1 State",
+            "openvpn_client_state",
+            "OpenVPN Client 3 State",
+            {"name": "3"},
             ARVpnClientSourceUniversal,
             EntityCategory.DIAGNOSTIC,
         ),
         (
-            "openvpn_server_2_state",
-            "OpenVPN Server 2 State",
+            "openvpn_server_state",
+            "OpenVPN Server 3 State",
+            {"unit": "3"},
             ARVpnServerSourceUniversal,
             EntityCategory.DIAGNOSTIC,
         ),
     ],
 )
 def test_description(
-    key: str, unique_id_name: str, source: Any, category: EntityCategory
+    key: str,
+    unique_id_name: str,
+    placeholders: dict[str, str],
+    source: Any,
+    category: EntityCategory,
 ) -> None:
     """Test that every VPN entity keeps its unique_id and default."""
 
     description = DESCRIPTIONS[key]
 
-    assert description.unique_id_name == unique_id_name
+    assert description.unique_id_fn(3) == unique_id_name
+    assert description.placeholders_fn(3) == placeholders
     assert description.source is source
-    # A client is named by its profile, the unit until it is read
-    placeholder = "name" if "client" in key else "unit"
-    unit = key.removesuffix("_state")[-1]
-    assert description.translation_placeholders == {placeholder: unit}
+    assert description.remove_missing is True
     assert description.entity_category is category
     assert description.entity_registry_enabled_default is False
 
 
 def test_descriptions() -> None:
-    """Test that every client unit and server of each protocol is listed."""
+    """Test that the clients and servers of every protocol are described."""
 
-    # 5 clients of each protocol, 2 OpenVPN servers and 1 WireGuard server
-    assert len(SWITCHES) == COUNT
     # A WireGuard server reports no state of its own
-    assert len(SENSORS) == COUNT - 1
-    assert "wireguard_server_2" not in DESCRIPTIONS
-    assert "wireguard_server_1_state" not in DESCRIPTIONS
+    assert set(DESCRIPTIONS) == {
+        "openvpn_client",
+        "openvpn_client_state",
+        "openvpn_server",
+        "openvpn_server_state",
+        "wireguard_client",
+        "wireguard_client_state",
+        "wireguard_server",
+    }
 
 
 @pytest.mark.parametrize("is_router", [True, False])
@@ -158,74 +185,116 @@ def test_supported(is_router: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    ("key", "data", "expected"),
+    ("key", "data", "keys"),
     [
         # A VPN Fusion client is keyed by its server
-        ("wireguard_client_2", CLIENTS, FUSION_CLIENT),
-        ("wireguard_client_1", CLIENTS, None),
-        # A classic client is keyed by its unit
-        ("openvpn_client_3", CLIENTS, CLASSIC_CLIENT),
-        ("openvpn_client_1", CLIENTS, None),
-        ("wireguard_server_1", SERVERS, SERVER),
-        ("openvpn_server_1", SERVERS, None),
-        ("openvpn_server_1", {ARVpnProtocol.OPENVPN: {1: {}}}, None),
-        ("openvpn_client_3", {}, None),
-        ("openvpn_client_3", None, None),
-        ("openvpn_server_2", None, None),
+        ("wireguard_client", CLIENTS, {2}),
+        # A classic client is keyed by its unit, one without a unit is not
+        ("openvpn_client", CLIENTS, {3}),
+        ("openvpn_server", SERVERS, {2}),
+        ("wireguard_server", SERVERS, {1}),
+        ("openvpn_client", {}, set()),
+        ("openvpn_client", {ARVpnProtocol.OPENVPN: None}, set()),
+        ("openvpn_server", None, set()),
     ],
 )
-def test_data(key: str, data: Any, expected: Any) -> None:
-    """Test that every switch and state finds its own unit."""
+def test_keys(key: str, data: Any, keys: set[int]) -> None:
+    """Test that every description reads the units the device reports."""
 
-    keys = (key, f"{key}_state")
-    for description in (DESCRIPTIONS[k] for k in keys if k in DESCRIPTIONS):
-        assert description.data_fn is not None
-        assert description.data_fn(data) is expected
+    for description in (DESCRIPTIONS[key], DESCRIPTIONS.get(f"{key}_state")):
+        if description is None:
+            continue
+        assert set(description.keys_fn(description.data_fn(data))) == keys
 
 
 @pytest.mark.parametrize(
-    ("key", "profile", "state"),
+    ("key", "data", "unit", "profile"),
     [
-        ("wireguard_client_2", FUSION_CLIENT, True),
-        ("openvpn_client_3", CLASSIC_CLIENT, False),
-        ("wireguard_server_1", SERVER, True),
-        ("openvpn_server_2", {}, None),
+        ("wireguard_client", CLIENTS, 2, FUSION_CLIENT),
+        ("openvpn_client", CLIENTS, 3, CLASSIC_CLIENT),
+        ("wireguard_server", SERVERS, 1, SERVER),
+        ("openvpn_server", SERVERS, 2, OPENVPN_SERVER),
     ],
 )
-def test_value(key: str, profile: dict[Any, Any], state: bool | None) -> None:
+def test_item(key: str, data: Any, unit: int, profile: Any) -> None:
+    """Test that every unit finds its profile."""
+
+    item = _get_item(key, data, unit)
+
+    assert item.unit == unit
+    assert item.profile is profile
+    assert _get_item(key, data, 9) is None
+
+
+@pytest.mark.parametrize(
+    ("key", "data", "unit", "state"),
+    [
+        ("wireguard_client", CLIENTS, 2, True),
+        ("openvpn_client", CLIENTS, 3, False),
+        ("wireguard_server", SERVERS, 1, True),
+        ("openvpn_server", SERVERS, 2, None),
+    ],
+)
+def test_value(key: str, data: Any, unit: int, state: bool | None) -> None:
     """Test that every switch reports whether its unit is enabled."""
 
-    description = DESCRIPTIONS[key]
+    item = _get_item(key, data, unit)
 
-    assert description.exists_fn is not None
-    assert description.exists_fn(profile) is True
-    assert description.value_fn(profile) is state
+    assert DESCRIPTIONS[key].value_fn(item) is state
 
 
 def test_client_name() -> None:
     """Test that a client is named by its profile."""
 
-    for key in ("wireguard_client_2", "wireguard_client_2_state"):
+    for key in ("wireguard_client", "wireguard_client_state"):
         description = DESCRIPTIONS[key]
         assert description.name_fn is not None
-        assert description.name_fn(FUSION_CLIENT) == "Example"
-        assert description.name_fn(CLASSIC_CLIENT) is None
-    assert DESCRIPTIONS["wireguard_server_1"].name_fn is None
-    assert DESCRIPTIONS["openvpn_server_2_state"].name_fn is None
+        assert description.name_fn(_get_item(key, CLIENTS, 2)) == "Example"
+    # A classic client has no profile name
+    description = DESCRIPTIONS["openvpn_client"]
+    assert description.name_fn is not None
+    assert description.name_fn(_get_item("openvpn_client", CLIENTS, 3)) is None
+    assert DESCRIPTIONS["wireguard_server"].name_fn is None
+    assert DESCRIPTIONS["openvpn_server_state"].name_fn is None
 
 
 @pytest.mark.parametrize("state", [True, False])
 @pytest.mark.parametrize(
-    ("key", "action_type", "protocol", "unit"),
+    ("key", "data", "action_type", "protocol", "unit"),
     [
-        ("wireguard_client_2", ARVpnClientAction, ARVpnProtocol.WIREGUARD, 2),
-        ("openvpn_client_3", ARVpnClientAction, ARVpnProtocol.OPENVPN, 3),
-        ("openvpn_server_2", ARVpnServerAction, ARVpnProtocol.OPENVPN, 2),
-        ("wireguard_server_1", ARVpnServerAction, ARVpnProtocol.WIREGUARD, 1),
+        (
+            "wireguard_client",
+            CLIENTS,
+            ARVpnClientAction,
+            ARVpnProtocol.WIREGUARD,
+            2,
+        ),
+        (
+            "openvpn_client",
+            CLIENTS,
+            ARVpnClientAction,
+            ARVpnProtocol.OPENVPN,
+            3,
+        ),
+        (
+            "openvpn_server",
+            SERVERS,
+            ARVpnServerAction,
+            ARVpnProtocol.OPENVPN,
+            2,
+        ),
+        (
+            "wireguard_server",
+            SERVERS,
+            ARVpnServerAction,
+            ARVpnProtocol.WIREGUARD,
+            1,
+        ),
     ],
 )
 def test_action(
     key: str,
+    data: Any,
     action_type: type[Any],
     protocol: ARVpnProtocol,
     unit: int,
@@ -233,7 +302,8 @@ def test_action(
 ) -> None:
     """Test that every switch toggles its own unit."""
 
-    action = DESCRIPTIONS[key].action_fn(state, {})
+    item = _get_item(key, data, unit)
+    action = DESCRIPTIONS[key].action_fn(state, item)
 
     assert isinstance(action, action_type)
     assert action.protocol is protocol
@@ -249,19 +319,14 @@ def test_switch_no_attributes() -> None:
 
 
 @pytest.mark.parametrize(
-    ("key", "profile", "state"),
+    ("key", "data", "unit", "state"),
     [
-        ("wireguard_client_2_state", FUSION_CLIENT, "connected"),
-        ("openvpn_client_3_state", CLASSIC_CLIENT, "error"),
-        (
-            "openvpn_server_2_state",
-            SERVERS[ARVpnProtocol.OPENVPN][2],
-            "connected",
-        ),
-        ("openvpn_server_2_state", {}, None),
+        ("wireguard_client_state", CLIENTS, 2, "connected"),
+        ("openvpn_client_state", CLIENTS, 3, "error"),
+        ("openvpn_server_state", SERVERS, 2, "connected"),
     ],
 )
-def test_state(key: str, profile: dict[Any, Any], state: str | None) -> None:
+def test_state(key: str, data: Any, unit: int, state: str | None) -> None:
     """Test that every state sensor reports its option."""
 
     description = DESCRIPTIONS[key]
@@ -273,31 +338,41 @@ def test_state(key: str, profile: dict[Any, Any], state: str | None) -> None:
         "connecting",
         "connected",
     ]
-    assert description.value_fn(profile) == state
+    assert description.value_fn(_get_item(key, data, unit)) == state
+
+
+def test_state_unknown() -> None:
+    """Test that an unknown state reports no option."""
+
+    description = DESCRIPTIONS["openvpn_server_state"]
+    item = _get_item(
+        "openvpn_server_state",
+        {ARVpnProtocol.OPENVPN: {1: {ARVpnServerField.ENABLED: True}}},
+        1,
+    )
+
+    assert description.value_fn(item) is None
 
 
 @pytest.mark.parametrize(
-    ("key", "profile", "attributes"),
+    ("key", "data", "unit", "attributes"),
     [
-        ("wireguard_client_2_state", FUSION_CLIENT, {"state_reason": None}),
+        ("wireguard_client_state", CLIENTS, 2, {"state_reason": None}),
         (
-            "openvpn_client_3_state",
-            CLASSIC_CLIENT,
+            "openvpn_client_state",
+            CLIENTS,
+            3,
             {"connected_since": None, "state_reason": 4},
         ),
-        (
-            "openvpn_server_2_state",
-            {ARVpnServerField.ERRNO: 1},
-            {"errno": 1},
-        ),
+        ("openvpn_server_state", SERVERS, 2, {"errno": 1}),
     ],
 )
 def test_state_attributes(
-    key: str, profile: dict[Any, Any], attributes: dict[str, Any]
+    key: str, data: Any, unit: int, attributes: dict[str, Any]
 ) -> None:
     """Test that a state reports why, never keys or settings."""
 
     description = DESCRIPTIONS[key]
 
     assert description.attributes_fn is not None
-    assert description.attributes_fn(profile) == attributes
+    assert description.attributes_fn(_get_item(key, data, unit)) == attributes

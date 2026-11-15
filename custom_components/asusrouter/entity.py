@@ -21,6 +21,7 @@ from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.core import CALLBACK_TYPE, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import (
@@ -44,7 +45,7 @@ class AREntityDescription(EntityDescription):
     source: ARDataSource
     update_interval: timedelta
     # The name the unique_id is built from, kept for existing entities
-    unique_id_name: str
+    unique_id_name: str = ""
     # Reads the entity data, the device's own when None
     data_fn: Callable[[Any], Any] | None = None
     value_fn: Callable[[Any], Any]
@@ -63,6 +64,17 @@ class AREntityDescription(EntityDescription):
     covers_mesh: bool = False
     # None when every device supports the entity
     supported_fn: Callable[[ARBridge], bool] | None = None
+    # Reads the keys of an entity each from the data, a single one when None
+    keys_fn: Callable[[Any], Iterable[Any]] | None = None
+    # Reads the data of a key
+    item_fn: Callable[[Any, Any], Any] | None = None
+    # Builds the name the unique_id of a key is built from
+    unique_id_fn: Callable[[Any], str] | None = None
+    # Builds the translation placeholders of a key
+    placeholders_fn: Callable[[Any], dict[str, str]] | None = None
+    # Removes the entity of a key the device stops reporting, otherwise it
+    # stays unavailable
+    remove_missing: bool = False
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -181,6 +193,7 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         coordinator: ARCoordinator[Any],
         description: AREntityDescription,
         mac: MacAddress,
+        key: Any = None,
     ) -> None:
         """Initialize the entity for the device with the given MAC."""
 
@@ -188,19 +201,34 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
 
         self.entity_description = description
         self._mac = mac
+        self._key = key
 
-        device_mac = format_mac(str(mac))
-        self._attr_unique_id = to_unique_id(
-            f"{device_mac}_{description.unique_id_name}"
+        unique_id_fn = description.unique_id_fn
+        unique_id_name = (
+            description.unique_id_name
+            if unique_id_fn is None
+            else unique_id_fn(key)
         )
+        device_mac = format_mac(str(mac))
+        self._attr_unique_id = to_unique_id(f"{device_mac}_{unique_id_name}")
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device_mac)})
+
+        self._placeholders = dict(description.translation_placeholders or {})
+        if (placeholders_fn := description.placeholders_fn) is not None:
+            self._placeholders.update(placeholders_fn(key))
+            self._attr_translation_placeholders = self._placeholders
         self._update_name()
 
     @property
     def _device_data(self) -> Any:
-        """Return the data of this entity's device."""
+        """Return the data of this entity, of its key when it has one."""
 
-        return _get_data(self.coordinator, self.entity_description, self._mac)
+        data = _get_data(self.coordinator, self.entity_description, self._mac)
+        item_fn = self.entity_description.item_fn
+        if item_fn is None or data is None:
+            return data
+
+        return item_fn(data, self._key)
 
     def _update_name(self) -> None:
         """Fill the name placeholder from its data, when it names itself."""
@@ -213,7 +241,7 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         # A missing name keeps the last one
         if (name := name_fn(data)) is not None:
             self._attr_translation_placeholders = {
-                **(description.translation_placeholders or {}),
+                **self._placeholders,
                 "name": name,
             }
 
@@ -347,16 +375,24 @@ def _exists(
 def async_setup_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
     config_entry: ARConfigEntry,
     descriptions: Iterable[DescriptionT],
-    entity_type: Callable[
-        [ARCoordinator[Any], DescriptionT, MacAddress], EntityT
-    ],
+    entity_type: Callable[..., EntityT],
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Add the entities of the device and its AiMesh nodes as they appear."""
 
     runtime_data = config_entry.runtime_data
     device_mac = runtime_data.bridge.identity.mac
-    pending = _get_targets(runtime_data, descriptions)
+    targets = _get_targets(runtime_data, descriptions)
+    pending = [target for target in targets if target[1].keys_fn is None]
+    # The entities of every key read so far, by the target reading them
+    keyed: list[
+        tuple[
+            tuple[ARCoordinator[Any], DescriptionT, MacAddress],
+            dict[Any, EntityT],
+        ]
+    ] = [(target, {}) for target in targets if target[1].keys_fn is not None]
+    # New keys can appear on every update
+    keyed_coordinators = {target[0] for target, _ in keyed}
     listeners: dict[ARCoordinator[Any], CALLBACK_TYPE] = {}
 
     @callback
@@ -365,7 +401,7 @@ def async_setup_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
 
         nonlocal pending
 
-        entities: list[EntityT] = []
+        entities = _async_update_keys(config_entry, keyed, entity_type)
         waiting: list[tuple[ARCoordinator[Any], DescriptionT, MacAddress]] = []
         for target in pending:
             exists = _exists(*target, device_mac)
@@ -379,14 +415,14 @@ def async_setup_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
             async_add_entities(entities)
 
         # Stop listening to the coordinators nothing waits for
-        waited = {target[0] for target in pending}
+        waited = {target[0] for target in pending} | keyed_coordinators
         for coordinator in listeners.keys() - waited:
             listeners.pop(coordinator)()
 
     _async_add_entities()
 
     # A coordinator without entities polls only while something waits for it
-    for coordinator in {target[0] for target in pending}:
+    for coordinator in {target[0] for target in pending} | keyed_coordinators:
         listeners[coordinator] = coordinator.async_add_listener(
             _async_add_entities
         )
@@ -400,3 +436,68 @@ def async_setup_entities[DescriptionT: AREntityDescription, EntityT: AREntity](
         listeners.clear()
 
     config_entry.async_on_unload(_async_remove_listeners)
+
+
+def _get_keys(
+    coordinator: ARCoordinator[Any],
+    description: AREntityDescription,
+    mac: MacAddress,
+) -> set[Any] | None:
+    """Get the keys the device with the given MAC reports, None unread."""
+
+    keys_fn = description.keys_fn
+    # A failed read keeps the entities, as an offline node does
+    if (
+        keys_fn is None
+        or coordinator.data is None
+        or not coordinator.last_update_success
+        or (data := _get_data(coordinator, description, mac)) is None
+    ):
+        return None
+
+    return set(keys_fn(data))
+
+
+@callback
+def _async_update_keys[DescriptionT: AREntityDescription, EntityT: AREntity](
+    config_entry: ARConfigEntry,
+    keyed: list[
+        tuple[
+            tuple[ARCoordinator[Any], DescriptionT, MacAddress],
+            dict[Any, EntityT],
+        ]
+    ],
+    entity_type: Callable[..., EntityT],
+) -> list[EntityT]:
+    """Get the entities of new keys, removing those of missing ones."""
+
+    entities: list[EntityT] = []
+    for target, known in keyed:
+        keys = _get_keys(*target)
+        if keys is None:
+            continue
+
+        for key in keys - known.keys():
+            known[key] = entity_type(*target, key)
+            entities.append(known[key])
+        # An empty read is no proof that every key is gone
+        if target[1].remove_missing and keys:
+            for key in known.keys() - keys:
+                _async_remove_entity(config_entry, known.pop(key))
+
+    return entities
+
+
+@callback
+def _async_remove_entity(
+    config_entry: ARConfigEntry, entity: AREntity
+) -> None:
+    """Remove an entity and its registry entry."""
+
+    registry = er.async_get(entity.coordinator.hass)
+    for entry in er.async_entries_for_config_entry(
+        registry, config_entry.entry_id
+    ):
+        # Removing the entry removes the entity
+        if entry.unique_id == entity.unique_id:
+            registry.async_remove(entry.entity_id)
