@@ -79,6 +79,12 @@
       "cpu": {
         "default": "mdi:cpu-32-bit"
       },
+      "dsl_datarate_down": {
+        "default": "mdi:download-network-outline"
+      },
+      "dsl_datarate_up": {
+        "default": "mdi:upload-network-outline"
+      },
       "ip_address": {
         "default": "mdi:ip-network"
       },

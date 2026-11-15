@@ -14,6 +14,7 @@ from . import (
     aimesh,
     clock,
     ddns,
+    dsl,
     led,
     network,
     port_forwarding,
@@ -37,6 +38,7 @@ LIGHTS: tuple[ARLightDescription, ...] = (*led.LIGHTS,)
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
     *clock.SENSORS,
+    *dsl.SENSORS,
     *ports.SENSORS,
     *sysinfo.SENSORS,
     *system_status.SENSORS,
