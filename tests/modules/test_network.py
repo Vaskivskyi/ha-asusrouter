@@ -144,8 +144,7 @@ def test_categories() -> None:
 def test_is_served(mode: AROperationMode, expected: bool) -> None:
     """Test that a node does not serve the networks of its router."""
 
-    bridge = Mock()
-    bridge.identity.operation_mode = mode
+    bridge = Mock(is_node=mode is AROperationMode.AIMESH_NODE)
 
     assert _is_served(bridge) is expected
 

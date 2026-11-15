@@ -36,6 +36,9 @@
       }
     },
     "button": {
+      "clean_up_clients": {
+        "default": "mdi:broom"
+      },
       "reboot": {
         "default": "mdi:restart"
       },
@@ -50,6 +53,14 @@
       },
       "restart_wireless": {
         "default": "mdi:wifi-refresh"
+      }
+    },
+    "device_tracker": {
+      "client": {
+        "default": "mdi:lan-disconnect",
+        "state": {
+          "home": "mdi:lan-connect"
+        }
       }
     },
     "light": {
@@ -87,6 +98,9 @@
       },
       "boot_time": {
         "default": "mdi:restart"
+      },
+      "connected_devices": {
+        "default": "mdi:devices"
       },
       "cpu": {
         "default": "mdi:cpu-32-bit"

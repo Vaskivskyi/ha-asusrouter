@@ -78,6 +78,12 @@ class ARBridge:
         return self.identity.operation_mode is AROperationMode.ROUTER
 
     @property
+    def is_node(self) -> bool:
+        """Return whether the device works as an AiMesh node."""
+
+        return self.identity.operation_mode is AROperationMode.AIMESH_NODE
+
+    @property
     def serves_mesh(self) -> bool:
         """Return whether the AiMesh nodes are served through this device."""
 

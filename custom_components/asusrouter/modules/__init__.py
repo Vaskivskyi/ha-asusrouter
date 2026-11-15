@@ -9,11 +9,13 @@ from ..entity import (
     ARLightDescription,
     ARSensorDescription,
     ARSwitchDescription,
+    ARTrackerDescription,
     ARUpdateDescription,
 )
 from . import (
     aimesh,
     aura,
+    clients,
     clock,
     ddns,
     dsl,
@@ -38,10 +40,14 @@ BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     *network.BINARY_SENSORS,
     *wan.BINARY_SENSORS,
 )
-BUTTONS: tuple[ARButtonDescription, ...] = (*service.BUTTONS,)
+BUTTONS: tuple[ARButtonDescription, ...] = (
+    *clients.BUTTONS,
+    *service.BUTTONS,
+)
 LIGHTS: tuple[ARLightDescription, ...] = (*aura.LIGHTS, *led.LIGHTS)
 SENSORS: tuple[ARSensorDescription, ...] = (
     *aimesh.SENSORS,
+    *clients.SENSORS,
     *clock.SENSORS,
     *dsl.SENSORS,
     *ports.SENSORS,
@@ -59,6 +65,7 @@ SWITCHES: tuple[ARSwitchDescription, ...] = (
     *vpn.SWITCHES,
     *wifi.SWITCHES,
 )
+TRACKERS: tuple[ARTrackerDescription, ...] = (*clients.TRACKERS,)
 UPDATES: tuple[ARUpdateDescription, ...] = (
     *aimesh.UPDATES,
     *firmware.UPDATES,
@@ -71,5 +78,6 @@ DESCRIPTIONS: tuple[AREntityDescription, ...] = (
     *LIGHTS,
     *SENSORS,
     *SWITCHES,
+    *TRACKERS,
     *UPDATES,
 )

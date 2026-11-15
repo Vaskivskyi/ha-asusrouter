@@ -18,6 +18,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
 from .bridge import ARBridge
+from .clients import can_remove_client
 from .coordinator import (
     ARCoordinator,
     ARTopologyCoordinator,
@@ -25,6 +26,7 @@ from .coordinator import (
 )
 from .entity import get_supported
 from .errors import is_auth_error
+from .helpers import is_client_device
 from .modules import DESCRIPTIONS
 from .ownership import async_hand_back, async_take_over, get_owned_devices
 from .topology import (
@@ -40,6 +42,7 @@ if TYPE_CHECKING:
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.DEVICE_TRACKER,
     Platform.LIGHT,
     Platform.SENSOR,
     Platform.SWITCH,
@@ -164,7 +167,10 @@ async def async_remove_config_entry_device(
     config_entry: ARConfigEntry,
     device_entry: dr.DeviceEntry,
 ) -> bool:
-    """Allow removing the device of a node that left the AiMesh."""
+    """Allow removing a node that left the AiMesh or a forgotten client."""
+
+    if is_client_device(device_entry):
+        return can_remove_client(config_entry, device_entry)
 
     return can_remove_device(config_entry, device_entry)
 

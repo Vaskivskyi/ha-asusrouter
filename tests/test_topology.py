@@ -115,6 +115,8 @@ async def test_remove_stale_devices(registry: Mock) -> None:
         Mock(id="left", via_device_id="device", identifiers={(DOMAIN, "x")}),
         # Linked to a device of another integration
         Mock(id="other", via_device_id="other", identifiers={(DOMAIN, "y")}),
+        # A client of the device, which has no identifier of ours
+        Mock(id="client", via_device_id="device", identifiers=set()),
     ]
 
     async_remove_stale_devices(Mock(), _get_entry(), device, [_get_node()])

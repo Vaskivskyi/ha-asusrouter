@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from unittest.mock import Mock
 
 from asusrouter.modules.firmware import ARFirmware
 from asusrouter.modules.port_forwarding import ARPortForwardingProtocol
@@ -11,6 +12,7 @@ import pytest
 
 from custom_components.asusrouter.const import DOMAIN
 from custom_components.asusrouter.helpers import (
+    is_client_device,
     to_identifier,
     to_str,
     to_unique_id,
@@ -91,3 +93,20 @@ def test_to_version(firmware: ARFirmware | None, expected: str | None) -> None:
     """Test that a firmware is converted to its version."""
 
     assert to_version(firmware) == expected
+
+
+@pytest.mark.parametrize(
+    ("identifiers", "expected"),
+    [
+        (set(), True),
+        ({("other", "id")}, True),
+        ({(DOMAIN, "aa:bb:cc:dd:ee:01")}, False),
+        ({("other", "id"), (DOMAIN, "aa:bb:cc:dd:ee:01")}, False),
+    ],
+)
+def test_is_client_device(
+    identifiers: set[tuple[str, str]], expected: bool
+) -> None:
+    """Test that a device without an identifier of ours is a client."""
+
+    assert is_client_device(Mock(identifiers=identifiers)) is expected
