@@ -43,6 +43,7 @@ def test_button(
     """Test that every button keeps its unique_id and runs its service."""
 
     description = DESCRIPTIONS[key]
+    assert description.action_fn is not None
     action = description.action_fn()
 
     assert description.unique_id_name == unique_id_name

@@ -13,6 +13,7 @@ from asusrouter.modules.system_status import (
 )
 from asusrouter.tools.identifiers import MacAddress
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 import pytest
 
@@ -129,6 +130,36 @@ def _get_keyed_entity(
     )
 
     return AREntity(_get_coordinator(data), description, MAC, "a")
+
+
+async def test_device_info_fn() -> None:
+    """Test that a key gets its own device, linked to the device."""
+
+    device_info = DeviceInfo(name="Client")
+    device_info_fn = Mock(return_value=device_info)
+    coordinator = _get_coordinator({MAC: {"a": "item"}})
+    description = _get_description(
+        unique_id_name="",
+        keys_fn=lambda data: data,
+        item_fn=lambda data, key: data.get(key),
+        unique_id_fn=lambda key: f"Test {key}",
+        device_info_fn=device_info_fn,
+    )
+
+    with patch.object(
+        entity_module.dr,
+        "async_get_device_id_by_identifier",
+        return_value="device",
+    ) as get_device_id:
+        entity = AREntity(coordinator, description, MAC, "a")
+
+    get_device_id.assert_called_once_with(
+        coordinator.hass,
+        (DOMAIN, "aa:bb:cc:dd:ee:01"),
+        config_entry_id=coordinator.config_entry.entry_id,
+    )
+    device_info_fn.assert_called_once_with("device", "a", "item")
+    assert entity.device_info is device_info
 
 
 async def test_keyed_init() -> None:

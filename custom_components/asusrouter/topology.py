@@ -11,7 +11,7 @@ from asusrouter.tools.identifiers import MacAddress
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 
-from .helpers import to_identifier
+from .helpers import is_client_device, to_identifier
 from .ownership import get_device_info, get_owned_devices
 
 if TYPE_CHECKING:
@@ -69,8 +69,10 @@ def async_remove_stale_devices(
     for node_device in dr.async_entries_for_config_entry(
         registry, config_entry.entry_id
     ):
+        # A client device of the router has no identifier of ours
         if (
             node_device.via_device_id == device.id
+            and not is_client_device(node_device)
             and node_device.identifiers.isdisjoint(identifiers)
         ):
             registry.async_remove_device(node_device.id)

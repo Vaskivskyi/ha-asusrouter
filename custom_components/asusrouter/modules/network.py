@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from asusrouter.modules.common.device import AROperationMode
 from asusrouter.modules.network import (
     ARNetworkAction,
     ARNetworkBackend,
@@ -85,7 +84,7 @@ def _get_label(key: tuple[Any, ...]) -> str:
 def _is_served(bridge: ARBridge) -> bool:
     """Check whether the device serves its own networks."""
 
-    return bridge.identity.operation_mode is not AROperationMode.AIMESH_NODE
+    return not bridge.is_node
 
 
 def _get_name(network: _Network) -> str | None:

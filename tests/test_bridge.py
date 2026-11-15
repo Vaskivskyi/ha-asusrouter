@@ -238,6 +238,25 @@ async def test_is_router(mode: AROperationMode, expected: bool) -> None:
 
 
 @pytest.mark.parametrize(
+    ("mode", "expected"),
+    [
+        (AROperationMode.AIMESH_NODE, True),
+        (AROperationMode.ACCESS_POINT, False),
+        (AROperationMode.ROUTER, False),
+    ],
+)
+async def test_is_node(mode: AROperationMode, expected: bool) -> None:
+    """Test that only a device in AiMesh node mode works as a node."""
+
+    identity = _get_identity()
+    identity._operation_mode = mode
+
+    bridge = await _get_bridge(identity)
+
+    assert bridge.is_node is expected
+
+
+@pytest.mark.parametrize(
     ("mode", "support", "expected"),
     [
         (AROperationMode.ROUTER, True, True),

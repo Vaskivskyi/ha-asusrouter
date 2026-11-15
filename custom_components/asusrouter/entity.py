@@ -15,13 +15,14 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.components.button import ButtonEntityDescription
+from homeassistant.components.device_tracker import ScannerEntityDescription
 from homeassistant.components.light import LightEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
-from homeassistant.core import CALLBACK_TYPE, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import (
@@ -75,6 +76,9 @@ class AREntityDescription(EntityDescription):
     # Removes the entity of a key the device stops reporting, otherwise it
     # stays unavailable
     remove_missing: bool = False
+    # Builds the device of a key linked to the device id, from the key and
+    # its data, the device itself when None
+    device_info_fn: Callable[[str, Any, Any], DeviceInfo] | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -98,8 +102,10 @@ class ARButtonDescription(AREntityDescription, ButtonEntityDescription):
 
     # A button has no state, its source only follows the device
     value_fn: Callable[[Any], Any] = lambda _: None
-    # Builds the action the button runs
-    action_fn: Callable[[], ARAction]
+    # Builds the action the button runs on the device
+    action_fn: Callable[[], ARAction] | None = None
+    # Runs in Home Assistant instead of an action on the device
+    press_fn: Callable[[HomeAssistant, ARConfigEntry], None] | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -127,6 +133,16 @@ class ARSensorDescription(AREntityDescription, SensorEntityDescription):
 @dataclass(frozen=True, kw_only=True)
 class ARSwitchDescription(ARToggleDescription, SwitchEntityDescription):
     """AsusRouter switch description."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class ARTrackerDescription(AREntityDescription, ScannerEntityDescription):
+    """AsusRouter device tracker description."""
+
+    # Reads the IP address of the tracked device
+    ip_fn: Callable[[Any], str | None]
+    # Reads the hostname of the tracked device
+    hostname_fn: Callable[[Any], str | None]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -212,6 +228,15 @@ class AREntity(CoordinatorEntity[ARCoordinator[Any]]):
         device_mac = format_mac(str(mac))
         self._attr_unique_id = to_unique_id(f"{device_mac}_{unique_id_name}")
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device_mac)})
+        if (device_info_fn := description.device_info_fn) is not None:
+            via_device_id = dr.async_get_device_id_by_identifier(
+                coordinator.hass,
+                (DOMAIN, device_mac),
+                config_entry_id=coordinator.config_entry.entry_id,
+            )
+            self._attr_device_info = device_info_fn(
+                via_device_id, key, self._device_data
+            )
 
         self._placeholders = dict(description.translation_placeholders or {})
         if (placeholders_fn := description.placeholders_fn) is not None:

@@ -194,6 +194,9 @@
       }
     },
     "button": {
+      "clean_up_clients": {
+        "name": "Clean up clients"
+      },
       "reboot": {
         "name": "Reboot"
       },
@@ -289,6 +292,9 @@
       },
       "boot_time": {
         "name": "Boot time"
+      },
+      "connected_devices": {
+        "name": "Connected devices"
       },
       "cpu": {
         "name": "CPU"
@@ -717,6 +723,9 @@
     },
     "action_not_applied": {
       "message": "{entity} did not apply the action"
+    },
+    "clients_unread": {
+      "message": "Cannot clean up clients before they are read"
     }
   }
 }

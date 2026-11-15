@@ -8,7 +8,7 @@ from typing import Any
 
 from asusrouter.modules.firmware import ARFirmware
 from asusrouter.tools.identifiers import MacAddress
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.helpers.device_registry import DeviceEntry, format_mac
 
 from .const import DOMAIN
 
@@ -57,3 +57,9 @@ def to_version(firmware: ARFirmware | None) -> str | None:
     return (
         None if firmware is None or firmware.major is None else str(firmware)
     )
+
+
+def is_client_device(device: DeviceEntry) -> bool:
+    """Check whether the device is a client, not a device of ours."""
+
+    return all(domain != DOMAIN for domain, *_ in device.identifiers)

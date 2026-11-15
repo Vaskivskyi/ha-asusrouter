@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
@@ -37,7 +38,8 @@ async def test_setup_entry() -> None:
 async def test_press() -> None:
     """Test that pressing runs the action without reading anything back."""
 
-    entity = ARButton(Mock(), BUTTONS[0], MAC)
+    description = next(button for button in BUTTONS if button.action_fn)
+    entity = ARButton(Mock(), description, MAC)
 
     with patch.object(ARButton, "_async_run_action", AsyncMock()) as run:
         await entity.async_press()
@@ -45,6 +47,34 @@ async def test_press() -> None:
     run.assert_awaited_once()
     assert run.await_args is not None
     assert run.await_args.kwargs == {"refresh": False}
+
+
+async def test_press_fn() -> None:
+    """Test that a button of Home Assistant runs there, not on the device."""
+
+    press_fn = Mock()
+    description = replace(BUTTONS[0], action_fn=None, press_fn=press_fn)
+    coordinator = Mock()
+    entity = ARButton(coordinator, description, MAC)
+    entity.hass = Mock()
+
+    with patch.object(ARButton, "_async_run_action", AsyncMock()) as run:
+        await entity.async_press()
+
+    press_fn.assert_called_once_with(entity.hass, coordinator.config_entry)
+    run.assert_not_awaited()
+
+
+async def test_press_nothing() -> None:
+    """Test that a button with neither runs nothing."""
+
+    description = replace(BUTTONS[0], action_fn=None, press_fn=None)
+    entity = ARButton(Mock(), description, MAC)
+
+    with patch.object(ARButton, "_async_run_action", AsyncMock()) as run:
+        await entity.async_press()
+
+    run.assert_not_awaited()
 
 
 async def test_no_value() -> None:

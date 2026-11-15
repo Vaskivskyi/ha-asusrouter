@@ -33,10 +33,12 @@ from custom_components.asusrouter import (
     async_setup_entry,
     async_unload_entry,
 )
+from custom_components.asusrouter.const import DOMAIN
 from custom_components.asusrouter.coordinator import ARTopologyCoordinator
 from custom_components.asusrouter.modules import (
     DESCRIPTIONS,
     aimesh,
+    clients,
     ddns,
     network,
     parental_control,
@@ -150,6 +152,7 @@ def _get_bridge(
         serves_mesh=serves_mesh,
         # A node is not a router
         is_router=serves_mesh,
+        is_node=not serves_mesh,
     )
     # A device not serving the mesh is a node, which is not a router
     bridge.identity.operation_mode = (
@@ -209,6 +212,9 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
         *aimesh.BINARY_SENSORS,
         *aimesh.SENSORS,
         *aimesh.UPDATES,
+        *clients.BUTTONS,
+        *clients.SENSORS,
+        *clients.TRACKERS,
         *ddns.BINARY_SENSORS,
         *network.BINARY_SENSORS,
         *network.SWITCHES,
@@ -450,21 +456,44 @@ async def test_unload_entry_platforms_failed() -> None:
     bridge.async_close.assert_not_awaited()
 
 
-async def test_remove_config_entry_device() -> None:
-    """Test that only a node that left the AiMesh can be removed."""
+@pytest.mark.parametrize(
+    ("identifiers", "checked"),
+    [
+        ({(DOMAIN, "aa:bb:cc:dd:ee:02")}, "can_remove_device"),
+        # A client device has no identifier of ours
+        ({("other", "id")}, "can_remove_client"),
+        (set(), "can_remove_client"),
+    ],
+)
+async def test_remove_config_entry_device(
+    identifiers: set[tuple[str, str]], checked: str
+) -> None:
+    """Test that a node or a client device is checked by its own rule."""
 
     entry = _get_entry()
-    device = Mock()
+    device = Mock(identifiers=identifiers)
 
-    with patch(
-        "custom_components.asusrouter.can_remove_device",
-        Mock(return_value=True),
-    ) as can_remove:
+    with (
+        patch(
+            "custom_components.asusrouter.can_remove_device",
+            Mock(return_value=True),
+        ) as can_remove_device,
+        patch(
+            "custom_components.asusrouter.can_remove_client",
+            Mock(return_value=True),
+        ) as can_remove_client,
+    ):
         assert await async_remove_config_entry_device(
             _get_hass(), entry, device
         )
 
-    can_remove.assert_called_once_with(entry, device)
+    can_remove = {
+        "can_remove_device": can_remove_device,
+        "can_remove_client": can_remove_client,
+    }
+    can_remove.pop(checked).assert_called_once_with(entry, device)
+    for other in can_remove.values():
+        other.assert_not_called()
 
 
 async def test_remove_entry() -> None:
