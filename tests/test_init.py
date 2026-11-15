@@ -39,6 +39,7 @@ from custom_components.asusrouter.modules import (
     aimesh,
     ddns,
     network,
+    parental_control,
     port_forwarding,
 )
 
@@ -209,6 +210,7 @@ async def test_setup_entry_aimesh_node(setup_coordinators: AsyncMock) -> None:
         *ddns.BINARY_SENSORS,
         *network.BINARY_SENSORS,
         *network.SWITCHES,
+        *parental_control.SWITCHES,
         *port_forwarding.SWITCHES,
     ]
     setup_coordinators.assert_awaited_once_with(

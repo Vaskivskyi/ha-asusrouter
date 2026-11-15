@@ -436,6 +436,9 @@
       }
     },
     "switch": {
+      "block_internet": {
+        "name": "Block Internet"
+      },
       "network": {
         "name": "Network",
         "state_attributes": {
@@ -474,6 +477,9 @@
             "name": "WiFi 7"
           }
         }
+      },
+      "parental_control": {
+        "name": "Parental control"
       },
       "port_forwarding": {
         "name": "Port forwarding",

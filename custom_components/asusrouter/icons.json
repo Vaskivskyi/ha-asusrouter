@@ -144,10 +144,22 @@
       }
     },
     "switch": {
+      "block_internet": {
+        "default": "mdi:lock-open-variant-outline",
+        "state": {
+          "on": "mdi:lock-outline"
+        }
+      },
       "network": {
         "default": "mdi:access-point-network-off",
         "state": {
           "on": "mdi:access-point-network"
+        }
+      },
+      "parental_control": {
+        "default": "mdi:magnify",
+        "state": {
+          "on": "mdi:magnify-expand"
         }
       },
       "port_forwarding": {
