@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -16,7 +15,7 @@ from asusrouter.modules.network import (
     ARNetworkSourceUniversal,
     ARNetworkType,
 )
-from asusrouter.modules.wifi import ARWiFiBand, ARWiFiMacFilterMode
+from asusrouter.modules.wifi import ARWiFiMacFilterMode
 from homeassistant.const import EntityCategory
 
 from ..entity import ARBinarySensorDescription, ARSwitchDescription
@@ -27,11 +26,8 @@ if TYPE_CHECKING:
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
-# Indexes of SDN networks, above the firmware default of 19 rules
-_SDN_INDEXES = range(1, 33)
-# A wireless unit per band and the guest slots of each unit
-_LEGACY_UNITS = range(len(ARWiFiBand) - 1)
-_LEGACY_SLOTS = range(1, 8)
+_SDN = "sdn"
+_LEGACY = "legacy"
 
 
 class _Network(NamedTuple):
@@ -41,21 +37,49 @@ class _Network(NamedTuple):
     profile: dict[ARNetworkField, Any]
 
 
-def _find(
-    data: Any, match: Callable[[ARNetworkHandle], bool]
-) -> _Network | None:
-    """Find the network whose handle matches, None when not reported."""
+def _get_key(handle: ARNetworkHandle) -> tuple[Any, ...] | None:
+    """Get the key of a network by its handle, None without a switch."""
 
-    if not isinstance(data, dict):
-        return None
-
-    for network_type, profiles in data.items():
-        for profile in profiles:
-            handle = profile.get(ARNetworkField.HANDLE)
-            if isinstance(handle, ARNetworkHandle) and match(handle):
-                return _Network(network_type, profile)
+    if handle.backend is ARNetworkBackend.SDN and handle.sdn_idx is not None:
+        return (_SDN, handle.sdn_idx)
+    # A legacy network is keyed by the first unit of its bands, its main
+    # network has no slot and is switched by its radio
+    if handle.backend is ARNetworkBackend.LEGACY and handle.units:
+        unit, slot = handle.units[0]
+        if slot is not None:
+            return (_LEGACY, unit, slot)
 
     return None
+
+
+def _get_networks(data: Any) -> dict[tuple[Any, ...], _Network]:
+    """Get the networks with a switch by their key."""
+
+    networks: dict[tuple[Any, ...], _Network] = {}
+    if not isinstance(data, dict):
+        return networks
+
+    for network_type, profiles in data.items():
+        # Turning the backhaul off breaks the AiMesh
+        if network_type is ARNetworkType.MAINBH:
+            continue
+        for profile in profiles:
+            handle = profile.get(ARNetworkField.HANDLE)
+            if isinstance(handle, ARNetworkHandle) and (
+                key := _get_key(handle)
+            ):
+                networks[key] = _Network(network_type, profile)
+
+    return networks
+
+
+def _get_label(key: tuple[Any, ...]) -> str:
+    """Get the label of a network key."""
+
+    if key[0] == _SDN:
+        return f"SDN {key[1]}"
+
+    return f"{key[1]}.{key[2]}"
 
 
 def _is_served(bridge: ARBridge) -> bool:
@@ -116,65 +140,6 @@ def _get_action(state: bool, network: _Network) -> ARNetworkAction:
     return ARNetworkAction(network.profile[ARNetworkField.HANDLE], state)
 
 
-def _get_switch(
-    key: str,
-    unique_id_name: str,
-    default_name: str,
-    match: Callable[[ARNetworkHandle], bool],
-) -> ARSwitchDescription:
-    """Get the description of the switch of a network."""
-
-    return ARSwitchDescription(
-        key=key,
-        translation_key="network",
-        # The handle names the network until its SSID is read
-        translation_placeholders={"name": default_name},
-        source=ARNetworkSourceUniversal,
-        update_interval=UPDATE_INTERVAL,
-        unique_id_name=unique_id_name,
-        # The device reports its networks, not keyed by its MAC
-        data_fn=lambda data: _find(data, match),
-        value_fn=lambda network: network.profile.get(ARNetworkField.ENABLED),
-        attributes_fn=_get_attributes,
-        name_fn=_get_name,
-        action_fn=_get_action,
-        # Turning the backhaul off breaks the AiMesh
-        exists_fn=lambda network: network.type is not ARNetworkType.MAINBH,
-        supported_fn=_is_served,
-        entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=False,
-    )
-
-
-def _get_sdn_switch(index: int) -> ARSwitchDescription:
-    """Get the description of the switch of an SDN network."""
-
-    return _get_switch(
-        f"network_sdn_{index}",
-        f"Network SDN {index}",
-        f"SDN {index}",
-        lambda handle: (
-            handle.backend is ARNetworkBackend.SDN and handle.sdn_idx == index
-        ),
-    )
-
-
-def _get_legacy_switch(unit: int, slot: int) -> ARSwitchDescription:
-    """Get the description of the switch of a legacy guest network."""
-
-    # A network is keyed by the first unit of its bands
-    return _get_switch(
-        f"network_{unit}_{slot}",
-        f"Network {unit}.{slot}",
-        f"{unit}.{slot}",
-        lambda handle: (
-            handle.backend is ARNetworkBackend.LEGACY
-            and bool(handle.units)
-            and handle.units[0] == (unit, slot)
-        ),
-    )
-
-
 BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
     ARBinarySensorDescription(
         key="backhaul_network",
@@ -193,10 +158,25 @@ BINARY_SENSORS: tuple[ARBinarySensorDescription, ...] = (
 )
 
 SWITCHES: tuple[ARSwitchDescription, ...] = (
-    *(_get_sdn_switch(index) for index in _SDN_INDEXES),
-    *(
-        _get_legacy_switch(unit, slot)
-        for unit in _LEGACY_UNITS
-        for slot in _LEGACY_SLOTS
+    ARSwitchDescription(
+        key="network",
+        translation_key="network",
+        source=ARNetworkSourceUniversal,
+        update_interval=UPDATE_INTERVAL,
+        # The device reports its networks, not keyed by its MAC
+        data_fn=lambda data: data,
+        keys_fn=_get_networks,
+        item_fn=lambda data, key: _get_networks(data).get(key),
+        unique_id_fn=lambda key: f"Network {_get_label(key)}",
+        # The handle names the network until its SSID is read
+        placeholders_fn=lambda key: {"name": _get_label(key)},
+        value_fn=lambda network: network.profile.get(ARNetworkField.ENABLED),
+        attributes_fn=_get_attributes,
+        name_fn=_get_name,
+        action_fn=_get_action,
+        remove_missing=True,
+        supported_fn=_is_served,
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
     ),
 )

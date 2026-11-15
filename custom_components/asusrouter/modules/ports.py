@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import re
 from typing import Any
 
 from asusrouter.modules.ports import (
@@ -21,30 +22,21 @@ from ..helpers import to_value
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
-# Port labels as the device reports them, only the present ones get a sensor
-_ETHERNET_PORTS = (
-    "AI",
-    # A 10G port of the legacy firmware endpoint
-    "SFP",
-    *(f"W{index}" for index in range(4)),
-    *(f"L{index}" for index in range(1, 17)),
-)
-_USB_PORTS = tuple(f"U{index}" for index in range(1, 5))
+# Labels of the USB ports as the device reports them, U1 and up
+_USB_LABEL = re.compile(r"U\d+")
 
 
-def _get_port(
-    data: ARPortsData, name: str
-) -> dict[ARPortProperty, Any] | None:
-    """Get a port by its label."""
+def _get_ports(
+    data: ARPortsData, *, usb: bool
+) -> dict[str, dict[ARPortProperty, Any]]:
+    """Get the Ethernet or the USB ports by their label."""
 
-    return next(
-        (
-            port
-            for port in data.ports
-            if port.get(ARPortProperty.NATIVE_NAME) == name
-        ),
-        None,
-    )
+    ports: dict[str, dict[ARPortProperty, Any]] = {}
+    for port in data.ports:
+        name = port.get(ARPortProperty.NATIVE_NAME)
+        if isinstance(name, str) and bool(_USB_LABEL.fullmatch(name)) is usb:
+            ports[name] = port
+    return ports
 
 
 def _get_rate(
@@ -59,10 +51,8 @@ def _get_rate(
     return rate.value
 
 
-def _get_attributes(data: ARPortsData, name: str) -> dict[str, Any]:
+def _get_attributes(port: dict[ARPortProperty, Any]) -> dict[str, Any]:
     """Get the attributes of a port."""
-
-    port = _get_port(data, name) or {}
 
     return {
         "capabilities": sorted(
@@ -74,24 +64,23 @@ def _get_attributes(data: ARPortsData, name: str) -> dict[str, Any]:
     }
 
 
-def _get_port_sensor(name: str, translation_key: str) -> ARSensorDescription:
-    """Get the description of the sensor of a port."""
+def _get_port_sensor(*, usb: bool) -> ARSensorDescription:
+    """Get the description of the sensors of the Ethernet or USB ports."""
 
     return ARSensorDescription(
-        key=f"port_{name.lower()}",
-        translation_key=translation_key,
-        translation_placeholders={"port": name},
+        key="usb_port" if usb else "port",
+        translation_key="usb_port" if usb else "port",
         source=ARPortsSourceUniversal,
         update_interval=UPDATE_INTERVAL,
-        unique_id_name=f"Port {name}",
         # The router reports the ports of every node it serves
         node_source=lambda _: ARPortsSourceUniversal,
+        keys_fn=lambda data: _get_ports(data, usb=usb),
+        item_fn=lambda data, name: _get_ports(data, usb=usb).get(name),
+        unique_id_fn=lambda name: f"Port {name}",
+        placeholders_fn=lambda name: {"port": name},
         # A port that is down reports 0
-        value_fn=lambda data: _get_rate(
-            _get_port(data, name), ARPortProperty.LINK_RATE
-        ),
-        attributes_fn=lambda data: _get_attributes(data, name),
-        exists_fn=lambda data: _get_port(data, name) is not None,
+        value_fn=lambda port: _get_rate(port, ARPortProperty.LINK_RATE),
+        attributes_fn=_get_attributes,
         device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
@@ -102,6 +91,6 @@ def _get_port_sensor(name: str, translation_key: str) -> ARSensorDescription:
 
 
 SENSORS: tuple[ARSensorDescription, ...] = (
-    *(_get_port_sensor(name, "port") for name in _ETHERNET_PORTS),
-    *(_get_port_sensor(name, "usb_port") for name in _USB_PORTS),
+    _get_port_sensor(usb=False),
+    _get_port_sensor(usb=True),
 )

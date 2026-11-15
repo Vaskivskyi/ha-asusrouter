@@ -41,10 +41,11 @@ class ARLight(ARToggleEntity, LightEntity):
         coordinator: ARCoordinator[Any],
         description: ARLightDescription,
         mac: MacAddress,
+        key: Any = None,
     ) -> None:
         """Initialize the light with the color mode it supports."""
 
-        super().__init__(coordinator, description, mac)
+        super().__init__(coordinator, description, mac, key)
 
         mode = ColorMode.ONOFF if description.rgb_fn is None else ColorMode.RGB
         self._attr_color_mode = mode
