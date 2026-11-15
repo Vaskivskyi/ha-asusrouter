@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from asusrouter.modules.aura import (
     ARAuraAction,
@@ -28,14 +28,26 @@ if TYPE_CHECKING:
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
-# Zones of a device, more than any device is known to report
-_ZONES = range(1, 9)
 # Every scheme showing light, by its effect name
 _EFFECTS = {
     scheme.name.lower(): scheme
     for scheme in ARAuraScheme
     if scheme > ARAuraScheme.OFF
 }
+
+
+class _Zone(NamedTuple):
+    """The Aura state with the zone it is read for."""
+
+    position: int
+    data: dict[ARAuraField, Any]
+
+
+def _get_zones(data: dict[ARAuraField, Any]) -> range:
+    """Get the indexes of the zones the device reports."""
+
+    zones = data.get(ARAuraField.ZONES)
+    return range(zones if isinstance(zones, int) else 0)
 
 
 def _get_aura(data: Any) -> dict[ARAuraField, Any] | None:
@@ -117,54 +129,51 @@ def _get_turn_on(
     )
 
 
-def _get_light(
-    key: str,
-    unique_id_name: str,
-    zone: int | None,
-    *,
-    enabled: bool,
-) -> ARLightDescription:
-    """Get the description of the light of a zone, every zone when None."""
-
-    return ARLightDescription(
-        key=key,
-        translation_key=key if zone is None else "aura_zone",
-        translation_placeholders=(
-            None if zone is None else {"zone": str(zone + 1)}
-        ),
-        source=ARAuraSourceUniversal,
-        update_interval=UPDATE_INTERVAL,
-        unique_id_name=unique_id_name,
-        # The device reports its Aura, not keyed by its MAC
-        data_fn=_get_aura,
-        value_fn=lambda data: data.get(ARAuraField.STATE),
-        # Turning off any zone turns off every zone
-        action_fn=lambda state, _: ARAuraAction(
-            scheme=ARAuraScheme.ON if state else ARAuraScheme.OFF
-        ),
-        effects=tuple(_EFFECTS),
-        effect_fn=_get_effect,
-        rgb_fn=lambda data: _get_rgb(data, zone),
-        brightness_fn=lambda data: _get_brightness(data, zone),
-        turn_on_fn=lambda kwargs, data: _get_turn_on(kwargs, data, zone),
-        exists_fn=(
-            None
-            if zone is None
-            else lambda data: data.get(ARAuraField.ZONES, 0) > zone
-        ),
-        supported_fn=_is_supported,
-        entity_category=EntityCategory.CONFIG,
-        entity_registry_enabled_default=enabled,
-    )
-
+# Shared by the light of every zone and those of a single zone
+_LIGHT: dict[str, Any] = {
+    "source": ARAuraSourceUniversal,
+    "update_interval": UPDATE_INTERVAL,
+    # The device reports its Aura, not keyed by its MAC
+    "data_fn": _get_aura,
+    # Turning off any zone turns off every zone
+    "action_fn": lambda state, _: ARAuraAction(
+        scheme=ARAuraScheme.ON if state else ARAuraScheme.OFF
+    ),
+    "effects": tuple(_EFFECTS),
+    "supported_fn": _is_supported,
+    "entity_category": EntityCategory.CONFIG,
+}
 
 LIGHTS: tuple[ARLightDescription, ...] = (
-    _get_light("aura", "AURA", None, enabled=True),
-    *(
-        _get_light(
-            f"aura_zone_{zone}", f"AURA Zone {zone}", zone - 1, enabled=False
-        )
-        for zone in _ZONES
+    ARLightDescription(
+        key="aura",
+        translation_key="aura",
+        unique_id_name="AURA",
+        value_fn=lambda data: data.get(ARAuraField.STATE),
+        effect_fn=_get_effect,
+        rgb_fn=lambda data: _get_rgb(data, None),
+        brightness_fn=lambda data: _get_brightness(data, None),
+        turn_on_fn=lambda kwargs, data: _get_turn_on(kwargs, data, None),
+        **_LIGHT,
+    ),
+    ARLightDescription(
+        key="aura_zone",
+        translation_key="aura_zone",
+        keys_fn=_get_zones,
+        item_fn=lambda data, index: (
+            _Zone(index, data) if index in _get_zones(data) else None
+        ),
+        unique_id_fn=lambda index: f"AURA Zone {index + 1}",
+        placeholders_fn=lambda index: {"zone": str(index + 1)},
+        value_fn=lambda zone: zone.data.get(ARAuraField.STATE),
+        effect_fn=lambda zone: _get_effect(zone.data),
+        rgb_fn=lambda zone: _get_rgb(zone.data, zone.position),
+        brightness_fn=lambda zone: _get_brightness(zone.data, zone.position),
+        turn_on_fn=lambda kwargs, zone: _get_turn_on(
+            kwargs, zone.data, zone.position
+        ),
+        entity_registry_enabled_default=False,
+        **_LIGHT,
     ),
 )
 

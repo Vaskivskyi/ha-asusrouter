@@ -68,20 +68,42 @@ DATA = ARPortsData(
                 ARPortProperty.ROLE: ARPortType.USB,
             },
         ),
+        # A port the device reports without a label
+        {ARPortProperty.LINK_RATE: ARPortSpeed.MBPS_1000},
     ],
 )
 
 DESCRIPTIONS: dict[str, ARSensorDescription] = {
     description.key: description for description in SENSORS
 }
+ETHERNET = DESCRIPTIONS["port"]
+USB = DESCRIPTIONS["usb_port"]
 
 
 @pytest.mark.parametrize(
-    ("name", "translation_key", "value", "attributes"),
+    ("description", "translation_key", "keys"),
+    [
+        (ETHERNET, "port", {"W0", "L1", "L2"}),
+        (USB, "usb_port", {"U1"}),
+    ],
+)
+def test_keys(
+    description: ARSensorDescription, translation_key: str, keys: set[str]
+) -> None:
+    """Test that every port on the device gets a sensor of its kind."""
+
+    assert description.translation_key == translation_key
+    assert description.keys_fn is not None
+    assert set(description.keys_fn(DATA)) == keys
+    assert description.keys_fn(ARPortsData(info={}, ports=[])) == {}
+
+
+@pytest.mark.parametrize(
+    ("description", "name", "value", "attributes"),
     [
         (
+            ETHERNET,
             "W0",
-            "port",
             2500,
             {
                 "capabilities": ["game", "wan"],
@@ -91,56 +113,55 @@ DESCRIPTIONS: dict[str, ARSensorDescription] = {
         ),
         # A port that is down
         (
+            ETHERNET,
             "L1",
-            "port",
             0,
             {"capabilities": [], "max_rate": 1000, "role": "lan"},
         ),
         # Nothing known about the port
         (
+            ETHERNET,
             "L2",
-            "port",
             None,
             {"capabilities": [], "max_rate": None, "role": None},
         ),
         (
+            USB,
             "U1",
-            "usb_port",
             5000,
             {"capabilities": [], "max_rate": 5000, "role": "usb"},
         ),
     ],
 )
 def test_port(
+    description: ARSensorDescription,
     name: str,
-    translation_key: str,
     value: int | None,
     attributes: dict[str, Any],
 ) -> None:
     """Test that a port reports its link rate and its properties."""
 
-    description = DESCRIPTIONS[f"port_{name.lower()}"]
+    assert description.item_fn is not None
+    assert description.unique_id_fn is not None
+    assert description.placeholders_fn is not None
+    port = description.item_fn(DATA, name)
 
-    assert description.translation_key == translation_key
-    assert description.translation_placeholders == {"port": name}
-    assert description.unique_id_name == f"Port {name}"
+    assert description.placeholders_fn(name) == {"port": name}
+    assert description.unique_id_fn(name) == f"Port {name}"
     assert description.suggested_display_precision == 0
-    assert description.value_fn(DATA) == value
+    assert description.value_fn(port) == value
     assert description.attributes_fn is not None
-    assert description.attributes_fn(DATA) == attributes
-    assert description.exists_fn is not None
-    assert description.exists_fn(DATA) is True
+    assert description.attributes_fn(port) == attributes
 
 
-@pytest.mark.parametrize("name", ["ai", "l3", "sfp", "u2", "w1"])
-def test_port_missing(name: str) -> None:
-    """Test that a port not on the device gets no sensor."""
+@pytest.mark.parametrize(
+    ("description", "name"), [(ETHERNET, "U1"), (USB, "W0"), (ETHERNET, "L3")]
+)
+def test_port_missing(description: ARSensorDescription, name: str) -> None:
+    """Test that a port of the other kind or not on the device is not read."""
 
-    description = DESCRIPTIONS[f"port_{name}"]
-
-    assert description.exists_fn is not None
-    assert description.exists_fn(DATA) is False
-    assert description.value_fn(DATA) is None
+    assert description.item_fn is not None
+    assert description.item_fn(DATA, name) is None
 
 
 @pytest.mark.parametrize("description", SENSORS, ids=lambda d: d.key)
@@ -153,3 +174,5 @@ def test_source(description: ARSensorDescription) -> None:
     # A node with its own entry reports its ports itself
     assert description.covers_mesh is False
     assert description.data_fn is None
+    # A port missing from a read is not removed
+    assert description.remove_missing is False

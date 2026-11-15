@@ -23,7 +23,7 @@ DESCRIPTIONS: dict[str, ARLightDescription] = {
     description.key: description for description in LIGHTS
 }
 AURA = DESCRIPTIONS["aura"]
-ZONE = DESCRIPTIONS["aura_zone_2"]
+ZONE = DESCRIPTIONS["aura_zone"]
 NIGHT_MODE = SWITCHES[0]
 
 RED = Color(255, 0, 0, 128)
@@ -42,20 +42,30 @@ DATA: dict[ARAuraField, Any] = {
 }
 
 
+def _get_zone(data: dict[ARAuraField, Any]) -> Any:
+    """Get the item of the second zone."""
+
+    assert ZONE.item_fn is not None
+    return ZONE.item_fn(data, 1)
+
+
+def test_unique_id() -> None:
+    """Test that every light keeps its unique_id."""
+
+    assert AURA.unique_id_name == "AURA"
+    assert ZONE.unique_id_fn is not None
+    assert ZONE.unique_id_fn(0) == "AURA Zone 1"
+    assert ZONE.unique_id_fn(7) == "AURA Zone 8"
+
+
 @pytest.mark.parametrize(
-    ("key", "unique_id_name", "enabled"),
-    [
-        ("aura", "AURA", True),
-        ("aura_zone_1", "AURA Zone 1", False),
-        ("aura_zone_8", "AURA Zone 8", False),
-    ],
+    ("key", "enabled"), [("aura", True), ("aura_zone", False)]
 )
-def test_description(key: str, unique_id_name: str, enabled: bool) -> None:
-    """Test that every light keeps its unique_id and default."""
+def test_description(key: str, enabled: bool) -> None:
+    """Test that every light keeps its default."""
 
     description = DESCRIPTIONS[key]
 
-    assert description.unique_id_name == unique_id_name
     assert description.source is ARAuraSourceUniversal
     assert description.entity_category is EntityCategory.CONFIG
     assert description.entity_registry_enabled_default is enabled
@@ -75,7 +85,8 @@ def test_zone_translation() -> None:
 
     assert AURA.translation_placeholders is None
     assert ZONE.translation_key == "aura_zone"
-    assert ZONE.translation_placeholders == {"zone": "2"}
+    assert ZONE.placeholders_fn is not None
+    assert ZONE.placeholders_fn(1) == {"zone": "2"}
 
 
 @pytest.mark.parametrize("support", [True, False])
@@ -102,15 +113,29 @@ def test_data(data: Any, expected: Any) -> None:
 
 
 @pytest.mark.parametrize(
-    ("key", "expected"),
-    [("aura", True), ("aura_zone_2", True), ("aura_zone_3", False)],
+    ("data", "zones"),
+    [
+        (DATA, [0, 1]),
+        ({ARAuraField.STATE: True}, []),
+        ({ARAuraField.ZONES: "2"}, []),
+    ],
 )
-def test_exists(key: str, expected: bool) -> None:
+def test_zones(data: dict[ARAuraField, Any], zones: list[int]) -> None:
     """Test that a zone exists only when the device reports it."""
 
-    exists_fn = DESCRIPTIONS[key].exists_fn
+    assert ZONE.keys_fn is not None
+    assert list(ZONE.keys_fn(data)) == zones
 
-    assert (exists_fn is None or exists_fn(DATA)) is expected
+
+def test_zone_item() -> None:
+    """Test that a zone reads the Aura state for its position."""
+
+    zone = _get_zone(DATA)
+
+    assert zone.position == 1
+    assert zone.data is DATA
+    assert ZONE.item_fn is not None
+    assert ZONE.item_fn(DATA, 2) is None
 
 
 @pytest.mark.parametrize("state", [True, False])
@@ -120,7 +145,7 @@ def test_value(state: bool) -> None:
     data = {**DATA, ARAuraField.STATE: state}
 
     assert AURA.value_fn(data) is state
-    assert ZONE.value_fn(data) is state
+    assert ZONE.value_fn(_get_zone(data)) is state
 
 
 @pytest.mark.parametrize(
@@ -150,8 +175,8 @@ def test_color() -> None:
 
     assert AURA.rgb_fn(DATA) == (0, 128, 0)
     assert AURA.brightness_fn(DATA) == GREEN.brightness
-    assert ZONE.rgb_fn(DATA) == (255, 0, 0)
-    assert ZONE.brightness_fn(DATA) == RED.brightness
+    assert ZONE.rgb_fn(_get_zone(DATA)) == (255, 0, 0)
+    assert ZONE.brightness_fn(_get_zone(DATA)) == RED.brightness
 
 
 @pytest.mark.parametrize(
@@ -165,7 +190,7 @@ def test_color() -> None:
             **DATA,
             ARAuraField.COLORS: {ARAuraScheme.STATIC: [GREEN]},
         },
-        {ARAuraField.STATE: True},
+        {ARAuraField.STATE: True, ARAuraField.ZONES: 2},
     ],
 )
 def test_color_missing(data: dict[ARAuraField, Any]) -> None:
@@ -174,8 +199,8 @@ def test_color_missing(data: dict[ARAuraField, Any]) -> None:
     assert ZONE.rgb_fn is not None
     assert ZONE.brightness_fn is not None
 
-    assert ZONE.rgb_fn(data) is None
-    assert ZONE.brightness_fn(data) is None
+    assert ZONE.rgb_fn(_get_zone(data)) is None
+    assert ZONE.brightness_fn(_get_zone(data)) is None
 
 
 def test_color_missing_aura() -> None:
@@ -195,7 +220,7 @@ def test_color_missing_aura() -> None:
 def test_action(state: bool, scheme: ARAuraScheme) -> None:
     """Test that the Aura is turned on and off by its scheme."""
 
-    action = ZONE.action_fn(state, DATA)
+    action = ZONE.action_fn(state, _get_zone(DATA))
 
     assert isinstance(action, ARAuraAction)
     assert action.scheme is scheme
@@ -233,7 +258,7 @@ def test_turn_on_zone() -> None:
 
     assert ZONE.turn_on_fn is not None
     action = ZONE.turn_on_fn(
-        {"rgb_color": (0, 0, 255), "brightness": BRIGHTNESS}, DATA
+        {"rgb_color": (0, 0, 255), "brightness": BRIGHTNESS}, _get_zone(DATA)
     )
 
     assert isinstance(action, ARAuraAction)

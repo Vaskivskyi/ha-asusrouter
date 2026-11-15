@@ -70,6 +70,27 @@ def _get_light(**kwargs: Any) -> ARLight:
     return ARLight(coordinator, description, MAC)
 
 
+async def test_light_key() -> None:
+    """Test that a light of a key reads the data of its key."""
+
+    description = ARLightDescription(
+        key="test",
+        translation_key="test",
+        source=ARLedSourceUniversal,
+        update_interval=timedelta(seconds=30),
+        value_fn=Mock(),
+        action_fn=Mock(),
+        item_fn=lambda data, key: (key, data),
+        unique_id_fn=lambda key: f"Test {key}",
+    )
+    coordinator = Mock(get_device=Mock(return_value=DEVICE_DATA))
+
+    entity = ARLight(coordinator, description, MAC, 2)
+
+    assert entity.unique_id == "aa:bb:cc:dd:ee:01_test_2"
+    assert entity._device_data == (2, DEVICE_DATA)
+
+
 async def test_light_onoff() -> None:
     """Test that a light without colors or effects is only on or off."""
 
