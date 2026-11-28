@@ -20,7 +20,7 @@ on:
     - cron: "0 0 * * *"
 
 env:
-  DEFAULT_PYTHON_VERSION: 3.13
+  DEFAULT_PYTHON_VERSION: 3.14
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -152,7 +152,7 @@ jobs:
           path: .
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
